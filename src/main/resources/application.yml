@@ -10,9 +10,9 @@ spring:
           multiplier: 2
 
   datasource:
-    url: jdbc:mysql://localhost:3306/spring_social?useSSL=false
-    username: root
-    password: root
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
 
   jpa:
     show-sql: true
