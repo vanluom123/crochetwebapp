@@ -11,25 +11,29 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.BeanIds;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(
+@EnableMethodSecurity(
     securedEnabled = true,
     jsr250Enabled = true,
     prePostEnabled = true
 )
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+public class SecurityConfig {
 
   private final CustomUserDetailsService customUserDetailsService;
 
@@ -39,19 +43,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
   private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
 
-  private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
-
   @Autowired
   public SecurityConfig(CustomUserDetailsService customUserDetailsService,
                         CustomOAuth2UserService customOAuth2UserService,
                         OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler,
-                        OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler,
-                        HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository) {
+                        OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler) {
     this.customUserDetailsService = customUserDetailsService;
     this.customOAuth2UserService = customOAuth2UserService;
     this.oAuth2AuthenticationSuccessHandler = oAuth2AuthenticationSuccessHandler;
     this.oAuth2AuthenticationFailureHandler = oAuth2AuthenticationFailureHandler;
-    this.httpCookieOAuth2AuthorizationRequestRepository = httpCookieOAuth2AuthorizationRequestRepository;
   }
 
   @Bean
@@ -69,11 +69,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     return new HttpCookieOAuth2AuthorizationRequestRepository();
   }
 
-  @Override
-  public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
-    authenticationManagerBuilder
-        .userDetailsService(customUserDetailsService)
-        .passwordEncoder(passwordEncoder());
+  @Bean
+  public AuthenticationProvider authenticationProvider() {
+    DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+    authProvider.setUserDetailsService(customUserDetailsService);
+    authProvider.setPasswordEncoder(passwordEncoder());
+    return authProvider;
   }
 
   @Bean
@@ -81,62 +82,43 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     return new BCryptPasswordEncoder();
   }
 
-
-  @Bean(BeanIds.AUTHENTICATION_MANAGER)
-  @Override
-  public AuthenticationManager authenticationManagerBean() throws Exception {
-    return super.authenticationManagerBean();
-  }
-
-  @Override
-  protected void configure(HttpSecurity http) throws Exception {
-    http
-        .cors()
-        .and()
-        .sessionManagement()
-        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-        .and()
-        .csrf()
-        .disable()
-        .formLogin()
-        .disable()
-        .httpBasic()
-        .disable()
-        .exceptionHandling()
-        .authenticationEntryPoint(new RestAuthenticationEntryPoint())
-        .and()
-        .authorizeRequests()
-        .antMatchers("/",
+  @Bean
+  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    return http
+        .cors(withDefaults())
+        .sessionManagement(sessionManagementCustomizer -> sessionManagementCustomizer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .csrf(AbstractHttpConfigurer::disable)
+        .formLogin(AbstractHttpConfigurer::disable)
+        .httpBasic(AbstractHttpConfigurer::disable)
+        .exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(new RestAuthenticationEntryPoint()))
+        .authorizeHttpRequests(authReq -> authReq.requestMatchers("/",
             "/error",
             "/favicon.ico",
-            "/**/*.png",
-            "/**/*.gif",
-            "/**/*.svg",
-            "/**/*.jpg",
-            "/**/*.html",
-            "/**/*.css",
-            "/**/*.js")
-        .permitAll()
-        .antMatchers("/auth/**", "/oauth2/**")
-        .permitAll()
-        .anyRequest()
-        .authenticated()
-        .and()
-        .oauth2Login()
-        .authorizationEndpoint()
-        .baseUri("/oauth2/authorize")
-        .authorizationRequestRepository(cookieAuthorizationRequestRepository())
-        .and()
-        .redirectionEndpoint()
-        .baseUri("/oauth2/callback/*")
-        .and()
-        .userInfoEndpoint()
-        .userService(customOAuth2UserService)
-        .and()
-        .successHandler(oAuth2AuthenticationSuccessHandler)
-        .failureHandler(oAuth2AuthenticationFailureHandler);
+            "/*.png",
+            "/*.gif",
+            "/*.svg",
+            "/*.jpg",
+            "/*.html",
+            "/*.css",
+            "/*.js").permitAll()
+            .requestMatchers("/auth/**", "/oauth2/**").permitAll()
+            .anyRequest().authenticated())
+        .oauth2Login(oauth -> oauth.authorizationEndpoint(authEndpointCustomizer ->
+            authEndpointCustomizer
+                .baseUri("/oauth2/authorize")
+                .authorizationRequestRepository(cookieAuthorizationRequestRepository()))
+            .redirectionEndpoint(redirectionEndpointCustomizer ->
+                redirectionEndpointCustomizer.baseUri("/oauth2/callback/*"))
+            .userInfoEndpoint(userInfoEndpointCustomizer -> userInfoEndpointCustomizer.userService(customOAuth2UserService))
+            .successHandler(oAuth2AuthenticationSuccessHandler)
+            .failureHandler(oAuth2AuthenticationFailureHandler))
+        .addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+        .authenticationProvider(authenticationProvider())
+        .build();
+  }
 
-    // Add our custom Token based authentication filter
-    http.addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+  @Bean
+  public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+    return config.getAuthenticationManager();
   }
 }
