@@ -6,10 +6,10 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.SignatureException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SecurityException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -35,20 +35,22 @@ public class TokenProvider {
     Date now = new Date();
     Date expiryDate = new Date(now.getTime() + appProperties.getAuth().getTokenExpirationMs());
 
-    byte[] keyBytes = Decoders.BASE64.decode(appProperties.getAuth().getTokenSecret());
-    Key key = Keys.hmacShaKeyFor(keyBytes);
-
     return Jwts.builder()
         .setSubject(Long.toString(userPrincipal.getId()))
         .setIssuedAt(new Date())
         .setExpiration(expiryDate)
-        .signWith(key, SignatureAlgorithm.HS512)
+        .signWith(getKey(), SignatureAlgorithm.HS512)
         .compact();
+  }
+
+  private Key getKey() {
+    byte[] keyBytes = Decoders.BASE64.decode(appProperties.getAuth().getTokenSecret());
+    return Keys.hmacShaKeyFor(keyBytes);
   }
 
   public Long getUserIdFromToken(String token) {
     Claims claims = Jwts.parserBuilder()
-        .setSigningKey(appProperties.getAuth().getTokenSecret())
+        .setSigningKey(getKey())
         .build()
         .parseClaimsJws(token)
         .getBody();
@@ -59,11 +61,11 @@ public class TokenProvider {
   public boolean validateToken(String authToken) {
     try {
       Jwts.parserBuilder()
-          .setSigningKey(appProperties.getAuth().getTokenSecret())
+          .setSigningKey(getKey())
           .build()
           .parseClaimsJws(authToken);
       return true;
-    } catch (SignatureException ex) {
+    } catch (SecurityException ex) {
       logger.error("Invalid JWT signature");
     } catch (MalformedJwtException ex) {
       logger.error("Invalid JWT token");
