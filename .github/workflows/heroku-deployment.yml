@@ -1,13 +1,18 @@
-name: Deployment
+name: Heroku Deploy
 
 on:
+  push:
+    branches:
+      - 'master'
   workflow_dispatch:
 
 jobs:
-  deployment:
+  deploy:
+    name: Deploy to Heroku
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v3
       - name: Deploy to heroku
         uses: akhileshns/heroku-deploy@v3.12.14
         with:
