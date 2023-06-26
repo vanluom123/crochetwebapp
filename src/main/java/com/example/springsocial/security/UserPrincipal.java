@@ -25,10 +25,17 @@ public class UserPrincipal implements OAuth2User, UserDetails {
     this.authorities = authorities;
   }
 
+  /**
+   * Creates a UserPrincipal object from the provided User object.
+   *
+   * @param user The User object to create the UserPrincipal from.
+   * @return The created UserPrincipal object.
+   */
   public static UserPrincipal create(User user) {
-    List<GrantedAuthority> authorities = Collections.
-        singletonList(new SimpleGrantedAuthority("ROLE_USER"));
+    // Create a list of GrantedAuthority with a single authority ROLE_USER
+    List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
 
+    // Create and return a new UserPrincipal object with the provided user's details and authorities
     return new UserPrincipal(
         user.getId(),
         user.getEmail(),
@@ -36,6 +43,7 @@ public class UserPrincipal implements OAuth2User, UserDetails {
         authorities
     );
   }
+
 
   public static UserPrincipal create(User user, Map<String, Object> attributes) {
     UserPrincipal userPrincipal = UserPrincipal.create(user);
