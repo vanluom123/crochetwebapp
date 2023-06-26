@@ -1,5 +1,6 @@
 package com.example.springsocial.security;
 
+import jakarta.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,9 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
   private static final Logger logger = LoggerFactory.getLogger(TokenAuthenticationFilter.class);
 
   @Override
-  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+  protected void doFilterInternal(@NotNull HttpServletRequest request,
+                                  @NotNull HttpServletResponse response,
+                                  @NotNull FilterChain filterChain) throws ServletException, IOException {
     try {
       String jwt = getJwtFromRequest(request);
 
