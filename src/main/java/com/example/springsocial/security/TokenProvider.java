@@ -29,11 +29,21 @@ public class TokenProvider {
     this.appProperties = appProperties;
   }
 
-  public String createToken(Authentication authentication) {
-    UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+  public String createToken(Authentication auth) {
+    return createToken(auth, false);
+  }
+
+  public String createRefreshToken(Authentication auth) {
+    return createToken(auth, true);
+  }
+
+  private String createToken(Authentication auth, boolean isRefreshed) {
+    UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
 
     Date now = new Date();
-    Date expiryDate = new Date(now.getTime() + appProperties.getAuth().getTokenExpirationMs());
+
+    long tokenExpirationMs = isRefreshed ? appProperties.getAuth().getRefreshTokenExpirationMs() : appProperties.getAuth().getTokenExpirationMs();
+    Date expiryDate = new Date(now.getTime() + tokenExpirationMs);
 
     return Jwts.builder()
         .setSubject(Long.toString(userPrincipal.getId()))
