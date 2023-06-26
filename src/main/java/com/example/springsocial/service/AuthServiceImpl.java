@@ -43,24 +43,40 @@ public class AuthServiceImpl implements AuthService {
     this.tokenProvider = tokenProvider;
   }
 
+  /**
+   * Authenticates a user based on the provided login credentials.
+   *
+   * @param loginRequest The login request containing the user's email and password.
+   * @return An AuthResponse containing the authentication token.
+   */
   @Override
   public AuthResponse authenticateUser(LoginRequest loginRequest) {
-    Authentication authentication = authenticationManager.authenticate(
-        new UsernamePasswordAuthenticationToken(
-            loginRequest.getEmail(),
-            loginRequest.getPassword()
-        )
-    );
+    // Create an authentication token with the provided email and password
+    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword());
+    // Authenticate the token using the authentication manager
+    Authentication authentication = authenticationManager.authenticate(authToken);
 
+    // Set the authenticated authentication object in the security context
     SecurityContextHolder.getContext().setAuthentication(authentication);
 
+    // Create a token for the authenticated user
     String token = tokenProvider.createToken(authentication);
+
+    // Return the authentication token in an AuthResponse
     return new AuthResponse(token);
   }
 
+  /**
+   * Registers a new user based on the provided sign-up request.
+   *
+   * @param signUpRequest The sign-up request containing user information.
+   * @return The response indicating the success of user registration.
+   * @throws BadRequestException If the email address is already in use.
+   */
   @Override
   @Transactional
   public RegisterResponse registerUser(SignUpRequest signUpRequest) {
+    // Check if the email address is already in use
     if (userRepository.existsByEmail(signUpRequest.getEmail())) {
       throw new BadRequestException("Email address already in use.");
     }
@@ -72,14 +88,20 @@ public class AuthServiceImpl implements AuthService {
         .setPassword(passwordEncoder.encode(signUpRequest.getPassword()))
         .setProvider(AuthProvider.local);
 
+    // Save the user to the repository
     user = userRepository.save(user);
 
+    // Build the URI for the newly registered user
     URI location = ServletUriComponentsBuilder
-        .fromCurrentContextPath().path("/user/me")
-        .buildAndExpand(user.getId()).toUri();
+        .fromCurrentContextPath()
+        .path("/user/me")
+        .buildAndExpand(user.getId())
+        .toUri();
 
+    // Create the RegisterResponse with the location and a success API response
     return new RegisterResponse()
         .setLocation(location)
         .setApiResponse(new ApiResponse(true, "User registered successfully@"));
   }
+
 }
