@@ -13,6 +13,7 @@ public class AppProperties {
   public static class Auth {
     private String tokenSecret;
     private long tokenExpirationMs;
+    private long refreshTokenExpirationMs;
 
     public String getTokenSecret() {
       return tokenSecret;
@@ -28,6 +29,14 @@ public class AppProperties {
 
     public void setTokenExpirationMs(long tokenExpirationMs) {
       this.tokenExpirationMs = tokenExpirationMs;
+    }
+
+    public long getRefreshTokenExpirationMs() {
+      return refreshTokenExpirationMs;
+    }
+
+    public void setRefreshTokenExpirationMs(long refreshTokenExpirationMs) {
+      this.refreshTokenExpirationMs = refreshTokenExpirationMs;
     }
   }
 
