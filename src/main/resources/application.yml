@@ -1,14 +1,4 @@
 spring:
-  rabbitmq:
-    listener:
-      simple:
-        retry:
-          enabled: true
-          initial-interval: 3s
-          max-attempts: 5
-          max-interval: 10s
-          multiplier: 2
-
   datasource:
     url: ${DATABASE_URL}
     username: ${DATABASE_USERNAME}
@@ -69,22 +59,3 @@ app:
       - http://localhost:3000/oauth2/redirect
       - myandroidapp://oauth2/redirect
       - myiosapp://oauth2/redirect
-
-littlecrochet:
-  rabbitmq:
-    connection:
-      channel-checkout-timeout: 5000
-      connection-timeout: 10000
-    dead-letter:
-      dead-letter-exchange: deadLetterExchange
-      dead-letter-queue: deadLetterQueue
-      dead-letter-routingKey: deadLetter
-      dead-letter-exchange-header: x-dead-letter-exchange
-      dead-letter-routingKey-header: x-dead-letter-routing-key
-    exchange: littlecrochet-direct-exchange
-    queue: littlecrochet.queue
-    routingkey: littlecrochet
-    uri: ${CLOUDAMQP_URL}
-    username: ${CLOUDAMQP_USERNAME}
-    password: ${CLOUDAMQP_PASSWORD}
-    virtual-host: /
