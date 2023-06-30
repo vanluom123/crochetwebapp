@@ -26,6 +26,7 @@ dependencies {
     implementation 'org.springframework.security:spring-security-oauth2-client:6.1.0'
     implementation 'mysql:mysql-connector-java:8.0.33'
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    implementation 'org.liquibase:liquibase-core:4.23.0'
     compileOnly 'org.projectlombok:lombok:1.18.28'
     annotationProcessor 'org.projectlombok:lombok:1.18.28'
     implementation 'org.springframework.boot:spring-boot-starter-amqp:3.1.0'
@@ -38,4 +39,8 @@ dependencies {
 
     testCompileOnly 'org.projectlombok:lombok:1.18.28'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.28'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
 }
