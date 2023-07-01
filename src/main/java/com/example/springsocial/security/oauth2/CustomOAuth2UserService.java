@@ -5,8 +5,6 @@ import com.example.springsocial.model.AuthProvider;
 import com.example.springsocial.model.User;
 import com.example.springsocial.repository.UserRepository;
 import com.example.springsocial.security.UserPrincipal;
-import com.example.springsocial.security.oauth2.user.AbstractOAuth2User;
-import com.example.springsocial.security.oauth2.user.OAuth2UserFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
@@ -43,44 +41,115 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     }
   }
 
+  /**
+   * Processes the OAuth2 user, either by updating an existing user or registering a new user.
+   *
+   * @param oAuth2UserRequest the OAuth2 user request
+   * @param oAuth2User        the OAuth2 user
+   * @return the authenticated user
+   */
   private OAuth2User processOAuth2User(OAuth2UserRequest oAuth2UserRequest, OAuth2User oAuth2User) {
-    AbstractOAuth2User abstractOAuth2User = OAuth2UserFactory.getOAuth2UserInfo(oAuth2UserRequest.getClientRegistration().getRegistrationId(), oAuth2User.getAttributes());
-    if (!StringUtils.hasLength(abstractOAuth2User.getEmail())) {
-      throw new OAuth2AuthenticationProcessingException("Email not found from OAuth2 provider");
-    }
+    // Extract email from OAuth2 user
+    String email = getEmailFromOAuth2User(oAuth2User);
 
-    Optional<User> userOptional = userRepository.findByEmail(abstractOAuth2User.getEmail());
-    User user;
-    if (userOptional.isPresent()) {
-      user = userOptional.get();
-      if (!user.getProvider().equals(AuthProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId()))) {
-        throw new OAuth2AuthenticationProcessingException("Looks like you're signed up with " +
-            user.getProvider() + " account. Please use your " + user.getProvider() +
-            " account to login.");
-      }
-      user = updateExistingUser(user, abstractOAuth2User);
-    } else {
-      user = registerNewUser(oAuth2UserRequest, abstractOAuth2User);
-    }
+    // Check if user exists in the repository
+    Optional<User> userOptional = getUserByEmail(email);
 
+    // If user exists, update the user; otherwise, register a new user
+    User user = userOptional.map(existingUser -> updateUser(existingUser, oAuth2User))
+        .orElseGet(() -> registerNewUser(oAuth2UserRequest, oAuth2User));
+
+    // Validate the user's provider
+    validateUserProvider(oAuth2UserRequest, user);
+
+    // Create and return the user principal
     return UserPrincipal.create(user, oAuth2User.getAttributes());
   }
 
-  private User registerNewUser(OAuth2UserRequest oAuth2UserRequest, AbstractOAuth2User abstractOAuth2User) {
-    User user = new User();
+  /**
+   * Extracts the email from the OAuth2 user.
+   *
+   * @param oAuth2User the OAuth2 user
+   * @return the email address
+   * @throws OAuth2AuthenticationProcessingException if email is not found from OAuth2 provider
+   */
+  private String getEmailFromOAuth2User(OAuth2User oAuth2User) {
+    String email = oAuth2User.getAttribute("email");
+    if (!StringUtils.hasLength(email)) {
+      throw new OAuth2AuthenticationProcessingException("Email not found from OAuth2 provider");
+    }
+    return email;
+  }
 
+  /**
+   * Retrieves a user from the repository based on the email address.
+   *
+   * @param email the email address
+   * @return an optional user
+   */
+  private Optional<User> getUserByEmail(String email) {
+    return userRepository.findByEmail(email);
+  }
+
+  /**
+   * Validates the user's provider against the OAuth2 user request.
+   *
+   * @param oAuth2UserRequest the OAuth2 user request
+   * @param user              the user to validate
+   * @throws OAuth2AuthenticationProcessingException if the user's provider does not match the OAuth2 client registration
+   */
+  private void validateUserProvider(OAuth2UserRequest oAuth2UserRequest, User user) {
+    AuthProvider provider = AuthProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId());
+    if (!user.getProvider().equals(provider)) {
+      throw new OAuth2AuthenticationProcessingException("Looks like you're signed up with " +
+          user.getProvider() + " account. Please use your " + user.getProvider() +
+          " account to login.");
+    }
+  }
+
+  /**
+   * Registers a new user based on the OAuth2 user.
+   *
+   * @param oAuth2UserRequest the OAuth2 user request
+   * @param oAuth2User        the OAuth2 user
+   * @return the registered user
+   */
+  private User registerNewUser(OAuth2UserRequest oAuth2UserRequest, OAuth2User oAuth2User) {
+    String providerId = oAuth2User.getAttribute("id");
+    String name = oAuth2User.getAttribute("name");
+    String email = getEmailFromOAuth2User(oAuth2User);
+    String imageUrl = oAuth2User.getAttribute("imageUrl");
+
+    // Create a new user
+    User user = new User();
     user.setProvider(AuthProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId()));
-    user.setProviderId(abstractOAuth2User.getId());
-    user.setName(abstractOAuth2User.getName());
-    user.setEmail(abstractOAuth2User.getEmail());
-    user.setImageUrl(abstractOAuth2User.getImageUrl());
+    user.setProviderId(providerId);
+    user.setName(name);
+    user.setEmail(email);
+    user.setImageUrl(imageUrl);
+
+    // Save the new user in the repository
     return userRepository.save(user);
   }
 
-  private User updateExistingUser(User existingUser, AbstractOAuth2User abstractOAuth2User) {
-    existingUser.setName(abstractOAuth2User.getName());
-    existingUser.setImageUrl(abstractOAuth2User.getImageUrl());
+  /**
+   * Updates an existing user with the attributes from the OAuth2 user.
+   *
+   * @param existingUser the existing user
+   * @param oAuth2User   the OAuth2 user
+   * @return the updated user
+   */
+  private User updateUser(User existingUser, OAuth2User oAuth2User) {
+    String name = oAuth2User.getAttribute("name");
+    String imageUrl = oAuth2User.getAttribute("imageUrl");
+
+    // Update the existing user's attributes
+    existingUser.setName(name);
+    existingUser.setImageUrl(imageUrl);
+
+    // Save the updated user in the repository
     return userRepository.save(existingUser);
   }
+
 
 }
