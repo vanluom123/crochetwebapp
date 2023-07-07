@@ -13,10 +13,16 @@ public class HikariDataSourceConfig {
 
     private final DatasourceProperties datasourceProps;
 
+    /**
+     * Constructs a new HikariDataSourceConfig object with the provided DatasourceProperties.
+     *
+     * @param datasourceProps The DatasourceProperties object containing the configuration properties.
+     */
     @Autowired
     public HikariDataSourceConfig(DatasourceProperties datasourceProps) {
         this.datasourceProps = datasourceProps;
     }
+
 
     @Bean
     public DataSource dataSource() {
