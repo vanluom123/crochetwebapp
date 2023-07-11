@@ -49,4 +49,5 @@ public class User {
 
   private String providerId;
 
+  private String verificationCode;
 }
