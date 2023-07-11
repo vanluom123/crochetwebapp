@@ -24,15 +24,21 @@ public class FacebookOAuth2User extends AbstractOAuth2User {
 
   @Override
   public String getImageUrl() {
-    if (attributes.containsKey("picture")) {
-      Map<String, Object> pictureObj = (Map<String, Object>) attributes.get("picture");
-      if (pictureObj.containsKey("data")) {
-        Map<String, Object> dataObj = (Map<String, Object>) pictureObj.get("data");
-        if (dataObj.containsKey("url")) {
-          return (String) dataObj.get("url");
-        }
+    Map<String, Object> pictureObj = uncheckedCast(attributes.get("picture"));
+    if (pictureObj != null) {
+      Map<String, Object> dataObj = uncheckedCast(pictureObj.get("data"));
+      if (dataObj != null) {
+        return uncheckedCast(dataObj.get("url"));
       }
     }
     return null;
+  }
+
+  private static <T> T uncheckedCast(Object obj) {
+    try {
+      return (T) obj;
+    } catch (ClassCastException e) {
+      throw new ClassCastException("Cannot cast object to target type");
+    }
   }
 }
