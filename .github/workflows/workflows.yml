@@ -32,6 +32,8 @@ jobs:
           DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          TOKEN_SECRET: ${{ secrets.TOKEN_SECRET }}
+          APP_PASSWORD: ${{ secrets.APP_PASSWORD }}
         run: |
           chmod +x gradlew
           ./gradlew build
