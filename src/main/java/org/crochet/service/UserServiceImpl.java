@@ -1,7 +1,7 @@
 package org.crochet.service;
 
 import org.crochet.exception.BadRequestException;
-import org.crochet.mapper.abstraction.UserMapper;
+import org.crochet.mapper.UserMapper;
 import org.crochet.model.AuthProvider;
 import org.crochet.model.User;
 import org.crochet.repository.UserRepository;
@@ -18,15 +18,12 @@ public class UserServiceImpl implements UserService {
 
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
-  private final UserMapper mapper;
 
   @Autowired
   public UserServiceImpl(UserRepository userRepository,
-                         PasswordEncoder passwordEncoder,
-                         UserMapper mapper) {
+                         PasswordEncoder passwordEncoder) {
     this.userRepository = userRepository;
     this.passwordEncoder = passwordEncoder;
-    this.mapper = mapper;
   }
 
   @Override
@@ -49,7 +46,7 @@ public class UserServiceImpl implements UserService {
     // Save the user to the repository
     user = userRepository.save(user);
 
-    return mapper.toUserResponse(user);
+    return UserMapper.INSTANCE.toUserResponse(user);
   }
 
   @Override
