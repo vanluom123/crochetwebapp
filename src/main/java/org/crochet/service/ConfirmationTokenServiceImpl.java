@@ -1,8 +1,8 @@
 package org.crochet.service;
 
 import org.crochet.exception.ResourceNotFoundException;
-import org.crochet.mapper.abstraction.ConfirmationTokenMapper;
-import org.crochet.mapper.abstraction.UserMapper;
+import org.crochet.mapper.ConfirmationTokenMapper;
+import org.crochet.mapper.UserMapper;
 import org.crochet.model.ConfirmationToken;
 import org.crochet.model.User;
 import org.crochet.repository.ConfirmationTokenRepository;
@@ -20,22 +20,16 @@ import java.util.UUID;
 public class ConfirmationTokenServiceImpl implements ConfirmationTokenService {
 
   private final ConfirmationTokenRepository repository;
-  private final ConfirmationTokenMapper mapper;
-  private final UserMapper userMapper;
 
   @Autowired
-  public ConfirmationTokenServiceImpl(ConfirmationTokenRepository repository,
-                                      ConfirmationTokenMapper mapper,
-                                      UserMapper userMapper) {
+  public ConfirmationTokenServiceImpl(ConfirmationTokenRepository repository) {
     this.repository = repository;
-    this.mapper = mapper;
-    this.userMapper = userMapper;
   }
 
   @Override
   @Transactional
   public ConfirmationTokenResponse createOrUpdate(UserResponse userResponse) {
-    User user = userMapper.toUser(userResponse);
+    User user = UserMapper.INSTANCE.toUser(userResponse);
 
     ConfirmationToken confirmationToken = repository
         .findByUser(user)
@@ -61,14 +55,14 @@ public class ConfirmationTokenServiceImpl implements ConfirmationTokenService {
 
     confirmationToken = repository.save(confirmationToken);
 
-    return mapper.toConfirmationTokenResponse(confirmationToken);
+    return ConfirmationTokenMapper.INSTANCE.toConfirmationTokenResponse(confirmationToken);
   }
 
   @Override
   public ConfirmationTokenResponse getToken(String token) {
     var confirmationToken = repository.findByToken(token)
         .orElseThrow(() -> new ResourceNotFoundException("Token not found"));
-    return mapper.toConfirmationTokenResponse(confirmationToken);
+    return ConfirmationTokenMapper.INSTANCE.toConfirmationTokenResponse(confirmationToken);
   }
 
   @Override
