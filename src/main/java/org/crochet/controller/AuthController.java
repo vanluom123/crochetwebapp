@@ -41,4 +41,10 @@ public class AuthController {
   public ResponseEntity<ApiResponse> confirm(@RequestParam("token") String token) {
     return ResponseEntity.ok(authService.confirmToken(token));
   }
+
+  @PostMapping("/resendEmailVerification")
+  public ResponseEntity<ApiResponse> resendEmailVerification() {
+    ApiResponse response = authService.resendEmailVerification();
+    return ResponseEntity.ok(response);
+  }
 }

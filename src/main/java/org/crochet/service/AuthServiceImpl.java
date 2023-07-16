@@ -1,5 +1,7 @@
 package org.crochet.service;
 
+import org.crochet.exception.EmailVerificationException;
+import org.crochet.exception.TokenException;
 import org.crochet.request.LoginRequest;
 import org.crochet.request.SignUpRequest;
 import org.crochet.response.ApiResponse;
@@ -7,6 +9,7 @@ import org.crochet.response.AuthResponse;
 import org.crochet.response.ConfirmationTokenResponse;
 import org.crochet.response.UserResponse;
 import org.crochet.security.TokenProvider;
+import org.crochet.security.UserPrincipal;
 import org.crochet.service.abstraction.AuthService;
 import org.crochet.service.abstraction.ConfirmationTokenService;
 import org.crochet.service.abstraction.EmailSender;
@@ -25,27 +28,19 @@ import java.time.LocalDateTime;
 @Service
 public class AuthServiceImpl implements AuthService {
   private final AuthenticationManager authenticationManager;
-
   private final TokenProvider tokenProvider;
-
-  private final EmailValidator emailValidator;
-
   private final EmailSender emailSender;
-
   private final ConfirmationTokenService confirmationTokenService;
-
   private final UserService userService;
 
   @Autowired
   public AuthServiceImpl(AuthenticationManager authenticationManager,
                          TokenProvider tokenProvider,
-                         EmailValidator emailValidator,
                          EmailSender emailSender,
                          ConfirmationTokenService confirmationTokenService,
                          UserService userService) {
     this.authenticationManager = authenticationManager;
     this.tokenProvider = tokenProvider;
-    this.emailValidator = emailValidator;
     this.emailSender = emailSender;
     this.confirmationTokenService = confirmationTokenService;
     this.userService = userService;
@@ -78,23 +73,17 @@ public class AuthServiceImpl implements AuthService {
    * Registers a new user based on the provided sign-up request.
    *
    * @param signUpRequest The sign-up request containing user information.
-   * @return The RegisterResponse containing the location and a success API response.
+   * @return A success API response.
    * @throws IllegalStateException If the email is not valid.
    */
   @Override
   @Transactional
   public ApiResponse registerUser(SignUpRequest signUpRequest) {
-    // Validate email
-    boolean isValidEmail = emailValidator.test(signUpRequest.getEmail());
-    if (!isValidEmail) {
-      throw new IllegalStateException("Email not valid");
-    }
-
     // Create or update user
     UserResponse userResponse = userService.createUser(signUpRequest);
 
     // Create or update confirmation token
-    ConfirmationTokenResponse confirmationToken = confirmationTokenService.createOrUpdate(userResponse);
+    ConfirmationTokenResponse confirmationToken = confirmationTokenService.createOrUpdate(userResponse.getEmail());
 
     // Build the base URI
     String baseUri = ServletUriComponentsBuilder.fromCurrentContextPath().toUriString();
@@ -108,26 +97,55 @@ public class AuthServiceImpl implements AuthService {
     return new ApiResponse(true, "User registered successfully");
   }
 
+  /**
+   * Resend link to active
+   *
+   * @return A success API response.
+   */
+  @Override
+  public ApiResponse resendEmailVerification() {
+    var auth = SecurityContextHolder.getContext().getAuthentication();
+    UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
+
+    // Create or update confirmation token
+    ConfirmationTokenResponse confirmationToken = confirmationTokenService.createOrUpdate(userPrincipal.getEmail());
+
+    // Build the base URI
+    String baseUri = ServletUriComponentsBuilder.fromCurrentContextPath().toUriString();
+
+    // Build the confirmation link
+    String link = baseUri + "/auth/confirm?token=" + confirmationToken.getToken();
+
+    // Send confirmation email
+    emailSender.send(userPrincipal.getEmail(), buildEmail(userPrincipal.getName(), link));
+
+    return new ApiResponse(true, "Resend successfully");
+  }
+
   @Transactional
   @Override
   public ApiResponse confirmToken(String token) {
     ConfirmationTokenResponse confirmationToken = confirmationTokenService.getToken(token);
 
-    if (confirmationToken.getConfirmedAt() != null) {
-      throw new IllegalStateException("Email already confirmed");
-    }
-
+    LocalDateTime now = LocalDateTime.now();
     LocalDateTime expiredAt = confirmationToken.getExpiresAt();
+    LocalDateTime confirmedAt = confirmationToken.getConfirmedAt();
 
-    if (expiredAt.isBefore(LocalDateTime.now())) {
-      throw new IllegalStateException("Token expired");
+    if (confirmedAt != null) {
+      throw new EmailVerificationException("Email already confirmed");
     }
 
+    if (expiredAt.isBefore(now)) {
+      throw new TokenException("Token expired");
+    }
+
+    // Update confirmedAt
     confirmationTokenService.updateConfirmedAt(token);
 
+    // Update emailVerified to true
     userService.verifyEmail(confirmationToken.getUserResponse().getEmail());
 
-    return new ApiResponse(true, "Confirmed");
+    return new ApiResponse(true, "Successfully confirmation");
   }
 
   private String buildEmail(String name, String link) {
