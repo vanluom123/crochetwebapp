@@ -1,10 +1,13 @@
 package org.crochet.service.abstraction;
 
+import org.crochet.request.UserRequest;
 import org.crochet.response.ConfirmationTokenResponse;
-import org.crochet.response.UserResponse;
 
 public interface ConfirmationTokenService {
-  ConfirmationTokenResponse createOrUpdate(UserResponse userResponse);
+  ConfirmationTokenResponse createOrUpdate(UserRequest userRequest);
+
+  ConfirmationTokenResponse createOrUpdate(String email);
+
   ConfirmationTokenResponse getToken(String token);
   void updateConfirmedAt(String token);
 }
