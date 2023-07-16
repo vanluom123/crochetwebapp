@@ -13,7 +13,6 @@ public class ApiExceptionHandler {
     ApiError err = ApiError.builder()
         .message(ex.getMessage())
         .statusCode(HttpStatus.BAD_REQUEST)
-        .rootCause(ex.getCause())
         .build();
     return ResponseEntity.ok(err);
   }
@@ -23,7 +22,6 @@ public class ApiExceptionHandler {
     ApiError err = ApiError.builder()
         .message(ex.getMessage())
         .statusCode(HttpStatus.INTERNAL_SERVER_ERROR)
-        .rootCause(ex.getCause())
         .build();
     return ResponseEntity.ok(err);
   }
@@ -33,7 +31,24 @@ public class ApiExceptionHandler {
     ApiError err = ApiError.builder()
         .message(ex.getMessage())
         .statusCode(HttpStatus.NOT_FOUND)
-        .rootCause(ex.getCause())
+        .build();
+    return ResponseEntity.ok(err);
+  }
+
+  @ExceptionHandler({EmailVerificationException.class})
+  public ResponseEntity<ApiError> handleEmailVerificationException(EmailVerificationException ex) {
+    ApiError err = ApiError.builder()
+        .message(ex.getMessage())
+        .statusCode(HttpStatus.INTERNAL_SERVER_ERROR)
+        .build();
+    return ResponseEntity.ok(err);
+  }
+
+  @ExceptionHandler({TokenException.class})
+  public ResponseEntity<ApiError> handleTokenException(TokenException ex) {
+    ApiError err = ApiError.builder()
+        .message(ex.getMessage())
+        .statusCode(HttpStatus.INTERNAL_SERVER_ERROR)
         .build();
     return ResponseEntity.ok(err);
   }
