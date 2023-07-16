@@ -1,6 +1,7 @@
 package org.crochet.mapper;
 
 import org.crochet.model.User;
+import org.crochet.request.UserRequest;
 import org.crochet.response.UserResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -12,8 +13,13 @@ public interface UserMapper {
 
   UserResponse toUserResponse(User user);
 
-  @Mapping(target = "password", ignore = true)
   @Mapping(target = "confirmationTokens", ignore = true)
-  @Mapping(target = "provider", ignore = true)
   User toUser(UserResponse response);
+
+  @Mapping(target = "confirmationTokens", ignore = true)
+  User toUser(UserRequest userRequest);
+
+  UserRequest toUserRequest(User user);
+
+  UserRequest toUserRequest(UserResponse userResponse);
 }
