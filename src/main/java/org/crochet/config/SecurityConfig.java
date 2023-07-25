@@ -99,7 +99,7 @@ public class SecurityConfig {
                 "/*.html",
                 "/*.css",
                 "/*.js").permitAll()
-            .requestMatchers("/auth/login", "/auth/signup", "/oauth2/**").permitAll()
+            .requestMatchers("/auth/**", "/oauth2/**").permitAll()
             .anyRequest().authenticated())
         .oauth2Login(oauth -> oauth.authorizationEndpoint(authEndpointCustomizer ->
                 authEndpointCustomizer
