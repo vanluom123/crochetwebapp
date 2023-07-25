@@ -127,6 +127,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     user.setName(name);
     user.setEmail(email);
     user.setImageUrl(imageUrl);
+    user.setEmailVerified(true);
 
     // Save the new user in the repository
     return userRepository.save(user);
