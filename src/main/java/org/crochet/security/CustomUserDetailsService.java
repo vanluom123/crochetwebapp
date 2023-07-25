@@ -39,6 +39,7 @@ public class CustomUserDetailsService implements UserDetailsService {
   public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
     // Retrieve the user by email from the UserRepository
     User user = userRepository.findByEmail(email)
+        .filter(User::getEmailVerified)
         .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
 
     // Create a UserPrincipal object from the retrieved user
@@ -57,7 +58,8 @@ public class CustomUserDetailsService implements UserDetailsService {
   public UserDetails loadUserById(Long id) {
     // Retrieve the user by ID from the UserRepository
     User user = userRepository.findById(id)
-        .orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
+        .filter(User::getEmailVerified)
+        .orElseThrow(() -> new ResourceNotFoundException(String.format("User with %s not found", id)));
 
     // Create a UserPrincipal object from the retrieved user
     return UserPrincipal.create(user);

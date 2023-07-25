@@ -1,49 +1,55 @@
 package org.crochet.service;
 
+import org.crochet.exception.BadRequestException;
 import org.crochet.exception.EmailVerificationException;
+import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.exception.TokenException;
+import org.crochet.model.AuthProvider;
+import org.crochet.model.ConfirmationToken;
+import org.crochet.model.User;
+import org.crochet.repository.ConfirmationTokenRepository;
+import org.crochet.repository.UserRepository;
 import org.crochet.request.LoginRequest;
 import org.crochet.request.SignUpRequest;
 import org.crochet.response.ApiResponse;
 import org.crochet.response.AuthResponse;
-import org.crochet.response.ConfirmationTokenResponse;
-import org.crochet.response.UserResponse;
 import org.crochet.security.TokenProvider;
-import org.crochet.security.UserPrincipal;
 import org.crochet.service.abstraction.AuthService;
-import org.crochet.service.abstraction.ConfirmationTokenService;
 import org.crochet.service.abstraction.EmailSender;
-import org.crochet.service.abstraction.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 public class AuthServiceImpl implements AuthService {
   private final AuthenticationManager authenticationManager;
   private final TokenProvider tokenProvider;
   private final EmailSender emailSender;
-  private final ConfirmationTokenService confirmationTokenService;
-  private final UserService userService;
+  private final ConfirmationTokenRepository confirmationTokenRepository;
+  private final UserRepository userRepository;
+  private final PasswordEncoder passwordEncoder;
 
   @Autowired
   public AuthServiceImpl(AuthenticationManager authenticationManager,
                          TokenProvider tokenProvider,
                          EmailSender emailSender,
-                         ConfirmationTokenService confirmationTokenService,
-                         UserService userService) {
+                         ConfirmationTokenRepository confirmationTokenRepository,
+                         UserRepository userRepository, PasswordEncoder passwordEncoder) {
     this.authenticationManager = authenticationManager;
     this.tokenProvider = tokenProvider;
     this.emailSender = emailSender;
-    this.confirmationTokenService = confirmationTokenService;
-    this.userService = userService;
+    this.confirmationTokenRepository = confirmationTokenRepository;
+    this.userRepository = userRepository;
+    this.passwordEncoder = passwordEncoder;
   }
 
   /**
@@ -80,10 +86,10 @@ public class AuthServiceImpl implements AuthService {
   @Transactional
   public ApiResponse registerUser(SignUpRequest signUpRequest) {
     // Create or update user
-    UserResponse userResponse = userService.createUser(signUpRequest);
+    User user = createUser(signUpRequest);
 
     // Create or update confirmation token
-    ConfirmationTokenResponse confirmationToken = confirmationTokenService.createOrUpdate(userResponse.getEmail());
+    ConfirmationToken confirmationToken = createOrUpdateToken(user);
 
     // Build the base URI
     String baseUri = ServletUriComponentsBuilder.fromCurrentContextPath().toUriString();
@@ -103,12 +109,12 @@ public class AuthServiceImpl implements AuthService {
    * @return A success API response.
    */
   @Override
-  public ApiResponse resendEmailVerification() {
-    var auth = SecurityContextHolder.getContext().getAuthentication();
-    UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
+  public ApiResponse resendVerificationEmail(String email) {
+    User user = userRepository.findByEmail(email)
+        .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
     // Create or update confirmation token
-    ConfirmationTokenResponse confirmationToken = confirmationTokenService.createOrUpdate(userPrincipal.getEmail());
+    ConfirmationToken confirmationToken = createOrUpdateToken(user);
 
     // Build the base URI
     String baseUri = ServletUriComponentsBuilder.fromCurrentContextPath().toUriString();
@@ -117,7 +123,7 @@ public class AuthServiceImpl implements AuthService {
     String link = baseUri + "/auth/confirm?token=" + confirmationToken.getToken();
 
     // Send confirmation email
-    emailSender.send(userPrincipal.getEmail(), buildEmail(userPrincipal.getName(), link));
+    emailSender.send(email, buildEmail(email, link));
 
     return new ApiResponse(true, "Resend successfully");
   }
@@ -125,7 +131,7 @@ public class AuthServiceImpl implements AuthService {
   @Transactional
   @Override
   public ApiResponse confirmToken(String token) {
-    ConfirmationTokenResponse confirmationToken = confirmationTokenService.getToken(token);
+    var confirmationToken = getToken(token);
 
     LocalDateTime now = LocalDateTime.now();
     LocalDateTime expiredAt = confirmationToken.getExpiresAt();
@@ -140,10 +146,10 @@ public class AuthServiceImpl implements AuthService {
     }
 
     // Update confirmedAt
-    confirmationTokenService.updateConfirmedAt(token);
+    confirmationTokenRepository.updateConfirmedAt(token, LocalDateTime.now());
 
     // Update emailVerified to true
-    userService.verifyEmail(confirmationToken.getUserResponse().getEmail());
+    userRepository.verifyEmail(confirmationToken.getUser().getEmail());
 
     return new ApiResponse(true, "Successfully confirmation");
   }
@@ -217,4 +223,55 @@ public class AuthServiceImpl implements AuthService {
         "</div></div>";
   }
 
+  private ConfirmationToken getToken(String token) {
+    return confirmationTokenRepository.findByToken(token)
+        .orElseThrow(() -> new ResourceNotFoundException("Token not found"));
+  }
+
+  private boolean isEmailPresent(String email) {
+    return userRepository.findByEmail(email).isPresent();
+  }
+
+  private ConfirmationToken createOrUpdateToken(User user) {
+    ConfirmationToken confirmationToken = confirmationTokenRepository
+        .findByUser(user)
+        .orElse(null);
+
+    if (confirmationToken == null) {
+      // Create a new token
+      String token = UUID.randomUUID().toString();
+      LocalDateTime now = LocalDateTime.now();
+      LocalDateTime expirationTime = now.plusMinutes(15);
+
+      confirmationToken = new ConfirmationToken()
+          .setToken(token)
+          .setCreatedAt(now)
+          .setExpiresAt(expirationTime)
+          .setUser(user);
+    } else {
+      // Update the existing token
+      confirmationToken.setToken(UUID.randomUUID().toString())
+          .setCreatedAt(LocalDateTime.now())
+          .setExpiresAt(LocalDateTime.now().plusMinutes(15));
+    }
+
+    return confirmationTokenRepository.save(confirmationToken);
+  }
+
+  private User createUser(SignUpRequest signUpRequest) {
+    // Check if the email address is already in use
+    if (isEmailPresent(signUpRequest.getEmail())) {
+      throw new BadRequestException("Email address already in use");
+    }
+
+    // Creating user's account
+    User user = new User()
+        .setName(signUpRequest.getName())
+        .setEmail(signUpRequest.getEmail())
+        .setPassword(passwordEncoder.encode(signUpRequest.getPassword()))
+        .setProvider(AuthProvider.local);
+
+    // Save the user to the repository
+    return userRepository.save(user);
+  }
 }
