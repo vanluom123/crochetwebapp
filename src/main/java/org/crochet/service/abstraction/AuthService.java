@@ -8,8 +8,6 @@ import org.crochet.request.SignUpRequest;
 public interface AuthService {
   AuthResponse authenticateUser(LoginRequest loginRequest);
   ApiResponse registerUser(SignUpRequest signUpRequest);
-
-  ApiResponse resendEmailVerification();
-
+  ApiResponse resendVerificationEmail(String email);
   ApiResponse confirmToken(String token);
 }
