@@ -16,6 +16,9 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+/**
+ * TokenAuthenticationFilter class
+ */
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
   @Autowired
