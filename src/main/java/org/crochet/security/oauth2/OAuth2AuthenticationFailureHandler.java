@@ -13,16 +13,34 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * OAuth2AuthenticationFailureHandler class
+ */
 @Component
 public class OAuth2AuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler {
 
   private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
 
+  /**
+   * Constructor of OAuth2AuthenticationFailureHandler class
+   *
+   * @param httpCookieOAuth2AuthorizationRequestRepository HttpCookieOAuth2AuthorizationRequestRepository
+   */
   @Autowired
   public OAuth2AuthenticationFailureHandler(HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository) {
     this.httpCookieOAuth2AuthorizationRequestRepository = httpCookieOAuth2AuthorizationRequestRepository;
   }
 
+  /**
+   * Handle authentication failure
+   *
+   * @param request the request during which the authentication attempt occurred.
+   * @param response the response.
+   * @param exception the exception which was thrown to reject the authentication
+   * request.
+   * @throws IOException I/O exception
+   * @throws ServletException a servlet exception
+   */
   @Override
   public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
     String targetUrl = CookieUtils.getCookie(request, HttpCookieOAuth2AuthorizationRequestRepository.REDIRECT_URI_PARAM_COOKIE_NAME)
