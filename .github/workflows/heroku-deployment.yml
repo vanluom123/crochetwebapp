@@ -1,9 +1,6 @@
 name: Heroku Deploy
 
 on:
-  push:
-    branches:
-      - 'master'
   workflow_dispatch:
 
 jobs:
@@ -11,7 +8,7 @@ jobs:
     name: Deploy to Heroku
     runs-on: ubuntu-latest
     environment:
-      name: 'Staging'
+      name: 'littlecrochet'
 
     steps:
       - name: Checkout repository
@@ -19,6 +16,15 @@ jobs:
       - name: Deploy to heroku
         uses: akhileshns/heroku-deploy@v3.12.14
         with:
-          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-          heroku_app_name: ${{secrets.HEROKU_APP}}
-          heroku_email: ${{secrets.HEROKU_EMAIL}}
+          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+          heroku_app_name: ${{ vars.HEROKU_APP }}
+          heroku_email: ${{ vars.HEROKU_EMAIL }}
+        env:
+          ENV: ${{ vars.ENV }}
+          DATABASE_URL: ${{ vars.DATABASE_URL }}
+          DATABASE_USERNAME: ${{ vars.DATABASE_USERNAME }}
+          DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          TOKEN_SECRET: ${{ secrets.TOKEN_SECRET }}
+          APP_PASSWORD: ${{ secrets.APP_PASSWORD }}
