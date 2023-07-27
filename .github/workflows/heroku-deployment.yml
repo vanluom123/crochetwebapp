@@ -1,4 +1,4 @@
-name: Heroku Deploy
+name: Heroku Deployment
 
 on:
   workflow_dispatch:
@@ -21,7 +21,7 @@ jobs:
           heroku_email: ${{ vars.HEROKU_EMAIL }}
         env:
           ENV: ${{ vars.ENV }}
-          DATABASE_URL: ${{ vars.DATABASE_URL }}
+          DB_URL: ${{ vars.DB_URL }}
           DATABASE_USERNAME: ${{ vars.DATABASE_USERNAME }}
           DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}

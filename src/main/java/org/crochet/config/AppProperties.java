@@ -1,38 +1,29 @@
 package org.crochet.config;
 
+import lombok.Getter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
 @ConfigurationProperties(prefix = "app")
 public class AppProperties {
   private final Auth auth = new Auth();
   private final OAuth2 oauth2 = new OAuth2();
 
+  @Getter
   public static class Auth {
     private String tokenSecret;
     private long tokenExpirationMs;
     private long refreshTokenExpirationMs;
 
-    public String getTokenSecret() {
-      return tokenSecret;
-    }
-
     public void setTokenSecret(String tokenSecret) {
       this.tokenSecret = tokenSecret;
     }
 
-    public long getTokenExpirationMs() {
-      return tokenExpirationMs;
-    }
-
     public void setTokenExpirationMs(long tokenExpirationMs) {
       this.tokenExpirationMs = tokenExpirationMs;
-    }
-
-    public long getRefreshTokenExpirationMs() {
-      return refreshTokenExpirationMs;
     }
 
     public void setRefreshTokenExpirationMs(long refreshTokenExpirationMs) {
@@ -40,12 +31,9 @@ public class AppProperties {
     }
   }
 
+  @Getter
   public static final class OAuth2 {
     private List<String> authorizedRedirectUris = new ArrayList<>();
-
-    public List<String> getAuthorizedRedirectUris() {
-      return authorizedRedirectUris;
-    }
 
     public OAuth2 authorizedRedirectUris(List<String> authorizedRedirectUris) {
       this.authorizedRedirectUris = authorizedRedirectUris;
@@ -53,11 +41,4 @@ public class AppProperties {
     }
   }
 
-  public Auth getAuth() {
-    return auth;
-  }
-
-  public OAuth2 getOauth2() {
-    return oauth2;
-  }
 }
