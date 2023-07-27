@@ -6,10 +6,13 @@ import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.exception.TokenException;
 import org.crochet.model.AuthProvider;
 import org.crochet.model.ConfirmationToken;
+import org.crochet.model.PasswordResetToken;
 import org.crochet.model.User;
 import org.crochet.repository.ConfirmationTokenRepository;
+import org.crochet.repository.PasswordResetTokenRepository;
 import org.crochet.repository.UserRepository;
 import org.crochet.request.LoginRequest;
+import org.crochet.request.PasswordResetRequest;
 import org.crochet.request.SignUpRequest;
 import org.crochet.response.ApiResponse;
 import org.crochet.response.AuthResponse;
@@ -29,27 +32,51 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+/**
+ * AuthServiceImpl class
+ */
 @Service
 public class AuthServiceImpl implements AuthService {
+  private static final String ACTIVE_NOW = "Active now";
+  private static final String CLICK_TO_ACTIVE_CONTENT = "Thank you for registering. Please click on the below link to activate your account:";
+  private static final String CONFIRM_YOUR_EMAIL = "Confirm your email";
+  public static final String RESET_YOUR_PASSWORD_CONTENT = "Please click the below link to reset your password";
+  public static final String RESET_PASSWORD = "Reset password";
+  public static final String RESET_NOTIFICATION = "Password Reset Notification";
   private final AuthenticationManager authenticationManager;
   private final TokenProvider tokenProvider;
   private final EmailSender emailSender;
   private final ConfirmationTokenRepository confirmationTokenRepository;
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
+  private final PasswordResetTokenRepository passwordResetTokenRepository;
 
+  /**
+   * Constructor
+   *
+   * @param authenticationManager AuthenticationManager
+   * @param tokenProvider TokenProvider
+   * @param emailSender EmailSender
+   * @param confirmationTokenRepository ConfirmationTokenRepository
+   * @param userRepository UserRepository
+   * @param passwordEncoder PasswordEncoder
+   * @param passwordResetTokenRepository PasswordResetTokenRepository
+   */
   @Autowired
   public AuthServiceImpl(AuthenticationManager authenticationManager,
                          TokenProvider tokenProvider,
                          EmailSender emailSender,
                          ConfirmationTokenRepository confirmationTokenRepository,
-                         UserRepository userRepository, PasswordEncoder passwordEncoder) {
+                         UserRepository userRepository,
+                         PasswordEncoder passwordEncoder,
+                         PasswordResetTokenRepository passwordResetTokenRepository) {
     this.authenticationManager = authenticationManager;
     this.tokenProvider = tokenProvider;
     this.emailSender = emailSender;
     this.confirmationTokenRepository = confirmationTokenRepository;
     this.userRepository = userRepository;
     this.passwordEncoder = passwordEncoder;
+    this.passwordResetTokenRepository = passwordResetTokenRepository;
   }
 
   /**
@@ -80,7 +107,6 @@ public class AuthServiceImpl implements AuthService {
    *
    * @param signUpRequest The sign-up request containing user information.
    * @return A success API response.
-   * @throws IllegalStateException If the email is not valid.
    */
   @Override
   @Transactional
@@ -98,7 +124,9 @@ public class AuthServiceImpl implements AuthService {
     String link = baseUri + "/auth/confirm?token=" + confirmationToken.getToken();
 
     // Send confirmation email
-    emailSender.send(signUpRequest.getEmail(), buildEmail(signUpRequest.getName(), link));
+    emailSender.send(signUpRequest.getEmail(),
+        CONFIRM_YOUR_EMAIL,
+        buildEmailLink(signUpRequest.getName(), link, CONFIRM_YOUR_EMAIL, CLICK_TO_ACTIVE_CONTENT, ACTIVE_NOW));
 
     return new ApiResponse(true, "User registered successfully");
   }
@@ -107,9 +135,11 @@ public class AuthServiceImpl implements AuthService {
    * Resend link to active
    *
    * @return A success API response.
+   * @throws ResourceNotFoundException User not found
    */
   @Override
   public ApiResponse resendVerificationEmail(String email) {
+    // If user don't exist, ResourceNotFoundException will be thrown
     User user = userRepository.findByEmail(email)
         .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
@@ -123,11 +153,19 @@ public class AuthServiceImpl implements AuthService {
     String link = baseUri + "/auth/confirm?token=" + confirmationToken.getToken();
 
     // Send confirmation email
-    emailSender.send(email, buildEmail(email, link));
+    emailSender.send(email, CONFIRM_YOUR_EMAIL, buildEmailLink(email, link, CONFIRM_YOUR_EMAIL, CLICK_TO_ACTIVE_CONTENT, ACTIVE_NOW));
 
     return new ApiResponse(true, "Resend successfully");
   }
 
+  /**
+   * Confirmation token
+   *
+   * @param token Token
+   * @return ApiResponse
+   * @throws EmailVerificationException Email already confirmed
+   * @throws TokenException Token expired
+   */
   @Transactional
   @Override
   public ApiResponse confirmToken(String token) {
@@ -154,7 +192,17 @@ public class AuthServiceImpl implements AuthService {
     return new ApiResponse(true, "Successfully confirmation");
   }
 
-  private String buildEmail(String name, String link) {
+  /**
+   * Build email link
+   *
+   * @param name Name of user or email
+   * @param link Link
+   * @param subjectEmail Subject email
+   * @param contentEmail Content email
+   * @param contentLink Content link
+   * @return Email link
+   */
+  private String buildEmailLink(String name, String link, String subjectEmail, String contentEmail, String contentLink) {
     return "<div style=\"font-family:Helvetica,Arial,sans-serif;font-size:16px;margin:0;color:#0b0c0c\">\n" +
         "\n" +
         "<span style=\"display:none;font-size:1px;color:#fff;max-height:0\"></span>\n" +
@@ -172,7 +220,7 @@ public class AuthServiceImpl implements AuthService {
         "                  \n" +
         "                    </td>\n" +
         "                    <td style=\"font-size:28px;line-height:1.315789474;Margin-top:4px;padding-left:10px\">\n" +
-        "                      <span style=\"font-family:Helvetica,Arial,sans-serif;font-weight:700;color:#ffffff;text-decoration:none;vertical-align:top;display:inline-block\">Confirm your email</span>\n" +
+        "                      <span style=\"font-family:Helvetica,Arial,sans-serif;font-weight:700;color:#ffffff;text-decoration:none;vertical-align:top;display:inline-block\">" + subjectEmail + "</span>\n" +
         "                    </td>\n" +
         "                  </tr>\n" +
         "                </tbody></table>\n" +
@@ -210,7 +258,7 @@ public class AuthServiceImpl implements AuthService {
         "      <td width=\"10\" valign=\"middle\"><br></td>\n" +
         "      <td style=\"font-family:Helvetica,Arial,sans-serif;font-size:19px;line-height:1.315789474;max-width:560px\">\n" +
         "        \n" +
-        "            <p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\">Hi " + name + ",</p><p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\"> Thank you for registering. Please click on the below link to activate your account: </p><blockquote style=\"Margin:0 0 20px 0;border-left:10px solid #b1b4b6;padding:15px 0 0.1px 15px;font-size:19px;line-height:25px\"><p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\"> <a href=\"" + link + "\">Activate Now</a> </p></blockquote>\n Link will expire in 15 minutes. <p>See you soon</p>" +
+        "            <p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\">Hi " + name + ",</p><p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\"> " + contentEmail + " </p><blockquote style=\"Margin:0 0 20px 0;border-left:10px solid #b1b4b6;padding:15px 0 0.1px 15px;font-size:19px;line-height:25px\"><p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\"> <a href=\"" + link + "\">" + contentLink + "</a> </p></blockquote>\n Link will expire in 15 minutes. <p>See you soon</p>" +
         "        \n" +
         "      </td>\n" +
         "      <td width=\"10\" valign=\"middle\"><br></td>\n" +
@@ -223,26 +271,45 @@ public class AuthServiceImpl implements AuthService {
         "</div></div>";
   }
 
+  /**
+   * Get confirmation token
+   *
+   * @param token token
+   * @return ConfirmationToken
+   * @throws ResourceNotFoundException Token not found
+   */
   private ConfirmationToken getToken(String token) {
     return confirmationTokenRepository.findByToken(token)
         .orElseThrow(() -> new ResourceNotFoundException("Token not found"));
   }
 
-  private boolean isEmailPresent(String email) {
+  /**
+   * Check email is valid
+   *
+   * @param email Email
+   * @return true if email exist
+   */
+  private boolean isValidEmail(String email) {
     return userRepository.findByEmail(email).isPresent();
   }
 
+  /**
+   * Create or update confirmation token
+   *
+   * @param user User
+   * @return ConfirmationToken
+   */
   private ConfirmationToken createOrUpdateToken(User user) {
     ConfirmationToken confirmationToken = confirmationTokenRepository
         .findByUser(user)
         .orElse(null);
 
+    String token = UUID.randomUUID().toString();
+    LocalDateTime now = LocalDateTime.now();
+    LocalDateTime expirationTime = now.plusMinutes(15);
+
     if (confirmationToken == null) {
       // Create a new token
-      String token = UUID.randomUUID().toString();
-      LocalDateTime now = LocalDateTime.now();
-      LocalDateTime expirationTime = now.plusMinutes(15);
-
       confirmationToken = new ConfirmationToken()
           .setToken(token)
           .setCreatedAt(now)
@@ -250,17 +317,24 @@ public class AuthServiceImpl implements AuthService {
           .setUser(user);
     } else {
       // Update the existing token
-      confirmationToken.setToken(UUID.randomUUID().toString())
-          .setCreatedAt(LocalDateTime.now())
-          .setExpiresAt(LocalDateTime.now().plusMinutes(15));
+      confirmationToken.setToken(token)
+          .setCreatedAt(now)
+          .setExpiresAt(expirationTime);
     }
 
     return confirmationTokenRepository.save(confirmationToken);
   }
 
+  /**
+   * Create user
+   *
+   * @param signUpRequest SignUpRequest
+   * @return User
+   * @throws BadRequestException Email address already in use
+   */
   private User createUser(SignUpRequest signUpRequest) {
     // Check if the email address is already in use
-    if (isEmailPresent(signUpRequest.getEmail())) {
+    if (isValidEmail(signUpRequest.getEmail())) {
       throw new BadRequestException("Email address already in use");
     }
 
@@ -273,5 +347,112 @@ public class AuthServiceImpl implements AuthService {
 
     // Save the user to the repository
     return userRepository.save(user);
+  }
+
+  /**
+   * Create or update password reset token
+   *
+   * @param user User
+   * @return PasswordResetToken
+   */
+  private PasswordResetToken createOrUpdatePasswordResetToken(User user) {
+    var passwordResetToken = passwordResetTokenRepository.findByUser(user)
+        .orElse(null);
+
+    String token = UUID.randomUUID().toString();
+    LocalDateTime now = LocalDateTime.now();
+    LocalDateTime expirationTime = now.plusMinutes(15);
+
+    if (passwordResetToken == null) {
+      // Create a new token
+      passwordResetToken = new PasswordResetToken()
+          .setToken(token)
+          .setCreatedAt(now)
+          .setExpiresAt(expirationTime)
+          .setUser(user);
+    } else {
+      passwordResetToken.setToken(token)
+          .setCreatedAt(now)
+          .setExpiresAt(expirationTime);
+    }
+
+    return passwordResetTokenRepository.save(passwordResetToken);
+  }
+
+  /**
+   * Reset password link
+   *
+   * @param email Email
+   * @return ApiResponse
+   * @throws ResourceNotFoundException User not found
+   */
+  @Transactional
+  @Override
+  public ApiResponse resetPasswordLink(String email) {
+    // Check user
+    User user = userRepository.findByEmail(email)
+        .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+    // Build password reset token
+    var passwordResetToken = createOrUpdatePasswordResetToken(user);
+
+    // Build the base URI
+    String baseUri = ServletUriComponentsBuilder.fromCurrentContextPath().toUriString();
+    String link = baseUri + "/auth/reset-password?passwordResetToken=" + passwordResetToken.getToken();
+
+    // Send password reset link to email
+    var passwordResetLink = buildEmailLink(email, link, RESET_NOTIFICATION, RESET_YOUR_PASSWORD_CONTENT, RESET_PASSWORD);
+    emailSender.send(email, RESET_NOTIFICATION, passwordResetLink);
+
+    return new ApiResponse(true, "Send successfully with link reset password: " + link);
+  }
+
+  /**
+   * Reset password
+   *
+   * @param token Token
+   * @param passwordResetRequest PasswordResetRequest
+   * @return ApiResponse
+   * @throws TokenException Password reset token is expired
+   * @throws ResourceNotFoundException User not found with current token
+   */
+  @Transactional
+  @Override
+  public ApiResponse resetPassword(String token, PasswordResetRequest passwordResetRequest) {
+    // Get PasswordResetToken
+    PasswordResetToken passwordResetToken = getPasswordResetToken(token);
+
+    LocalDateTime now = LocalDateTime.now();
+    LocalDateTime expiredAt = passwordResetToken.getExpiresAt();
+
+    if (expiredAt.isBefore(now)) {
+      throw new TokenException("Password reset token is expired");
+    }
+
+    // Get user by token
+    User user = passwordResetTokenRepository.getUserByToken(token)
+        .orElseThrow(() -> new ResourceNotFoundException("User not found with token: " + token));
+
+    // Update new password for user
+    user.setPassword(passwordEncoder.encode(passwordResetRequest.getNewPassword()));
+
+    // Update user
+    userRepository.save(user);
+
+    // Delete password reset token
+    passwordResetTokenRepository.delete(passwordResetToken);
+
+    return new ApiResponse(true, "Reset password successfully");
+  }
+
+  /**
+   * Get password reset token
+   *
+   * @param token token
+   * @return PasswordResetToken
+   * @throws ResourceNotFoundException Password reset token not found
+   */
+  private PasswordResetToken getPasswordResetToken(String token) {
+    return passwordResetTokenRepository.findByToken(token)
+        .orElseThrow(() -> new ResourceNotFoundException("Password reset token not found"));
   }
 }

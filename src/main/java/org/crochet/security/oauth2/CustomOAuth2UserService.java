@@ -17,11 +17,19 @@ import org.springframework.util.StringUtils;
 
 import java.util.Optional;
 
+/**
+ * CustomOAuth2UserService class
+ */
 @Service
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
   private final UserRepository userRepository;
 
+  /**
+   * Constructor of CustomOAuth2UserService class
+   *
+   * @param userRepository UserRepository
+   */
   @Autowired
   public CustomOAuth2UserService(UserRepository userRepository) {
     this.userRepository = userRepository;
