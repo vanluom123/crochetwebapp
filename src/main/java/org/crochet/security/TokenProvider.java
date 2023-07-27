@@ -19,6 +19,9 @@ import org.springframework.stereotype.Service;
 import java.security.Key;
 import java.util.Date;
 
+/**
+ * TokenProvider class
+ */
 @Service
 public class TokenProvider {
 
@@ -36,10 +39,22 @@ public class TokenProvider {
     this.appProperties = appProperties;
   }
 
+  /**
+   * Create token
+   *
+   * @param auth Authentication
+   * @return Token string
+   */
   public String createToken(Authentication auth) {
     return createToken(auth, false);
   }
 
+  /**
+   * Create refresh token
+   *
+   * @param auth Authentication
+   * @return Refresh token string
+   */
   public String createRefreshToken(Authentication auth) {
     return createToken(auth, true);
   }
