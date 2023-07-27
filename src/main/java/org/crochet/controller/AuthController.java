@@ -1,11 +1,12 @@
 package org.crochet.controller;
 
+import jakarta.validation.Valid;
 import org.crochet.request.LoginRequest;
+import org.crochet.request.PasswordResetRequest;
 import org.crochet.request.SignUpRequest;
 import org.crochet.response.ApiResponse;
 import org.crochet.response.AuthResponse;
 import org.crochet.service.abstraction.AuthService;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,6 +46,19 @@ public class AuthController {
   @GetMapping("/resendVerificationEmail")
   public ResponseEntity<ApiResponse> resendVerificationEmail(@RequestParam("email") String email) {
     ApiResponse response = authService.resendVerificationEmail(email);
+    return ResponseEntity.ok(response);
+  }
+
+  @GetMapping("/password-reset-request")
+  public ResponseEntity<ApiResponse> resetPasswordRequest(@RequestParam("email") String email) {
+    var response = authService.resetPasswordLink(email);
+    return ResponseEntity.ok(response);
+  }
+
+  @PostMapping("/reset-password")
+  public ResponseEntity<ApiResponse> resetPassword(@RequestParam("passwordResetToken") String passwordResetToken,
+                                                   @RequestBody PasswordResetRequest passwordResetRequest) {
+    var response = authService.resetPassword(passwordResetToken, passwordResetRequest);
     return ResponseEntity.ok(response);
   }
 }

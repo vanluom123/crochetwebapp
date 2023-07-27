@@ -11,6 +11,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * UserPrincipal class
+ */
 public class UserPrincipal implements OAuth2User, UserDetails {
   private final Long id;
   private final String email;
@@ -18,6 +21,14 @@ public class UserPrincipal implements OAuth2User, UserDetails {
   private final Collection<? extends GrantedAuthority> authorities;
   private Map<String, Object> attributes;
 
+  /**
+   * Constructor of UserPrincipal class
+   *
+   * @param id id
+   * @param email email
+   * @param password password
+   * @param authorities authorities
+   */
   public UserPrincipal(Long id, String email, String password, Collection<? extends GrantedAuthority> authorities) {
     this.id = id;
     this.email = email;
@@ -44,7 +55,13 @@ public class UserPrincipal implements OAuth2User, UserDetails {
     );
   }
 
-
+  /**
+   * Create object
+   *
+   * @param user User
+   * @param attributes Map<String, Object>
+   * @return UserPrincipal
+   */
   public static UserPrincipal create(User user, Map<String, Object> attributes) {
     UserPrincipal userPrincipal = UserPrincipal.create(user);
     userPrincipal.setAttributes(attributes);

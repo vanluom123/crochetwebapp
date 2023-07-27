@@ -56,4 +56,7 @@ public class User {
 
   @OneToMany(mappedBy = "user")
   private Set<ConfirmationToken> confirmationTokens;
+
+  @OneToMany(mappedBy = "user")
+  private Set<PasswordResetToken> passwordResetTokens;
 }
