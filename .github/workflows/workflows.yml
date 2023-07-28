@@ -13,8 +13,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    environment:
-      name: 'local'
 
     steps:
       - name: Checkout repository
@@ -29,7 +27,7 @@ jobs:
       - name: Gradle build
         env:
           ENV: ${{ vars.ENV }}
-          DATABASE_URL: ${{ vars.DATABASE_URL }}
+          DB_URL: ${{ vars.DB_URL }}
           DATABASE_USERNAME: ${{ vars.DATABASE_USERNAME }}
           DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}

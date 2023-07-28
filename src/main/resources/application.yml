@@ -2,15 +2,6 @@ spring:
   profiles:
     active: ${ENV}
 
-  jpa:
-    show-sql: true
-    hibernate:
-      ddl-auto: update
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQL8Dialect
-        format_sql: true
-
   security:
     oauth2:
       client:
@@ -33,6 +24,8 @@ spring:
           auth: true
           starttls:
             enable: true
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
 
 app:
   auth:
@@ -50,7 +43,3 @@ app:
       - http://localhost:3000/oauth2/redirect
       - myandroidapp://oauth2/redirect
       - myiosapp://oauth2/redirect
-
-datasource:
-  liquibase:
-    change-log: db/changelog/db.changelog-master.yaml
