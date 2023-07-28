@@ -1,62 +1,37 @@
 spring:
-  rabbitmq:
-    listener:
-      simple:
-        retry:
-          enabled: true
-          initial-interval: 3s
-          max-attempts: 5
-          max-interval: 10s
-          multiplier: 2
-
-  datasource:
-    url: ${DATABASE_URL}
-    username: ${DATABASE_USERNAME}
-    password: ${DATABASE_PASSWORD}
-
-  jpa:
-    show-sql: true
-    hibernate:
-      ddl-auto: update
-      naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQL8Dialect
+  profiles:
+    active: ${ENV}
 
   security:
     oauth2:
       client:
         registration:
           google:
-            clientId: 5014057553-8gm9um6vnli3cle5rgigcdjpdrid14m9.apps.googleusercontent.com
-            clientSecret: tWZKVLxaD_ARWsriiiUFYoIk
+            clientId: ${GOOGLE_CLIENT_ID}
+            clientSecret: ${GOOGLE_CLIENT_SECRET}
             redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
             scope:
               - email
               - profile
-          facebook:
-            clientId: 121189305185277
-            clientSecret: 42ffe5aa7379e8326387e0fe16f34132
-            redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
-            scope:
-              - email
-              - public_profile
-          github:
-            clientId: d3e47fc2ddd966fa4352
-            clientSecret: 3bc0f6b8332f93076354c2a5bada2f5a05aea60d
-            redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
-            scope:
-              - user:email
-              - read:user
-        provider:
-          facebook:
-            authorizationUri: https://www.facebook.com/v3.0/dialog/oauth
-            tokenUri: https://graph.facebook.com/v3.0/oauth/access_token
-            userInfoUri: https://graph.facebook.com/v3.0/me?fields=id,first_name,middle_name,last_name,name,email,verified,is_verified,picture.width(250).height(250)
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: phanvanluom97bd@gmail.com
+    password: ${APP_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+
 app:
   auth:
-    tokenSecret: 04ca023b39512e46d0c2cf4b48d5aac61d34302994c87ed4eff225dcf3b0a218739f3897051a057f9b846a69ea2927a587044164b7bae5e1306219d50b588cb1
+    tokenSecret: ${TOKEN_SECRET}
     tokenExpirationMs: 864000000
+    refresh-token-expiration-ms: 864000000
   cors:
     allowedOrigins: http://localhost:3000,http://localhost:8080
   oauth2:
@@ -68,22 +43,3 @@ app:
       - http://localhost:3000/oauth2/redirect
       - myandroidapp://oauth2/redirect
       - myiosapp://oauth2/redirect
-
-littlecrochet:
-  rabbitmq:
-    connection:
-      channel-checkout-timeout: 5000
-      connection-timeout: 10000
-    dead-letter:
-      dead-letter-exchange: deadLetterExchange
-      dead-letter-queue: deadLetterQueue
-      dead-letter-routingKey: deadLetter
-      dead-letter-exchange-header: x-dead-letter-exchange
-      dead-letter-routingKey-header: x-dead-letter-routing-key
-    exchange: littlecrochet-direct-exchange
-    queue: littlecrochet.queue
-    routingkey: littlecrochet
-    uri: ${CLOUDAMQP_URL}
-    username: ${CLOUDAMQP_USERNAME}
-    password: ${CLOUDAMQP_PASSWORD}
-    virtual-host: /
