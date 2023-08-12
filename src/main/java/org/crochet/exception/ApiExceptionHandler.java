@@ -56,4 +56,12 @@ public class ApiExceptionHandler {
         .setStatusCode(HttpStatus.NOT_FOUND);
     return ResponseEntity.ok(err);
   }
+
+  @ExceptionHandler({CloudStorageException.class})
+  public ResponseEntity<ApiError> handleCloudStorageException(CloudStorageException ex) {
+    ApiError err = ApiError.create()
+        .setMessage(ex.getMessage())
+        .setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
+    return ResponseEntity.ok(err);
+  }
 }
