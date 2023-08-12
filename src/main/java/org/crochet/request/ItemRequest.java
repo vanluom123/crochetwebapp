@@ -7,6 +7,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class ItemRequest {
   private long id;
+  private String name;
   private String image;
   private String description;
   private double price;

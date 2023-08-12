@@ -15,6 +15,9 @@ databaseChangeLog:
                   name: id
                   type: BIGINT
               - column:
+                  name: name
+                  type: VARCHAR(50)
+              - column:
                   name: image
                   type: LONGBLOB
               - column:

@@ -24,6 +24,9 @@ public class Item {
   @Column(name = "id", nullable = false)
   private long id;
 
+  @Column(name = "name")
+  private String name;
+
   @Lob
   @Column(name = "image", columnDefinition = "LONGBLOB")
   private String image;

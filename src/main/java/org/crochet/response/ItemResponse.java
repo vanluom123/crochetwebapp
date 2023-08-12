@@ -9,6 +9,7 @@ import lombok.experimental.Accessors;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ItemResponse {
   private long id;
+  private String name;
   private byte[] image;
   private String description;
   private double price;
