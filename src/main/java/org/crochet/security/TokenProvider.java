@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.stream.Stream;
 
 /**
  * TokenProvider class
@@ -150,5 +151,13 @@ public class TokenProvider {
     return false;
   }
 
-
+  /**
+   * Validate with many tokens
+   *
+   * @param jwtTokens The list of tokens
+   * @return true/false
+   */
+  public boolean validateToken(String... jwtTokens) {
+    return Stream.of(jwtTokens).allMatch(this::validateToken);
+  }
 }
