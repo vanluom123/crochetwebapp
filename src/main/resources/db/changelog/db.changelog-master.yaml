@@ -3,3 +3,5 @@ databaseChangeLog:
       file: classpath:/db/migration/11-01-changelog.yaml
   - include:
       file: classpath:/db/migration/CreatePasswordResetTokenTable.yaml
+  - include:
+      file: classpath:/db/migration/create-item-table.yaml
