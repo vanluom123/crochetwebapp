@@ -2,8 +2,10 @@ package org.crochet.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.crochet.util.CookieUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,8 +45,10 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     try {
       String jwt = getJwtFromRequest(request);
 
+      var jwtToken = CookieUtils.getCookie(request, "jwtToken").map(Cookie::getValue).orElse(null);
+
       // Check if the JWT exists and is valid
-      if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
+      if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt, jwtToken)) {
         Long userId = tokenProvider.getUserIdFromToken(jwt);
 
         // Load the user details by user ID
