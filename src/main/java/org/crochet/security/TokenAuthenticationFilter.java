@@ -43,13 +43,15 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
     try {
-      String jwt = getJwtFromRequest(request);
+      // Get jwtToken from header
+      String jwtToken = getJwtFromRequest(request);
 
-      var jwtToken = CookieUtils.getCookie(request, "jwtToken").map(Cookie::getValue).orElse(null);
+      // Get jwtToken from cookie
+      var tokenFromCookie = CookieUtils.getCookie(request, "jwtToken").map(Cookie::getValue).orElse(null);
 
       // Check if the JWT exists and is valid
-      if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt, jwtToken)) {
-        Long userId = tokenProvider.getUserIdFromToken(jwt);
+      if (StringUtils.hasText(jwtToken) && tokenProvider.validateToken(jwtToken, tokenFromCookie)) {
+        Long userId = tokenProvider.getUserIdFromToken(tokenFromCookie);
 
         // Load the user details by user ID
         UserDetails userDetails = customUserDetailsService.loadUserById(userId);
