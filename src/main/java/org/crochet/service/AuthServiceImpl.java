@@ -1,5 +1,6 @@
 package org.crochet.service;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.crochet.exception.BadRequestException;
 import org.crochet.exception.EmailVerificationException;
@@ -54,6 +55,7 @@ public class AuthServiceImpl implements AuthService {
   private final PasswordEncoder passwordEncoder;
   private final PasswordResetTokenRepository passwordResetTokenRepository;
   private final HttpServletResponse servletResponse;
+  private final HttpServletRequest servletRequest;
 
   /**
    * Constructor
@@ -66,6 +68,7 @@ public class AuthServiceImpl implements AuthService {
    * @param passwordEncoder              PasswordEncoder
    * @param passwordResetTokenRepository PasswordResetTokenRepository
    * @param servletResponse              HttpServletResponse
+   * @param servletRequest               HttpServletRequest
    */
   @Autowired
   public AuthServiceImpl(AuthenticationManager authenticationManager,
@@ -75,7 +78,8 @@ public class AuthServiceImpl implements AuthService {
                          UserRepository userRepository,
                          PasswordEncoder passwordEncoder,
                          PasswordResetTokenRepository passwordResetTokenRepository,
-                         HttpServletResponse servletResponse) {
+                         HttpServletResponse servletResponse,
+                         HttpServletRequest servletRequest) {
     this.authenticationManager = authenticationManager;
     this.tokenProvider = tokenProvider;
     this.emailSender = emailSender;
@@ -84,6 +88,7 @@ public class AuthServiceImpl implements AuthService {
     this.passwordEncoder = passwordEncoder;
     this.passwordResetTokenRepository = passwordResetTokenRepository;
     this.servletResponse = servletResponse;
+    this.servletRequest = servletRequest;
   }
 
   /**
@@ -450,6 +455,9 @@ public class AuthServiceImpl implements AuthService {
 
     // Delete password reset token
     passwordResetTokenRepository.delete(passwordResetToken);
+
+    // Delete token from cookie
+    CookieUtils.deleteCookie(servletRequest, servletResponse, "jwtToken");
 
     return new ApiResponse(true, "Reset password successfully");
   }
