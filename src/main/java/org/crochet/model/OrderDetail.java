@@ -9,33 +9,23 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-import java.time.LocalDateTime;
-
 @Data
-@NoArgsConstructor
+@Table(name = "order_detail")
 @Entity
-@Table(name = "confirmation_token")
 @Accessors(chain = true)
-public class ConfirmationToken {
+public class OrderDetail {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "id", nullable = false)
   private Long id;
 
-  @Column(nullable = false)
-  private String token;
-
-  @Column(nullable = false)
-  private LocalDateTime createdAt;
-
-  @Column(nullable = false)
-  private LocalDateTime expiresAt;
-
-  private LocalDateTime confirmedAt;
+  @ManyToOne
+  @JoinColumn(name = "pattern_id")
+  private Pattern pattern;
 
   @ManyToOne
-  @JoinColumn(name = "user_id")
-  private User user;
+  @JoinColumn(name = "order_id")
+  private Order order;
 }

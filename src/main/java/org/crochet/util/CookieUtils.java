@@ -37,6 +37,14 @@ public class CookieUtils {
   }
 
 
+  /**
+   * Add cookie
+   *
+   * @param response HttpServletResponse
+   * @param name name
+   * @param value value
+   * @param maxAge max age
+   */
   public static void addCookie(HttpServletResponse response, String name, String value, int maxAge) {
     Cookie cookie = new Cookie(name, value);
     cookie.setPath("/");
@@ -74,15 +82,26 @@ public class CookieUtils {
   }
 
 
+  /**
+   * Serialize
+   *
+   * @param object object
+   * @return Serialize string
+   */
   public static String serialize(Object object) {
     return Base64.getUrlEncoder()
         .encodeToString(SerializationUtils.serialize(object));
   }
 
+  /**
+   * Deserialize
+   *
+   * @param cookie Cookie
+   * @param cls class type
+   * @return deserialize string
+   */
   public static <T> T deserialize(Cookie cookie, Class<T> cls) {
     return cls.cast(SerializationUtils.deserialize(
         Base64.getUrlDecoder().decode(cookie.getValue())));
   }
-
-
 }

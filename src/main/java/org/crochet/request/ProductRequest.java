@@ -1,11 +1,13 @@
 package org.crochet.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 @Data
 @Accessors(chain = true)
-public class ItemRequest {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class ProductRequest {
   private long id;
   private String name;
   private String image;

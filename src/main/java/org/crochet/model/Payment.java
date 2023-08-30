@@ -2,40 +2,43 @@ package org.crochet.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.time.LocalDateTime;
 
 @Data
-@NoArgsConstructor
 @Entity
-@Table(name = "confirmation_token")
+@Table(name = "payment")
 @Accessors(chain = true)
-public class ConfirmationToken {
+public class Payment {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "id", nullable = false)
   private Long id;
 
-  @Column(nullable = false)
-  private String token;
+  private LocalDateTime paymentDate;
 
-  @Column(nullable = false)
-  private LocalDateTime createdAt;
+  private Double paymentAmount;
 
-  @Column(nullable = false)
-  private LocalDateTime expiresAt;
+  private String paymentMethod;
 
-  private LocalDateTime confirmedAt;
+  private String transactionId;
+
+  @Enumerated(EnumType.STRING)
+  @NotNull
+  private StatusType status;
 
   @ManyToOne
-  @JoinColumn(name = "user_id")
-  private User user;
+  @JoinColumn(name = "order_id")
+  private Order order;
 }

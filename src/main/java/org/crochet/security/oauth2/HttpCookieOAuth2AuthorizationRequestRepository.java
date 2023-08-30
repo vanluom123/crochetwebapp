@@ -42,14 +42,14 @@ public class HttpCookieOAuth2AuthorizationRequestRepository implements Authoriza
   @Override
   public void saveAuthorizationRequest(OAuth2AuthorizationRequest authorizationRequest, HttpServletRequest request, HttpServletResponse response) {
     if (authorizationRequest == null) {
-      CookieUtils.deleteCookie(request, response, OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME);
-      CookieUtils.deleteCookie(request, response, REDIRECT_URI_PARAM_COOKIE_NAME);
+      removeAuthorizationRequestCookies(request, response);
       return;
     }
 
     CookieUtils.addCookie(response, OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME, CookieUtils.serialize(authorizationRequest), cookieExpireSeconds);
+
     String redirectUriAfterLogin = request.getParameter(REDIRECT_URI_PARAM_COOKIE_NAME);
-    if (StringUtils.isNotBlank(redirectUriAfterLogin)) {
+    if (!redirectUriAfterLogin.isBlank()) {
       CookieUtils.addCookie(response, REDIRECT_URI_PARAM_COOKIE_NAME, redirectUriAfterLogin, cookieExpireSeconds);
     }
   }

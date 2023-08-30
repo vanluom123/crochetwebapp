@@ -7,7 +7,7 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ItemResponse {
+public class ProductResponse {
   private long id;
   private String name;
   private byte[] image;

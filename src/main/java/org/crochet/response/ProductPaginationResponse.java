@@ -7,8 +7,8 @@ import java.util.List;
 
 @Data
 @Accessors(chain = true)
-public class ItemPaginationResponse {
-  private List<ItemResponse> contents;
+public class ProductPaginationResponse {
+  private List<ProductResponse> contents;
   private int pageNo;
   private int pageSize;
   private long totalElements;

@@ -159,6 +159,4 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     // Save the updated user in the repository
     return userRepository.save(existingUser);
   }
-
-
 }

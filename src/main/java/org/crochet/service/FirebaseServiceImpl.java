@@ -59,6 +59,4 @@ public class FirebaseServiceImpl implements FirebaseService {
       throw new CloudStorageException("Image not found in Firebase Cloud Storage");
     }
   }
-
-
 }
