@@ -80,8 +80,8 @@ public class ProductServiceImpl implements ProductService {
 
   @Override
   public ProductResponse getDetail(long id) {
-    var item = productRepository.findById(id)
+    var product = productRepository.findById(id)
         .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
-    return ProductMapper.INSTANCE.toResponse(item);
+    return ProductMapper.INSTANCE.toResponse(product);
   }
 }

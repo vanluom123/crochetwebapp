@@ -20,7 +20,7 @@ public interface ProductMapper {
   ProductResponse toResponse(Product product);
 
   @Mapping(target = "image", source = "image", qualifiedByName = "encoding")
-  Product toItem(ProductResponse item);
+  Product toProduct(ProductResponse item);
 
   List<ProductResponse> toResponses(List<Product> products);
 

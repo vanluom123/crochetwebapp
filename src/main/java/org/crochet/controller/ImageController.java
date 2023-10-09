@@ -33,6 +33,7 @@ public class ImageController {
   }
 
   @GetMapping("/get-image")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<?> getImage(@RequestParam("fileName") String fileName) {
     var image = firebaseService.getImage(fileName);
     return ResponseEntity.status(HttpStatus.OK)
