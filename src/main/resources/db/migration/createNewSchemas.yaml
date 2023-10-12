@@ -1,6 +1,6 @@
 databaseChangeLog:
   - changeSet:
-      id: 1693374983639-1
+      id: 1697102216299-1
       author: admin (generated)
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -37,7 +37,7 @@ databaseChangeLog:
                   type: BIGINT
             tableName: confirmation_token
   - changeSet:
-      id: 1693374983639-2
+      id: 1697102216299-2
       author: admin (generated)
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -64,7 +64,7 @@ databaseChangeLog:
                   type: BIGINT
             tableName: order
   - changeSet:
-      id: 1693374983639-3
+      id: 1697102216299-3
       author: admin (generated)
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -86,7 +86,7 @@ databaseChangeLog:
                   type: BIGINT
             tableName: order_detail
   - changeSet:
-      id: 1693374983639-4
+      id: 1697102216299-4
       author: admin (generated)
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -120,7 +120,7 @@ databaseChangeLog:
                   type: BIGINT
             tableName: password_reset_token
   - changeSet:
-      id: 1693374983639-5
+      id: 1697102216299-5
       author: admin (generated)
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -148,7 +148,7 @@ databaseChangeLog:
                   type: DOUBLE
             tableName: pattern
   - changeSet:
-      id: 1693374983639-6
+      id: 1697102216299-6
       author: admin (generated)
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -184,7 +184,7 @@ databaseChangeLog:
                   type: BIGINT
             tableName: payment
   - changeSet:
-      id: 1693374983639-7
+      id: 1697102216299-7
       author: admin (generated)
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -212,7 +212,7 @@ databaseChangeLog:
                   type: DOUBLE
             tableName: product
   - changeSet:
-      id: 1693374983639-8
+      id: 1697102216299-8
       author: admin (generated)
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -258,9 +258,14 @@ databaseChangeLog:
               - column:
                   name: verification_code
                   type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: role
+                  type: VARCHAR(255)
             tableName: users
   - changeSet:
-      id: 1693374983639-9
+      id: 1697102216299-9
       author: admin (generated)
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -269,7 +274,7 @@ databaseChangeLog:
             constraintName: uc_74165e195b2f7b25de690d14a
             tableName: users
   - changeSet:
-      id: 1693374983639-10
+      id: 1697102216299-10
       author: admin (generated)
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -280,7 +285,7 @@ databaseChangeLog:
             referencedColumnNames: id
             referencedTableName: users
   - changeSet:
-      id: 1693374983639-11
+      id: 1697102216299-11
       author: admin (generated)
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -291,7 +296,7 @@ databaseChangeLog:
             referencedColumnNames: id
             referencedTableName: order
   - changeSet:
-      id: 1693374983639-12
+      id: 1697102216299-12
       author: admin (generated)
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -302,7 +307,7 @@ databaseChangeLog:
             referencedColumnNames: id
             referencedTableName: pattern
   - changeSet:
-      id: 1693374983639-13
+      id: 1697102216299-13
       author: admin (generated)
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -313,7 +318,7 @@ databaseChangeLog:
             referencedColumnNames: id
             referencedTableName: users
   - changeSet:
-      id: 1693374983639-14
+      id: 1697102216299-14
       author: admin (generated)
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -324,7 +329,7 @@ databaseChangeLog:
             referencedColumnNames: id
             referencedTableName: users
   - changeSet:
-      id: 1693374983639-15
+      id: 1697102216299-15
       author: admin (generated)
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:

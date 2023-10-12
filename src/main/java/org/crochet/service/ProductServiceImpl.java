@@ -36,18 +36,19 @@ public class ProductServiceImpl implements ProductService {
     var product = productRepository.findById(request.getId()).orElse(null);
     if (product == null) {
       // create product
-      product = new Product()
-          .setId(request.getId())
-          .setName(request.getName())
-          .setPrice(request.getPrice())
-          .setDescription(request.getDescription())
-          .setImage(request.getImage());
+      product = Product.builder()
+          .id(request.getId())
+          .name(request.getName())
+          .price(request.getPrice())
+          .description(request.getDescription())
+          .image(request.getImage())
+          .build();
     } else {
       // update product
-      product.setName(request.getName())
-          .setPrice(request.getPrice())
-          .setDescription(request.getDescription())
-          .setImage(request.getImage());
+      product.setName(request.getName());
+      product.setPrice(request.getPrice());
+      product.setDescription(request.getDescription());
+      product.setImage(request.getImage());
     }
     product = productRepository.save(product);
     return ProductMapper.INSTANCE.toResponse(product);

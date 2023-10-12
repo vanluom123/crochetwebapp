@@ -33,11 +33,12 @@ public class PatternServiceImpl implements PatternService {
     if (pattern == null) {
       pattern = PatternMapper.INSTANCE.toPattern(request);
     } else {
-      pattern = new Pattern()
-          .setName(request.getName())
-          .setPrice(request.getPrice())
-          .setImage(request.getImage())
-          .setDescription(request.getDescription());
+      pattern = Pattern.builder()
+          .name(request.getName())
+          .price(request.getPrice())
+          .image(request.getImage())
+          .description(request.getDescription())
+          .build();
     }
 
     pattern = patternRepository.save(pattern);

@@ -13,9 +13,11 @@ import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.experimental.Accessors;
 
 import java.util.Set;
 
@@ -25,7 +27,9 @@ import java.util.Set;
 })
 @Getter
 @Setter
-@Accessors(chain = true)
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class User {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,7 +45,7 @@ public class User {
   private String imageUrl;
 
   @Column(nullable = false)
-  private Boolean emailVerified = false;
+  private Boolean emailVerified;
 
   @JsonIgnore
   private String password;
@@ -53,6 +57,10 @@ public class User {
   private String providerId;
 
   private String verificationCode;
+
+  @NotNull
+  @Enumerated(EnumType.STRING)
+  private RoleType role;
 
   @OneToMany(mappedBy = "user")
   private Set<ConfirmationToken> confirmationTokens;
