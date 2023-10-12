@@ -358,8 +358,10 @@ public class AuthServiceImpl implements AuthService {
     User user = User.builder()
         .name(signUpRequest.getName())
         .email(signUpRequest.getEmail())
+        .emailVerified(false)
         .password(passwordEncoder.encode(signUpRequest.getPassword()))
         .provider(AuthProvider.local)
+        .role(signUpRequest.getRole())
         .build();
     // Save the user to the repository
     return userRepository.save(user);
