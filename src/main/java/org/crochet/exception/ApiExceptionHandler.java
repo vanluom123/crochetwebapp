@@ -1,13 +1,36 @@
 package org.crochet.exception;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+@Slf4j
 @RestControllerAdvice
 public class ApiExceptionHandler {
+
+  @ExceptionHandler({Exception.class})
+  public ResponseEntity<ApiError> handleException(Exception ex) {
+    ApiError error = ApiError.builder()
+        .message(ex.getMessage())
+        .statusCode(HttpStatus.INTERNAL_SERVER_ERROR)
+        .build();
+    log.error(ex.getMessage());
+    return ResponseEntity.ok(error);
+  }
+
+  @ExceptionHandler({AccessDeniedException.class})
+  public ResponseEntity<ApiError> handleAccessDeniedException(AccessDeniedException ex) {
+    ApiError error = ApiError.builder()
+        .message(ex.getMessage())
+        .statusCode(HttpStatus.FORBIDDEN)
+        .build();
+    log.error(ex.getMessage());
+    return ResponseEntity.ok(error);
+  }
 
   @ExceptionHandler({BadRequestException.class})
   public ResponseEntity<ApiError> handleBadRequestException(BadRequestException ex) {
@@ -15,6 +38,7 @@ public class ApiExceptionHandler {
         .message(ex.getMessage())
         .statusCode(HttpStatus.BAD_REQUEST)
         .build();
+    log.error(ex.getMessage());
     return ResponseEntity.ok(err);
   }
 
@@ -24,6 +48,7 @@ public class ApiExceptionHandler {
         .message(ex.getMessage())
         .statusCode(HttpStatus.INTERNAL_SERVER_ERROR)
         .build();
+    log.error(ex.getMessage());
     return ResponseEntity.ok(err);
   }
 
@@ -33,6 +58,7 @@ public class ApiExceptionHandler {
         .message(ex.getMessage())
         .statusCode(HttpStatus.NOT_FOUND)
         .build();
+    log.error(ex.getMessage());
     return ResponseEntity.ok(err);
   }
 
@@ -42,6 +68,7 @@ public class ApiExceptionHandler {
         .message(ex.getMessage())
         .statusCode(HttpStatus.INTERNAL_SERVER_ERROR)
         .build();
+    log.error(ex.getMessage());
     return ResponseEntity.ok(err);
   }
 
@@ -51,6 +78,7 @@ public class ApiExceptionHandler {
         .message(ex.getMessage())
         .statusCode(HttpStatus.INTERNAL_SERVER_ERROR)
         .build();
+    log.error(ex.getMessage());
     return ResponseEntity.ok(err);
   }
 
@@ -60,6 +88,7 @@ public class ApiExceptionHandler {
         .message(ex.getMessage())
         .statusCode(HttpStatus.NOT_FOUND)
         .build();
+    log.error(ex.getMessage());
     return ResponseEntity.ok(err);
   }
 
@@ -69,6 +98,7 @@ public class ApiExceptionHandler {
         .message(ex.getMessage())
         .statusCode(HttpStatus.INTERNAL_SERVER_ERROR)
         .build();
+    log.error(ex.getMessage());
     return ResponseEntity.ok(err);
   }
 }

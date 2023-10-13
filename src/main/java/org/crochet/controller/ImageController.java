@@ -28,8 +28,8 @@ public class ImageController {
   @PostMapping("/upload")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<String> uploadImage(@RequestPart("imageFile") MultipartFile imageFile) {
-    var fileName = firebaseService.updateLoadImage(imageFile);
-    return ResponseEntity.ok(fileName);
+    firebaseService.updateLoadImage(imageFile);
+    return ResponseEntity.ok("Upload image successfully");
   }
 
   @GetMapping("/get-image")
