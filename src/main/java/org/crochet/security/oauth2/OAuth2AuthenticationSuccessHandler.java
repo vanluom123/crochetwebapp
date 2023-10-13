@@ -16,7 +16,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.io.IOException;
 import java.net.URI;
 
-import static org.crochet.security.oauth2.HttpCookieOAuth2AuthorizationRequestRepository.REDIRECT_URI_PARAM_COOKIE_NAME;
+import static org.crochet.security.oauth2.OAuth2CookieRepository.REDIRECT_URI_PARAM_COOKIE_NAME;
 
 /**
  * OAuth2AuthenticationSuccessHandler class
@@ -28,22 +28,22 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
   private final AppProperties appProperties;
 
-  private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
+  private final OAuth2CookieRepository OAuth2CookieRepository;
 
   /**
    * Constructor of OAuth2AuthenticationSuccessHandler class
    *
    * @param tokenProvider TokenProvider
    * @param appProperties AppProperties
-   * @param httpCookieOAuth2AuthorizationRequestRepository HttpCookieOAuth2AuthorizationRequestRepository
+   * @param OAuth2CookieRepository HttpCookieOAuth2AuthorizationRequestRepository
    */
   @Autowired
   OAuth2AuthenticationSuccessHandler(TokenProvider tokenProvider,
                                      AppProperties appProperties,
-                                     HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository) {
+                                     OAuth2CookieRepository OAuth2CookieRepository) {
     this.tokenProvider = tokenProvider;
     this.appProperties = appProperties;
-    this.httpCookieOAuth2AuthorizationRequestRepository = httpCookieOAuth2AuthorizationRequestRepository;
+    this.OAuth2CookieRepository = OAuth2CookieRepository;
   }
 
   /**
@@ -100,7 +100,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
    */
   protected void clearAuthenticationAttributes(HttpServletRequest request, HttpServletResponse response) {
     super.clearAuthenticationAttributes(request);
-    httpCookieOAuth2AuthorizationRequestRepository.removeAuthorizationRequestCookies(request, response);
+    OAuth2CookieRepository.removeAuthorizationRequestCookies(request, response);
   }
 
   /**
