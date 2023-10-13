@@ -2,6 +2,7 @@ package org.crochet.security.oauth2;
 
 import org.crochet.exception.OAuth2AuthenticationProcessingException;
 import org.crochet.model.AuthProvider;
+import org.crochet.model.RoleType;
 import org.crochet.model.User;
 import org.crochet.repository.UserRepository;
 import org.crochet.security.UserPrincipal;
@@ -126,16 +127,18 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     String providerId = oAuth2User.getAttribute("id");
     String name = oAuth2User.getAttribute("name");
     String email = getEmailFromOAuth2User(oAuth2User);
-    String imageUrl = oAuth2User.getAttribute("imageUrl");
+    String imageUrl = oAuth2User.getAttribute("picture");
 
     // Create a new user
-    User user = new User();
-    user.setProvider(AuthProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId()));
-    user.setProviderId(providerId);
-    user.setName(name);
-    user.setEmail(email);
-    user.setImageUrl(imageUrl);
-    user.setEmailVerified(true);
+    User user = User.builder()
+        .role(RoleType.USER)
+        .provider(AuthProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId()))
+        .providerId(providerId)
+        .name(name)
+        .email(email)
+        .imageUrl(imageUrl)
+        .emailVerified(true)
+        .build();
 
     // Save the new user in the repository
     return userRepository.save(user);
@@ -150,7 +153,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
    */
   private User updateUser(User existingUser, OAuth2User oAuth2User) {
     String name = oAuth2User.getAttribute("name");
-    String imageUrl = oAuth2User.getAttribute("imageUrl");
+    String imageUrl = oAuth2User.getAttribute("picture");
 
     // Update the existing user's attributes
     existingUser.setName(name);

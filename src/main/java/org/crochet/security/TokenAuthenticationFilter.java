@@ -13,6 +13,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -44,13 +45,11 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
     try {
       // Get jwtToken from cookie
-      var token = CookieUtils.getCookie(request, "jwtToken")
-          .map(Cookie::getValue)
-          .orElse(null);
+      var jwtToken = extractJwtTokenFromCookie(request);
 
       // Check if the JWT exists and is valid
-      if (StringUtils.hasText(token) && tokenProvider.validateToken(token)) {
-        Long userId = tokenProvider.getUserIdFromToken(token);
+      if (StringUtils.hasText(jwtToken) && tokenProvider.validateToken(jwtToken)) {
+        Long userId = tokenProvider.getUserIdFromToken(jwtToken);
 
         // Load the user details by user ID
         UserDetails userDetails = customUserDetailsService.loadUserById(userId);
@@ -77,7 +76,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
    * @param request The HttpServletRequest representing the HTTP request.
    * @return The extracted JWT, or null if it is not found.
    */
-  private String getJwtFromRequest(HttpServletRequest request) {
+  private String getJwtFromAuthorizationHeader(HttpServletRequest request) {
     // Retrieve the value of the "Authorization" header from the request
     String bearerToken = request.getHeader("Authorization");
 
@@ -89,6 +88,12 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
     // Return null if the JWT is not found or the "Authorization" header is missing or malformed
     return null;
+  }
+
+  private String extractJwtTokenFromCookie(HttpServletRequest request) {
+    return CookieUtils.getCookie(request, "jwtToken")
+        .map(Cookie::getValue)
+        .orElse(null);
   }
 
 }
