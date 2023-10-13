@@ -141,7 +141,7 @@ public class AuthServiceImpl implements AuthService {
     // Send confirmation email
     emailSender.send(signUpRequest.getEmail(),
         CONFIRM_YOUR_EMAIL,
-        buildEmailLink(signUpRequest.getName(), link, CONFIRM_YOUR_EMAIL, CLICK_TO_ACTIVE_CONTENT, ACTIVE_NOW));
+        buildEmailLink(signUpRequest.getEmail(), link, CONFIRM_YOUR_EMAIL, CLICK_TO_ACTIVE_CONTENT, ACTIVE_NOW));
 
     return new ApiResponse(true, "User registered successfully");
   }
