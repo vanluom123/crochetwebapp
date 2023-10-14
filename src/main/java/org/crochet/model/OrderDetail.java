@@ -14,32 +14,24 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-
 @Getter
 @Setter
+@Table(name = "order_detail")
 @Entity
-@Table(name = "confirmation_token")
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class ConfirmationToken {
+@NoArgsConstructor
+public class OrderDetail {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "id", nullable = false)
   private Long id;
 
-  @Column(nullable = false)
-  private String token;
-
-  @Column(nullable = false)
-  private LocalDateTime createdAt;
-
-  @Column(nullable = false)
-  private LocalDateTime expiresAt;
-
-  private LocalDateTime confirmedAt;
+  @ManyToOne
+  @JoinColumn(name = "pattern_id")
+  private Pattern pattern;
 
   @ManyToOne
-  @JoinColumn(name = "user_id")
-  private User user;
+  @JoinColumn(name = "order_id")
+  private Order order;
 }

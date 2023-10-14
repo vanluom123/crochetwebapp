@@ -1,21 +1,17 @@
 package org.crochet.exception;
 
-import lombok.AccessLevel;
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import org.springframework.http.HttpStatus;
 
-@Getter
-@Setter
-@Accessors(chain = true)
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class ApiError {
   private String message;
   private HttpStatus statusCode;
   private Throwable rootCause;
-  public static ApiError create() {
-    return new ApiError();
-  }
 }

@@ -5,8 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,32 +13,29 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-
 @Getter
 @Setter
 @Entity
-@Table(name = "confirmation_token")
+@Table(name = "product")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ConfirmationToken {
+public class Product {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  @Column(name = "id", nullable = false)
+  private long id;
 
-  @Column(nullable = false)
-  private String token;
+  @Column(name = "name")
+  private String name;
 
-  @Column(nullable = false)
-  private LocalDateTime createdAt;
+  @Lob
+  @Column(name = "image", columnDefinition = "LONGBLOB")
+  private String image;
 
-  @Column(nullable = false)
-  private LocalDateTime expiresAt;
+  @Column(name = "description")
+  private String description;
 
-  private LocalDateTime confirmedAt;
-
-  @ManyToOne
-  @JoinColumn(name = "user_id")
-  private User user;
+  @Column(name = "price")
+  private double price;
 }

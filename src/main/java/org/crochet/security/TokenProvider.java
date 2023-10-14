@@ -1,6 +1,5 @@
 package org.crochet.security;
 
-import org.crochet.config.AppProperties;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -10,6 +9,7 @@ import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SecurityException;
+import org.crochet.config.AppProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 
 import java.security.Key;
 import java.util.Date;
-import java.util.stream.Stream;
 
 /**
  * TokenProvider class
@@ -40,43 +39,22 @@ public class TokenProvider {
     this.appProperties = appProperties;
   }
 
-  /**
-   * Create token
-   *
-   * @param auth Authentication
-   * @return Token string
-   */
-  public String createToken(Authentication auth) {
-    return createToken(auth, false);
-  }
-
-  /**
-   * Create refresh token
-   *
-   * @param auth Authentication
-   * @return Refresh token string
-   */
-  public String createRefreshToken(Authentication auth) {
-    return createToken(auth, true);
-  }
 
   /**
    * Creates a JWT token for the provided Authentication object.
    *
-   * @param auth         The Authentication object representing the authenticated user.
-   * @param isRefreshed  A flag indicating whether the token is a refreshed token or not.
+   * @param auth The Authentication object representing the authenticated user.
    * @return The created JWT token.
    */
-  private String createToken(Authentication auth, boolean isRefreshed) {
+  public String createToken(Authentication auth) {
     // Get the UserPrincipal from the Authentication object
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
 
     // Get the current date and time
     Date now = new Date();
 
-    // Determine the token expiration time based on the isRefreshed flag
-    long tokenExpirationMs = isRefreshed ? appProperties.getAuth().getRefreshTokenExpirationMs() : appProperties.getAuth().getTokenExpirationMs();
-    Date expiryDate = new Date(now.getTime() + tokenExpirationMs);
+    // Expire date
+    Date expiryDate = new Date(now.getTime() + appProperties.getAuth().getTokenExpirationMs());
 
     // Build and sign the JWT token
     return Jwts.builder()
@@ -149,15 +127,5 @@ public class TokenProvider {
     }
     // If an exception is caught during parsing or validation, the token is considered invalid
     return false;
-  }
-
-  /**
-   * Validate with many tokens
-   *
-   * @param jwtTokens The list of tokens
-   * @return true/false
-   */
-  public boolean validateToken(String... jwtTokens) {
-    return Stream.of(jwtTokens).allMatch(this::validateToken);
   }
 }
