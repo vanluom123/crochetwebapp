@@ -1,11 +1,16 @@
 package org.crochet.request;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Getter;
+import lombok.Data;
+import org.crochet.model.RoleType;
 
-@Getter
+@Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class SignUpRequest {
   @NotBlank
   private String name;
@@ -17,15 +22,6 @@ public class SignUpRequest {
   @NotBlank
   private String password;
 
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public void setEmail(String email) {
-    this.email = email;
-  }
-
-  public void setPassword(String password) {
-    this.password = password;
-  }
+  @Enumerated(EnumType.STRING)
+  private RoleType role = RoleType.USER;
 }

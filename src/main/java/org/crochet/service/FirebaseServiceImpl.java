@@ -24,7 +24,7 @@ public class FirebaseServiceImpl implements FirebaseService {
   }
 
   @Override
-  public String updateLoadImage(MultipartFile imageFile) {
+  public byte[] updateLoadImage(MultipartFile imageFile) {
     // Define the path and filename in Firebase Cloud Storage
     String fileName = "images/" + imageFile.getOriginalFilename();
 
@@ -40,7 +40,7 @@ public class FirebaseServiceImpl implements FirebaseService {
 
     log.info("image name: {}", blob.getName());
 
-    return blob.getName();
+    return blob.getContent();
   }
 
   @Override
@@ -59,6 +59,4 @@ public class FirebaseServiceImpl implements FirebaseService {
       throw new CloudStorageException("Image not found in Firebase Cloud Storage");
     }
   }
-
-
 }

@@ -141,7 +141,7 @@ public class AuthServiceImpl implements AuthService {
     // Send confirmation email
     emailSender.send(signUpRequest.getEmail(),
         CONFIRM_YOUR_EMAIL,
-        buildEmailLink(signUpRequest.getName(), link, CONFIRM_YOUR_EMAIL, CLICK_TO_ACTIVE_CONTENT, ACTIVE_NOW));
+        buildEmailLink(signUpRequest.getEmail(), link, CONFIRM_YOUR_EMAIL, CLICK_TO_ACTIVE_CONTENT, ACTIVE_NOW));
 
     return new ApiResponse(true, "User registered successfully");
   }
@@ -325,16 +325,17 @@ public class AuthServiceImpl implements AuthService {
 
     if (confirmationToken == null) {
       // Create a new token
-      confirmationToken = new ConfirmationToken()
-          .setToken(token)
-          .setCreatedAt(now)
-          .setExpiresAt(expirationTime)
-          .setUser(user);
+      confirmationToken = ConfirmationToken.builder()
+          .token(token)
+          .createdAt(now)
+          .expiresAt(expirationTime)
+          .user(user)
+          .build();
     } else {
       // Update the existing token
-      confirmationToken.setToken(token)
-          .setCreatedAt(now)
-          .setExpiresAt(expirationTime);
+      confirmationToken.setToken(token);
+      confirmationToken.setCreatedAt(now);
+      confirmationToken.setExpiresAt(expirationTime);
     }
 
     return confirmationTokenRepository.save(confirmationToken);
@@ -354,12 +355,14 @@ public class AuthServiceImpl implements AuthService {
     }
 
     // Creating user's account
-    User user = new User()
-        .setName(signUpRequest.getName())
-        .setEmail(signUpRequest.getEmail())
-        .setPassword(passwordEncoder.encode(signUpRequest.getPassword()))
-        .setProvider(AuthProvider.local);
-
+    User user = User.builder()
+        .name(signUpRequest.getName())
+        .email(signUpRequest.getEmail())
+        .emailVerified(false)
+        .password(passwordEncoder.encode(signUpRequest.getPassword()))
+        .provider(AuthProvider.local)
+        .role(signUpRequest.getRole())
+        .build();
     // Save the user to the repository
     return userRepository.save(user);
   }
@@ -380,15 +383,16 @@ public class AuthServiceImpl implements AuthService {
 
     if (passwordResetToken == null) {
       // Create a new token
-      passwordResetToken = new PasswordResetToken()
-          .setToken(token)
-          .setCreatedAt(now)
-          .setExpiresAt(expirationTime)
-          .setUser(user);
+      passwordResetToken = PasswordResetToken.builder()
+          .token(token)
+          .createdAt(now)
+          .expiresAt(expirationTime)
+          .user(user)
+          .build();
     } else {
-      passwordResetToken.setToken(token)
-          .setCreatedAt(now)
-          .setExpiresAt(expirationTime);
+      passwordResetToken.setToken(token);
+      passwordResetToken.setCreatedAt(now);
+      passwordResetToken.setExpiresAt(expirationTime);
     }
 
     return passwordResetTokenRepository.save(passwordResetToken);
