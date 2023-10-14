@@ -1,10 +1,11 @@
 package org.crochet.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.crochet.security.CustomUserDetailsService;
 import org.crochet.security.RestAuthenticationEntryPoint;
 import org.crochet.security.TokenAuthenticationFilter;
 import org.crochet.security.oauth2.CustomOAuth2UserService;
-import org.crochet.security.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
+import org.crochet.security.oauth2.OAuth2CookieRepository;
 import org.crochet.security.oauth2.OAuth2AuthenticationFailureHandler;
 import org.crochet.security.oauth2.OAuth2AuthenticationSuccessHandler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,13 +20,13 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
+@Slf4j
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(
@@ -69,8 +70,8 @@ public class SecurityConfig {
     the session. We'll save the request in a Base64 encoded cookie instead.
   */
   @Bean
-  public HttpCookieOAuth2AuthorizationRequestRepository cookieAuthorizationRequestRepository() {
-    return new HttpCookieOAuth2AuthorizationRequestRepository();
+  public OAuth2CookieRepository cookieAuthorizationRequestRepository() {
+    return new OAuth2CookieRepository();
   }
 
   @Bean

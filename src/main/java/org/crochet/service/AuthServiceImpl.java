@@ -1,5 +1,7 @@
 package org.crochet.service;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.crochet.exception.BadRequestException;
 import org.crochet.exception.EmailVerificationException;
 import org.crochet.exception.ResourceNotFoundException;
@@ -19,6 +21,7 @@ import org.crochet.response.AuthResponse;
 import org.crochet.security.TokenProvider;
 import org.crochet.service.abstraction.AuthService;
 import org.crochet.service.abstraction.EmailSender;
+import org.crochet.util.CookieUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -43,6 +46,7 @@ public class AuthServiceImpl implements AuthService {
   public static final String RESET_YOUR_PASSWORD_CONTENT = "Please click the below link to reset your password";
   public static final String RESET_PASSWORD = "Reset password";
   public static final String RESET_NOTIFICATION = "Password Reset Notification";
+  public static final int JWT_TOKEN_MAX_AGE = 900;
   private final AuthenticationManager authenticationManager;
   private final TokenProvider tokenProvider;
   private final EmailSender emailSender;
@@ -50,17 +54,21 @@ public class AuthServiceImpl implements AuthService {
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
   private final PasswordResetTokenRepository passwordResetTokenRepository;
+  private final HttpServletResponse servletResponse;
+  private final HttpServletRequest servletRequest;
 
   /**
    * Constructor
    *
-   * @param authenticationManager AuthenticationManager
-   * @param tokenProvider TokenProvider
-   * @param emailSender EmailSender
-   * @param confirmationTokenRepository ConfirmationTokenRepository
-   * @param userRepository UserRepository
-   * @param passwordEncoder PasswordEncoder
+   * @param authenticationManager        AuthenticationManager
+   * @param tokenProvider                TokenProvider
+   * @param emailSender                  EmailSender
+   * @param confirmationTokenRepository  ConfirmationTokenRepository
+   * @param userRepository               UserRepository
+   * @param passwordEncoder              PasswordEncoder
    * @param passwordResetTokenRepository PasswordResetTokenRepository
+   * @param servletResponse              HttpServletResponse
+   * @param servletRequest               HttpServletRequest
    */
   @Autowired
   public AuthServiceImpl(AuthenticationManager authenticationManager,
@@ -69,7 +77,9 @@ public class AuthServiceImpl implements AuthService {
                          ConfirmationTokenRepository confirmationTokenRepository,
                          UserRepository userRepository,
                          PasswordEncoder passwordEncoder,
-                         PasswordResetTokenRepository passwordResetTokenRepository) {
+                         PasswordResetTokenRepository passwordResetTokenRepository,
+                         HttpServletResponse servletResponse,
+                         HttpServletRequest servletRequest) {
     this.authenticationManager = authenticationManager;
     this.tokenProvider = tokenProvider;
     this.emailSender = emailSender;
@@ -77,6 +87,8 @@ public class AuthServiceImpl implements AuthService {
     this.userRepository = userRepository;
     this.passwordEncoder = passwordEncoder;
     this.passwordResetTokenRepository = passwordResetTokenRepository;
+    this.servletResponse = servletResponse;
+    this.servletRequest = servletRequest;
   }
 
   /**
@@ -97,6 +109,9 @@ public class AuthServiceImpl implements AuthService {
 
     // Create a token for the authenticated user
     String token = tokenProvider.createToken(authentication);
+
+    // Add cookie for jwtToken
+    CookieUtils.addCookie(servletResponse, "jwtToken", token, JWT_TOKEN_MAX_AGE);
 
     // Return the authentication token in an AuthResponse
     return new AuthResponse(token);
@@ -126,7 +141,7 @@ public class AuthServiceImpl implements AuthService {
     // Send confirmation email
     emailSender.send(signUpRequest.getEmail(),
         CONFIRM_YOUR_EMAIL,
-        buildEmailLink(signUpRequest.getName(), link, CONFIRM_YOUR_EMAIL, CLICK_TO_ACTIVE_CONTENT, ACTIVE_NOW));
+        buildEmailLink(signUpRequest.getEmail(), link, CONFIRM_YOUR_EMAIL, CLICK_TO_ACTIVE_CONTENT, ACTIVE_NOW));
 
     return new ApiResponse(true, "User registered successfully");
   }
@@ -310,16 +325,17 @@ public class AuthServiceImpl implements AuthService {
 
     if (confirmationToken == null) {
       // Create a new token
-      confirmationToken = new ConfirmationToken()
-          .setToken(token)
-          .setCreatedAt(now)
-          .setExpiresAt(expirationTime)
-          .setUser(user);
+      confirmationToken = ConfirmationToken.builder()
+          .token(token)
+          .createdAt(now)
+          .expiresAt(expirationTime)
+          .user(user)
+          .build();
     } else {
       // Update the existing token
-      confirmationToken.setToken(token)
-          .setCreatedAt(now)
-          .setExpiresAt(expirationTime);
+      confirmationToken.setToken(token);
+      confirmationToken.setCreatedAt(now);
+      confirmationToken.setExpiresAt(expirationTime);
     }
 
     return confirmationTokenRepository.save(confirmationToken);
@@ -339,12 +355,14 @@ public class AuthServiceImpl implements AuthService {
     }
 
     // Creating user's account
-    User user = new User()
-        .setName(signUpRequest.getName())
-        .setEmail(signUpRequest.getEmail())
-        .setPassword(passwordEncoder.encode(signUpRequest.getPassword()))
-        .setProvider(AuthProvider.local);
-
+    User user = User.builder()
+        .name(signUpRequest.getName())
+        .email(signUpRequest.getEmail())
+        .emailVerified(false)
+        .password(passwordEncoder.encode(signUpRequest.getPassword()))
+        .provider(AuthProvider.local)
+        .role(signUpRequest.getRole())
+        .build();
     // Save the user to the repository
     return userRepository.save(user);
   }
@@ -365,15 +383,16 @@ public class AuthServiceImpl implements AuthService {
 
     if (passwordResetToken == null) {
       // Create a new token
-      passwordResetToken = new PasswordResetToken()
-          .setToken(token)
-          .setCreatedAt(now)
-          .setExpiresAt(expirationTime)
-          .setUser(user);
+      passwordResetToken = PasswordResetToken.builder()
+          .token(token)
+          .createdAt(now)
+          .expiresAt(expirationTime)
+          .user(user)
+          .build();
     } else {
-      passwordResetToken.setToken(token)
-          .setCreatedAt(now)
-          .setExpiresAt(expirationTime);
+      passwordResetToken.setToken(token);
+      passwordResetToken.setCreatedAt(now);
+      passwordResetToken.setExpiresAt(expirationTime);
     }
 
     return passwordResetTokenRepository.save(passwordResetToken);
@@ -440,6 +459,9 @@ public class AuthServiceImpl implements AuthService {
 
     // Delete password reset token
     passwordResetTokenRepository.delete(passwordResetToken);
+
+    // Delete token from cookie
+    CookieUtils.deleteCookie(servletRequest, servletResponse, "jwtToken");
 
     return new ApiResponse(true, "Reset password successfully");
   }
