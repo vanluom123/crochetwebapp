@@ -1,17 +1,15 @@
-package org.crochet.exception;
+package org.crochet.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.http.HttpStatus;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ApiError {
+public class ApiResponse {
+  private boolean success;
   private String message;
-  private HttpStatus statusCode;
-  private Throwable rootCause;
 }

@@ -4,17 +4,17 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-
-import java.util.List;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PatternResponse {
-    private String id;
-    private String name;
-    private String description;
-    private double price;
-    private List<String> bytes;
+  private Long id;
+  private String name;
+  private String image;
+  private String description;
+  private double price;
 }

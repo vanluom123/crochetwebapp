@@ -1,6 +1,5 @@
 package org.crochet.service;
 
-import org.crochet.constant.AppConstant;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.PatternMapper;
 import org.crochet.model.Pattern;
@@ -9,7 +8,8 @@ import org.crochet.repository.PatternSpecifications;
 import org.crochet.request.PatternRequest;
 import org.crochet.response.PatternPaginationResponse;
 import org.crochet.response.PatternResponse;
-import org.crochet.service.contact.PatternService;
+import org.crochet.service.abstraction.PatternService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -19,94 +19,60 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.UUID;
 
-/**
- * PatternServiceImpl class
- */
 @Service
 public class PatternServiceImpl implements PatternService {
-    private final PatternRepository patternRepo;
 
-    public PatternServiceImpl(PatternRepository patternRepo) {
-        this.patternRepo = patternRepo;
+  @Autowired
+  private PatternRepository patternRepository;
+
+  @Transactional
+  @Override
+  public void createOrUpdate(PatternRequest request) {
+    var pattern = patternRepository.findById(request.getId()).orElse(null);
+    if (pattern == null) {
+      pattern = PatternMapper.INSTANCE.toPattern(request);
+    } else {
+      pattern = Pattern.builder()
+          .name(request.getName())
+          .price(request.getPrice())
+          .image(request.getImage())
+          .description(request.getDescription())
+          .build();
     }
 
-    /**
-     * Create or update pattern
-     *
-     * @param request PatternRequest
-     */
-    @Transactional
-    @Override
-    public void createOrUpdate(PatternRequest request) {
-        var pattern = (request.getId() == null) ? new Pattern()
-                : findOne(request.getId());
-        pattern.setName(request.getName());
-        pattern.setPrice(request.getPrice());
-        pattern.setDescription(request.getDescription());
-        patternRepo.save(pattern);
+    pattern = patternRepository.save(pattern);
+  }
+
+  @Override
+  public PatternPaginationResponse getPatterns(int pageNo, int pageSize, String sortBy, String sortDir, String text) {
+    // create Sort instance
+    Sort sort = Sort.by(sortBy);
+    sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? sort.ascending() : sort.descending();
+    // create Pageable instance
+    Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+
+    Specification<Pattern> spec = Specification.where(null);
+    if (text != null && !text.isEmpty()) {
+      spec = spec.and(PatternSpecifications.searchBy(text));
     }
 
-    /**
-     * Get patterns
-     *
-     * @param pageNo   Page number
-     * @param pageSize The size of page
-     * @param sortBy   Sort by
-     * @param sortDir  Sort directory
-     * @param text     Text
-     * @return Pattern is paginated
-     */
-    @Override
-    public PatternPaginationResponse getPatterns(int pageNo, int pageSize, String sortBy, String sortDir, String text) {
-        // create Sort instance
-        Sort sort = Sort.by(sortBy);
-        sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? sort.ascending() : sort.descending();
-        // create Pageable instance
-        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+    Page<Pattern> menuPage = patternRepository.findAll(spec, pageable);
+    List<PatternResponse> responses = PatternMapper.INSTANCE.toResponses(menuPage.getContent());
 
-        Specification<Pattern> spec = Specification.where(null);
-        if (text != null && !text.isEmpty()) {
-            spec = spec.and(PatternSpecifications.searchBy(text));
-        }
+    return PatternPaginationResponse.builder()
+        .responses(responses)
+        .pageNo(menuPage.getNumber())
+        .pageSize(menuPage.getSize())
+        .totalElements(menuPage.getTotalElements())
+        .totalPages(menuPage.getTotalPages())
+        .last(menuPage.isLast())
+        .build();
+  }
 
-        Page<Pattern> menuPage = patternRepo.findAll(spec, pageable);
-        List<PatternResponse> responses = PatternMapper.INSTANCE.toResponses(menuPage.getContent());
-
-        return PatternPaginationResponse.builder()
-                .contents(responses)
-                .pageNo(menuPage.getNumber())
-                .pageSize(menuPage.getSize())
-                .totalElements(menuPage.getTotalElements())
-                .totalPages(menuPage.getTotalPages())
-                .last(menuPage.isLast())
-                .build();
-    }
-
-    @Override
-    public List<PatternResponse> getLimitedPatterns() {
-        var patterns = patternRepo.findAll()
-                .stream()
-                .limit(AppConstant.PATTERN_SIZE)
-                .toList();
-        return PatternMapper.INSTANCE.toResponses(patterns);
-    }
-
-    /**
-     * Get pattern detail
-     *
-     * @param id Id
-     * @return Pattern response
-     */
-    @Override
-    public PatternResponse getDetail(String id) {
-        var pattern = findOne(id);
-        return PatternMapper.INSTANCE.toResponse(pattern);
-    }
-
-    private Pattern findOne(String id) {
-        return patternRepo.findById(UUID.fromString(id))
-                .orElseThrow(() -> new ResourceNotFoundException("Pattern not found"));
-    }
+  @Override
+  public PatternResponse getDetail(long id) {
+    var pattern = patternRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Pattern not found"));
+    return PatternMapper.INSTANCE.toResponse(pattern);
+  }
 }

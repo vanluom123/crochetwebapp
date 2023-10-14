@@ -2,46 +2,49 @@ package org.crochet.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Set;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "pattern")
+@Table(name = "payment")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Pattern {
+public class Payment {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "id", nullable = false)
   private Long id;
 
-  @Column(name = "name")
-  private String name;
+  private LocalDateTime paymentDate;
 
-  @Lob
-  @Column(name = "image", columnDefinition = "LONGBLOB")
-  private String image;
+  private Double paymentAmount;
 
-  @Column(name = "description")
-  private String description;
+  private String paymentMethod;
 
-  @Column(name = "price")
-  private double price;
+  private String transactionId;
 
-  @OneToMany(mappedBy = "pattern")
-  private Set<OrderDetail> orderDetails;
+  @Enumerated(EnumType.STRING)
+  @NotNull
+  private StatusType status;
+
+  @ManyToOne
+  @JoinColumn(name = "order_id")
+  private Order order;
 }

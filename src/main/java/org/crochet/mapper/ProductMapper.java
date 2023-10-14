@@ -1,40 +1,36 @@
 package org.crochet.mapper;
 
 import org.crochet.model.Product;
-import org.crochet.model.ProductFile;
 import org.crochet.response.ProductResponse;
+import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
-import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 
-import java.util.Collection;
+import java.util.Base64;
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper
 public interface ProductMapper {
-    ProductMapper INSTANCE = Mappers.getMapper(ProductMapper.class);
+  ProductMapper INSTANCE = Mappers.getMapper(ProductMapper.class);
 
-    @Mapping(target = "id", source = "id", qualifiedByName = "uuidToString")
-    @Mapping(target = "bytes", source = "productFiles", qualifiedByName = "toList")
-    ProductResponse toResponse(Product product);
+  @InheritInverseConfiguration
+  @Mapping(target = "image", source = "image", qualifiedByName = "decoding")
+  ProductResponse toResponse(Product product);
 
-    @Named("toList")
-    default List<String> toList(Collection<ProductFile> productFiles) {
-        return Optional.ofNullable(productFiles)
-                .map(file -> file.stream()
-                        .map(ProductFile::getBytes)
-                        .toList())
-                .orElse(null);
-    }
+  @Mapping(target = "image", source = "image", qualifiedByName = "encoding")
+  Product toProduct(ProductResponse item);
 
-    List<ProductResponse> toResponses(Collection<Product> products);
+  List<ProductResponse> toResponses(List<Product> products);
 
-    @Named("uuidToString")
-    default String uuidToString(UUID uuid) {
-        return uuid.toString();
-    }
+  @Named("encoding")
+  default String encoding(byte[] data) {
+    return Base64.getEncoder().encodeToString(data);
+  }
+
+  @Named("decoding")
+  default byte[] decoding(String data) {
+    return Base64.getDecoder().decode(data);
+  }
 }
