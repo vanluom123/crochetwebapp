@@ -24,6 +24,7 @@ public class UserController {
   }
 
   @GetMapping("/hello")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<String> getHello() {
     return ResponseEntity.ok("Hello World!");
   }

@@ -1,5 +1,6 @@
 package org.crochet.security;
 
+import lombok.Getter;
 import org.crochet.model.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -15,10 +16,11 @@ import java.util.Map;
  * UserPrincipal class
  */
 public class UserPrincipal implements OAuth2User, UserDetails {
-  private final Long id;
-  private final String email;
-  private final String password;
-  private final Collection<? extends GrantedAuthority> authorities;
+  @Getter
+  private Long id;
+  private String email;
+  private String password;
+  private Collection<? extends GrantedAuthority> authorities;
   private Map<String, Object> attributes;
 
   /**
@@ -29,7 +31,10 @@ public class UserPrincipal implements OAuth2User, UserDetails {
    * @param password password
    * @param authorities authorities
    */
-  public UserPrincipal(Long id, String email, String password, Collection<? extends GrantedAuthority> authorities) {
+  public UserPrincipal(Long id,
+                       String email,
+                       String password,
+                       Collection<? extends GrantedAuthority> authorities) {
     this.id = id;
     this.email = email;
     this.password = password;
@@ -44,7 +49,7 @@ public class UserPrincipal implements OAuth2User, UserDetails {
    */
   public static UserPrincipal create(User user) {
     // Create a list of GrantedAuthority with a single authority ROLE_USER
-    List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
+    List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRole()));
 
     // Create and return a new UserPrincipal object with the provided user's details and authorities
     return new UserPrincipal(
@@ -66,14 +71,6 @@ public class UserPrincipal implements OAuth2User, UserDetails {
     UserPrincipal userPrincipal = UserPrincipal.create(user);
     userPrincipal.setAttributes(attributes);
     return userPrincipal;
-  }
-
-  public Long getId() {
-    return id;
-  }
-
-  public String getEmail() {
-    return email;
   }
 
   @Override
@@ -122,6 +119,6 @@ public class UserPrincipal implements OAuth2User, UserDetails {
 
   @Override
   public String getName() {
-    return String.valueOf(id);
+    return attributes.get("name").toString();
   }
 }

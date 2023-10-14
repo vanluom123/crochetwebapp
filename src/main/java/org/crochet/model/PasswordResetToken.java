@@ -7,18 +7,22 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.experimental.Accessors;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @Entity
-@Accessors(chain = true)
+@Table(name = "password_reset_token")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class PasswordResetToken {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

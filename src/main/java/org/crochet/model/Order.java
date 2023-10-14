@@ -7,6 +7,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,31 +16,32 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "confirmation_token")
+@Table(name = "order")
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class ConfirmationToken {
+@NoArgsConstructor
+public class Order {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "id", nullable = false)
   private Long id;
 
-  @Column(nullable = false)
-  private String token;
+  private LocalDateTime orderDate;
 
-  @Column(nullable = false)
-  private LocalDateTime createdAt;
-
-  @Column(nullable = false)
-  private LocalDateTime expiresAt;
-
-  private LocalDateTime confirmedAt;
+  private double totalPrice;
 
   @ManyToOne
   @JoinColumn(name = "user_id")
   private User user;
+
+  @OneToMany(mappedBy = "order")
+  private Set<OrderDetail> orderDetails;
+
+  @OneToMany(mappedBy = "order")
+  private Set<Payment> payments;
 }

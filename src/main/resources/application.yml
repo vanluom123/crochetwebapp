@@ -26,6 +26,11 @@ spring:
             enable: true
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml
+    enabled: false
+
+  servlet:
+    multipart:
+      max-file-size: 100MB
 
 app:
   auth:
@@ -43,3 +48,6 @@ app:
       - http://localhost:3000/oauth2/redirect
       - myandroidapp://oauth2/redirect
       - myiosapp://oauth2/redirect
+
+
+
