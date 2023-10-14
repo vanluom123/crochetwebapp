@@ -1,3 +1,5 @@
 databaseChangeLog:
   - include:
-      file: classpath:/db/migration/createNewSchemas.yaml
+      file: src/main/resources/db/migration/14-01-changelog.yaml
+#      file: src/main/resources/db/migration/createNewSchemas.yaml
+#      file: classpath:/db/migration/createNewSchemas.yaml
