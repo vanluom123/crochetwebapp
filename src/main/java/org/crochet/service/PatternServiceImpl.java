@@ -60,13 +60,14 @@ public class PatternServiceImpl implements PatternService {
     Page<Pattern> menuPage = patternRepository.findAll(spec, pageable);
     List<PatternResponse> responses = PatternMapper.INSTANCE.toResponses(menuPage.getContent());
 
-    return new PatternPaginationResponse()
-        .setResponses(responses)
-        .setPageNo(menuPage.getNumber())
-        .setPageSize(menuPage.getSize())
-        .setTotalElements(menuPage.getTotalElements())
-        .setTotalPages(menuPage.getTotalPages())
-        .setLast(menuPage.isLast());
+    return PatternPaginationResponse.builder()
+        .responses(responses)
+        .pageNo(menuPage.getNumber())
+        .pageSize(menuPage.getSize())
+        .totalElements(menuPage.getTotalElements())
+        .totalPages(menuPage.getTotalPages())
+        .last(menuPage.isLast())
+        .build();
   }
 
   @Override

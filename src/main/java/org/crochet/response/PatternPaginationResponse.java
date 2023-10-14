@@ -1,12 +1,16 @@
 package org.crochet.response;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.experimental.Accessors;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Data
-@Accessors(chain = true)
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class PatternPaginationResponse {
   public List<PatternResponse> responses;
   private int pageNo;

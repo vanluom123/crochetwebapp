@@ -70,13 +70,14 @@ public class ProductServiceImpl implements ProductService {
     Page<Product> menuPage = productRepository.findAll(spec, pageable);
     List<ProductResponse> contents = ProductMapper.INSTANCE.toResponses(menuPage.getContent());
 
-    return new ProductPaginationResponse()
-        .setContents(contents)
-        .setPageNo(menuPage.getNumber())
-        .setPageSize(menuPage.getSize())
-        .setTotalElements(menuPage.getTotalElements())
-        .setTotalPages(menuPage.getTotalPages())
-        .setLast(menuPage.isLast());
+    return ProductPaginationResponse.builder()
+        .contents(contents)
+        .pageNo(menuPage.getNumber())
+        .pageSize(menuPage.getSize())
+        .totalElements(menuPage.getTotalElements())
+        .totalPages(menuPage.getTotalPages())
+        .last(menuPage.isLast())
+        .build();
   }
 
   @Override
