@@ -8,16 +8,13 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
@@ -41,10 +38,8 @@ public class BlogPost {
   @Column(name = "imageUrl", columnDefinition = "LONGBLOB")
   private String imageUrl;
 
-  @CreationTimestamp
-  @Temporal(TemporalType.TIMESTAMP)
   @Column(name = "creation_date", nullable = false, updatable = false)
-  private Date creationDate;
+  private LocalDateTime creationDate;
 
   @NotNull
   @ManyToOne
