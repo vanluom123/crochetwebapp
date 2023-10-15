@@ -1,6 +1,5 @@
 package org.crochet.service;
 
-import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.repository.OrderRepository;
 import org.crochet.request.OrderRequest;
 import org.crochet.service.abstraction.OrderService;
