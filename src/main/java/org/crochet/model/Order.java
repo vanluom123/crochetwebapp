@@ -1,7 +1,9 @@
 package org.crochet.model;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -16,6 +18,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 @Getter
@@ -31,17 +34,19 @@ public class Order {
   @Column(name = "id", nullable = false)
   private Long id;
 
+  @Column(name = "order_date")
   private LocalDateTime orderDate;
 
+  @Column(name = "total_price")
   private double totalPrice;
 
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
   @JoinColumn(name = "user_id")
   private User user;
 
   @OneToMany(mappedBy = "order")
-  private Set<OrderDetail> orderDetails;
+  private Set<OrderDetail> orderDetails = new HashSet<>();
 
   @OneToMany(mappedBy = "order")
-  private Set<Payment> payments;
+  private Set<Payment> payments = new HashSet<>();
 }

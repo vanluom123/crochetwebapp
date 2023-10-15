@@ -19,6 +19,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -33,41 +34,48 @@ import java.util.Set;
 public class User {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "id", nullable = false)
   private Long id;
 
-  @Column(nullable = false)
+  @Column(name = "name", nullable = false)
   private String name;
 
   @Email
-  @Column(nullable = false)
+  @Column(name = "email", nullable = false)
   private String email;
 
+  @Column(name = "image_url")
   private String imageUrl;
 
-  @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+  @Column(name = "email_verified", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
   private Boolean emailVerified;
 
   @JsonIgnore
+  @Column(name = "password", nullable = false)
   private String password;
 
   @NotNull
   @Enumerated(EnumType.STRING)
+  @Column(name = "provider")
   private AuthProvider provider;
 
+  @Column(name = "provider_id")
   private String providerId;
 
+  @Column(name = "verification_code")
   private String verificationCode;
 
   @NotNull
   @Enumerated(EnumType.STRING)
+  @Column(name = "role")
   private RoleType role;
 
   @OneToMany(mappedBy = "user")
-  private Set<ConfirmationToken> confirmationTokens;
+  private Set<ConfirmationToken> confirmationTokens = new HashSet<>();
 
   @OneToMany(mappedBy = "user")
-  private Set<PasswordResetToken> passwordResetTokens;
+  private Set<PasswordResetToken> passwordResetTokens = new HashSet<>();
 
   @OneToMany(mappedBy = "user")
-  private Set<Order> orders;
+  private Set<Order> orders = new HashSet<>();
 }
