@@ -1,6 +1,45 @@
 databaseChangeLog:
   - changeSet:
-      id: 1697107357082-1
+      id: 1697331760147-1
+      author: admin (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_blogpost
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: title
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: content
+                  type: LONGBLOB
+              - column:
+                  name: image_url
+                  type: LONGBLOB
+              - column:
+                  constraints:
+                    nullable: false
+                  name: creation_date
+                  type: DATETIME
+              - column:
+                  constraints:
+                    nullable: false
+                  name: user_id
+                  type: BIGINT
+            tableName: blog_post
+  - changeSet:
+      id: 1697331760147-2
       author: admin (generated)
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -37,7 +76,7 @@ databaseChangeLog:
                   type: BIGINT
             tableName: confirmation_token
   - changeSet:
-      id: 1697107357082-2
+      id: 1697331760147-3
       author: admin (generated)
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -55,8 +94,6 @@ databaseChangeLog:
                   name: order_date
                   type: DATETIME
               - column:
-                  constraints:
-                    nullable: false
                   name: total_price
                   type: DOUBLE
               - column:
@@ -64,7 +101,7 @@ databaseChangeLog:
                   type: BIGINT
             tableName: order
   - changeSet:
-      id: 1697107357082-3
+      id: 1697331760147-4
       author: admin (generated)
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -86,7 +123,7 @@ databaseChangeLog:
                   type: BIGINT
             tableName: order_detail
   - changeSet:
-      id: 1697107357082-4
+      id: 1697331760147-5
       author: admin (generated)
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -120,7 +157,7 @@ databaseChangeLog:
                   type: BIGINT
             tableName: password_reset_token
   - changeSet:
-      id: 1697107357082-5
+      id: 1697331760147-6
       author: admin (generated)
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -148,7 +185,7 @@ databaseChangeLog:
                   type: DOUBLE
             tableName: pattern
   - changeSet:
-      id: 1697107357082-6
+      id: 1697331760147-7
       author: admin (generated)
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -184,7 +221,7 @@ databaseChangeLog:
                   type: BIGINT
             tableName: payment
   - changeSet:
-      id: 1697107357082-7
+      id: 1697331760147-8
       author: admin (generated)
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -212,7 +249,7 @@ databaseChangeLog:
                   type: DOUBLE
             tableName: product
   - changeSet:
-      id: 1697107357082-8
+      id: 1697331760147-9
       author: admin (generated)
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -246,6 +283,8 @@ databaseChangeLog:
                   name: email_verified
                   type: BOOLEAN
               - column:
+                  constraints:
+                    nullable: false
                   name: password
                   type: VARCHAR(255)
               - column:
@@ -266,7 +305,7 @@ databaseChangeLog:
                   type: VARCHAR(255)
             tableName: users
   - changeSet:
-      id: 1697107357082-9
+      id: 1697331760147-10
       author: admin (generated)
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -275,7 +314,18 @@ databaseChangeLog:
             constraintName: uc_74165e195b2f7b25de690d14a
             tableName: users
   - changeSet:
-      id: 1697107357082-10
+      id: 1697331760147-11
+      author: admin (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: blog_post
+            constraintName: FK_BLOGPOST_ON_USER
+            referencedColumnNames: id
+            referencedTableName: users
+  - changeSet:
+      id: 1697331760147-12
       author: admin (generated)
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -286,7 +336,7 @@ databaseChangeLog:
             referencedColumnNames: id
             referencedTableName: users
   - changeSet:
-      id: 1697107357082-11
+      id: 1697331760147-13
       author: admin (generated)
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -297,7 +347,7 @@ databaseChangeLog:
             referencedColumnNames: id
             referencedTableName: order
   - changeSet:
-      id: 1697107357082-12
+      id: 1697331760147-14
       author: admin (generated)
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -308,7 +358,7 @@ databaseChangeLog:
             referencedColumnNames: id
             referencedTableName: pattern
   - changeSet:
-      id: 1697107357082-13
+      id: 1697331760147-15
       author: admin (generated)
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -319,7 +369,7 @@ databaseChangeLog:
             referencedColumnNames: id
             referencedTableName: users
   - changeSet:
-      id: 1697107357082-14
+      id: 1697331760147-16
       author: admin (generated)
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -330,7 +380,7 @@ databaseChangeLog:
             referencedColumnNames: id
             referencedTableName: users
   - changeSet:
-      id: 1697107357082-15
+      id: 1697331760147-17
       author: admin (generated)
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
