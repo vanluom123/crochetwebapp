@@ -40,13 +40,13 @@ public class Order {
   @Column(name = "total_price")
   private double totalPrice;
 
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
   @JoinColumn(name = "user_id")
   private User user;
 
-  @OneToMany(mappedBy = "order", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+  @OneToMany(mappedBy = "order")
   private Set<OrderDetail> orderDetails = new HashSet<>();
 
-  @OneToMany(mappedBy = "order", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+  @OneToMany(mappedBy = "order")
   private Set<Payment> payments = new HashSet<>();
 }

@@ -5,10 +5,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
-import jakarta.persistence.ManyToOne;
-import jakarta.validation.constraints.NotNull;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,6 +16,7 @@ import java.time.LocalDateTime;
 
 @Data
 @Entity
+@Table(name = "blog_post")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -35,14 +34,9 @@ public class BlogPost {
   private String content;
 
   @Lob
-  @Column(name = "imageUrl", columnDefinition = "LONGBLOB")
+  @Column(name = "image_url", columnDefinition = "LONGBLOB")
   private String imageUrl;
 
   @Column(name = "creation_date", nullable = false, updatable = false)
   private LocalDateTime creationDate;
-
-  @NotNull
-  @ManyToOne
-  @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
-  private User user;
 }

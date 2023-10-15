@@ -1,9 +1,7 @@
 package org.crochet.model;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -45,6 +43,6 @@ public class Pattern {
   @Column(name = "price")
   private double price;
 
-  @OneToMany(mappedBy = "pattern", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+  @OneToMany(mappedBy = "pattern")
   private Set<OrderDetail> orderDetails = new HashSet<>();
 }
