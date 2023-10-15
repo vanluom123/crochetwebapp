@@ -26,15 +26,16 @@ import java.time.LocalDateTime;
 public class PasswordResetToken {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "id", nullable = false)
   private Long id;
 
-  @Column(nullable = false)
+  @Column(name = "token", nullable = false)
   private String token;
 
-  @Column(nullable = false)
+  @Column(name = "created_at", nullable = false)
   private LocalDateTime createdAt;
 
-  @Column(nullable = false)
+  @Column(name = "expires_at", nullable = false)
   private LocalDateTime expiresAt;
 
   @ManyToOne

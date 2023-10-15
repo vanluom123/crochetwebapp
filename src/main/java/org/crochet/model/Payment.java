@@ -40,8 +40,8 @@ public class Payment {
 
   private String transactionId;
 
-  @Enumerated(EnumType.STRING)
   @NotNull
+  @Enumerated(EnumType.STRING)
   private StatusType status;
 
   @ManyToOne
