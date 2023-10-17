@@ -9,24 +9,31 @@ import org.crochet.repository.UserRepository;
 import org.crochet.request.CommentRequest;
 import org.crochet.security.UserPrincipal;
 import org.crochet.service.abstraction.CommentService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
 @Service
 public class CommentServiceImpl implements CommentService {
 
-  @Autowired
-  private CommentRepository commentRepository;
+  private final CommentRepository commentRepository;
 
-  @Autowired
-  private UserRepository userRepository;
+  private final UserRepository userRepository;
 
-  @Autowired
-  private BlogPostRepository blogPostRepository;
+  private final BlogPostRepository blogPostRepository;
 
+  public CommentServiceImpl(CommentRepository commentRepository,
+                            UserRepository userRepository,
+                            BlogPostRepository blogPostRepository) {
+    this.commentRepository = commentRepository;
+    this.userRepository = userRepository;
+    this.blogPostRepository = blogPostRepository;
+  }
+
+  @Transactional
+  @Override
   public void createOrUpdate(CommentRequest request) {
     var auth = SecurityContextHolder.getContext().getAuthentication();
     UserPrincipal principal = (UserPrincipal) auth.getPrincipal();
