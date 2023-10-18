@@ -1,5 +1,7 @@
 package org.crochet.controller;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.crochet.request.LoginRequest;
 import org.crochet.request.PasswordResetRequest;
@@ -7,8 +9,8 @@ import org.crochet.request.SignUpRequest;
 import org.crochet.response.ApiResponse;
 import org.crochet.response.AuthResponse;
 import org.crochet.service.abstraction.AuthService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,13 +23,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
   private final AuthService authService;
 
-  @Autowired
   public AuthController(AuthService authService) {
     this.authService = authService;
   }
 
   @PostMapping("/login")
-  public ResponseEntity<AuthResponse> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+  public ResponseEntity<AuthResponse> authenticateUser(HttpServletResponse response, @Valid @RequestBody LoginRequest loginRequest) {
     AuthResponse authResponse = authService.authenticateUser(loginRequest);
     return ResponseEntity.ok(authResponse);
   }
@@ -60,5 +61,19 @@ public class AuthController {
                                                    @RequestBody PasswordResetRequest passwordResetRequest) {
     var response = authService.resetPassword(passwordResetToken, passwordResetRequest);
     return ResponseEntity.ok(response);
+  }
+
+  @GetMapping("/logout")
+  public String logout(HttpServletResponse response,
+                       @CookieValue(name = "jwtToken", required = false) String jwtToken) {
+    if (jwtToken != null) {
+      Cookie cookie = new Cookie("jwtToken", null);
+      cookie.setMaxAge(0);
+      cookie.setPath("/");
+      response.addCookie(cookie);
+      return "Logged out successfully.";
+    } else {
+      return "No JWT token found in the cookie.";
+    }
   }
 }
