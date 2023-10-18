@@ -5,7 +5,6 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.crochet.util.CookieUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
@@ -26,7 +25,6 @@ public class OAuth2AuthenticationFailureHandler extends SimpleUrlAuthenticationF
    *
    * @param OAuth2CookieRepository HttpCookieOAuth2AuthorizationRequestRepository
    */
-  @Autowired
   public OAuth2AuthenticationFailureHandler(OAuth2CookieRepository OAuth2CookieRepository) {
     this.OAuth2CookieRepository = OAuth2CookieRepository;
   }
