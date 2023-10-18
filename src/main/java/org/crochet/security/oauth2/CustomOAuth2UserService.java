@@ -6,7 +6,6 @@ import org.crochet.model.RoleType;
 import org.crochet.model.User;
 import org.crochet.repository.UserRepository;
 import org.crochet.security.UserPrincipal;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -31,7 +30,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
    *
    * @param userRepository UserRepository
    */
-  @Autowired
   public CustomOAuth2UserService(UserRepository userRepository) {
     this.userRepository = userRepository;
   }

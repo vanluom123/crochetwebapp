@@ -4,7 +4,6 @@ package org.crochet.security;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.model.User;
 import org.crochet.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -24,7 +23,6 @@ public class CustomUserDetailsService implements UserDetailsService {
    *
    * @param userRepository The UserRepository dependency.
    */
-  @Autowired
   public CustomUserDetailsService(UserRepository userRepository) {
     this.userRepository = userRepository;
   }

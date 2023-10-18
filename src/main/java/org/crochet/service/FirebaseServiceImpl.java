@@ -5,7 +5,6 @@ import com.google.firebase.cloud.StorageClient;
 import lombok.extern.slf4j.Slf4j;
 import org.crochet.exception.CloudStorageException;
 import org.crochet.service.abstraction.FirebaseService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,7 +17,6 @@ public class FirebaseServiceImpl implements FirebaseService {
   private static final String BUCKET_NAME = "littlecrochet.appspot.com";
   private final StorageClient storageClient;
 
-  @Autowired
   public FirebaseServiceImpl(StorageClient storageClient) {
     this.storageClient = storageClient;
   }
