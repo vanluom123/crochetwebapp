@@ -5,7 +5,6 @@ import org.crochet.model.User;
 import org.crochet.repository.UserRepository;
 import org.crochet.security.CurrentUser;
 import org.crochet.security.UserPrincipal;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,7 +17,6 @@ public class UserController {
 
   private final UserRepository userRepository;
 
-  @Autowired
   public UserController(UserRepository userRepository) {
     this.userRepository = userRepository;
   }
