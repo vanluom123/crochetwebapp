@@ -1,4 +1,4 @@
-package org.crochet.security;
+package org.crochet.service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -10,9 +10,10 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SecurityException;
 import org.crochet.config.AppProperties;
+import org.crochet.security.UserPrincipal;
+import org.crochet.service.abstraction.TokenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
@@ -23,9 +24,9 @@ import java.util.Date;
  * TokenProvider class
  */
 @Service
-public class TokenProvider {
+public class TokenServiceImpl implements TokenService {
 
-  private static final Logger logger = LoggerFactory.getLogger(TokenProvider.class);
+  private static final Logger logger = LoggerFactory.getLogger(TokenServiceImpl.class);
 
   private final AppProperties appProperties;
 
@@ -34,8 +35,7 @@ public class TokenProvider {
    *
    * @param appProperties The AppProperties dependency.
    */
-  @Autowired
-  public TokenProvider(AppProperties appProperties) {
+  public TokenServiceImpl(AppProperties appProperties) {
     this.appProperties = appProperties;
   }
 
@@ -46,6 +46,7 @@ public class TokenProvider {
    * @param auth The Authentication object representing the authenticated user.
    * @return The created JWT token.
    */
+  @Override
   public String createToken(Authentication auth) {
     // Get the UserPrincipal from the Authentication object
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
@@ -86,6 +87,7 @@ public class TokenProvider {
    * @param token The token from which to extract the user ID.
    * @return The user ID extracted from the token.
    */
+  @Override
   public Long getUserIdFromToken(String token) {
     // Parse the token, validate its signature, and retrieve the claims
     Claims claims = Jwts.parserBuilder()
@@ -105,6 +107,7 @@ public class TokenProvider {
    * @param authToken The JWT token to validate.
    * @return true if the token is valid, false otherwise.
    */
+  @Override
   public boolean validateToken(String authToken) {
     try {
       // Parse the token and validate it using the configured signing key
