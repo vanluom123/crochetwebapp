@@ -6,7 +6,6 @@ import org.crochet.response.PatternPaginationResponse;
 import org.crochet.response.PatternResponse;
 import org.crochet.service.abstraction.FirebaseService;
 import org.crochet.service.abstraction.PatternService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,11 +20,14 @@ import java.util.Base64;
 @RestController
 @RequestMapping("/pattern")
 public class PatternController {
-  @Autowired
-  private PatternService patternService;
+  private final PatternService patternService;
 
-  @Autowired
-  private FirebaseService firebaseService;
+  private final FirebaseService firebaseService;
+
+  public PatternController(PatternService patternService, FirebaseService firebaseService) {
+    this.patternService = patternService;
+    this.firebaseService = firebaseService;
+  }
 
 
   @PostMapping("/create")
