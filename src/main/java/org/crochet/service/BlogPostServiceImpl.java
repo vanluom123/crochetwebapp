@@ -9,7 +9,6 @@ import org.crochet.request.BlogPostRequest;
 import org.crochet.response.BlogPostPaginationResponse;
 import org.crochet.response.BlogPostResponse;
 import org.crochet.service.abstraction.BlogPostService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -23,8 +22,11 @@ import java.time.LocalDateTime;
 @Service
 public class BlogPostServiceImpl implements BlogPostService {
 
-  @Autowired
-  private BlogPostRepository blogPostRepository;
+  private final BlogPostRepository blogPostRepository;
+
+  public BlogPostServiceImpl(BlogPostRepository blogPostRepository) {
+    this.blogPostRepository = blogPostRepository;
+  }
 
   @Transactional
   @Override

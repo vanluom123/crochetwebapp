@@ -34,6 +34,7 @@ public class FacebookOAuth2User extends AbstractOAuth2User {
     return null;
   }
 
+  @SuppressWarnings("unchecked")
   private static <T> T uncheckedCast(Object obj) {
     try {
       return (T) obj;
