@@ -5,7 +5,6 @@ import org.crochet.request.BlogPostRequest;
 import org.crochet.response.BlogPostPaginationResponse;
 import org.crochet.service.abstraction.BlogPostService;
 import org.crochet.service.abstraction.FirebaseService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,11 +20,14 @@ import java.util.Base64;
 @RequestMapping("/blog")
 public class BlogController {
 
-  @Autowired
-  private BlogPostService blogPostService;
+  private final BlogPostService blogPostService;
 
-  @Autowired
-  private FirebaseService firebaseService;
+  private final FirebaseService firebaseService;
+
+  public BlogController(BlogPostService blogPostService, FirebaseService firebaseService) {
+    this.blogPostService = blogPostService;
+    this.firebaseService = firebaseService;
+  }
 
   @PostMapping("/create")
   @PreAuthorize("hasRole('ADMIN')")

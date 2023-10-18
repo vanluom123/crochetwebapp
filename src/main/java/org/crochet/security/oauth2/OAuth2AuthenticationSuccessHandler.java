@@ -5,9 +5,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.crochet.config.AppProperties;
 import org.crochet.exception.BadRequestException;
-import org.crochet.security.TokenProvider;
+import org.crochet.service.abstraction.TokenService;
 import org.crochet.util.CookieUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -24,7 +23,7 @@ import static org.crochet.security.oauth2.OAuth2CookieRepository.REDIRECT_URI_PA
 @Component
 public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
-  private final TokenProvider tokenProvider;
+  private final TokenService tokenService;
 
   private final AppProperties appProperties;
 
@@ -33,15 +32,14 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
   /**
    * Constructor of OAuth2AuthenticationSuccessHandler class
    *
-   * @param tokenProvider TokenProvider
+   * @param tokenService TokenProvider
    * @param appProperties AppProperties
    * @param OAuth2CookieRepository HttpCookieOAuth2AuthorizationRequestRepository
    */
-  @Autowired
-  OAuth2AuthenticationSuccessHandler(TokenProvider tokenProvider,
+  OAuth2AuthenticationSuccessHandler(TokenService tokenService,
                                      AppProperties appProperties,
                                      OAuth2CookieRepository OAuth2CookieRepository) {
-    this.tokenProvider = tokenProvider;
+    this.tokenService = tokenService;
     this.appProperties = appProperties;
     this.OAuth2CookieRepository = OAuth2CookieRepository;
   }
@@ -84,7 +82,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         .orElseThrow(() -> new BadRequestException("Sorry! We've got an Unauthorized Redirect URI and can't proceed with the authentication"));
 
     String targetUrl = redirectUri.isEmpty() ? getDefaultTargetUrl() : redirectUri;
-    String token = tokenProvider.createToken(authentication);
+    String token = tokenService.createToken(authentication);
 
     return UriComponentsBuilder.fromUriString(targetUrl)
         .queryParam("token", token)

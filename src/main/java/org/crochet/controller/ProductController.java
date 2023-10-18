@@ -6,7 +6,6 @@ import org.crochet.response.ProductPaginationResponse;
 import org.crochet.response.ProductResponse;
 import org.crochet.service.abstraction.FirebaseService;
 import org.crochet.service.abstraction.ProductService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,7 +23,6 @@ public class ProductController {
   private final ProductService productService;
   private final FirebaseService firebaseService;
 
-  @Autowired
   public ProductController(ProductService productService, FirebaseService firebaseService) {
     this.productService = productService;
     this.firebaseService = firebaseService;

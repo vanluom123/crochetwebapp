@@ -18,11 +18,10 @@ import org.crochet.request.PasswordResetRequest;
 import org.crochet.request.SignUpRequest;
 import org.crochet.response.ApiResponse;
 import org.crochet.response.AuthResponse;
-import org.crochet.security.TokenProvider;
 import org.crochet.service.abstraction.AuthService;
 import org.crochet.service.abstraction.EmailSender;
+import org.crochet.service.abstraction.TokenService;
 import org.crochet.util.CookieUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -48,7 +47,7 @@ public class AuthServiceImpl implements AuthService {
   public static final String RESET_NOTIFICATION = "Password Reset Notification";
   public static final int JWT_TOKEN_MAX_AGE = 900;
   private final AuthenticationManager authenticationManager;
-  private final TokenProvider tokenProvider;
+  private final TokenService tokenService;
   private final EmailSender emailSender;
   private final ConfirmationTokenRepository confirmationTokenRepository;
   private final UserRepository userRepository;
@@ -61,7 +60,7 @@ public class AuthServiceImpl implements AuthService {
    * Constructor
    *
    * @param authenticationManager        AuthenticationManager
-   * @param tokenProvider                TokenProvider
+   * @param tokenService                TokenProvider
    * @param emailSender                  EmailSender
    * @param confirmationTokenRepository  ConfirmationTokenRepository
    * @param userRepository               UserRepository
@@ -70,9 +69,8 @@ public class AuthServiceImpl implements AuthService {
    * @param servletResponse              HttpServletResponse
    * @param servletRequest               HttpServletRequest
    */
-  @Autowired
   public AuthServiceImpl(AuthenticationManager authenticationManager,
-                         TokenProvider tokenProvider,
+                         TokenService tokenService,
                          EmailSender emailSender,
                          ConfirmationTokenRepository confirmationTokenRepository,
                          UserRepository userRepository,
@@ -81,7 +79,7 @@ public class AuthServiceImpl implements AuthService {
                          HttpServletResponse servletResponse,
                          HttpServletRequest servletRequest) {
     this.authenticationManager = authenticationManager;
-    this.tokenProvider = tokenProvider;
+    this.tokenService = tokenService;
     this.emailSender = emailSender;
     this.confirmationTokenRepository = confirmationTokenRepository;
     this.userRepository = userRepository;
@@ -108,7 +106,7 @@ public class AuthServiceImpl implements AuthService {
     SecurityContextHolder.getContext().setAuthentication(authentication);
 
     // Create a token for the authenticated user
-    String token = tokenProvider.createToken(authentication);
+    String token = tokenService.createToken(authentication);
 
     // Add cookie for jwtToken
     CookieUtils.addCookie(servletResponse, "jwtToken", token, JWT_TOKEN_MAX_AGE);

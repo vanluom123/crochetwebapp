@@ -9,7 +9,6 @@ import org.crochet.request.SignUpRequest;
 import org.crochet.response.ApiResponse;
 import org.crochet.response.AuthResponse;
 import org.crochet.service.abstraction.AuthService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,7 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
   private final AuthService authService;
 
-  @Autowired
   public AuthController(AuthService authService) {
     this.authService = authService;
   }

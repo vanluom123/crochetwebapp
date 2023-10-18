@@ -8,7 +8,6 @@ import org.crochet.security.oauth2.CustomOAuth2UserService;
 import org.crochet.security.oauth2.OAuth2AuthenticationFailureHandler;
 import org.crochet.security.oauth2.OAuth2AuthenticationSuccessHandler;
 import org.crochet.security.oauth2.OAuth2CookieRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -46,33 +45,26 @@ public class SecurityConfig {
 
   private final PasswordEncoder passwordEncoder;
 
-  @Autowired
+  private final OAuth2CookieRepository oAuth2CookieRepository;
+
+  private final TokenAuthenticationFilter tokenAuthenticationFilter;
+
   public SecurityConfig(CustomUserDetailsService customUserDetailsService,
                         CustomOAuth2UserService customOAuth2UserService,
                         OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler,
                         OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler,
-                        PasswordEncoder passwordEncoder) {
+                        PasswordEncoder passwordEncoder,
+                        OAuth2CookieRepository oAuth2CookieRepository,
+                        TokenAuthenticationFilter tokenAuthenticationFilter) {
     this.customUserDetailsService = customUserDetailsService;
     this.customOAuth2UserService = customOAuth2UserService;
     this.oAuth2AuthenticationSuccessHandler = oAuth2AuthenticationSuccessHandler;
     this.oAuth2AuthenticationFailureHandler = oAuth2AuthenticationFailureHandler;
     this.passwordEncoder = passwordEncoder;
+    this.oAuth2CookieRepository = oAuth2CookieRepository;
+    this.tokenAuthenticationFilter = tokenAuthenticationFilter;
   }
 
-  @Bean
-  public TokenAuthenticationFilter tokenAuthenticationFilter() {
-    return new TokenAuthenticationFilter();
-  }
-
-  /*
-    By default, Spring OAuth2 uses HttpSessionOAuth2AuthorizationRequestRepository to save
-    the authorization request. But, since our service is stateless, we can't save it in
-    the session. We'll save the request in a Base64 encoded cookie instead.
-  */
-  @Bean
-  public OAuth2CookieRepository cookieAuthorizationRequestRepository() {
-    return new OAuth2CookieRepository();
-  }
 
   @Bean
   public AuthenticationProvider authenticationProvider() {
@@ -106,13 +98,13 @@ public class SecurityConfig {
         .oauth2Login(oauth -> oauth.authorizationEndpoint(authEndpointCustomizer ->
                 authEndpointCustomizer
                     .baseUri("/oauth2/authorize")
-                    .authorizationRequestRepository(cookieAuthorizationRequestRepository()))
+                    .authorizationRequestRepository(oAuth2CookieRepository))
             .redirectionEndpoint(redirectionEndpointCustomizer ->
                 redirectionEndpointCustomizer.baseUri("/oauth2/callback/*"))
             .userInfoEndpoint(userInfoEndpointCustomizer -> userInfoEndpointCustomizer.userService(customOAuth2UserService))
             .successHandler(oAuth2AuthenticationSuccessHandler)
             .failureHandler(oAuth2AuthenticationFailureHandler))
-        .addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+        .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
         .authenticationProvider(authenticationProvider())
         .build();
   }
