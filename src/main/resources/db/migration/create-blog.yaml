@@ -1,0 +1,36 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1697563608510-1
+      author: admin (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_blog_post
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: title
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: content
+                  type: LONGBLOB
+              - column:
+                  name: image_url
+                  type: LONGBLOB
+              - column:
+                  constraints:
+                    nullable: false
+                  name: creation_date
+                  type: DATETIME
+            tableName: blog_post
+
