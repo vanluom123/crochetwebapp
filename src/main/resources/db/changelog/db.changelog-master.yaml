@@ -1,4 +1,19 @@
 databaseChangeLog:
   - include:
-      file: src/main/resources/db/migration/createNewSchemas.yaml
-#      file: classpath:/db/migration/createNewSchemas.yaml
+      file: src/main/resources/db/migration/create-user.yaml
+  - include:
+      file: src/main/resources/db/migration/create-product.yaml
+  - include:
+      file: src/main/resources/db/migration/create-pattern.yaml
+  - include:
+      file: src/main/resources/db/migration/create-confirmation-token.yaml
+  - include:
+      file: src/main/resources/db/migration/create-password-reset-token.yaml
+  - include:
+      file: src/main/resources/db/migration/create-order.yaml
+  - include:
+      file: src/main/resources/db/migration/create-payment.yaml
+  - include:
+      file: src/main/resources/db/migration/create-blog.yaml
+  - include:
+      file: src/main/resources/db/migration/create-comment.yaml
