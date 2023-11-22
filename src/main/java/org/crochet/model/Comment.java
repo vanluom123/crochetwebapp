@@ -11,36 +11,35 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
+@Data
 @Entity
-@Table(name = "password_reset_token")
+@Table(name = "comment")
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class PasswordResetToken {
+@NoArgsConstructor
+public class Comment {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "id", nullable = false)
   private Long id;
 
-  @Column(name = "token", nullable = false)
-  private String token;
-
-  @Column(name = "created_at", nullable = false)
-  private LocalDateTime createdAt;
-
-  @Column(name = "expires_at", nullable = false)
-  private LocalDateTime expiresAt;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "post_id")
+  private BlogPost blogPost;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id")
   private User user;
+
+  @Column(name = "content", nullable = false)
+  private String content;
+
+  @Column(name = "created_date", nullable = false)
+  private LocalDateTime createdDate;
 
 }
