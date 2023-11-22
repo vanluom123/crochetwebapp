@@ -1,0 +1,55 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1697563559905-1
+      author: admin (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_payment
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: payment_date
+                  type: DATETIME
+              - column:
+                  constraints:
+                    nullable: false
+                  name: payment_amount
+                  type: DOUBLE
+              - column:
+                  name: payment_method
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: transaction_id
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: status
+                  type: VARCHAR(255)
+              - column:
+                  name: order_id
+                  type: BIGINT
+            tableName: payment
+  - changeSet:
+      id: 1697563559905-2
+      author: admin (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: order_id
+            baseTableName: payment
+            constraintName: FK_PAYMENT_ON_ORDER
+            referencedColumnNames: id
+            referencedTableName: order
+

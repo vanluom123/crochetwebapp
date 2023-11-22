@@ -19,7 +19,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -71,11 +70,14 @@ public class User {
   private RoleType role;
 
   @OneToMany(mappedBy = "user")
-  private Set<ConfirmationToken> confirmationTokens = new HashSet<>();
+  private Set<ConfirmationToken> confirmationTokens;
 
   @OneToMany(mappedBy = "user")
-  private Set<PasswordResetToken> passwordResetTokens = new HashSet<>();
+  private Set<PasswordResetToken> passwordResetTokens;
 
   @OneToMany(mappedBy = "user")
-  private Set<Order> orders = new HashSet<>();
+  private Set<Order> orders;
+
+  @OneToMany(mappedBy = "user")
+  private Set<Comment> comments;
 }
