@@ -14,7 +14,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.HashSet;
 import java.util.Set;
 
 @Getter
@@ -44,5 +43,5 @@ public class Pattern {
   private double price;
 
   @OneToMany(mappedBy = "pattern")
-  private Set<OrderDetail> orderDetails = new HashSet<>();
+  private Set<OrderDetail> orderDetails;
 }
