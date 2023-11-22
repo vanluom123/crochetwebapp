@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,6 +14,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Data
 @Entity
@@ -39,4 +41,7 @@ public class BlogPost {
 
   @Column(name = "creation_date", nullable = false, updatable = false)
   private LocalDateTime creationDate;
+
+  @OneToMany(mappedBy = "blogPost")
+  private Set<Comment> comments;
 }

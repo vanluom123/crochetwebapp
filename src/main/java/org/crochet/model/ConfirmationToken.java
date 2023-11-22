@@ -1,6 +1,5 @@
 package org.crochet.model;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -43,7 +42,7 @@ public class ConfirmationToken {
   @Column(name = "confirmed_at")
   private LocalDateTime confirmedAt;
 
-  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id")
   private User user;
 }

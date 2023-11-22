@@ -1,6 +1,5 @@
 package org.crochet.model;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -34,19 +33,24 @@ public class Payment {
   @Column(name = "id", nullable = false)
   private Long id;
 
+  @Column(name = "payment_date", nullable = false)
   private LocalDateTime paymentDate;
 
+  @Column(name = "payment_amount", nullable = false)
   private Double paymentAmount;
 
+  @Column(name = "payment_method")
   private String paymentMethod;
 
+  @Column(name = "transaction_id", nullable = false)
   private String transactionId;
 
   @NotNull
   @Enumerated(EnumType.STRING)
+  @Column(name = "status")
   private StatusType status;
 
-  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "order_id")
   private Order order;
 }
