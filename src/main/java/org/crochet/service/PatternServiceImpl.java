@@ -23,9 +23,11 @@ import java.util.List;
 public class PatternServiceImpl implements PatternService {
 
   private final PatternRepository patternRepository;
+  private final PatternMapper patternMapper;
 
-  public PatternServiceImpl(PatternRepository patternRepository) {
+  public PatternServiceImpl(PatternRepository patternRepository, PatternMapper patternMapper) {
     this.patternRepository = patternRepository;
+    this.patternMapper = patternMapper;
   }
 
   @Transactional
@@ -33,7 +35,7 @@ public class PatternServiceImpl implements PatternService {
   public void createOrUpdate(PatternRequest request) {
     var pattern = patternRepository.findById(request.getId()).orElse(null);
     if (pattern == null) {
-      pattern = PatternMapper.INSTANCE.toPattern(request);
+      pattern = patternMapper.toPattern(request);
     } else {
       pattern = Pattern.builder()
           .name(request.getName())
@@ -60,7 +62,7 @@ public class PatternServiceImpl implements PatternService {
     }
 
     Page<Pattern> menuPage = patternRepository.findAll(spec, pageable);
-    List<PatternResponse> responses = PatternMapper.INSTANCE.toResponses(menuPage.getContent());
+    List<PatternResponse> responses = patternMapper.toResponses(menuPage.getContent());
 
     return PatternPaginationResponse.builder()
         .responses(responses)
@@ -75,6 +77,6 @@ public class PatternServiceImpl implements PatternService {
   @Override
   public PatternResponse getDetail(long id) {
     var pattern = patternRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Pattern not found"));
-    return PatternMapper.INSTANCE.toResponse(pattern);
+    return patternMapper.toResponse(pattern);
   }
 }
