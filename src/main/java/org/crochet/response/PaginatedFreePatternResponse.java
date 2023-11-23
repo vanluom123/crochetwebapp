@@ -7,8 +7,8 @@ import java.util.List;
 
 @Builder
 @AllArgsConstructor
-public class ProductPaginationResponse {
-  private List<ProductResponse> contents;
+public class PaginatedFreePatternResponse {
+  private List<FreePatternResponse> contents;
   private int pageNo;
   private int pageSize;
   private long totalElements;

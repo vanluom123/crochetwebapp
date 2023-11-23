@@ -24,21 +24,6 @@ public class ProductMapperImpl implements ProductMapper {
   }
 
   @Override
-  public Product toProduct(ProductResponse response) {
-    if (response == null) {
-      return null;
-    }
-
-    return Product.builder()
-        .id(response.getId())
-        .name(response.getName())
-        .image(encoding(response.getImage()))
-        .description(response.getDescription())
-        .price(response.getPrice())
-        .build();
-  }
-
-  @Override
   public List<ProductResponse> toResponses(List<Product> products) {
     if (ObjectUtils.isEmpty(products)) {
       return null;

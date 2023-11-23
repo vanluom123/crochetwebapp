@@ -9,8 +9,6 @@ import java.util.List;
 public interface ProductMapper {
   ProductResponse toResponse(Product product);
 
-  Product toProduct(ProductResponse item);
-
   List<ProductResponse> toResponses(List<Product> products);
 
   default String encoding(byte[] data) {

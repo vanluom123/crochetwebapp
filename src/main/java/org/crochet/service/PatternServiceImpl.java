@@ -25,11 +25,23 @@ public class PatternServiceImpl implements PatternService {
   private final PatternRepository patternRepository;
   private final PatternMapper patternMapper;
 
-  public PatternServiceImpl(PatternRepository patternRepository, PatternMapper patternMapper) {
+  /**
+   * Constructor
+   *
+   * @param patternRepository PatternRepository
+   * @param patternMapper PatternMapper
+   */
+  public PatternServiceImpl(PatternRepository patternRepository,
+                            PatternMapper patternMapper) {
     this.patternRepository = patternRepository;
     this.patternMapper = patternMapper;
   }
 
+  /**
+   * Create or update pattern
+   *
+   * @param request PatternRequest
+   */
   @Transactional
   @Override
   public void createOrUpdate(PatternRequest request) {
@@ -48,6 +60,16 @@ public class PatternServiceImpl implements PatternService {
     pattern = patternRepository.save(pattern);
   }
 
+  /**
+   * Get patterns
+   *
+   * @param pageNo Page number
+   * @param pageSize The size of page
+   * @param sortBy Sort by
+   * @param sortDir Sort directory
+   * @param text Text
+   * @return Pattern is paginated
+   */
   @Override
   public PatternPaginationResponse getPatterns(int pageNo, int pageSize, String sortBy, String sortDir, String text) {
     // create Sort instance
@@ -74,6 +96,12 @@ public class PatternServiceImpl implements PatternService {
         .build();
   }
 
+  /**
+   * Get pattern detail
+   *
+   * @param id Id
+   * @return Pattern response
+   */
   @Override
   public PatternResponse getDetail(long id) {
     var pattern = patternRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Pattern not found"));

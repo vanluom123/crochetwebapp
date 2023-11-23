@@ -1,6 +1,5 @@
 package org.crochet.mapper;
 
-import org.crochet.model.FreePattern;
 import org.crochet.model.Pattern;
 import org.crochet.request.PatternRequest;
 import org.crochet.response.PatternResponse;
@@ -27,20 +26,6 @@ public class PatternMapperImpl implements PatternMapper {
   }
 
   @Override
-  public PatternResponse toResponse(FreePattern pattern) {
-    if (pattern == null) {
-      return null;
-    }
-
-    return PatternResponse.builder()
-        .id(pattern.getId())
-        .name(pattern.getName())
-        .image(pattern.getImage())
-        .description(pattern.getDescription())
-        .build();
-  }
-
-  @Override
   public Pattern toPattern(PatternRequest request) {
     if (request == null) {
       return null;
@@ -56,37 +41,12 @@ public class PatternMapperImpl implements PatternMapper {
   }
 
   @Override
-  public FreePattern toFreePattern(PatternRequest request) {
-    if (request == null) {
-      return null;
-    }
-
-    return FreePattern.builder()
-        .id(request.getId())
-        .name(request.getName())
-        .image(request.getImage())
-        .description(request.getDescription())
-        .build();
-  }
-
-  @Override
   public List<PatternResponse> toResponses(List<Pattern> patterns) {
     if (ObjectUtils.isEmpty(patterns)) {
       return null;
     }
 
     return patterns.stream()
-        .map(this::toResponse)
-        .toList();
-  }
-
-  @Override
-  public List<PatternResponse> toResponsesWithFreePattern(List<FreePattern> freePatterns) {
-    if (ObjectUtils.isEmpty(freePatterns)) {
-      return null;
-    }
-
-    return freePatterns.stream()
         .map(this::toResponse)
         .toList();
   }
