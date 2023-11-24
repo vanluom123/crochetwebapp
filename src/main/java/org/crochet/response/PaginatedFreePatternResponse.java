@@ -9,8 +9,8 @@ import java.util.List;
 @Data
 @Builder
 @AllArgsConstructor
-public class PatternPaginationResponse {
-  public List<PatternResponse> contents;
+public class PaginatedFreePatternResponse {
+  private List<FreePatternResponse> contents;
   private int pageNo;
   private int pageSize;
   private long totalElements;

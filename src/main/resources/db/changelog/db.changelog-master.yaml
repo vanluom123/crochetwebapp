@@ -17,3 +17,5 @@ databaseChangeLog:
       file: src/main/resources/db/migration/create-blog.yaml
   - include:
       file: src/main/resources/db/migration/create-comment.yaml
+  - include:
+      file: src/main/resources/db/migration/create-free-pattern.yaml
