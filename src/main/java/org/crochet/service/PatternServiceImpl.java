@@ -87,7 +87,7 @@ public class PatternServiceImpl implements PatternService {
     List<PatternResponse> responses = patternMapper.toResponses(menuPage.getContent());
 
     return PatternPaginationResponse.builder()
-        .responses(responses)
+        .contents(responses)
         .pageNo(menuPage.getNumber())
         .pageSize(menuPage.getSize())
         .totalElements(menuPage.getTotalElements())
