@@ -24,8 +24,13 @@ spring:
           auth: true
           starttls:
             enable: true
-  liquibase:
-    change-log: classpath:db/changelog/db.changelog-master.yaml
+#  liquibase:
+#    change-log: classpath:db/changelog/db.changelog-master.yaml
+#    enabled: false
+
+  servlet:
+    multipart:
+      max-file-size: 100MB
 
 app:
   auth:
