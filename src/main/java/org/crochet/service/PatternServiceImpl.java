@@ -23,17 +23,31 @@ import java.util.List;
 public class PatternServiceImpl implements PatternService {
 
   private final PatternRepository patternRepository;
+  private final PatternMapper patternMapper;
 
-  public PatternServiceImpl(PatternRepository patternRepository) {
+  /**
+   * Constructor
+   *
+   * @param patternRepository PatternRepository
+   * @param patternMapper PatternMapper
+   */
+  public PatternServiceImpl(PatternRepository patternRepository,
+                            PatternMapper patternMapper) {
     this.patternRepository = patternRepository;
+    this.patternMapper = patternMapper;
   }
 
+  /**
+   * Create or update pattern
+   *
+   * @param request PatternRequest
+   */
   @Transactional
   @Override
   public void createOrUpdate(PatternRequest request) {
     var pattern = patternRepository.findById(request.getId()).orElse(null);
     if (pattern == null) {
-      pattern = PatternMapper.INSTANCE.toPattern(request);
+      pattern = patternMapper.toPattern(request);
     } else {
       pattern = Pattern.builder()
           .name(request.getName())
@@ -46,6 +60,16 @@ public class PatternServiceImpl implements PatternService {
     pattern = patternRepository.save(pattern);
   }
 
+  /**
+   * Get patterns
+   *
+   * @param pageNo Page number
+   * @param pageSize The size of page
+   * @param sortBy Sort by
+   * @param sortDir Sort directory
+   * @param text Text
+   * @return Pattern is paginated
+   */
   @Override
   public PatternPaginationResponse getPatterns(int pageNo, int pageSize, String sortBy, String sortDir, String text) {
     // create Sort instance
@@ -60,10 +84,10 @@ public class PatternServiceImpl implements PatternService {
     }
 
     Page<Pattern> menuPage = patternRepository.findAll(spec, pageable);
-    List<PatternResponse> responses = PatternMapper.INSTANCE.toResponses(menuPage.getContent());
+    List<PatternResponse> responses = patternMapper.toResponses(menuPage.getContent());
 
     return PatternPaginationResponse.builder()
-        .responses(responses)
+        .contents(responses)
         .pageNo(menuPage.getNumber())
         .pageSize(menuPage.getSize())
         .totalElements(menuPage.getTotalElements())
@@ -72,9 +96,15 @@ public class PatternServiceImpl implements PatternService {
         .build();
   }
 
+  /**
+   * Get pattern detail
+   *
+   * @param id Id
+   * @return Pattern response
+   */
   @Override
   public PatternResponse getDetail(long id) {
     var pattern = patternRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Pattern not found"));
-    return PatternMapper.INSTANCE.toResponse(pattern);
+    return patternMapper.toResponse(pattern);
   }
 }

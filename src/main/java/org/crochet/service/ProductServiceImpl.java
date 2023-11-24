@@ -23,9 +23,11 @@ import java.util.List;
 public class ProductServiceImpl implements ProductService {
 
   private final ProductRepository productRepository;
+  private final ProductMapper productMapper;
 
-  public ProductServiceImpl(ProductRepository productRepository) {
+  public ProductServiceImpl(ProductRepository productRepository, ProductMapper productMapper) {
     this.productRepository = productRepository;
+    this.productMapper = productMapper;
   }
 
   @Transactional
@@ -49,7 +51,7 @@ public class ProductServiceImpl implements ProductService {
       product.setImage(request.getImage());
     }
     product = productRepository.save(product);
-    return ProductMapper.INSTANCE.toResponse(product);
+    return productMapper.toResponse(product);
   }
 
   @Override
@@ -66,7 +68,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     Page<Product> menuPage = productRepository.findAll(spec, pageable);
-    List<ProductResponse> contents = ProductMapper.INSTANCE.toResponses(menuPage.getContent());
+    List<ProductResponse> contents = productMapper.toResponses(menuPage.getContent());
 
     return ProductPaginationResponse.builder()
         .contents(contents)
@@ -82,6 +84,6 @@ public class ProductServiceImpl implements ProductService {
   public ProductResponse getDetail(long id) {
     var product = productRepository.findById(id)
         .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
-    return ProductMapper.INSTANCE.toResponse(product);
+    return productMapper.toResponse(product);
   }
 }
