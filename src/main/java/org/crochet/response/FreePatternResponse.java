@@ -1,6 +1,5 @@
 package org.crochet.response;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -8,11 +7,9 @@ import lombok.Data;
 @Data
 @Builder
 @AllArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class ProductResponse {
+public class FreePatternResponse {
   private long id;
   private String name;
-  private byte[] image;
+  private String image;
   private String description;
-  private double price;
 }
