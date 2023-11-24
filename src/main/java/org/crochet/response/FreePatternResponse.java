@@ -4,14 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
-import java.util.List;
-
 @Data
 @Builder
 @AllArgsConstructor
 public class FreePatternResponse {
-    private String id;
-    private String name;
-    private String description;
-    private List<String> bytes;
+  private long id;
+  private String name;
+  private String image;
+  private String description;
 }

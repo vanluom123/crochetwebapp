@@ -4,7 +4,8 @@ import lombok.Data;
 
 @Data
 public class FreePatternRequest {
-    private String id;
-    private String name;
-    private String description;
+  private Long id;
+  private String name;
+  private String image;
+  private String description;
 }

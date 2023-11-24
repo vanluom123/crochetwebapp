@@ -23,9 +23,11 @@ import java.time.LocalDateTime;
 public class BlogPostServiceImpl implements BlogPostService {
 
   private final BlogPostRepository blogPostRepository;
+  private final BlogPostMapper blogPostMapper;
 
-  public BlogPostServiceImpl(BlogPostRepository blogPostRepository) {
+  public BlogPostServiceImpl(BlogPostRepository blogPostRepository, BlogPostMapper blogPostMapper) {
     this.blogPostRepository = blogPostRepository;
+    this.blogPostMapper = blogPostMapper;
   }
 
   @Transactional
@@ -64,7 +66,7 @@ public class BlogPostServiceImpl implements BlogPostService {
     }
 
     Page<BlogPost> menuPage = blogPostRepository.findAll(spec, pageable);
-    var contents = BlogPostMapper.INSTANCE.toResponses(menuPage.getContent());
+    var contents = blogPostMapper.toResponses(menuPage.getContent());
 
     return BlogPostPaginationResponse.builder()
         .contents(contents)
@@ -79,6 +81,6 @@ public class BlogPostServiceImpl implements BlogPostService {
   @Override
   public BlogPostResponse getDetail(long id) {
     var blogPost = blogPostRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Blog not found"));
-    return BlogPostMapper.INSTANCE.toResponse(blogPost);
+    return blogPostMapper.toResponse(blogPost);
   }
 }

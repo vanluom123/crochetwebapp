@@ -34,6 +34,7 @@ public class PatternController {
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<String> createPattern(@RequestParam("filePath") String filePath,
                                               @RequestBody PatternRequest request) {
+
     var byteData = firebaseService.getImage(filePath);
     var image = Base64.getEncoder().encodeToString(byteData);
     request.setImage(image);
