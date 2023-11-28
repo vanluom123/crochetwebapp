@@ -5,15 +5,15 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Inheritance;
-import jakarta.persistence.InheritanceType;
-import jakarta.persistence.Lob;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+
+import java.util.Set;
 
 @Getter
 @Setter
@@ -22,20 +22,28 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
-public class FreePattern {
-  @Id
-  @GeneratedValue(strategy = GenerationType.TABLE)
-  @Column(name = "id", nullable = false)
-  private Long id;
+public class FreePattern extends ParentPattern {
 
-  @Column(name = "name")
-  private String name;
+    @OneToMany(mappedBy = "freePattern")
+    private Set<FreePatternImage> freePatternImages;
 
-  @Lob
-  @Column(name = "image", columnDefinition = "LONGBLOB")
-  private String image;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
+    @Override
+    public Long getId() {
+        return super.getId();
+    }
 
-  @Column(name = "description")
-  private String description;
+    @Column(name = "name")
+    @Override
+    public String getName() {
+        return super.getName();
+    }
+
+    @Column(name = "description")
+    @Override
+    public String getDescription() {
+        return super.getDescription();
+    }
 }
