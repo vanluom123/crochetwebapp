@@ -23,7 +23,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "users", uniqueConstraints = {
-    @UniqueConstraint(columnNames = "email")
+        @UniqueConstraint(columnNames = "email")
 })
 @Getter
 @Setter
@@ -31,53 +31,53 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "id", nullable = false)
-  private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
+    private Long id;
 
-  @Column(name = "name", nullable = false)
-  private String name;
+    @Column(name = "name", nullable = false)
+    private String name;
 
-  @Email
-  @Column(name = "email", nullable = false)
-  private String email;
+    @Email
+    @Column(name = "email", nullable = false)
+    private String email;
 
-  @Column(name = "image_url")
-  private String imageUrl;
+    @Column(name = "image_url")
+    private String imageUrl;
 
-  @Column(name = "email_verified", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
-  private Boolean emailVerified;
+    @Column(name = "email_verified", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean emailVerified;
 
-  @JsonIgnore
-  @Column(name = "password", nullable = false)
-  private String password;
+    @JsonIgnore
+    @Column(name = "password", nullable = false)
+    private String password;
 
-  @NotNull
-  @Enumerated(EnumType.STRING)
-  @Column(name = "provider")
-  private AuthProvider provider;
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "provider")
+    private AuthProvider provider = AuthProvider.local;
 
-  @Column(name = "provider_id")
-  private String providerId;
+    @Column(name = "provider_id")
+    private String providerId;
 
-  @Column(name = "verification_code")
-  private String verificationCode;
+    @Column(name = "verification_code")
+    private String verificationCode;
 
-  @NotNull
-  @Enumerated(EnumType.STRING)
-  @Column(name = "role")
-  private RoleType role;
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role")
+    private RoleType role = RoleType.USER;
 
-  @OneToMany(mappedBy = "user")
-  private Set<ConfirmationToken> confirmationTokens;
+    @OneToMany(mappedBy = "user")
+    private Set<ConfirmationToken> confirmationTokens;
 
-  @OneToMany(mappedBy = "user")
-  private Set<PasswordResetToken> passwordResetTokens;
+    @OneToMany(mappedBy = "user")
+    private Set<PasswordResetToken> passwordResetTokens;
 
-  @OneToMany(mappedBy = "user")
-  private Set<Order> orders;
+    @OneToMany(mappedBy = "user")
+    private Set<Order> orders;
 
-  @OneToMany(mappedBy = "user")
-  private Set<Comment> comments;
+    @OneToMany(mappedBy = "user")
+    private Set<Comment> comments;
 }

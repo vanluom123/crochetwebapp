@@ -1,17 +1,14 @@
 package org.crochet.service;
 
 import org.crochet.exception.ResourceNotFoundException;
-import org.crochet.mapper.PatternMapper;
-import org.crochet.mapper.PatternMapperImpl;
 import org.crochet.model.Pattern;
 import org.crochet.repository.PatternRepository;
 import org.crochet.request.PatternRequest;
 import org.crochet.response.PatternPaginationResponse;
 import org.crochet.response.PatternResponse;
-import org.crochet.service.abstraction.PatternService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
@@ -38,13 +35,8 @@ public class PatternServiceTest {
   @Mock
   private Page<Pattern> patternPage;
 
-  private PatternService patternService;
-
-  @BeforeEach
-  public void setup() {
-    PatternMapper patternMapper = new PatternMapperImpl();
-    patternService = new PatternServiceImpl(patternRepository, patternMapper);
-  }
+  @InjectMocks
+  private PatternServiceImpl patternService;
 
   @Test
   public void testCreateOrUpdate() {
@@ -52,7 +44,6 @@ public class PatternServiceTest {
     PatternRequest request = new PatternRequest();
     request.setId(1);
     request.setName("test");
-    request.setImage("test");
     request.setDescription("test");
     request.setPrice(10);
 
@@ -60,7 +51,6 @@ public class PatternServiceTest {
     Pattern existingPattern = Pattern.builder()
         .id(1L)
         .name("test")
-        .image("test")
         .description("test")
         .price(10)
         .build();
@@ -92,7 +82,6 @@ public class PatternServiceTest {
 
     Pattern pattern = Pattern.builder()
         .name("test")
-        .image("test")
         .description("test")
         .price(10)
         .build();
@@ -124,7 +113,6 @@ public class PatternServiceTest {
     Pattern existingPattern = Pattern.builder()
         .id(patternId)
         .name("test")
-        .image("test")
         .description("test")
         .price(10)
         .build();

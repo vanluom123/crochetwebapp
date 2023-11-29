@@ -7,5 +7,5 @@ import lombok.Setter;
 @Setter
 public class CrochetImage {
     private Long imageId;
-    private String image;
+    private String imageUrl;
 }

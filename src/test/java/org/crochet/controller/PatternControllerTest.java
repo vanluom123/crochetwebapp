@@ -3,8 +3,8 @@ package org.crochet.controller;
 import org.crochet.response.PatternPaginationResponse;
 import org.crochet.response.PatternResponse;
 import org.crochet.security.TokenAuthenticationFilter;
-import org.crochet.service.abstraction.FirebaseService;
-import org.crochet.service.abstraction.PatternService;
+import org.crochet.service.FirebaseService;
+import org.crochet.service.PatternService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -42,7 +42,6 @@ public class PatternControllerTest {
     PatternResponse response = PatternResponse.builder()
         .id(1L)
         .name("test")
-        .image("test")
         .description("test")
         .price(10)
         .build();

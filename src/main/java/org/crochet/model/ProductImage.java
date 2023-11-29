@@ -2,6 +2,7 @@ package org.crochet.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -16,14 +17,14 @@ import lombok.Setter;
 @Entity
 @Table(name = "product_image")
 public class ProductImage extends CrochetImage {
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Product product;
 
     @Lob
-    @Column(name = "image", columnDefinition = "LONGBLOB")
+    @Column(name = "imageUrl", columnDefinition = "LONGBLOB")
     @Override
-    public String getImage() {
-        return super.getImage();
+    public String getImageUrl() {
+        return super.getImageUrl();
     }
 
     @Id

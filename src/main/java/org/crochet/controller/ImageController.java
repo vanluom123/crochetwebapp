@@ -1,6 +1,6 @@
 package org.crochet.controller;
 
-import org.crochet.service.abstraction.FirebaseService;
+import org.crochet.service.FirebaseService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,23 +16,23 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/image")
 public class ImageController {
 
-  private final FirebaseService firebaseService;
+    private final FirebaseService firebaseService;
 
-  public ImageController(FirebaseService firebaseService) {
-    this.firebaseService = firebaseService;
-  }
+    public ImageController(FirebaseService firebaseService) {
+        this.firebaseService = firebaseService;
+    }
 
-  @PostMapping("/upload")
-  @PreAuthorize("hasRole('ADMIN')")
-  public ResponseEntity<String> uploadImage(@RequestPart("imageFile") MultipartFile imageFile) {
-    firebaseService.updateLoadImage(imageFile);
-    return ResponseEntity.ok("Upload image successfully");
-  }
+    @PostMapping("/upload")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> uploadImage(@RequestPart("imageFile") MultipartFile imageFile) {
+        firebaseService.updateLoadImage(imageFile);
+        return ResponseEntity.ok("Upload image successfully");
+    }
 
-  @GetMapping("/get-image")
-  @PreAuthorize("hasRole('ADMIN')")
-  public ResponseEntity<?> getImage(@RequestParam("fileName") String fileName) {
-    var image = firebaseService.getImage(fileName);
-    return ResponseEntity.status(HttpStatus.OK).body(image);
-  }
+    @GetMapping("/get-image")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> getImage(@RequestParam("fileName") String fileName) {
+        var image = firebaseService.getImage(fileName);
+        return ResponseEntity.status(HttpStatus.OK).body(image);
+    }
 }

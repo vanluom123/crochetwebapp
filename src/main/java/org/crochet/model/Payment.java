@@ -28,29 +28,29 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Payment {
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "id", nullable = false)
-  private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
+    private Long id;
 
-  @Column(name = "payment_date", nullable = false)
-  private LocalDateTime paymentDate;
+    @Column(name = "payment_date", nullable = false)
+    private LocalDateTime paymentDate;
 
-  @Column(name = "payment_amount", nullable = false)
-  private Double paymentAmount;
+    @Column(name = "payment_amount", nullable = false)
+    private Double paymentAmount;
 
-  @Column(name = "payment_method")
-  private String paymentMethod;
+    @Column(name = "payment_method")
+    private String paymentMethod;
 
-  @Column(name = "transaction_id", nullable = false)
-  private String transactionId;
+    @Column(name = "transaction_id", nullable = false)
+    private String transactionId;
 
-  @NotNull
-  @Enumerated(EnumType.STRING)
-  @Column(name = "status")
-  private StatusType status;
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private StatusType status = StatusType.PENDING;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "order_id")
-  private Order order;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id")
+    private Order order;
 }

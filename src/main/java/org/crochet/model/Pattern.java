@@ -24,32 +24,32 @@ import java.util.Set;
 @AllArgsConstructor
 public class Pattern extends ParentPattern {
 
-  @Column(name = "price")
-  private double price;
+    @Column(name = "price")
+    private double price;
 
-  @OneToMany(mappedBy = "pattern")
-  private Set<OrderDetail> orderDetails;
+    @OneToMany(mappedBy = "pattern")
+    private Set<OrderDetail> orderDetails;
 
-  @OneToMany(mappedBy = "pattern")
-  private Set<PatternImage> patternImages;
+    @OneToMany(mappedBy = "pattern")
+    private Set<PatternImage> patternImages;
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "id", nullable = false)
-  @Override
-  public Long getId() {
-    return super.getId();
-  }
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
+    @Override
+    public Long getId() {
+        return super.getId();
+    }
 
-  @Column(name = "name")
-  @Override
-  public String getName() {
-    return super.getName();
-  }
+    @Column(name = "name")
+    @Override
+    public String getName() {
+        return super.getName();
+    }
 
-  @Column(name = "description")
-  @Override
-  public String getDescription() {
-    return super.getDescription();
-  }
+    @Column(name = "description")
+    @Override
+    public String getDescription() {
+        return super.getDescription();
+    }
 }

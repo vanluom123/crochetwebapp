@@ -27,24 +27,24 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Order {
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "id", nullable = false)
-  private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
+    private Long id;
 
-  @Column(name = "order_date")
-  private LocalDateTime orderDate;
+    @Column(name = "order_date")
+    private LocalDateTime orderDate;
 
-  @Column(name = "total_price")
-  private double totalPrice;
+    @Column(name = "total_price")
+    private double totalPrice;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id")
-  private User user;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
-  @OneToMany(mappedBy = "order")
-  private Set<OrderDetail> orderDetails;
+    @OneToMany(mappedBy = "order")
+    private Set<OrderDetail> orderDetails;
 
-  @OneToMany(mappedBy = "order")
-  private Set<Payment> payments;
+    @OneToMany(mappedBy = "order")
+    private Set<Payment> payments;
 }

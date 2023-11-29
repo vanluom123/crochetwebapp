@@ -12,9 +12,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class BlogPostResponse {
-  private Long id;
-  private String title;
-  private String content;
-  private String imageUrl;
-  private LocalDateTime creationDate;
+    private Long id;
+    private String title;
+    private String content;
+    private String imageUrl;
+    private LocalDateTime creationDate;
 }

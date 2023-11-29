@@ -2,6 +2,7 @@ package org.crochet.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -17,15 +18,15 @@ import lombok.Setter;
 @Entity
 @Table(name = "pattern_image")
 public class PatternImage extends CrochetImage {
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pattern_id", nullable = false)
     private Pattern pattern;
 
     @Lob
-    @Column(name = "image", columnDefinition = "LONGBLOB")
+    @Column(name = "imageUrl", columnDefinition = "LONGBLOB")
     @Override
-    public String getImage() {
-        return super.getImage();
+    public String getImageUrl() {
+        return super.getImageUrl();
     }
 
     @Id

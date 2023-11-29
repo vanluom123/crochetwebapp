@@ -7,9 +7,9 @@ import org.crochet.response.PatternResponse;
 import java.util.List;
 
 public interface PatternMapper {
-  PatternResponse toResponse(Pattern pattern);
+    PatternResponse toResponse(Pattern pattern);
 
-  Pattern toPattern(PatternRequest request);
+    Pattern toPattern(PatternRequest request);
 
-  List<PatternResponse> toResponses(List<Pattern> patterns);
+    List<PatternResponse> toResponses(List<Pattern> patterns);
 }

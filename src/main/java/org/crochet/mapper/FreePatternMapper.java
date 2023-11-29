@@ -7,9 +7,9 @@ import org.crochet.response.FreePatternResponse;
 import java.util.List;
 
 public interface FreePatternMapper {
-  FreePattern toFreePattern(FreePatternRequest request);
+    FreePattern toFreePattern(FreePatternRequest request);
 
-  FreePatternResponse toResponse(FreePattern pattern);
+    FreePatternResponse toResponse(FreePattern pattern);
 
-  List<FreePatternResponse> toResponses(List<FreePattern> freePatterns);
+    List<FreePatternResponse> toResponses(List<FreePattern> freePatterns);
 }

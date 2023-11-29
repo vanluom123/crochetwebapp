@@ -1,7 +1,7 @@
 package org.crochet.controller;
 
 import org.crochet.request.CommentRequest;
-import org.crochet.service.abstraction.CommentService;
+import org.crochet.service.CommentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -12,15 +12,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/comment")
 public class CommentController {
 
-  private final CommentService commentService;
+    private final CommentService commentService;
 
-  public CommentController(CommentService commentService) {
-    this.commentService = commentService;
-  }
+    public CommentController(CommentService commentService) {
+        this.commentService = commentService;
+    }
 
-  @PostMapping("/create")
-  public ResponseEntity<String> createComment(@RequestBody CommentRequest request) {
-    commentService.createOrUpdate(request);
-    return ResponseEntity.ok("Create comment successfully");
-  }
+    @PostMapping("/create")
+    public ResponseEntity<String> createComment(@RequestBody CommentRequest request) {
+        commentService.createOrUpdate(request);
+        return ResponseEntity.ok("Create comment successfully");
+    }
 }
