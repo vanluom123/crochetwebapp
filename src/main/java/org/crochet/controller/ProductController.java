@@ -4,8 +4,7 @@ import org.crochet.constant.AppConstant;
 import org.crochet.request.ProductRequest;
 import org.crochet.response.ProductPaginationResponse;
 import org.crochet.response.ProductResponse;
-import org.crochet.service.FirebaseService;
-import org.crochet.service.ProductService;
+import org.crochet.service.contact.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,14 +21,11 @@ public class ProductController {
     @Autowired
     private ProductService productService;
 
-    @Autowired
-    private FirebaseService firebaseService;
-
     @PostMapping("/create")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> createProduct(@RequestBody ProductRequest request) {
-        productService.createOrUpdate(request);
-        return ResponseEntity.ok("Create product successfully");
+    public ResponseEntity<ProductResponse> createProduct(@RequestBody ProductRequest request) {
+        var response = productService.createOrUpdate(request);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/pagination")
@@ -45,7 +41,7 @@ public class ProductController {
     }
 
     @GetMapping("/detail")
-    public ResponseEntity<ProductResponse> getProductDetail(@RequestParam("id") long id) {
+    public ResponseEntity<ProductResponse> getProductDetail(@RequestParam("id") String id) {
         return ResponseEntity.ok(productService.getDetail(id));
     }
 }

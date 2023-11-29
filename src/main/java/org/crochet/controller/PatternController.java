@@ -4,8 +4,8 @@ import org.crochet.constant.AppConstant;
 import org.crochet.request.PatternRequest;
 import org.crochet.response.PatternPaginationResponse;
 import org.crochet.response.PatternResponse;
-import org.crochet.service.FirebaseService;
-import org.crochet.service.PatternService;
+import org.crochet.service.contact.PatternService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,15 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/pattern")
 public class PatternController {
-    private final PatternService patternService;
-
-    private final FirebaseService firebaseService;
-
-    public PatternController(PatternService patternService, FirebaseService firebaseService) {
-        this.patternService = patternService;
-        this.firebaseService = firebaseService;
-    }
-
+    @Autowired
+    private PatternService patternService;
 
     @PostMapping("/create")
     @PreAuthorize("hasRole('ADMIN')")
@@ -48,7 +41,7 @@ public class PatternController {
     }
 
     @GetMapping("/detail")
-    public ResponseEntity<PatternResponse> getDetail(@RequestParam("id") long id) {
+    public ResponseEntity<PatternResponse> getDetail(@RequestParam("id") String id) {
         return ResponseEntity.ok(patternService.getDetail(id));
     }
 }

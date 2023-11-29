@@ -1,4 +1,4 @@
-package org.crochet.service;
+package org.crochet.service.contact;
 
 import org.crochet.request.BlogPostRequest;
 import org.crochet.response.BlogPostPaginationResponse;
@@ -9,5 +9,5 @@ public interface BlogPostService {
 
     BlogPostPaginationResponse getBlogs(int pageNo, int pageSize, String sortBy, String sortDir, String text);
 
-    BlogPostResponse getDetail(long id);
+    BlogPostResponse getDetail(String id);
 }

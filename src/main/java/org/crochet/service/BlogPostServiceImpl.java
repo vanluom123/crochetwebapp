@@ -8,6 +8,7 @@ import org.crochet.repository.BlogPostSpecifications;
 import org.crochet.request.BlogPostRequest;
 import org.crochet.response.BlogPostPaginationResponse;
 import org.crochet.response.BlogPostResponse;
+import org.crochet.service.contact.BlogPostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 public class BlogPostServiceImpl implements BlogPostService {
@@ -25,17 +27,14 @@ public class BlogPostServiceImpl implements BlogPostService {
     @Autowired
     private BlogPostRepository blogPostRepo;
 
-    @Autowired
-    private BlogPostMapper mapper;
-
     @Transactional
     @Override
     public void createOrUpdatePost(BlogPostRequest request) {
-        var blogPost = blogPostRepo.findById(request.getId()).orElse(null);
+        var blogPost = blogPostRepo.findById(UUID.fromString(request.getId()))
+                .orElse(null);
         if (blogPost == null) {
             // create new a post
             blogPost = BlogPost.builder()
-                    .id(request.getId())
                     .title(request.getTitle())
                     .content(request.getContent())
                     .imageUrl(request.getImageUrl())
@@ -64,7 +63,7 @@ public class BlogPostServiceImpl implements BlogPostService {
         }
 
         Page<BlogPost> menuPage = blogPostRepo.findAll(spec, pageable);
-        var contents = mapper.toResponses(menuPage.getContent());
+        var contents = BlogPostMapper.INSTANCE.toResponses(menuPage.getContent());
 
         return BlogPostPaginationResponse.builder()
                 .contents(contents)
@@ -77,9 +76,9 @@ public class BlogPostServiceImpl implements BlogPostService {
     }
 
     @Override
-    public BlogPostResponse getDetail(long id) {
-        var blogPost = blogPostRepo.findById(id)
+    public BlogPostResponse getDetail(String id) {
+        var blogPost = blogPostRepo.findById(UUID.fromString(id))
                 .orElseThrow(() -> new ResourceNotFoundException("Blog not found"));
-        return mapper.toResponse(blogPost);
+        return BlogPostMapper.INSTANCE.toResponse(blogPost);
     }
 }

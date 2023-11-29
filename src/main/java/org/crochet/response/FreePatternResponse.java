@@ -10,7 +10,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 public class FreePatternResponse {
-    private long id;
+    private String id;
     private String name;
     private String description;
     private List<String> images;

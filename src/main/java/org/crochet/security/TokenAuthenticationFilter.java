@@ -5,7 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.crochet.service.TokenService;
+import org.crochet.service.contact.TokenService;
 import org.crochet.util.CookieUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

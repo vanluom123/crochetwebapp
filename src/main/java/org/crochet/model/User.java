@@ -20,6 +20,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Table(name = "users", uniqueConstraints = {
@@ -32,9 +33,9 @@ import java.util.Set;
 @AllArgsConstructor
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false)
-    private Long id;
+    private UUID id;
 
     @Column(name = "name", nullable = false)
     private String name;
@@ -53,9 +54,8 @@ public class User {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @NotNull
     @Enumerated(EnumType.STRING)
-    @Column(name = "provider")
+    @Column(name = "provider", columnDefinition = "varchar(25) default 'local'")
     private AuthProvider provider = AuthProvider.local;
 
     @Column(name = "provider_id")
@@ -64,9 +64,8 @@ public class User {
     @Column(name = "verification_code")
     private String verificationCode;
 
-    @NotNull
     @Enumerated(EnumType.STRING)
-    @Column(name = "role")
+    @Column(name = "role", columnDefinition = "varchar(10) default 'USER'")
     private RoleType role = RoleType.USER;
 
     @OneToMany(mappedBy = "user")
@@ -74,9 +73,6 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     private Set<PasswordResetToken> passwordResetTokens;
-
-    @OneToMany(mappedBy = "user")
-    private Set<Order> orders;
 
     @OneToMany(mappedBy = "user")
     private Set<Comment> comments;

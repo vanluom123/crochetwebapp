@@ -1,4 +1,4 @@
-package org.crochet.service;
+package org.crochet.service.contact;
 
 import org.springframework.security.core.Authentication;
 

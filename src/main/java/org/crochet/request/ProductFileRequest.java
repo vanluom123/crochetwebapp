@@ -2,13 +2,14 @@ package org.crochet.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
-public class CommentRequest {
-    private String id;
+@Getter
+@Setter
+public class ProductFileRequest {
     @NotNull
     @NotBlank
-    private String blogPostId;
-    private String content;
+    private String productId;
+    private String fileUrl;
 }

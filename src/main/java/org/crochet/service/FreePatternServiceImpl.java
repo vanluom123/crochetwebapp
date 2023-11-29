@@ -8,6 +8,7 @@ import org.crochet.repository.FreePatternSpecifications;
 import org.crochet.request.FreePatternRequest;
 import org.crochet.response.FreePatternResponse;
 import org.crochet.response.PaginatedFreePatternResponse;
+import org.crochet.service.contact.FreePatternService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,15 +19,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class FreePatternServiceImpl implements FreePatternService {
 
     @Autowired
     private FreePatternRepository freePatternRepo;
-
-    @Autowired
-    private FreePatternMapper mapper;
 
     /**
      * Create or update free pattern
@@ -39,9 +38,9 @@ public class FreePatternServiceImpl implements FreePatternService {
         FreePattern freePattern;
 
         if (request.getId() == null) {
-            freePattern = mapper.toFreePattern(request);
+            freePattern = FreePatternMapper.INSTANCE.toFreePattern(request);
         } else {
-            freePattern = freePatternRepo.findById(request.getId())
+            freePattern = freePatternRepo.findById(UUID.fromString(request.getId()))
                     .orElseThrow(() -> new ResourceNotFoundException("FreePattern with id " + request.getId() + " not found"));
 
             freePattern.setName(request.getName());
@@ -74,7 +73,7 @@ public class FreePatternServiceImpl implements FreePatternService {
         }
 
         Page<FreePattern> page = freePatternRepo.findAll(spec, pageable);
-        List<FreePatternResponse> contents = mapper.toResponses(page.getContent());
+        List<FreePatternResponse> contents = FreePatternMapper.INSTANCE.toResponses(page.getContent());
 
         return PaginatedFreePatternResponse.builder()
                 .contents(contents)
@@ -93,9 +92,9 @@ public class FreePatternServiceImpl implements FreePatternService {
      * @return Response
      */
     @Override
-    public FreePatternResponse getDetail(long id) {
-        var freePattern = freePatternRepo.findById(id)
+    public FreePatternResponse getDetail(String id) {
+        var freePattern = freePatternRepo.findById(UUID.fromString(id))
                 .orElseThrow(() -> new ResourceNotFoundException("Free pattern not found"));
-        return mapper.toResponse(freePattern);
+        return FreePatternMapper.INSTANCE.toResponse(freePattern);
     }
 }

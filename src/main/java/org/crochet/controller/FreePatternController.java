@@ -4,8 +4,8 @@ import org.crochet.constant.AppConstant;
 import org.crochet.request.FreePatternRequest;
 import org.crochet.response.FreePatternResponse;
 import org.crochet.response.PaginatedFreePatternResponse;
-import org.crochet.service.FirebaseService;
-import org.crochet.service.FreePatternService;
+import org.crochet.service.contact.FreePatternService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,21 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/free-pattern")
 public class FreePatternController {
-    private final FreePatternService freePatternService;
-
-    private final FirebaseService firebaseService;
-
-    /**
-     * Constructor
-     *
-     * @param freePatternService FreePatternService
-     * @param firebaseService    FirebaseService
-     */
-    public FreePatternController(FreePatternService freePatternService,
-                                 FirebaseService firebaseService) {
-        this.freePatternService = freePatternService;
-        this.firebaseService = firebaseService;
-    }
+    @Autowired
+    private FreePatternService freePatternService;
 
     @PostMapping("/create")
     @PreAuthorize("hasRole('ADMIN')")
@@ -54,7 +41,7 @@ public class FreePatternController {
     }
 
     @GetMapping("/detail")
-    public ResponseEntity<FreePatternResponse> getDetail(@RequestParam("id") long id) {
+    public ResponseEntity<FreePatternResponse> getDetail(@RequestParam("id") String id) {
         return ResponseEntity.ok(freePatternService.getDetail(id));
     }
 }

@@ -1,4 +1,4 @@
-package org.crochet.service;
+package org.crochet.service.contact;
 
 import org.crochet.request.PatternRequest;
 import org.crochet.response.PatternPaginationResponse;
@@ -9,5 +9,5 @@ public interface PatternService {
 
     PatternPaginationResponse getPatterns(int pageNo, int pageSize, String sortBy, String sortDir, String text);
 
-    PatternResponse getDetail(long id);
+    PatternResponse getDetail(String id);
 }

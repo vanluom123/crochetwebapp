@@ -11,13 +11,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * UserPrincipal class
  */
 public class UserPrincipal implements OAuth2User, UserDetails {
     @Getter
-    private Long id;
+    private UUID id;
     private String email;
     private String password;
     private Collection<? extends GrantedAuthority> authorities;
@@ -31,7 +32,7 @@ public class UserPrincipal implements OAuth2User, UserDetails {
      * @param password    password
      * @param authorities authorities
      */
-    public UserPrincipal(Long id,
+    public UserPrincipal(UUID id,
                          String email,
                          String password,
                          Collection<? extends GrantedAuthority> authorities) {

@@ -3,8 +3,9 @@ package org.crochet.controller;
 import org.crochet.constant.AppConstant;
 import org.crochet.request.BlogPostRequest;
 import org.crochet.response.BlogPostPaginationResponse;
-import org.crochet.service.BlogPostService;
-import org.crochet.service.FirebaseService;
+import org.crochet.service.contact.BlogPostService;
+import org.crochet.service.contact.FirebaseService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,21 +20,17 @@ import java.util.Base64;
 @RestController
 @RequestMapping("/blog")
 public class BlogController {
+    @Autowired
+    private BlogPostService blogPostService;
 
-    private final BlogPostService blogPostService;
-
-    private final FirebaseService firebaseService;
-
-    public BlogController(BlogPostService blogPostService, FirebaseService firebaseService) {
-        this.blogPostService = blogPostService;
-        this.firebaseService = firebaseService;
-    }
+    @Autowired
+    private FirebaseService firebaseService;
 
     @PostMapping("/create")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> createOrUpdatePost(@RequestParam("filePath") String filePath,
                                                      @RequestBody BlogPostRequest request) {
-        var img = firebaseService.getImage(filePath);
+        var img = firebaseService.getFile(filePath);
         var base64 = Base64.getEncoder().encodeToString(img);
         request.setImageUrl(base64);
         blogPostService.createOrUpdatePost(request);

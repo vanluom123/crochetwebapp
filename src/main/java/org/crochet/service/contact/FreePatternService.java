@@ -1,4 +1,4 @@
-package org.crochet.service;
+package org.crochet.service.contact;
 
 import org.crochet.request.FreePatternRequest;
 import org.crochet.response.FreePatternResponse;
@@ -9,5 +9,5 @@ public interface FreePatternService {
 
     PaginatedFreePatternResponse getFreePatterns(int pageNo, int pageSize, String sortBy, String sortDir, String text);
 
-    FreePatternResponse getDetail(long id);
+    FreePatternResponse getDetail(String id);
 }

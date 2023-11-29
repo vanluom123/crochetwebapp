@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PatternResponse {
-    private Long id;
+    private String id;
     private String name;
     private String description;
     private double price;

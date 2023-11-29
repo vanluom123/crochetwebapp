@@ -11,6 +11,7 @@ import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SecurityException;
 import org.crochet.config.AppProperties;
 import org.crochet.security.UserPrincipal;
+import org.crochet.service.contact.TokenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -58,7 +59,7 @@ public class TokenServiceImpl implements TokenService {
 
         // Build and sign the JWT token
         return Jwts.builder()
-                .setSubject(Long.toString(userPrincipal.getId())) // Set the subject of the token as the user ID
+                .setSubject(userPrincipal.getId().toString()) // Set the subject of the token as the user ID
                 .setIssuedAt(new Date()) // Set the issued date as the current date
                 .setExpiration(expiryDate) // Set the token expiration date
                 .signWith(getKey(), SignatureAlgorithm.HS512) // Sign the token using the key and algorithm

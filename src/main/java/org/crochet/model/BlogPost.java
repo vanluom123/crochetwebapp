@@ -10,13 +10,16 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.Set;
+import java.util.UUID;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "blog_post")
 @Builder
@@ -24,9 +27,9 @@ import java.util.Set;
 @NoArgsConstructor
 public class BlogPost {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false)
-    private Long id;
+    private UUID id;
 
     @Column(name = "title", nullable = false)
     private String title;

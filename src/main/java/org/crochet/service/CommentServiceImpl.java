@@ -8,12 +8,14 @@ import org.crochet.repository.CommentRepository;
 import org.crochet.repository.UserRepository;
 import org.crochet.request.CommentRequest;
 import org.crochet.security.UserPrincipal;
+import org.crochet.service.contact.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 public class CommentServiceImpl implements CommentService {
@@ -35,10 +37,11 @@ public class CommentServiceImpl implements CommentService {
         User user = userRepo.findById(principal.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        var blog = blogPostRepo.findById(request.getBlogPostId())
+        var blog = blogPostRepo.findById(UUID.fromString(request.getBlogPostId()))
                 .orElseThrow(() -> new ResourceNotFoundException("Blog not found"));
 
-        var comment = commentRepo.findById(request.getId()).orElse(null);
+        var comment = commentRepo.findById(UUID.fromString(request.getId()))
+                .orElse(null);
         if (comment == null) {
             comment = Comment.builder()
                     .blogPost(blog)

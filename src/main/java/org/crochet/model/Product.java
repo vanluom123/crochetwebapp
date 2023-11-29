@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Set;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -24,9 +25,9 @@ import java.util.Set;
 @AllArgsConstructor
 public class Product {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false)
-    private long id;
+    private UUID id;
 
     @Column(name = "name")
     private String name;
@@ -38,5 +39,5 @@ public class Product {
     private double price;
 
     @OneToMany(mappedBy = "product")
-    private Set<ProductImage> productImages;
+    private Set<ProductFile> productFiles;
 }

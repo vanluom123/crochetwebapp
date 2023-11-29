@@ -4,24 +4,33 @@ import com.google.cloud.storage.Blob;
 import com.google.firebase.cloud.StorageClient;
 import lombok.extern.slf4j.Slf4j;
 import org.crochet.exception.CloudStorageException;
+import org.crochet.service.contact.FirebaseService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 @Service
 @Slf4j
 public class FirebaseServiceImpl implements FirebaseService {
 
     private static final String BUCKET_NAME = "littlecrochet.appspot.com";
-    private final StorageClient storageClient;
 
-    public FirebaseServiceImpl(StorageClient storageClient) {
-        this.storageClient = storageClient;
+    @Autowired
+    private StorageClient storageClient;
+
+    @Override
+    public List<String> uploadFiles(MultipartFile[] files) {
+        return Arrays.stream(files)
+                .map(this::uploadFile)
+                .toList();
     }
 
     @Override
-    public byte[] updateLoadImage(MultipartFile imageFile) {
+    public String uploadFile(MultipartFile imageFile) {
         // Define the path and filename in Firebase Cloud Storage
         String fileName = "images/" + imageFile.getOriginalFilename();
 
@@ -37,11 +46,11 @@ public class FirebaseServiceImpl implements FirebaseService {
 
         log.info("image name: {}", blob.getName());
 
-        return blob.getContent();
+        return fileName;
     }
 
     @Override
-    public byte[] getImage(String filename) {
+    public byte[] getFile(String filename) {
         // Define the path and filename in Firebase Cloud Storage
         String filePath = filename;
         if (!filename.startsWith("images/")) {

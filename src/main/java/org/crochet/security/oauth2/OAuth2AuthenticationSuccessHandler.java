@@ -5,7 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.crochet.config.AppProperties;
 import org.crochet.exception.BadRequestException;
-import org.crochet.service.TokenService;
+import org.crochet.service.contact.TokenService;
 import org.crochet.util.CookieUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;

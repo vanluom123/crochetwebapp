@@ -8,6 +8,7 @@ import org.crochet.repository.ProductSpecifications;
 import org.crochet.request.ProductRequest;
 import org.crochet.response.ProductPaginationResponse;
 import org.crochet.response.ProductResponse;
+import org.crochet.service.contact.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -25,17 +27,14 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private ProductRepository productRepo;
 
-    @Autowired
-    private ProductMapper mapper;
-
     @Transactional
     @Override
     public ProductResponse createOrUpdate(ProductRequest request) {
-        var product = productRepo.findById(request.getId()).orElse(null);
+        var product = productRepo.findById(UUID.fromString(request.getId()))
+                .orElse(null);
         if (product == null) {
             // create product
             product = Product.builder()
-                    .id(request.getId())
                     .name(request.getName())
                     .price(request.getPrice())
                     .description(request.getDescription())
@@ -47,7 +46,7 @@ public class ProductServiceImpl implements ProductService {
             product.setDescription(request.getDescription());
         }
         product = productRepo.save(product);
-        return mapper.toResponse(product);
+        return ProductMapper.INSTANCE.toResponse(product);
     }
 
     @Override
@@ -64,7 +63,7 @@ public class ProductServiceImpl implements ProductService {
         }
 
         Page<Product> menuPage = productRepo.findAll(spec, pageable);
-        List<ProductResponse> contents = mapper.toResponses(menuPage.getContent());
+        List<ProductResponse> contents = ProductMapper.INSTANCE.toResponses(menuPage.getContent());
 
         return ProductPaginationResponse.builder()
                 .contents(contents)
@@ -77,9 +76,9 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponse getDetail(long id) {
-        var product = productRepo.findById(id)
+    public ProductResponse getDetail(String id) {
+        var product = productRepo.findById(UUID.fromString(id))
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
-        return mapper.toResponse(product);
+        return ProductMapper.INSTANCE.toResponse(product);
     }
 }

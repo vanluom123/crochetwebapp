@@ -8,6 +8,7 @@ import org.crochet.repository.PatternSpecifications;
 import org.crochet.request.PatternRequest;
 import org.crochet.response.PatternPaginationResponse;
 import org.crochet.response.PatternResponse;
+import org.crochet.service.contact.PatternService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,15 +19,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class PatternServiceImpl implements PatternService {
 
     @Autowired
     private PatternRepository patternRepo;
-
-    @Autowired
-    private PatternMapper mapper;
 
     /**
      * Create or update pattern
@@ -36,9 +35,10 @@ public class PatternServiceImpl implements PatternService {
     @Transactional
     @Override
     public void createOrUpdate(PatternRequest request) {
-        var pattern = patternRepo.findById(request.getId()).orElse(null);
+        var pattern = patternRepo.findById(UUID.fromString(request.getId()))
+                .orElse(null);
         if (pattern == null) {
-            pattern = mapper.toPattern(request);
+            pattern = PatternMapper.INSTANCE.toPattern(request);
         } else {
             pattern = Pattern.builder()
                     .name(request.getName())
@@ -74,7 +74,7 @@ public class PatternServiceImpl implements PatternService {
         }
 
         Page<Pattern> menuPage = patternRepo.findAll(spec, pageable);
-        List<PatternResponse> responses = mapper.toResponses(menuPage.getContent());
+        List<PatternResponse> responses = PatternMapper.INSTANCE.toResponses(menuPage.getContent());
 
         return PatternPaginationResponse.builder()
                 .contents(responses)
@@ -93,9 +93,9 @@ public class PatternServiceImpl implements PatternService {
      * @return Pattern response
      */
     @Override
-    public PatternResponse getDetail(long id) {
-        var pattern = patternRepo.findById(id)
+    public PatternResponse getDetail(String id) {
+        var pattern = patternRepo.findById(UUID.fromString(id))
                 .orElseThrow(() -> new ResourceNotFoundException("Pattern not found"));
-        return mapper.toResponse(pattern);
+        return PatternMapper.INSTANCE.toResponse(pattern);
     }
 }
