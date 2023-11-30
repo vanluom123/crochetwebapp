@@ -17,6 +17,7 @@ import org.springframework.data.jpa.domain.Specification;
 
 import java.util.Collections;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.*;
@@ -42,28 +43,28 @@ public class PatternServiceTest {
   public void testCreateOrUpdate() {
     // Create request
     PatternRequest request = new PatternRequest();
-    request.setId(1);
+    request.setId(UUID.randomUUID().toString());
     request.setName("test");
     request.setDescription("test");
     request.setPrice(10);
 
     // Create pattern
     Pattern existingPattern = Pattern.builder()
-        .id(1L)
+        .id(UUID.randomUUID())
         .name("test")
         .description("test")
         .price(10)
         .build();
 
     // Mock the behavior of patternRepository
-    when(patternRepository.findById(anyLong())).thenReturn(Optional.ofNullable(existingPattern));
+    when(patternRepository.findById(any())).thenReturn(Optional.ofNullable(existingPattern));
     when(patternRepository.save(any())).thenReturn(existingPattern);
 
     // Act
     patternService.createOrUpdate(request);
 
     // Assert
-    verify(patternRepository, times(1)).findById(anyLong());
+    verify(patternRepository, times(1)).findById(any());
     verify(patternRepository, times(1)).save(any());
   }
 
@@ -108,7 +109,7 @@ public class PatternServiceTest {
   @Test
   public void testGetDetail() {
     // Arrange
-    long patternId = 1L;
+    UUID patternId = UUID.randomUUID();
 
     Pattern existingPattern = Pattern.builder()
         .id(patternId)
@@ -118,29 +119,29 @@ public class PatternServiceTest {
         .build();
 
     // Mock the behavior of patternRepository
-    when(patternRepository.findById(anyLong())).thenReturn(Optional.ofNullable(existingPattern));
+    when(patternRepository.findById(any())).thenReturn(Optional.ofNullable(existingPattern));
 
     // Act
-    PatternResponse result = patternService.getDetail(patternId);
+    PatternResponse result = patternService.getDetail(patternId.toString());
 
     // Assert
     assertNotNull(result);
 
     // Verify that certain methods were called
-    verify(patternRepository, times(1)).findById(anyLong());
+    verify(patternRepository, times(1)).findById(any());
   }
 
   @Test
   public void testGetDetailNotFound() {
     // Arrange
-    long nonExistentPatternId = 2L;
+    UUID nonExistentPatternId = UUID.randomUUID();
 
     // Mock the behavior of patternRepository when the pattern is not found
-    when(patternRepository.findById(anyLong())).thenReturn(Optional.empty());
+    when(patternRepository.findById(any())).thenReturn(Optional.empty());
 
     // Assert
     // Expecting ResourceNotFoundException to be thrown
-    var thrown = assertThrows(ResourceNotFoundException.class, () -> patternService.getDetail(nonExistentPatternId), "Pattern not found");
+    var thrown = assertThrows(ResourceNotFoundException.class, () -> patternService.getDetail(nonExistentPatternId.toString()), "Pattern not found");
     assertEquals("Pattern not found", thrown.getMessage());
   }
 }

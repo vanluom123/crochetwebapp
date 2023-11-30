@@ -1,7 +1,6 @@
 package org.crochet.controller;
 
 import org.crochet.response.ProductFileResponse;
-import org.crochet.service.contact.FirebaseService;
 import org.crochet.service.contact.ProductFileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -21,15 +20,11 @@ public class ProductFileController {
     @Autowired
     private ProductFileService productFileService;
 
-    @Autowired
-    private FirebaseService firebaseService;
-
     @PostMapping("/create")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<ProductFileResponse>> create(@RequestPart MultipartFile[] files,
                                                             @RequestParam("productId") String productId) {
-        var fileNames = firebaseService.uploadFiles(files);
-        var responses = productFileService.create(fileNames, productId);
+        var responses = productFileService.create(files, productId);
         return ResponseEntity.ok(responses);
     }
 }

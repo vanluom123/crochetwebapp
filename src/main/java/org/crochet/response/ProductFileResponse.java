@@ -10,6 +10,6 @@ import lombok.Setter;
 @Builder
 @AllArgsConstructor
 public class ProductFileResponse {
-    private String fileUrl;
-    private ProductResponse product;
+    private String fileName;
+    private String bytes;
 }

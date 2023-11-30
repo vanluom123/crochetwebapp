@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.anyInt;
@@ -40,7 +41,7 @@ public class PatternControllerTest {
   public void testGetPatterns() throws Exception {
     // Mock data for testing
     PatternResponse response = PatternResponse.builder()
-        .id(1L)
+        .id(UUID.randomUUID().toString())
         .name("test")
         .description("test")
         .price(10)

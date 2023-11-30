@@ -3,11 +3,13 @@ package org.crochet.response;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -16,5 +18,5 @@ public class ProductResponse {
     private String name;
     private String description;
     private double price;
-    private List<String> fileNames;
+    private List<String> encodingBytes;
 }

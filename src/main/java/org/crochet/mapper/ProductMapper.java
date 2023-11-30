@@ -12,22 +12,26 @@ import org.mapstruct.factory.Mappers;
 import java.util.Base64;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @Mapper
 public interface ProductMapper {
     ProductMapper INSTANCE = Mappers.getMapper(ProductMapper.class);
 
-    @Mapping(target = "fileNames", source = "productFiles", qualifiedByName = "covertToImages")
+    @Mapping(target = "id", source = "id", qualifiedByName = "uuidToString")
+    @Mapping(target = "encodingBytes", source = "productFiles", qualifiedByName = "toList")
     ProductResponse toResponse(Product product);
 
-    @Named("covertToImages")
-    default List<String> convertToImages(Set<ProductFile> productFiles) {
+    @Named("toList")
+    default List<String> toList(Set<ProductFile> productFiles) {
         return productFiles.stream()
-                .map(ProductFile::getFileUrl)
+                .map(ProductFile::getBytes)
                 .toList();
     }
 
     List<ProductResponse> toResponses(List<Product> products);
+
+    Product toProduct(ProductRequest request);
 
     default String encoding(byte[] data) {
         return Base64.getEncoder().encodeToString(data);
@@ -37,5 +41,8 @@ public interface ProductMapper {
         return Base64.getDecoder().decode(data);
     }
 
-    Product toProduct(ProductRequest request);
+    @Named("uuidToString")
+    default String uuidToString(UUID uuid) {
+        return uuid.toString();
+    }
 }

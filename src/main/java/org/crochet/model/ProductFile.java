@@ -24,9 +24,12 @@ public class ProductFile {
     @Column(name = "id", nullable = false)
     private UUID id;
 
+    @Column(name = "file_name")
+    private String fileName;
+
     @Lob
-    @Column(name = "fileUrl", columnDefinition = "LONGBLOB")
-    private String fileUrl;
+    @Column(name = "bytes", columnDefinition = "LONGBLOB")
+    private String bytes;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Product product;
