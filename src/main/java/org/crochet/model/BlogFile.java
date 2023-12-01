@@ -39,6 +39,6 @@ public class BlogFile {
     private String bytes;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "blog_id", nullable = false)
+    @JoinColumn(name = "blog_id")
     private BlogPost blogPost;
 }

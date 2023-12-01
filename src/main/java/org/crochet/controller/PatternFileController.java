@@ -1,13 +1,10 @@
 package org.crochet.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.crochet.response.PatternFileResponse;
+import org.crochet.response.ProductFileResponse;
 import org.crochet.service.contact.PatternFileService;
+import org.crochet.service.contact.ProductFileService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,16 +25,10 @@ public class PatternFileController {
         this.patternFileService = patternFileService;
     }
 
-    @Operation(summary = "Create pattern files")
-    @ApiResponse(responseCode = "200", description = "Pattern files created successfully",
-                 content = @Content(mediaType = "application/json", schema = @Schema(implementation = List.class)))
     @PostMapping("/create")
     @PreAuthorize("hasRole('ADMIN')")
-    @SecurityRequirement(name = "BearerAuth")
-    public ResponseEntity<List<PatternFileResponse>> create(
-            @RequestPart("files") MultipartFile[] files,
-            @Parameter(description = "ID of the pattern to associate the files with")
-            @RequestParam("patternId") String patternId) {
+    public ResponseEntity<List<PatternFileResponse>> create(@RequestPart MultipartFile[] files,
+                                                            @RequestParam("patternId") String patternId) {
         var responses = patternFileService.create(files, patternId);
         return ResponseEntity.ok(responses);
     }

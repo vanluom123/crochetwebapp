@@ -11,7 +11,7 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ApiError {
-  private String message;
-  private HttpStatus statusCode;
-  private Throwable rootCause;
+    private String message;
+    private HttpStatus statusCode;
+    private Throwable rootCause;
 }

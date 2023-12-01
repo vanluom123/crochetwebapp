@@ -19,11 +19,10 @@ import java.util.Set;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Pattern extends FreePattern {
+public class Pattern extends BasePattern {
+    @Column(name = "price")
+    private double price;
 
-  @Column(name = "price")
-  private double price;
-
-  @OneToMany(mappedBy = "pattern")
-  private Set<OrderDetail> orderDetails;
+    @OneToMany(mappedBy = "pattern")
+    private Set<PatternFile> patternFiles;
 }

@@ -10,12 +10,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AuthResponse {
-  private String accessToken;
+    private String accessToken;
 
-  @Builder.Default
-  private String tokenType = "Bearer";
+    private String tokenType = "Bearer";
 
-  public AuthResponse(String accessToken) {
-    this.accessToken = accessToken;
-  }
+    public AuthResponse(String accessToken) {
+        this.accessToken = accessToken;
+    }
 }

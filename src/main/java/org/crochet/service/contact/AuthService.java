@@ -3,19 +3,19 @@ package org.crochet.service.contact;
 import org.crochet.request.LoginRequest;
 import org.crochet.request.PasswordResetRequest;
 import org.crochet.request.SignUpRequest;
-import org.crochet.response.EntityResponse;
+import org.crochet.response.ApiResponse;
 import org.crochet.response.AuthResponse;
 
 public interface AuthService {
     AuthResponse authenticateUser(LoginRequest loginRequest);
 
-    EntityResponse registerUser(SignUpRequest signUpRequest);
+    ApiResponse registerUser(SignUpRequest signUpRequest);
 
-    EntityResponse resendVerificationEmail(String email);
+    ApiResponse resendVerificationEmail(String email);
 
-    EntityResponse confirmToken(String token);
+    ApiResponse confirmToken(String token);
 
-    EntityResponse resetPasswordLink(String email);
+    ApiResponse resetPasswordLink(String email);
 
-    EntityResponse resetPassword(String token, PasswordResetRequest passwordResetRequest);
+    ApiResponse resetPassword(String token, PasswordResetRequest passwordResetRequest);
 }
