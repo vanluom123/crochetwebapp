@@ -10,18 +10,19 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface ConfirmationTokenRepository extends JpaRepository<ConfirmationToken, Long> {
-  Optional<ConfirmationToken> findByUser(User user);
+public interface ConfirmationTokenRepository extends JpaRepository<ConfirmationToken, UUID> {
+    Optional<ConfirmationToken> findByUser(User user);
 
-  Optional<ConfirmationToken> findByToken(String token);
+    Optional<ConfirmationToken> findByToken(String token);
 
-  @Transactional
-  @Modifying
-  @Query("UPDATE ConfirmationToken c " +
-      "SET c.confirmedAt = ?2 " +
-      "WHERE c.token = ?1")
-  void updateConfirmedAt(String token, LocalDateTime confirmedAt);
+    @Transactional
+    @Modifying
+    @Query("UPDATE ConfirmationToken c " +
+            "SET c.confirmedAt = ?2 " +
+            "WHERE c.token = ?1")
+    void updateConfirmedAt(String token, LocalDateTime confirmedAt);
 
 }

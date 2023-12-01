@@ -1,21 +1,3 @@
 databaseChangeLog:
-  - include:
-      file: src/main/resources/db/migration/create-user.yaml
-  - include:
-      file: src/main/resources/db/migration/create-product.yaml
-  - include:
-      file: src/main/resources/db/migration/create-pattern.yaml
-  - include:
-      file: src/main/resources/db/migration/create-confirmation-token.yaml
-  - include:
-      file: src/main/resources/db/migration/create-password-reset-token.yaml
-  - include:
-      file: src/main/resources/db/migration/create-order.yaml
-  - include:
-      file: src/main/resources/db/migration/create-payment.yaml
-  - include:
-      file: src/main/resources/db/migration/create-blog.yaml
-  - include:
-      file: src/main/resources/db/migration/create-comment.yaml
-  - include:
-      file: src/main/resources/db/migration/create-free-pattern.yaml
+  - includeAll:
+      path: src/main/resources/db/migration
