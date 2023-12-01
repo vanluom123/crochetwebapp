@@ -10,16 +10,16 @@ import org.crochet.model.RoleType;
 
 @Data
 public class SignUpRequest {
-  @NotBlank
-  private String name;
+    @NotBlank
+    private String name;
 
-  @NotBlank
-  @Email
-  private String email;
+    @NotBlank
+    @Email
+    private String email;
 
-  @NotBlank
-  private String password;
+    @NotBlank
+    private String password;
 
-  @Enumerated(EnumType.STRING)
-  private RoleType role = RoleType.USER;
+    @Enumerated(EnumType.STRING)
+    private RoleType role = RoleType.USER;
 }

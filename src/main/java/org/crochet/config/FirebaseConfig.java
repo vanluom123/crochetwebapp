@@ -16,20 +16,20 @@ import java.io.InputStream;
 @Configuration
 public class FirebaseConfig {
 
-  @Bean
-  public FirebaseApp firebaseApp() throws IOException {
-    InputStream is = new ClassPathResource("serviceAccount.json").getInputStream();
+    @Bean
+    public FirebaseApp firebaseApp() throws IOException {
+        InputStream is = new ClassPathResource("serviceAccount.json").getInputStream();
 
-    FirebaseOptions options = FirebaseOptions.builder()
-        .setCredentials(GoogleCredentials.fromStream(is))
-        .build();
+        FirebaseOptions options = FirebaseOptions.builder()
+                .setCredentials(GoogleCredentials.fromStream(is))
+                .build();
 
-    return FirebaseApp.initializeApp(options);
-  }
+        return FirebaseApp.initializeApp(options);
+    }
 
-  @Bean
-  public StorageClient storageClient(FirebaseApp firebaseApp) {
-    return StorageClient.getInstance(firebaseApp);
-  }
+    @Bean
+    public StorageClient storageClient(FirebaseApp firebaseApp) {
+        return StorageClient.getInstance(firebaseApp);
+    }
 }
 

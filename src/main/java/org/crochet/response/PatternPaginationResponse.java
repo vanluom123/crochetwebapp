@@ -10,10 +10,10 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 public class PatternPaginationResponse {
-  public List<PatternResponse> contents;
-  private int pageNo;
-  private int pageSize;
-  private long totalElements;
-  private int totalPages;
-  private boolean last;
+    public List<PatternResponse> contents;
+    private int pageNo;
+    private int pageSize;
+    private long totalElements;
+    private int totalPages;
+    private boolean last;
 }
