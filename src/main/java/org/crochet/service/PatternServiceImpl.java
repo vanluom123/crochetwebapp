@@ -9,7 +9,6 @@ import org.crochet.request.PatternRequest;
 import org.crochet.response.PatternPaginationResponse;
 import org.crochet.response.PatternResponse;
 import org.crochet.service.contact.PatternService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -27,8 +26,11 @@ import java.util.UUID;
 @Service
 public class PatternServiceImpl implements PatternService {
 
-    @Autowired
-    private PatternRepository patternRepo;
+    private final PatternRepository patternRepo;
+
+    public PatternServiceImpl(PatternRepository patternRepo) {
+        this.patternRepo = patternRepo;
+    }
 
     /**
      * Create or update pattern
