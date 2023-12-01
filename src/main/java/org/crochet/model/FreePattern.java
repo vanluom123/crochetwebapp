@@ -20,5 +20,5 @@ import java.util.Set;
 @AllArgsConstructor
 public class FreePattern extends BasePattern {
     @OneToMany(mappedBy = "freePattern")
-    private Set<FreePatternFile> freePatternImages;
+    private Set<FreePatternFile> freePatternFiles;
 }

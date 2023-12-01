@@ -2,7 +2,6 @@ package org.crochet.mapper;
 
 import org.crochet.model.FreePattern;
 import org.crochet.model.FreePatternFile;
-import org.crochet.request.FreePatternRequest;
 import org.crochet.response.FreePatternResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -18,7 +17,7 @@ public interface FreePatternMapper {
     FreePatternMapper INSTANCE = Mappers.getMapper(FreePatternMapper.class);
 
     @Mapping(target = "id", source = "id", qualifiedByName = "uuidToString")
-    @Mapping(target = "encodingBytes", source = "freePatternImages", qualifiedByName = "toList")
+    @Mapping(target = "encodingBytes", source = "freePatternFiles", qualifiedByName = "toList")
     FreePatternResponse toResponse(FreePattern pattern);
 
     List<FreePatternResponse> toResponses(Collection<FreePattern> freePatterns);
