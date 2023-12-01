@@ -21,34 +21,57 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * ProductServiceImpl class
+ */
 @Service
 public class ProductServiceImpl implements ProductService {
 
-    @Autowired
-    private ProductRepository productRepo;
+    private final ProductRepository productRepo;
 
+    /**
+     * Constructs a new {@code ProductServiceImpl} with the specified product repository.
+     *
+     * @param productRepo The repository for handling product-related operations.
+     */
+    public ProductServiceImpl(ProductRepository productRepo) {
+        this.productRepo = productRepo;
+    }
+
+    /**
+     * Creates a new product or updates an existing one based on the provided {@link ProductRequest}.
+     * <p>
+     * If the product with the specified ID exists, its attributes will be updated.
+     * If no product with the specified ID is found, a new product will be created.
+     *
+     * @param request The {@link ProductRequest} containing information for creating or updating the product.
+     * @return A {@link ProductResponse} representing the created or updated product.
+     */
     @Transactional
     @Override
     public ProductResponse createOrUpdate(ProductRequest request) {
         var product = productRepo.findById(UUID.fromString(request.getId()))
                 .orElse(null);
         if (product == null) {
-            // create product
-            product = Product.builder()
-                    .name(request.getName())
-                    .price(request.getPrice())
-                    .description(request.getDescription())
-                    .build();
-        } else {
-            // update product
-            product.setName(request.getName());
-            product.setPrice(request.getPrice());
-            product.setDescription(request.getDescription());
+            product = new Product();
         }
+        product.setName(request.getName());
+        product.setPrice(request.getPrice());
+        product.setDescription(request.getDescription());
         product = productRepo.save(product);
         return ProductMapper.INSTANCE.toResponse(product);
     }
 
+    /**
+     * Retrieves a paginated list of products based on the provided parameters.
+     *
+     * @param pageNo   The page number to retrieve (0-indexed).
+     * @param pageSize The number of products to include in each page.
+     * @param sortBy   The attribute by which the products should be sorted.
+     * @param sortDir  The sorting direction, either "ASC" (ascending) or "DESC" (descending).
+     * @param text     The search text used to filter products by name or other criteria.
+     * @return A {@link ProductPaginationResponse} containing the paginated list of products.
+     */
     @Override
     public ProductPaginationResponse getProducts(int pageNo, int pageSize, String sortBy, String sortDir, String text) {
         // create Sort instance
@@ -75,6 +98,13 @@ public class ProductServiceImpl implements ProductService {
                 .build();
     }
 
+    /**
+     * Retrieves detailed information for a specific product identified by the given ID.
+     *
+     * @param id The unique identifier of the product.
+     * @return A {@link ProductResponse} containing detailed information about the product.
+     * @throws ResourceNotFoundException If the specified product ID does not correspond to an existing product.
+     */
     @Override
     public ProductResponse getDetail(String id) {
         var product = productRepo.findById(UUID.fromString(id))

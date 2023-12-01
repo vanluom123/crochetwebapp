@@ -9,7 +9,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.UUID;
@@ -18,6 +21,9 @@ import java.util.UUID;
 @Setter
 @Entity
 @Table(name = "product_file")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ProductFile {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

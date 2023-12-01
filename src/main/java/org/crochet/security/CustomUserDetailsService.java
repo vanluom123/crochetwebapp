@@ -10,6 +10,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 /**
  * CustomUserDetailsService class
  */
@@ -56,9 +58,9 @@ public class CustomUserDetailsService implements UserDetailsService {
      * @throws ResourceNotFoundException If the user is not found for the given ID.
      */
     @Transactional
-    public UserDetails loadUserById(Long id) {
+    public UserDetails loadUserById(String id) {
         // Retrieve the user by ID from the UserRepository
-        User user = userRepository.findById(id)
+        User user = userRepository.findById(UUID.fromString(id))
                 .filter(User::getEmailVerified)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("User with %s not found", id)));
 

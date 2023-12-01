@@ -21,16 +21,30 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * FreePatternServiceImpl class
+ */
 @Service
 public class FreePatternServiceImpl implements FreePatternService {
 
-    @Autowired
-    private FreePatternRepository freePatternRepo;
+    private final FreePatternRepository freePatternRepo;
 
     /**
-     * Create or update free pattern
+     * Constructs a new {@code FreePatternServiceImpl} with the specified FreePattern repository.
      *
-     * @param request FreePatternRequest
+     * @param freePatternRepo The repository for handling FreePattern-related operations.
+     */
+    public FreePatternServiceImpl(FreePatternRepository freePatternRepo) {
+        this.freePatternRepo = freePatternRepo;
+    }
+
+    /**
+     * Creates a new FreePattern or updates an existing one based on the provided {@link FreePatternRequest}.
+     * If the request contains an ID, it updates the existing FreePattern with the corresponding ID.
+     * If the request does not contain an ID, it creates a new FreePattern.
+     *
+     * @param request The {@link FreePatternRequest} containing information for creating or updating the FreePattern.
+     * @throws ResourceNotFoundException If an existing FreePattern is to be updated, and the specified ID is not found.
      */
     @Transactional
     @Override
@@ -50,14 +64,14 @@ public class FreePatternServiceImpl implements FreePatternService {
     }
 
     /**
-     * Get free pattern
+     * Retrieves a paginated list of FreePatterns based on the provided parameters.
      *
-     * @param pageNo   Page number
-     * @param pageSize The size of page
-     * @param sortBy   Sort by
-     * @param sortDir  Sort directory
-     * @param text     Text
-     * @return Free pattern is paginated
+     * @param pageNo   The page number to retrieve (0-indexed).
+     * @param pageSize The number of FreePatterns to include in each page.
+     * @param sortBy   The attribute by which the FreePatterns should be sorted.
+     * @param sortDir  The sorting direction, either "ASC" (ascending) or "DESC" (descending).
+     * @param text     The search text used to filter FreePatterns by name or other criteria.
+     * @return A {@link PaginatedFreePatternResponse} containing the paginated list of FreePatterns.
      */
     @Override
     public PaginatedFreePatternResponse getFreePatterns(int pageNo, int pageSize, String sortBy, String sortDir, String text) {
@@ -86,10 +100,11 @@ public class FreePatternServiceImpl implements FreePatternService {
     }
 
     /**
-     * Get detail
+     * Retrieves detailed information for a specific FreePattern identified by the given ID.
      *
-     * @param id Id
-     * @return Response
+     * @param id The unique identifier of the FreePattern.
+     * @return A {@link FreePatternResponse} containing detailed information about the FreePattern.
+     * @throws ResourceNotFoundException If the specified FreePattern ID does not correspond to an existing FreePattern.
      */
     @Override
     public FreePatternResponse getDetail(String id) {

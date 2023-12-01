@@ -10,6 +10,7 @@ import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 
 import java.util.Base64;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -23,13 +24,13 @@ public interface ProductMapper {
     ProductResponse toResponse(Product product);
 
     @Named("toList")
-    default List<String> toList(Set<ProductFile> productFiles) {
+    default List<String> toList(Collection<ProductFile> productFiles) {
         return productFiles.stream()
                 .map(ProductFile::getBytes)
                 .toList();
     }
 
-    List<ProductResponse> toResponses(List<Product> products);
+    List<ProductResponse> toResponses(Collection<Product> products);
 
     Product toProduct(ProductRequest request);
 

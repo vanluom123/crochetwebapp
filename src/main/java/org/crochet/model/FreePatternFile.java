@@ -10,7 +10,10 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.UUID;
@@ -19,6 +22,9 @@ import java.util.UUID;
 @Setter
 @Entity
 @Table(name = "free_pattern_file")
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class FreePatternFile {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -26,8 +32,12 @@ public class FreePatternFile {
     private UUID id;
 
     @Lob
-    @Column(name = "fileUrl", columnDefinition = "LONGBLOB")
-    private String fileUrl;
+    @Column(name = "file_name")
+    private String fileName;
+
+    @Lob
+    @Column(name = "bytes", columnDefinition = "LONGBLOB")
+    private String bytes;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "free_pattern_id", nullable = false)

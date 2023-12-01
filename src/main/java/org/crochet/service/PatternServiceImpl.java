@@ -21,6 +21,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * PatternServiceImpl class
+ */
 @Service
 public class PatternServiceImpl implements PatternService {
 
@@ -38,15 +41,11 @@ public class PatternServiceImpl implements PatternService {
         var pattern = patternRepo.findById(UUID.fromString(request.getId()))
                 .orElse(null);
         if (pattern == null) {
-            pattern = PatternMapper.INSTANCE.toPattern(request);
-        } else {
-            pattern = Pattern.builder()
-                    .name(request.getName())
-                    .price(request.getPrice())
-                    .description(request.getDescription())
-                    .build();
+            pattern = new Pattern();
         }
-
+        pattern.setName(request.getName());
+        pattern.setPrice(request.getPrice());
+        pattern.setDescription(request.getDescription());
         patternRepo.save(pattern);
     }
 

@@ -4,7 +4,9 @@ import org.crochet.model.ProductFile;
 import org.crochet.response.ProductFileResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
+import org.springframework.util.ObjectUtils;
 
+import java.util.Collection;
 import java.util.List;
 
 @Mapper(uses = {ProductMapper.class})
@@ -13,5 +15,12 @@ public interface ProductFileMapper {
 
     ProductFileResponse toResponse(ProductFile productFile);
 
-    List<ProductFileResponse> toResponses(List<ProductFile> productFiles);
+    default List<ProductFileResponse> toResponses(Collection<ProductFile> productFiles) {
+        if (ObjectUtils.isEmpty(productFiles)) {
+            return null;
+        }
+        return productFiles.stream()
+                .map(this::toResponse)
+                .toList();
+    }
 }

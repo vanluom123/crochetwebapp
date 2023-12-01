@@ -17,18 +17,41 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+/**
+ * CommentServiceImpl class
+ */
 @Service
 public class CommentServiceImpl implements CommentService {
 
-    @Autowired
-    private CommentRepository commentRepo;
+    private final CommentRepository commentRepo;
 
-    @Autowired
-    private UserRepository userRepo;
+    private final UserRepository userRepo;
 
-    @Autowired
-    private BlogPostRepository blogPostRepo;
+    private final BlogPostRepository blogPostRepo;
 
+    /**
+     * Constructs a new {@code CommentServiceImpl} with the specified repositories.
+     *
+     * @param commentRepo   The repository for handling comments.
+     * @param userRepo      The repository for handling users.
+     * @param blogPostRepo  The repository for handling blog posts.
+     */
+    public CommentServiceImpl(CommentRepository commentRepo,
+                              UserRepository userRepo,
+                              BlogPostRepository blogPostRepo) {
+        this.commentRepo = commentRepo;
+        this.userRepo = userRepo;
+        this.blogPostRepo = blogPostRepo;
+    }
+
+    /**
+     * Creates a new comment or updates an existing one based on the provided {@link CommentRequest}.
+     * If the request contains an ID, it updates the existing comment with the corresponding ID.
+     * If the request does not contain an ID, it creates a new comment.
+     *
+     * @param request The {@link CommentRequest} containing information for creating or updating the comment.
+     * @throws ResourceNotFoundException If an existing comment is to be updated, and the specified ID is not found.
+     */
     @Transactional
     @Override
     public void createOrUpdate(CommentRequest request) {
@@ -51,6 +74,7 @@ public class CommentServiceImpl implements CommentService {
                     .build();
         } else {
             comment.setContent(request.getContent());
+            comment.setCreatedDate(LocalDateTime.now());
         }
 
         commentRepo.save(comment);

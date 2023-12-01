@@ -4,7 +4,6 @@ import org.crochet.model.Pattern;
 import org.crochet.request.PatternRequest;
 import org.crochet.response.PatternResponse;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
@@ -15,7 +14,6 @@ public interface PatternMapper {
 
     PatternResponse toResponse(Pattern pattern);
 
-    @Mapping(target = "orderDetails", ignore = true)
     Pattern toPattern(PatternRequest request);
 
     List<PatternResponse> toResponses(List<Pattern> patterns);

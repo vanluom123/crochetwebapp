@@ -1,6 +1,8 @@
 package org.crochet.controller;
 
+import org.crochet.response.PatternFileResponse;
 import org.crochet.response.ProductFileResponse;
+import org.crochet.service.contact.PatternFileService;
 import org.crochet.service.contact.ProductFileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -15,19 +17,19 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@RequestMapping("/product-file")
-public class ProductFileController {
-    private final ProductFileService productFileService;
+@RequestMapping("/pattern-file")
+public class PatternFileController {
+    private final PatternFileService patternFileService;
 
-    public ProductFileController(ProductFileService productFileService) {
-        this.productFileService = productFileService;
+    public PatternFileController(PatternFileService patternFileService) {
+        this.patternFileService = patternFileService;
     }
 
     @PostMapping("/create")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<ProductFileResponse>> create(@RequestPart MultipartFile[] files,
-                                                            @RequestParam("productId") String productId) {
-        var responses = productFileService.create(files, productId);
+    public ResponseEntity<List<PatternFileResponse>> create(@RequestPart MultipartFile[] files,
+                                                            @RequestParam("patternId") String patternId) {
+        var responses = patternFileService.create(files, patternId);
         return ResponseEntity.ok(responses);
     }
 }

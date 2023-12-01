@@ -6,6 +6,7 @@ import org.crochet.response.FreePatternResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
+import java.util.Collection;
 import java.util.List;
 
 @Mapper
@@ -16,5 +17,5 @@ public interface FreePatternMapper {
 
     FreePatternResponse toResponse(FreePattern pattern);
 
-    List<FreePatternResponse> toResponses(List<FreePattern> freePatterns);
+    List<FreePatternResponse> toResponses(Collection<FreePattern> freePatterns);
 }

@@ -18,8 +18,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/pattern")
 public class PatternController {
-    @Autowired
-    private PatternService patternService;
+    private final PatternService patternService;
+
+    public PatternController(PatternService patternService) {
+        this.patternService = patternService;
+    }
 
     @PostMapping("/create")
     @PreAuthorize("hasRole('ADMIN')")

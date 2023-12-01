@@ -5,6 +5,7 @@ import org.crochet.response.BlogPostResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
+import java.util.Collection;
 import java.util.List;
 
 @Mapper
@@ -13,5 +14,5 @@ public interface BlogPostMapper {
 
     BlogPostResponse toResponse(BlogPost blogPost);
 
-    List<BlogPostResponse> toResponses(List<BlogPost> blogPosts);
+    List<BlogPostResponse> toResponses(Collection<BlogPost> blogPosts);
 }

@@ -13,15 +13,32 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * FirebaseServiceImpl class
+ */
 @Service
 @Slf4j
 public class FirebaseServiceImpl implements FirebaseService {
 
     private static final String BUCKET_NAME = "littlecrochet.appspot.com";
 
-    @Autowired
-    private StorageClient storageClient;
+    private final StorageClient storageClient;
 
+    /**
+     * Constructs a new {@code FirebaseServiceImpl} with the specified StorageClient.
+     *
+     * @param storageClient The StorageClient for handling Firebase storage operations.
+     */
+    public FirebaseServiceImpl(StorageClient storageClient) {
+        this.storageClient = storageClient;
+    }
+
+    /**
+     * Uploads an array of {@link MultipartFile} objects and returns a list of corresponding file URLs or identifiers.
+     *
+     * @param files An array of {@link MultipartFile} objects representing the files to be uploaded.
+     * @return A list of strings representing the URLs or identifiers of the uploaded files.
+     */
     @Override
     public List<String> uploadFiles(MultipartFile[] files) {
         return Arrays.stream(files)
@@ -29,6 +46,13 @@ public class FirebaseServiceImpl implements FirebaseService {
                 .toList();
     }
 
+    /**
+     * Uploads a single {@link MultipartFile} image file to Firebase Cloud Storage.
+     *
+     * @param imageFile The {@link MultipartFile} representing the image file to be uploaded.
+     * @return A string representing the path and filename in Firebase Cloud Storage.
+     * @throws CloudStorageException If there is an error during the upload process.
+     */
     @Override
     public String uploadFile(MultipartFile imageFile) {
         // Define the path and filename in Firebase Cloud Storage
@@ -49,6 +73,13 @@ public class FirebaseServiceImpl implements FirebaseService {
         return fileName;
     }
 
+    /**
+     * Retrieves the content of a file from Firebase Cloud Storage based on the specified filename.
+     *
+     * @param filename The path and filename of the file in Firebase Cloud Storage.
+     * @return A byte array representing the content of the file.
+     * @throws CloudStorageException If the file is not found or there is an error retrieving the file content.
+     */
     @Override
     public byte[] getFile(String filename) {
         // Define the path and filename in Firebase Cloud Storage

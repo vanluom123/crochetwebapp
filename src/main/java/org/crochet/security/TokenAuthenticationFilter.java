@@ -52,7 +52,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
             // Check if the JWT exists and is valid
             if (StringUtils.hasText(jwtToken) && tokenService.validateToken(jwtToken)) {
-                Long userId = tokenService.getUserIdFromToken(jwtToken);
+                String userId = tokenService.getUserIdFromToken(jwtToken);
 
                 // Load the user details by user ID
                 UserDetails userDetails = customUserDetailsService.loadUserById(userId);

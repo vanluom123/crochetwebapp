@@ -18,8 +18,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/free-pattern")
 public class FreePatternController {
-    @Autowired
-    private FreePatternService freePatternService;
+    private final FreePatternService freePatternService;
+
+    public FreePatternController(FreePatternService freePatternService) {
+        this.freePatternService = freePatternService;
+    }
 
     @PostMapping("/create")
     @PreAuthorize("hasRole('ADMIN')")

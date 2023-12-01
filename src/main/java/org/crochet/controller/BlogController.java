@@ -20,11 +20,14 @@ import java.util.Base64;
 @RestController
 @RequestMapping("/blog")
 public class BlogController {
-    @Autowired
-    private BlogPostService blogPostService;
+    private final BlogPostService blogPostService;
 
-    @Autowired
-    private FirebaseService firebaseService;
+    private final FirebaseService firebaseService;
+
+    public BlogController(BlogPostService blogPostService, FirebaseService firebaseService) {
+        this.blogPostService = blogPostService;
+        this.firebaseService = firebaseService;
+    }
 
     @PostMapping("/create")
     @PreAuthorize("hasRole('ADMIN')")

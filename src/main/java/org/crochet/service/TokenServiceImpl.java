@@ -88,7 +88,7 @@ public class TokenServiceImpl implements TokenService {
      * @return The user ID extracted from the token.
      */
     @Override
-    public Long getUserIdFromToken(String token) {
+    public String getUserIdFromToken(String token) {
         // Parse the token, validate its signature, and retrieve the claims
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(getKey())
@@ -97,7 +97,7 @@ public class TokenServiceImpl implements TokenService {
                 .getBody();
 
         // Extract and return the user ID from the claims
-        return Long.parseLong(claims.getSubject());
+        return claims.getSubject();
     }
 
 

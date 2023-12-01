@@ -57,17 +57,17 @@ public class AuthServiceImpl implements AuthService {
     private final HttpServletRequest servletRequest;
 
     /**
-     * Constructor
+     * Constructs a new {@code AuthServiceImpl} with the specified components and repositories.
      *
-     * @param authenticationManager        AuthenticationManager
-     * @param tokenService                 TokenProvider
-     * @param emailSender                  EmailSender
-     * @param confirmationTokenRepository  ConfirmationTokenRepository
-     * @param userRepository               UserRepository
-     * @param passwordEncoder              PasswordEncoder
-     * @param passwordResetTokenRepository PasswordResetTokenRepository
-     * @param servletResponse              HttpServletResponse
-     * @param servletRequest               HttpServletRequest
+     * @param authenticationManager           The {@link AuthenticationManager} for managing authentication.
+     * @param tokenService                    The {@link TokenService} for handling token-related operations.
+     * @param emailSender                     The {@link EmailSender} for sending emails.
+     * @param confirmationTokenRepository     The repository for handling confirmation tokens.
+     * @param userRepository                  The repository for handling user-related operations.
+     * @param passwordEncoder                 The {@link PasswordEncoder} for encoding passwords.
+     * @param passwordResetTokenRepository    The repository for handling password reset tokens.
+     * @param servletResponse                 The {@link HttpServletResponse} for handling HTTP responses.
+     * @param servletRequest                  The {@link HttpServletRequest} for handling HTTP requests.
      */
     public AuthServiceImpl(AuthenticationManager authenticationManager,
                            TokenService tokenService,

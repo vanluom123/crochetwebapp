@@ -9,7 +9,6 @@ import org.crochet.request.BlogPostRequest;
 import org.crochet.response.BlogPostPaginationResponse;
 import org.crochet.response.BlogPostResponse;
 import org.crochet.service.contact.BlogPostService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,35 +20,55 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+/**
+ * BlogPostServiceImpl class
+ */
 @Service
 public class BlogPostServiceImpl implements BlogPostService {
 
-    @Autowired
-    private BlogPostRepository blogPostRepo;
+    private final BlogPostRepository blogPostRepo;
 
+    /**
+     * Constructs a new {@code BlogPostServiceImpl} with the specified BlogPost repository.
+     *
+     * @param blogPostRepo The repository for handling BlogPost-related operations.
+     */
+    public BlogPostServiceImpl(BlogPostRepository blogPostRepo) {
+        this.blogPostRepo = blogPostRepo;
+    }
+
+    /**
+     * Creates a new blog post or updates an existing one based on the provided {@link BlogPostRequest}.
+     * If the request contains an ID, it updates the existing blog post with the corresponding ID.
+     * If the request does not contain an ID, it creates a new blog post.
+     *
+     * @param request The {@link BlogPostRequest} containing information for creating or updating the blog post.
+     */
     @Transactional
     @Override
     public void createOrUpdatePost(BlogPostRequest request) {
         var blogPost = blogPostRepo.findById(UUID.fromString(request.getId()))
                 .orElse(null);
         if (blogPost == null) {
-            // create new a post
-            blogPost = BlogPost.builder()
-                    .title(request.getTitle())
-                    .content(request.getContent())
-                    .imageUrl(request.getImageUrl())
-                    .creationDate(LocalDateTime.now())
-                    .build();
-        } else {
-            // update the post
-            blogPost.setTitle(request.getTitle());
-            blogPost.setContent(request.getContent());
-            blogPost.setImageUrl(request.getImageUrl());
+            blogPost = new BlogPost();
         }
-
+        blogPost.setTitle(request.getTitle());
+        blogPost.setContent(request.getContent());
+        blogPost.setImageUrl(request.getImageUrl());
+        blogPost.setCreationDate(LocalDateTime.now());
         blogPostRepo.save(blogPost);
     }
 
+    /**
+     * Retrieves a paginated list of blog posts based on the provided parameters.
+     *
+     * @param pageNo   The page number to retrieve (0-indexed).
+     * @param pageSize The number of blog posts to include in each page.
+     * @param sortBy   The attribute by which the blog posts should be sorted.
+     * @param sortDir  The sorting direction, either "ASC" (ascending) or "DESC" (descending).
+     * @param text     The search text used to filter blog posts by title or content.
+     * @return A {@link BlogPostPaginationResponse} containing the paginated list of blog posts.
+     */
     @Override
     public BlogPostPaginationResponse getBlogs(int pageNo, int pageSize, String sortBy, String sortDir, String text) {
         // create Sort instance
@@ -75,6 +94,13 @@ public class BlogPostServiceImpl implements BlogPostService {
                 .build();
     }
 
+    /**
+     * Retrieves detailed information for a specific blog post identified by the given ID.
+     *
+     * @param id The unique identifier of the blog post.
+     * @return A {@link BlogPostResponse} containing detailed information about the blog post.
+     * @throws ResourceNotFoundException If the specified blog post ID does not correspond to an existing blog post.
+     */
     @Override
     public BlogPostResponse getDetail(String id) {
         var blogPost = blogPostRepo.findById(UUID.fromString(id))
