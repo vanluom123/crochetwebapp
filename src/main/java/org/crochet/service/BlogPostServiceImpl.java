@@ -54,7 +54,6 @@ public class BlogPostServiceImpl implements BlogPostService {
         }
         blogPost.setTitle(request.getTitle());
         blogPost.setContent(request.getContent());
-        blogPost.setImageUrl(request.getImageUrl());
         blogPost.setCreationDate(LocalDateTime.now());
         blogPostRepo.save(blogPost);
     }

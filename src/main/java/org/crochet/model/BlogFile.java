@@ -2,11 +2,13 @@ package org.crochet.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,36 +16,29 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-import java.util.Set;
 import java.util.UUID;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "blog_post")
+@Table(name = "blog_file")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class BlogPost {
+public class BlogFile {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false)
     private UUID id;
 
-    @Column(name = "title", nullable = false)
-    private String title;
+    @Column(name = "file_name")
+    private String fileName;
 
     @Lob
-    @Column(name = "content", columnDefinition = "LONGBLOB", nullable = false)
-    private String content;
+    @Column(name = "bytes", columnDefinition = "LONGBLOB")
+    private String bytes;
 
-    @Column(name = "creation_date", nullable = false, updatable = false)
-    private LocalDateTime creationDate;
-
-    @OneToMany(mappedBy = "blogPost")
-    private Set<Comment> comments;
-
-    @OneToMany(mappedBy = "blogPost")
-    private Set<BlogFile> blogFiles;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "blog_id")
+    private BlogPost blogPost;
 }
