@@ -3,8 +3,8 @@ package org.crochet.controller;
 import org.crochet.response.PatternPaginationResponse;
 import org.crochet.response.PatternResponse;
 import org.crochet.security.TokenAuthenticationFilter;
-import org.crochet.service.abstraction.FirebaseService;
-import org.crochet.service.abstraction.PatternService;
+import org.crochet.service.contact.FirebaseService;
+import org.crochet.service.contact.PatternService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.anyInt;
@@ -37,12 +38,11 @@ public class PatternControllerTest {
   private TokenAuthenticationFilter tokenAuthenticationFilter;
 
   @Test
-  public void testGetPatterns() throws Exception {
+  void testGetPatterns() throws Exception {
     // Mock data for testing
     PatternResponse response = PatternResponse.builder()
-        .id(1L)
+        .id(UUID.randomUUID().toString())
         .name("test")
-        .image("test")
         .description("test")
         .price(10)
         .build();

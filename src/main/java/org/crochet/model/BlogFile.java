@@ -7,6 +7,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -15,24 +16,29 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @Getter
 @Setter
-@Table(name = "order_detail")
 @Entity
+@Table(name = "blog_file")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class OrderDetail {
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "id", nullable = false)
-  private Long id;
+public class BlogFile {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", nullable = false)
+    private UUID id;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "pattern_id")
-  private Pattern pattern;
+    @Column(name = "file_name")
+    private String fileName;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "order_id")
-  private Order order;
+    @Lob
+    @Column(name = "bytes", columnDefinition = "LONGBLOB")
+    private String bytes;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "blog_id")
+    private BlogPost blogPost;
 }

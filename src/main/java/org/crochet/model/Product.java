@@ -5,13 +5,16 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.Set;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -21,21 +24,20 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Product {
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "id", nullable = false)
-  private long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", nullable = false)
+    private UUID id;
 
-  @Column(name = "name")
-  private String name;
+    @Column(name = "name")
+    private String name;
 
-  @Lob
-  @Column(name = "image", columnDefinition = "LONGBLOB")
-  private String image;
+    @Column(name = "description")
+    private String description;
 
-  @Column(name = "description")
-  private String description;
+    @Column(name = "price")
+    private double price;
 
-  @Column(name = "price")
-  private double price;
+    @OneToMany(mappedBy = "product")
+    private Set<ProductFile> productFiles;
 }
