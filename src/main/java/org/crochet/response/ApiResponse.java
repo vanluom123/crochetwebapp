@@ -1,13 +1,13 @@
 package org.crochet.response;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
-@Builder
+@Getter
+@Setter
 @AllArgsConstructor
 public class ApiResponse {
-  private boolean success;
-  private String message;
+    private boolean success;
+    private String message;
 }

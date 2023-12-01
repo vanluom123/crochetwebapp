@@ -29,88 +29,88 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(
-    securedEnabled = true,
-    jsr250Enabled = true,
-    prePostEnabled = true
+        securedEnabled = true,
+        jsr250Enabled = true,
+        prePostEnabled = true
 )
 public class SecurityConfig {
 
-  private final CustomUserDetailsService customUserDetailsService;
+    private final CustomUserDetailsService customUserDetailsService;
 
-  private final CustomOAuth2UserService customOAuth2UserService;
+    private final CustomOAuth2UserService customOAuth2UserService;
 
-  private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+    private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
 
-  private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
+    private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
 
-  private final PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
-  private final OAuth2CookieRepository oAuth2CookieRepository;
+    private final OAuth2CookieRepository oAuth2CookieRepository;
 
-  private final TokenAuthenticationFilter tokenAuthenticationFilter;
+    private final TokenAuthenticationFilter tokenAuthenticationFilter;
 
-  public SecurityConfig(CustomUserDetailsService customUserDetailsService,
-                        CustomOAuth2UserService customOAuth2UserService,
-                        OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler,
-                        OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler,
-                        PasswordEncoder passwordEncoder,
-                        OAuth2CookieRepository oAuth2CookieRepository,
-                        TokenAuthenticationFilter tokenAuthenticationFilter) {
-    this.customUserDetailsService = customUserDetailsService;
-    this.customOAuth2UserService = customOAuth2UserService;
-    this.oAuth2AuthenticationSuccessHandler = oAuth2AuthenticationSuccessHandler;
-    this.oAuth2AuthenticationFailureHandler = oAuth2AuthenticationFailureHandler;
-    this.passwordEncoder = passwordEncoder;
-    this.oAuth2CookieRepository = oAuth2CookieRepository;
-    this.tokenAuthenticationFilter = tokenAuthenticationFilter;
-  }
+    public SecurityConfig(CustomUserDetailsService customUserDetailsService,
+                          CustomOAuth2UserService customOAuth2UserService,
+                          OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler,
+                          OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler,
+                          PasswordEncoder passwordEncoder,
+                          OAuth2CookieRepository oAuth2CookieRepository,
+                          TokenAuthenticationFilter tokenAuthenticationFilter) {
+        this.customUserDetailsService = customUserDetailsService;
+        this.customOAuth2UserService = customOAuth2UserService;
+        this.oAuth2AuthenticationSuccessHandler = oAuth2AuthenticationSuccessHandler;
+        this.oAuth2AuthenticationFailureHandler = oAuth2AuthenticationFailureHandler;
+        this.passwordEncoder = passwordEncoder;
+        this.oAuth2CookieRepository = oAuth2CookieRepository;
+        this.tokenAuthenticationFilter = tokenAuthenticationFilter;
+    }
 
 
-  @Bean
-  public AuthenticationProvider authenticationProvider() {
-    DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-    authProvider.setUserDetailsService(customUserDetailsService);
-    authProvider.setPasswordEncoder(passwordEncoder);
-    return authProvider;
-  }
+    @Bean
+    public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(customUserDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder);
+        return authProvider;
+    }
 
-  @Bean
-  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    return http
-        .cors(withDefaults())
-        .sessionManagement(sessionManagementCustomizer -> sessionManagementCustomizer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .csrf(AbstractHttpConfigurer::disable)
-        .formLogin(AbstractHttpConfigurer::disable)
-        .httpBasic(AbstractHttpConfigurer::disable)
-        .exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(new RestAuthenticationEntryPoint()))
-        .authorizeHttpRequests(authReq -> authReq.requestMatchers("/",
-                "/error",
-                "/favicon.ico",
-                "/*.png",
-                "/*.gif",
-                "/*.svg",
-                "/*.jpg",
-                "/*.html",
-                "/*.css",
-                "/*.js").permitAll()
-            .requestMatchers("/auth/**", "/oauth2/**").permitAll()
-            .anyRequest().authenticated())
-        .oauth2Login(oauth -> oauth.authorizationEndpoint(authEndpointCustomizer ->
-                authEndpointCustomizer
-                    .baseUri("/oauth2/authorize")
-                    .authorizationRequestRepository(oAuth2CookieRepository))
-            .redirectionEndpoint(redirectionEndpointCustomizer ->
-                redirectionEndpointCustomizer.baseUri("/oauth2/callback/*"))
-            .userInfoEndpoint(userInfoEndpointCustomizer -> userInfoEndpointCustomizer.userService(customOAuth2UserService))
-            .successHandler(oAuth2AuthenticationSuccessHandler)
-            .failureHandler(oAuth2AuthenticationFailureHandler))
-        .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-        .authenticationProvider(authenticationProvider())
-        .build();
-  }
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        return http
+                .cors(withDefaults())
+                .sessionManagement(sessionManagementCustomizer -> sessionManagementCustomizer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .csrf(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(new RestAuthenticationEntryPoint()))
+                .authorizeHttpRequests(authReq -> authReq.requestMatchers("/",
+                                "/error",
+                                "/favicon.ico",
+                                "/*.png",
+                                "/*.gif",
+                                "/*.svg",
+                                "/*.jpg",
+                                "/*.html",
+                                "/*.css",
+                                "/*.js").permitAll()
+                        .requestMatchers("/auth/**", "/oauth2/**").permitAll()
+                        .anyRequest().authenticated())
+                .oauth2Login(oauth -> oauth.authorizationEndpoint(authEndpointCustomizer ->
+                                authEndpointCustomizer
+                                        .baseUri("/oauth2/authorize")
+                                        .authorizationRequestRepository(oAuth2CookieRepository))
+                        .redirectionEndpoint(redirectionEndpointCustomizer ->
+                                redirectionEndpointCustomizer.baseUri("/oauth2/callback/*"))
+                        .userInfoEndpoint(userInfoEndpointCustomizer -> userInfoEndpointCustomizer.userService(customOAuth2UserService))
+                        .successHandler(oAuth2AuthenticationSuccessHandler)
+                        .failureHandler(oAuth2AuthenticationFailureHandler))
+                .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .authenticationProvider(authenticationProvider())
+                .build();
+    }
 
-  @Bean
-  public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-    return config.getAuthenticationManager();
-  }
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
 }
