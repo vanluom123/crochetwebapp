@@ -1,17 +1,26 @@
 -- liquibase formatted sql
 
--- changeset luompv97:1701279341646-1
+-- changeset luompv97:1701408838806-1
+CREATE TABLE blog_file
+(
+    id        BINARY(16) NOT NULL,
+    file_name VARCHAR(255) NULL,
+    bytes     LONGBLOB NULL,
+    blog_id   BINARY(16) NULL,
+    CONSTRAINT pk_blog_file PRIMARY KEY (id)
+);
+
+-- changeset luompv97:1701408838806-2
 CREATE TABLE blog_post
 (
     id            BINARY(16) NOT NULL,
     title         VARCHAR(255) NOT NULL,
     content       LONGBLOB     NOT NULL,
-    image_url     LONGBLOB NULL,
     creation_date datetime     NOT NULL,
     CONSTRAINT pk_blog_post PRIMARY KEY (id)
 );
 
--- changeset luompv97:1701279341646-2
+-- changeset luompv97:1701408838806-3
 CREATE TABLE comment
 (
     id           BINARY(16) NOT NULL,
@@ -22,7 +31,7 @@ CREATE TABLE comment
     CONSTRAINT pk_comment PRIMARY KEY (id)
 );
 
--- changeset luompv97:1701279341646-3
+-- changeset luompv97:1701408838806-4
 CREATE TABLE confirmation_token
 (
     id           BINARY(16) NOT NULL,
@@ -34,7 +43,7 @@ CREATE TABLE confirmation_token
     CONSTRAINT pk_confirmation_token PRIMARY KEY (id)
 );
 
--- changeset luompv97:1701279341646-4
+-- changeset luompv97:1701408838806-5
 CREATE TABLE free_pattern
 (
     id            BINARY(16) NOT NULL,
@@ -43,16 +52,17 @@ CREATE TABLE free_pattern
     CONSTRAINT pk_freepattern PRIMARY KEY (id)
 );
 
--- changeset luompv97:1701279341646-5
+-- changeset luompv97:1701408838806-6
 CREATE TABLE free_pattern_file
 (
     id              BINARY(16) NOT NULL,
-    file_url        LONGBLOB NULL,
+    file_name       LONGTEXT NULL,
+    bytes           LONGBLOB NULL,
     free_pattern_id BINARY(16) NOT NULL,
     CONSTRAINT pk_free_pattern_file PRIMARY KEY (id)
 );
 
--- changeset luompv97:1701279341646-6
+-- changeset luompv97:1701408838806-7
 CREATE TABLE password_reset_token
 (
     id         BINARY(16) NOT NULL,
@@ -63,7 +73,7 @@ CREATE TABLE password_reset_token
     CONSTRAINT pk_password_reset_token PRIMARY KEY (id)
 );
 
--- changeset luompv97:1701279341646-7
+-- changeset luompv97:1701408838806-8
 CREATE TABLE pattern
 (
     id            BINARY(16) NOT NULL,
@@ -73,16 +83,17 @@ CREATE TABLE pattern
     CONSTRAINT pk_pattern PRIMARY KEY (id)
 );
 
--- changeset luompv97:1701279341646-8
+-- changeset luompv97:1701408838806-9
 CREATE TABLE pattern_file
 (
     id         BINARY(16) NOT NULL,
-    file_url   LONGBLOB NULL,
+    file_name  LONGBLOB NULL,
+    bytes      LONGBLOB NULL,
     pattern_id BINARY(16) NOT NULL,
     CONSTRAINT pk_pattern_file PRIMARY KEY (id)
 );
 
--- changeset luompv97:1701279341646-9
+-- changeset luompv97:1701408838806-10
 CREATE TABLE product
 (
     id            BINARY(16) NOT NULL,
@@ -92,16 +103,17 @@ CREATE TABLE product
     CONSTRAINT pk_product PRIMARY KEY (id)
 );
 
--- changeset luompv97:1701279341646-10
+-- changeset luompv97:1701408838806-11
 CREATE TABLE product_file
 (
     id         BINARY(16) NOT NULL,
-    file_url   LONGBLOB NULL,
+    file_name  VARCHAR(255) NULL,
+    bytes      LONGBLOB NULL,
     product_id BINARY(16) NULL,
     CONSTRAINT pk_product_file PRIMARY KEY (id)
 );
 
--- changeset luompv97:1701279341646-11
+-- changeset luompv97:1701408838806-12
 CREATE TABLE users
 (
     id                BINARY(16) NOT NULL,
@@ -117,35 +129,39 @@ CREATE TABLE users
     CONSTRAINT pk_users PRIMARY KEY (id)
 );
 
--- changeset luompv97:1701279341646-12
+-- changeset luompv97:1701408838806-13
 ALTER TABLE users
     ADD CONSTRAINT uc_74165e195b2f7b25de690d14a UNIQUE (email);
 
--- changeset luompv97:1701279341646-13
+-- changeset luompv97:1701408838806-14
+ALTER TABLE blog_file
+    ADD CONSTRAINT FK_BLOG_FILE_ON_BLOG FOREIGN KEY (blog_id) REFERENCES blog_post (id);
+
+-- changeset luompv97:1701408838806-15
 ALTER TABLE comment
     ADD CONSTRAINT FK_COMMENT_ON_POST FOREIGN KEY (post_id) REFERENCES blog_post (id);
 
--- changeset luompv97:1701279341646-14
+-- changeset luompv97:1701408838806-16
 ALTER TABLE comment
     ADD CONSTRAINT FK_COMMENT_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
 
--- changeset luompv97:1701279341646-15
+-- changeset luompv97:1701408838806-17
 ALTER TABLE confirmation_token
     ADD CONSTRAINT FK_CONFIRMATION_TOKEN_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
 
--- changeset luompv97:1701279341646-16
+-- changeset luompv97:1701408838806-18
 ALTER TABLE free_pattern_file
     ADD CONSTRAINT FK_FREE_PATTERN_FILE_ON_FREE_PATTERN FOREIGN KEY (free_pattern_id) REFERENCES free_pattern (id);
 
--- changeset luompv97:1701279341646-17
+-- changeset luompv97:1701408838806-19
 ALTER TABLE password_reset_token
     ADD CONSTRAINT FK_PASSWORD_RESET_TOKEN_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
 
--- changeset luompv97:1701279341646-18
+-- changeset luompv97:1701408838806-20
 ALTER TABLE pattern_file
     ADD CONSTRAINT FK_PATTERN_FILE_ON_PATTERN FOREIGN KEY (pattern_id) REFERENCES pattern (id);
 
--- changeset luompv97:1701279341646-19
+-- changeset luompv97:1701408838806-21
 ALTER TABLE product_file
     ADD CONSTRAINT FK_PRODUCT_FILE_ON_PRODUCT FOREIGN KEY (product_id) REFERENCES product (id);
 
