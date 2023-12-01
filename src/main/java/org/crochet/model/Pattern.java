@@ -24,5 +24,5 @@ public class Pattern extends BasePattern {
     private double price;
 
     @OneToMany(mappedBy = "pattern")
-    private Set<PatternFile> patternImages;
+    private Set<PatternFile> patternFiles;
 }
