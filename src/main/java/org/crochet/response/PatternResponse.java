@@ -16,5 +16,5 @@ public class PatternResponse {
     private String name;
     private String description;
     private double price;
-    private List<String> images;
+    private List<String> encodingBytes;
 }

@@ -34,18 +34,19 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import static org.crochet.constant.MessageConstant.ACTIVE_NOW;
+import static org.crochet.constant.MessageConstant.CLICK_TO_ACTIVE_CONTENT;
+import static org.crochet.constant.MessageConstant.CONFIRM_YOUR_EMAIL;
+import static org.crochet.constant.MessageConstant.JWT_TOKEN_MAX_AGE;
+import static org.crochet.constant.MessageConstant.RESET_NOTIFICATION;
+import static org.crochet.constant.MessageConstant.RESET_PASSWORD;
+import static org.crochet.constant.MessageConstant.RESET_YOUR_PASSWORD_CONTENT;
+
 /**
  * AuthServiceImpl class
  */
 @Service
 public class AuthServiceImpl implements AuthService {
-    public static final String RESET_YOUR_PASSWORD_CONTENT = "Please click the below link to reset your password";
-    public static final String RESET_PASSWORD = "Reset password";
-    public static final String RESET_NOTIFICATION = "Password Reset Notification";
-    public static final int JWT_TOKEN_MAX_AGE = 900;
-    private static final String ACTIVE_NOW = "Active now";
-    private static final String CLICK_TO_ACTIVE_CONTENT = "Thank you for registering. Please click on the below link to activate your account:";
-    private static final String CONFIRM_YOUR_EMAIL = "Confirm your email";
     private final AuthenticationManager authenticationManager;
     private final TokenService tokenService;
     private final EmailSender emailSender;

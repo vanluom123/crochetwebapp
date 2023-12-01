@@ -14,7 +14,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
-@Table(name = "freePattern")
+@Table(name = "free_pattern")
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor

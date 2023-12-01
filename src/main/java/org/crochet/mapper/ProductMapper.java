@@ -12,7 +12,6 @@ import org.mapstruct.factory.Mappers;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 @Mapper
@@ -32,7 +31,7 @@ public interface ProductMapper {
 
     List<ProductResponse> toResponses(Collection<Product> products);
 
-    Product toProduct(ProductRequest request);
+    Product toEntity(ProductRequest request);
 
     default String encoding(byte[] data) {
         return Base64.getEncoder().encodeToString(data);

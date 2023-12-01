@@ -9,7 +9,6 @@ import org.crochet.request.FreePatternRequest;
 import org.crochet.response.FreePatternResponse;
 import org.crochet.response.PaginatedFreePatternResponse;
 import org.crochet.service.contact.FreePatternService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -49,17 +48,13 @@ public class FreePatternServiceImpl implements FreePatternService {
     @Transactional
     @Override
     public void createOrUpdate(FreePatternRequest request) {
-        FreePattern freePattern;
-
-        if (request.getId() == null) {
-            freePattern = FreePatternMapper.INSTANCE.toFreePattern(request);
-        } else {
-            freePattern = freePatternRepo.findById(UUID.fromString(request.getId()))
-                    .orElseThrow(() -> new ResourceNotFoundException("FreePattern with id " + request.getId() + " not found"));
-
-            freePattern.setName(request.getName());
-            freePattern.setDescription(request.getDescription());
+        FreePattern freePattern = freePatternRepo.findById(UUID.fromString(request.getId()))
+                .orElseThrow(() -> new ResourceNotFoundException("Free pattern with id " + request.getId() + " not found"));
+        if (freePattern == null) {
+            freePattern = new FreePattern();
         }
+        freePattern.setName(request.getName());
+        freePattern.setDescription(request.getDescription());
         freePatternRepo.save(freePattern);
     }
 

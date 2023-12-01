@@ -13,5 +13,5 @@ public class FreePatternResponse {
     private String id;
     private String name;
     private String description;
-    private List<String> images;
+    private List<String> encodingBytes;
 }
