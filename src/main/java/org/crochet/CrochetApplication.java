@@ -9,7 +9,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 @EnableConfigurationProperties(AppProperties.class)
 public class CrochetApplication {
 
-  public static void main(String[] args) {
-    SpringApplication.run(CrochetApplication.class, args);
-  }
+    public static void main(String[] args) {
+        SpringApplication.run(CrochetApplication.class, args);
+    }
 }

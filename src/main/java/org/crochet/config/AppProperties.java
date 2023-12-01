@@ -9,36 +9,36 @@ import java.util.List;
 @Getter
 @ConfigurationProperties(prefix = "app")
 public class AppProperties {
-  private final Auth auth = new Auth();
-  private final OAuth2 oauth2 = new OAuth2();
+    private final Auth auth = new Auth();
+    private final OAuth2 oauth2 = new OAuth2();
 
-  @Getter
-  public static class Auth {
-    private String tokenSecret;
-    private long tokenExpirationMs;
-    private long refreshTokenExpirationMs;
+    @Getter
+    public static class Auth {
+        private String tokenSecret;
+        private long tokenExpirationMs;
+        private long refreshTokenExpirationMs;
 
-    public void setTokenSecret(String tokenSecret) {
-      this.tokenSecret = tokenSecret;
+        public void setTokenSecret(String tokenSecret) {
+            this.tokenSecret = tokenSecret;
+        }
+
+        public void setTokenExpirationMs(long tokenExpirationMs) {
+            this.tokenExpirationMs = tokenExpirationMs;
+        }
+
+        public void setRefreshTokenExpirationMs(long refreshTokenExpirationMs) {
+            this.refreshTokenExpirationMs = refreshTokenExpirationMs;
+        }
     }
 
-    public void setTokenExpirationMs(long tokenExpirationMs) {
-      this.tokenExpirationMs = tokenExpirationMs;
-    }
+    @Getter
+    public static final class OAuth2 {
+        private List<String> authorizedRedirectUris = new ArrayList<>();
 
-    public void setRefreshTokenExpirationMs(long refreshTokenExpirationMs) {
-      this.refreshTokenExpirationMs = refreshTokenExpirationMs;
+        public OAuth2 authorizedRedirectUris(List<String> authorizedRedirectUris) {
+            this.authorizedRedirectUris = authorizedRedirectUris;
+            return this;
+        }
     }
-  }
-
-  @Getter
-  public static final class OAuth2 {
-    private List<String> authorizedRedirectUris = new ArrayList<>();
-
-    public OAuth2 authorizedRedirectUris(List<String> authorizedRedirectUris) {
-      this.authorizedRedirectUris = authorizedRedirectUris;
-      return this;
-    }
-  }
 
 }
