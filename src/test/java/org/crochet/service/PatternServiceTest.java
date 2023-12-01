@@ -20,9 +20,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.anyLong;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -40,7 +40,7 @@ public class PatternServiceTest {
   private PatternServiceImpl patternService;
 
   @Test
-  public void testCreateOrUpdate() {
+  void testCreateOrUpdate() {
     // Create request
     PatternRequest request = new PatternRequest();
     request.setId(UUID.randomUUID().toString());
@@ -70,7 +70,7 @@ public class PatternServiceTest {
 
   @SuppressWarnings("unchecked")
   @Test
-  public void testGetPatterns() {
+  void testGetPatterns() {
     // Arrange
     int pageNo = 1;
     int pageSize = 10;
@@ -107,7 +107,7 @@ public class PatternServiceTest {
   }
 
   @Test
-  public void testGetDetail() {
+  void testGetDetail() {
     // Arrange
     UUID patternId = UUID.randomUUID();
 
@@ -132,7 +132,7 @@ public class PatternServiceTest {
   }
 
   @Test
-  public void testGetDetailNotFound() {
+  void testGetDetailNotFound() {
     // Arrange
     UUID nonExistentPatternId = UUID.randomUUID();
 

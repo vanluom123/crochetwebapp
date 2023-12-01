@@ -38,7 +38,7 @@ public class PatternControllerTest {
   private TokenAuthenticationFilter tokenAuthenticationFilter;
 
   @Test
-  public void testGetPatterns() throws Exception {
+  void testGetPatterns() throws Exception {
     // Mock data for testing
     PatternResponse response = PatternResponse.builder()
         .id(UUID.randomUUID().toString())
