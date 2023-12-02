@@ -55,6 +55,7 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "provider", columnDefinition = "varchar(25) default 'local'")
+    @Builder.Default
     private AuthProvider provider = AuthProvider.local;
 
     @Column(name = "provider_id")
@@ -65,6 +66,7 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role", columnDefinition = "varchar(10) default 'USER'")
+    @Builder.Default
     private RoleType role = RoleType.USER;
 
     @OneToMany(mappedBy = "user")

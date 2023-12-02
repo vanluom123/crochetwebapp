@@ -15,12 +15,9 @@ import java.util.UUID;
 @Service
 public class ProductCategoryServiceImpl implements ProductCategoryService {
     private final ProductCategoryRepository productCategoryRepo;
-    private final ProductCategoryMapper mapper;
 
-    public ProductCategoryServiceImpl(ProductCategoryRepository productCategoryRepo,
-                                      ProductCategoryMapper mapper) {
+    public ProductCategoryServiceImpl(ProductCategoryRepository productCategoryRepo) {
         this.productCategoryRepo = productCategoryRepo;
-        this.mapper = mapper;
     }
 
     @Transactional
@@ -33,12 +30,12 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
         }
         category.setCategoryName(request.getCategoryName());
         category = productCategoryRepo.save(category);
-        return mapper.toResponse(category);
+        return ProductCategoryMapper.INSTANCE.toResponse(category);
     }
 
     @Override
     public List<ProductCategoryResponse> getAll() {
         var categories = productCategoryRepo.findAll();
-        return mapper.toResponses(categories);
+        return ProductCategoryMapper.INSTANCE.toResponses(categories);
     }
 }

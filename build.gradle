@@ -72,7 +72,6 @@ liquibase {
             url 'jdbc:mysql://localhost:3306/testDB'
             username 'root'
             password 'root'
-            logLevel 'info'
         }
     }
     runList = 'main'
