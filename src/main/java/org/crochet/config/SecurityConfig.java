@@ -94,7 +94,15 @@ public class SecurityConfig {
                                 "/*.css",
                                 "/*.js").permitAll()
                         .requestMatchers("/auth/**", "/oauth2/**").permitAll()
-                        .anyRequest().authenticated())
+                        .requestMatchers("/blog/create",
+                                "/blog-file/create",
+                                "/comment/create",
+                                "/free-pattern/create",
+                                "/pattern/create",
+                                "/pattern-file/create",
+                                "/product-category/create",
+                                "/product/create",
+                                "/product-file/create").authenticated())
                 .oauth2Login(oauth -> oauth.authorizationEndpoint(authEndpointCustomizer ->
                                 authEndpointCustomizer
                                         .baseUri("/oauth2/authorize")
