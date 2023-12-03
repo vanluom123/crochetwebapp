@@ -5,7 +5,6 @@ import org.crochet.request.ProductRequest;
 import org.crochet.response.ProductPaginationResponse;
 import org.crochet.response.ProductResponse;
 import org.crochet.service.contact.ProductService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
