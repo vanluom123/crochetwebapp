@@ -3,6 +3,7 @@ plugins {
     id 'org.springframework.boot' version '3.2.0'
     id 'io.spring.dependency-management' version '1.1.4'
     id 'org.liquibase.gradle' version '2.2.1'
+    id 'com.bmuschko.docker-spring-boot-application' version '9.4.0'
 }
 
 group = 'org'
@@ -63,6 +64,16 @@ dependencies {
     liquibaseRuntime 'org.liquibase:liquibase-groovy-dsl:3.0.3'
     liquibaseRuntime 'info.picocli:picocli:4.7.4'
     liquibaseRuntime 'mysql:mysql-connector-java:8.0.33'
+}
+
+docker {
+    springBootApplication {
+        baseImage = 'openjdk:17-alpine'
+        ports = [9090, 8080]
+        images = ['crochet:1.0', 'crochet:latest']
+        jvmArgs = ['-Dspring.profiles.active=local', '-Xmx2048m']
+
+    }
 }
 
 liquibase {
