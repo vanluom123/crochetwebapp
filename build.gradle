@@ -80,7 +80,7 @@ liquibase {
     activities {
         main {
             changelogFile 'src/main/resources/db/changelog/db.changelog-master.yaml'
-            url 'jdbc:mysql://localhost:3306/testDB'
+            url 'jdbc:mysql://localhost:3307/testDB'
             username 'root'
             password 'root'
         }
