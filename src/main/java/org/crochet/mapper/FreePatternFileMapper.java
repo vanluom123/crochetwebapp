@@ -5,10 +5,10 @@ import org.crochet.response.FreePatternFileResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
-import org.springframework.util.ObjectUtils;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE,
         uses = {FreePatternMapper.class})
@@ -20,11 +20,10 @@ public interface FreePatternFileMapper {
     FreePatternFileResponse toResponse(FreePatternFile freePatternFile);
 
     default List<FreePatternFileResponse> toResponses(Collection<FreePatternFile> freePatternFiles) {
-        if (ObjectUtils.isEmpty(freePatternFiles)) {
-            return null;
-        }
-        return freePatternFiles.stream()
-                .map(this::toResponse)
-                .toList();
+        return Optional.ofNullable(freePatternFiles)
+                .map(file -> file.stream()
+                        .map(this::toResponse)
+                        .toList())
+                .orElseThrow(() -> new IllegalArgumentException("Input list cannot be null"));
     }
 }
