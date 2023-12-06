@@ -2,7 +2,6 @@ package org.crochet.controller;
 
 import org.crochet.request.CommentRequest;
 import org.crochet.service.contact.CommentService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

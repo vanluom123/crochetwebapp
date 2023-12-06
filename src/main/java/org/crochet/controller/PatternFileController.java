@@ -1,10 +1,7 @@
 package org.crochet.controller;
 
 import org.crochet.response.PatternFileResponse;
-import org.crochet.response.ProductFileResponse;
 import org.crochet.service.contact.PatternFileService;
-import org.crochet.service.contact.ProductFileService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;

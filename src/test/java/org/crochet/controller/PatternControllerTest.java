@@ -3,7 +3,6 @@ package org.crochet.controller;
 import org.crochet.response.PatternPaginationResponse;
 import org.crochet.response.PatternResponse;
 import org.crochet.security.TokenAuthenticationFilter;
-import org.crochet.service.contact.FirebaseService;
 import org.crochet.service.contact.PatternService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,9 +29,6 @@ public class PatternControllerTest {
 
   @MockBean
   private PatternService patternService;
-
-  @MockBean
-  private FirebaseService firebaseService;
 
   @MockBean
   private TokenAuthenticationFilter tokenAuthenticationFilter;
