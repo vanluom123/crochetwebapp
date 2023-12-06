@@ -40,11 +40,8 @@ public class PatternServiceImpl implements PatternService {
     @Transactional
     @Override
     public void createOrUpdate(PatternRequest request) {
-        var pattern = patternRepo.findById(UUID.fromString(request.getId()))
-                .orElse(null);
-        if (pattern == null) {
-            pattern = new Pattern();
-        }
+        var pattern = (request.getId() == null) ? new Pattern()
+                : findOne(request.getId());
         pattern.setName(request.getName());
         pattern.setPrice(request.getPrice());
         pattern.setDescription(request.getDescription());
@@ -95,8 +92,12 @@ public class PatternServiceImpl implements PatternService {
      */
     @Override
     public PatternResponse getDetail(String id) {
-        var pattern = patternRepo.findById(UUID.fromString(id))
-                .orElseThrow(() -> new ResourceNotFoundException("Pattern not found"));
+        var pattern = findOne(id);
         return PatternMapper.INSTANCE.toResponse(pattern);
+    }
+
+    private Pattern findOne(String id) {
+        return patternRepo.findById(UUID.fromString(id))
+                .orElseThrow(() -> new ResourceNotFoundException("Pattern not found"));
     }
 }

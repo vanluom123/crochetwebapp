@@ -2,7 +2,7 @@ version: '3'
 services:
   # Spring Boot application
   web:
-    image: phanvanluom97bd/crochet
+    image: crochet
     ports:
       - "8080:8080"
     depends_on:
