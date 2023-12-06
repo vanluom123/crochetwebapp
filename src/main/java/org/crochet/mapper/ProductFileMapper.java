@@ -4,10 +4,10 @@ import org.crochet.model.ProductFile;
 import org.crochet.response.ProductFileResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
-import org.springframework.util.ObjectUtils;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @Mapper(uses = {ProductMapper.class})
 public interface ProductFileMapper {
@@ -16,11 +16,10 @@ public interface ProductFileMapper {
     ProductFileResponse toResponse(ProductFile productFile);
 
     default List<ProductFileResponse> toResponses(Collection<ProductFile> productFiles) {
-        if (ObjectUtils.isEmpty(productFiles)) {
-            return null;
-        }
-        return productFiles.stream()
-                .map(this::toResponse)
-                .toList();
+        return Optional.ofNullable(productFiles)
+                .map(file -> file.stream()
+                        .map(this::toResponse)
+                        .toList())
+                .orElseThrow(() -> new IllegalArgumentException("Input list cannot be null"));
     }
 }

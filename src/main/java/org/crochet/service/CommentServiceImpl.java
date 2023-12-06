@@ -2,6 +2,7 @@ package org.crochet.service;
 
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.model.Comment;
+import org.crochet.model.Product;
 import org.crochet.model.User;
 import org.crochet.repository.BlogPostRepository;
 import org.crochet.repository.CommentRepository;
@@ -32,9 +33,9 @@ public class CommentServiceImpl implements CommentService {
     /**
      * Constructs a new {@code CommentServiceImpl} with the specified repositories.
      *
-     * @param commentRepo   The repository for handling comments.
-     * @param userRepo      The repository for handling users.
-     * @param blogPostRepo  The repository for handling blog posts.
+     * @param commentRepo  The repository for handling comments.
+     * @param userRepo     The repository for handling users.
+     * @param blogPostRepo The repository for handling blog posts.
      */
     public CommentServiceImpl(CommentRepository commentRepo,
                               UserRepository userRepo,
@@ -63,20 +64,22 @@ public class CommentServiceImpl implements CommentService {
         var blog = blogPostRepo.findById(UUID.fromString(request.getBlogPostId()))
                 .orElseThrow(() -> new ResourceNotFoundException("Blog not found"));
 
-        var comment = commentRepo.findById(UUID.fromString(request.getId()))
-                .orElse(null);
-        if (comment == null) {
-            comment = Comment.builder()
-                    .blogPost(blog)
-                    .user(user)
-                    .content(request.getContent())
-                    .createdDate(LocalDateTime.now())
-                    .build();
+        var id = request.getId();
+        Comment comment;
+        if (id == null) {
+            comment = new Comment();
+            comment.setBlogPost(blog);
+            comment.setUser(user);
         } else {
-            comment.setContent(request.getContent());
-            comment.setCreatedDate(LocalDateTime.now());
+            comment = findOne(id);
         }
-
+        comment.setContent(request.getContent());
+        comment.setCreatedDate(LocalDateTime.now());
         commentRepo.save(comment);
+    }
+
+    private Comment findOne(String id) {
+        return commentRepo.findById(UUID.fromString(id))
+                .orElseThrow(() -> new ResourceNotFoundException("Comment not found"));
     }
 }
