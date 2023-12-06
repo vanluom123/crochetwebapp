@@ -10,7 +10,9 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Mapper
 public interface FreePatternMapper {
@@ -24,9 +26,12 @@ public interface FreePatternMapper {
 
     @Named("toList")
     default List<String> toList(Collection<FreePatternFile> freePatternFiles) {
-        return freePatternFiles.stream()
-                .map(FreePatternFile::getBytes)
-                .toList();
+        return Optional.ofNullable(freePatternFiles)
+                .map(files -> files.stream()
+                        .map(FreePatternFile::getBytes)
+                        .collect(Collectors.toList())
+                )
+                .orElseThrow(() -> new IllegalArgumentException("Input list cannot be null"));
     }
 
     @Named("uuidToString")

@@ -7,14 +7,16 @@ import org.crochet.response.ProductResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
+import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 
 import java.util.Base64;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
-@Mapper
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface ProductMapper {
     ProductMapper INSTANCE = Mappers.getMapper(ProductMapper.class);
 
@@ -24,9 +26,11 @@ public interface ProductMapper {
 
     @Named("toList")
     default List<String> toList(Collection<ProductFile> productFiles) {
-        return productFiles.stream()
-                .map(ProductFile::getBytes)
-                .toList();
+        return Optional.ofNullable(productFiles)
+                .map(file -> file.stream()
+                        .map(ProductFile::getBytes)
+                        .toList())
+                .orElseThrow(() -> new IllegalArgumentException("Input list cannot be null"));
     }
 
     List<ProductResponse> toResponses(Collection<Product> products);

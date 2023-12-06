@@ -43,16 +43,12 @@ public class FreePatternServiceImpl implements FreePatternService {
      * If the request does not contain an ID, it creates a new FreePattern.
      *
      * @param request The {@link FreePatternRequest} containing information for creating or updating the FreePattern.
-     * @throws ResourceNotFoundException If an existing FreePattern is to be updated, and the specified ID is not found.
      */
     @Transactional
     @Override
     public void createOrUpdate(FreePatternRequest request) {
-        FreePattern freePattern = freePatternRepo.findById(UUID.fromString(request.getId()))
-                .orElseThrow(() -> new ResourceNotFoundException("Free pattern with id " + request.getId() + " not found"));
-        if (freePattern == null) {
-            freePattern = new FreePattern();
-        }
+        FreePattern freePattern = (request.getId() == null) ? new FreePattern()
+                : findOne(request.getId());
         freePattern.setName(request.getName());
         freePattern.setDescription(request.getDescription());
         freePatternRepo.save(freePattern);
@@ -99,12 +95,15 @@ public class FreePatternServiceImpl implements FreePatternService {
      *
      * @param id The unique identifier of the FreePattern.
      * @return A {@link FreePatternResponse} containing detailed information about the FreePattern.
-     * @throws ResourceNotFoundException If the specified FreePattern ID does not correspond to an existing FreePattern.
      */
     @Override
     public FreePatternResponse getDetail(String id) {
-        var freePattern = freePatternRepo.findById(UUID.fromString(id))
-                .orElseThrow(() -> new ResourceNotFoundException("Free pattern not found"));
+        var freePattern = findOne(id);
         return FreePatternMapper.INSTANCE.toResponse(freePattern);
+    }
+
+    private FreePattern findOne(String id) {
+        return freePatternRepo.findById(UUID.fromString(id))
+                .orElseThrow(() -> new ResourceNotFoundException("Free pattern not found"));
     }
 }
