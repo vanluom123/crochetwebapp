@@ -10,6 +10,7 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Mapper
@@ -24,9 +25,11 @@ public interface PatternMapper {
 
     @Named("toList")
     default List<String> toList(Collection<PatternFile> patternFiles) {
-        return patternFiles.stream()
-                .map(PatternFile::getBytes)
-                .toList();
+        return Optional.ofNullable(patternFiles)
+                .map(file -> file.stream()
+                        .map(PatternFile::getBytes)
+                        .toList())
+                .orElseThrow(() -> new IllegalArgumentException("Input list cannot be null"));
     }
 
     @Named("uuidToString")

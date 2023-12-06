@@ -3,6 +3,7 @@ plugins {
     id 'org.springframework.boot' version '3.2.0'
     id 'io.spring.dependency-management' version '1.1.4'
     id 'org.liquibase.gradle' version '2.2.1'
+    id 'com.bmuschko.docker-spring-boot-application' version '9.4.0'
 }
 
 group = 'org'
@@ -65,14 +66,23 @@ dependencies {
     liquibaseRuntime 'mysql:mysql-connector-java:8.0.33'
 }
 
+docker {
+    springBootApplication {
+        baseImage = 'openjdk:17-alpine'
+        ports = [9090, 8080]
+        images = ['crochet:1.0', 'crochet:latest']
+        jvmArgs = ['-Dspring.profiles.active=local', '-Xmx2048m']
+
+    }
+}
+
 liquibase {
     activities {
         main {
             changelogFile 'src/main/resources/db/changelog/db.changelog-master.yaml'
-            url 'jdbc:mysql://localhost:3306/testDB'
+            url 'jdbc:mysql://localhost:3307/testDB'
             username 'root'
             password 'root'
-            logLevel 'info'
         }
     }
     runList = 'main'
