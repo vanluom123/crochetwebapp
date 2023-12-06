@@ -10,7 +10,6 @@ import org.crochet.repository.UserRepository;
 import org.crochet.request.CommentRequest;
 import org.crochet.security.UserPrincipal;
 import org.crochet.service.contact.CommentService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
