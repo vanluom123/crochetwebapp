@@ -102,7 +102,8 @@ public class SecurityConfig {
                                 "/pattern-file/create",
                                 "/product-category/create",
                                 "/product/create",
-                                "/product-file/create").authenticated())
+                                "/product-file/create").authenticated()
+                        .anyRequest().permitAll())
                 .oauth2Login(oauth -> oauth.authorizationEndpoint(authEndpointCustomizer ->
                                 authEndpointCustomizer
                                         .baseUri("/oauth2/authorize")

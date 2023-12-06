@@ -47,11 +47,8 @@ public class BlogPostServiceImpl implements BlogPostService {
     @Transactional
     @Override
     public void createOrUpdatePost(BlogPostRequest request) {
-        var blogPost = blogPostRepo.findById(UUID.fromString(request.getId()))
-                .orElse(null);
-        if (blogPost == null) {
-            blogPost = new BlogPost();
-        }
+        String id = request.getId();
+        var blogPost = (id == null) ? new BlogPost() : findOne(id);
         blogPost.setTitle(request.getTitle());
         blogPost.setContent(request.getContent());
         blogPost.setCreationDate(LocalDateTime.now());
@@ -102,8 +99,12 @@ public class BlogPostServiceImpl implements BlogPostService {
      */
     @Override
     public BlogPostResponse getDetail(String id) {
-        var blogPost = blogPostRepo.findById(UUID.fromString(id))
-                .orElseThrow(() -> new ResourceNotFoundException("Blog not found"));
+        var blogPost = findOne(id);
         return BlogPostMapper.INSTANCE.toResponse(blogPost);
+    }
+
+    private BlogPost findOne(String id) {
+        return blogPostRepo.findById(UUID.fromString(id))
+                .orElseThrow(() -> new ResourceNotFoundException("Blog not found"));
     }
 }

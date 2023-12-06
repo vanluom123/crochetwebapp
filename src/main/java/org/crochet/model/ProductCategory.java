@@ -1,11 +1,6 @@
 package org.crochet.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,11 +8,14 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Getter
 @Setter
 @Entity
+@Table(name = "product_category",
+        uniqueConstraints = {@UniqueConstraint(name = "category_name_constraint", columnNames = {"categoryName"})})
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -32,4 +30,19 @@ public class ProductCategory {
 
     @OneToMany(mappedBy = "productCategory")
     private List<Product> products;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ProductCategory that = (ProductCategory) o;
+
+        return Objects.equals(categoryName, that.categoryName);
+    }
+
+    @Override
+    public int hashCode() {
+        return categoryName != null ? categoryName.hashCode() : 0;
+    }
 }
