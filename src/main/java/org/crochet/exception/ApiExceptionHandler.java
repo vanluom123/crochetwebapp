@@ -91,14 +91,4 @@ public class ApiExceptionHandler {
         log.error(ex.getMessage());
         return ResponseEntity.ok(err);
     }
-
-    @ExceptionHandler({CloudStorageException.class})
-    public ResponseEntity<ApiError> handleCloudStorageException(CloudStorageException ex) {
-        ApiError err = ApiError.builder()
-                .message(ex.getMessage())
-                .statusCode(HttpStatus.INTERNAL_SERVER_ERROR)
-                .build();
-        log.error(ex.getMessage());
-        return ResponseEntity.ok(err);
-    }
 }

@@ -13,10 +13,6 @@ spring:
             scope:
               - email
               - profile
-  liquibase:
-    change-log: classpath:db/changelog/db.changelog-master.yaml
-    enabled: false
-
   mail:
     host: smtp.gmail.com
     port: 587
@@ -28,6 +24,9 @@ spring:
           auth: true
           starttls:
             enable: true
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+    enabled: false
 
   servlet:
     multipart:
