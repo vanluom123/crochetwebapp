@@ -63,10 +63,9 @@ public class ProductServiceTest {
 
     @Test
     void testCreateOrUpdate_CreateNewProduct() {
-        UUID productId = UUID.fromString(request.getId());
+        request.setId(null);
 
         // Mock the behavior of productRepo
-        when(productRepo.findById(productId)).thenReturn(Optional.empty());
         when(productRepo.save(any(Product.class))).thenReturn(existingProduct);
 
         // Act
@@ -79,7 +78,6 @@ public class ProductServiceTest {
         assertEquals(100, result.getPrice());
 
         // Add your assertions based on the expected behavior
-        verify(productRepo, times(1)).findById(productId);
         verify(productRepo, times(1)).save(any(Product.class));
     }
 

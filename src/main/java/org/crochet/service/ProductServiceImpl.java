@@ -2,6 +2,7 @@ package org.crochet.service;
 
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.ProductMapper;
+import org.crochet.model.Pattern;
 import org.crochet.model.Product;
 import org.crochet.repository.ProductRepository;
 import org.crochet.repository.ProductSpecifications;
@@ -50,11 +51,8 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     @Override
     public ProductResponse createOrUpdate(ProductRequest request) {
-        var product = productRepo.findById(UUID.fromString(request.getId()))
-                .orElse(null);
-        if (product == null) {
-            product = new Product();
-        }
+        var product = (request.getId() == null) ? new Product()
+                : findOne(request.getId());
         product.setName(request.getName());
         product.setPrice(request.getPrice());
         product.setDescription(request.getDescription());
@@ -103,12 +101,15 @@ public class ProductServiceImpl implements ProductService {
      *
      * @param id The unique identifier of the product.
      * @return A {@link ProductResponse} containing detailed information about the product.
-     * @throws ResourceNotFoundException If the specified product ID does not correspond to an existing product.
      */
     @Override
     public ProductResponse getDetail(String id) {
-        var product = productRepo.findById(UUID.fromString(id))
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+        var product = findOne(id);
         return ProductMapper.INSTANCE.toResponse(product);
+    }
+
+    private Product findOne(String id) {
+        return productRepo.findById(UUID.fromString(id))
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
     }
 }
