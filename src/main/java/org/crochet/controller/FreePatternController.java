@@ -5,7 +5,6 @@ import org.crochet.request.FreePatternRequest;
 import org.crochet.response.FreePatternResponse;
 import org.crochet.response.PaginatedFreePatternResponse;
 import org.crochet.service.contact.FreePatternService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
