@@ -103,6 +103,14 @@ public class SecurityConfig {
                                 "/product-category/create",
                                 "/product/create",
                                 "/product-file/create").authenticated()
+                        .requestMatchers(
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "webjars/**",
+                                "/v3/api-docs/**",
+                                "/v3/api-docs",
+                                "/swagger-resources",
+                                "/swagger-resources/**").permitAll()
                         .anyRequest().permitAll())
                 .oauth2Login(oauth -> oauth.authorizationEndpoint(authEndpointCustomizer ->
                                 authEndpointCustomizer

@@ -1,5 +1,11 @@
 package org.crochet.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.crochet.response.BlogFileResponse;
 import org.crochet.service.contact.BlogFileService;
 import org.springframework.http.ResponseEntity;
@@ -22,10 +28,16 @@ public class BlogFileController {
         this.blogFileService = blogFileService;
     }
 
+    @Operation(summary = "Create blog files")
+    @ApiResponse(responseCode = "200", description = "Blog files created successfully",
+                 content = @Content(mediaType = "application/json", schema = @Schema(implementation = List.class)))
     @PostMapping("/create")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<BlogFileResponse>> create(@RequestPart MultipartFile[] files,
-                                                         @RequestParam("blogId") String blogId) {
+    @SecurityRequirement(name = "BearerAuth")
+    public ResponseEntity<List<BlogFileResponse>> create(
+            @RequestPart("files") MultipartFile[] files,
+            @Parameter(description = "ID of the blog to associate the files with")
+            @RequestParam("blogId") String blogId) {
         var responses = blogFileService.createBlogFile(files, blogId);
         return ResponseEntity.ok(responses);
     }
