@@ -1,5 +1,10 @@
 package org.crochet.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.crochet.request.CommentRequest;
 import org.crochet.service.contact.CommentService;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +22,13 @@ public class CommentController {
         this.commentService = commentService;
     }
 
+    @Operation(summary = "Create a comment")
+    @ApiResponse(responseCode = "200", description = "Comment created successfully",
+                 content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class)))
     @PostMapping("/create")
-    public ResponseEntity<String> createComment(@RequestBody CommentRequest request) {
+    @SecurityRequirement(name = "BearerAuth")
+    public ResponseEntity<String> createComment(
+            @RequestBody CommentRequest request) {
         commentService.createOrUpdate(request);
         return ResponseEntity.ok("Create comment successfully");
     }
