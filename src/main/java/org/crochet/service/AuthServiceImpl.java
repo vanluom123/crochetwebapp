@@ -16,7 +16,7 @@ import org.crochet.repository.UserRepository;
 import org.crochet.request.LoginRequest;
 import org.crochet.request.PasswordResetRequest;
 import org.crochet.request.SignUpRequest;
-import org.crochet.response.ApiResponse;
+import org.crochet.response.EntityResponse;
 import org.crochet.response.AuthResponse;
 import org.crochet.service.contact.AuthService;
 import org.crochet.service.contact.EmailSender;
@@ -124,7 +124,7 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     @Transactional
-    public ApiResponse registerUser(SignUpRequest signUpRequest) {
+    public EntityResponse registerUser(SignUpRequest signUpRequest) {
         // Create or update user
         User user = createUser(signUpRequest);
 
@@ -142,7 +142,7 @@ public class AuthServiceImpl implements AuthService {
                 CONFIRM_YOUR_EMAIL,
                 buildEmailLink(signUpRequest.getEmail(), link, CONFIRM_YOUR_EMAIL, CLICK_TO_ACTIVE_CONTENT, ACTIVE_NOW));
 
-        return new ApiResponse(true, "User registered successfully");
+        return new EntityResponse(true, "User registered successfully");
     }
 
     /**
@@ -152,7 +152,7 @@ public class AuthServiceImpl implements AuthService {
      * @throws ResourceNotFoundException User not found
      */
     @Override
-    public ApiResponse resendVerificationEmail(String email) {
+    public EntityResponse resendVerificationEmail(String email) {
         // If user don't exist, ResourceNotFoundException will be thrown
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
@@ -169,7 +169,7 @@ public class AuthServiceImpl implements AuthService {
         // Send confirmation email
         emailSender.send(email, CONFIRM_YOUR_EMAIL, buildEmailLink(email, link, CONFIRM_YOUR_EMAIL, CLICK_TO_ACTIVE_CONTENT, ACTIVE_NOW));
 
-        return new ApiResponse(true, "Resend successfully");
+        return new EntityResponse(true, "Resend successfully");
     }
 
     /**
@@ -182,7 +182,7 @@ public class AuthServiceImpl implements AuthService {
      */
     @Transactional
     @Override
-    public ApiResponse confirmToken(String token) {
+    public EntityResponse confirmToken(String token) {
         var confirmationToken = getToken(token);
 
         LocalDateTime now = LocalDateTime.now();
@@ -203,7 +203,7 @@ public class AuthServiceImpl implements AuthService {
         // Update emailVerified to true
         userRepository.verifyEmail(confirmationToken.getUser().getEmail());
 
-        return new ApiResponse(true, "Successfully confirmation");
+        return new EntityResponse(true, "Successfully confirmation");
     }
 
     /**
@@ -406,7 +406,7 @@ public class AuthServiceImpl implements AuthService {
      */
     @Transactional
     @Override
-    public ApiResponse resetPasswordLink(String email) {
+    public EntityResponse resetPasswordLink(String email) {
         // Check user
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
@@ -421,7 +421,7 @@ public class AuthServiceImpl implements AuthService {
         var passwordResetLink = buildEmailLink(email, link, RESET_NOTIFICATION, RESET_YOUR_PASSWORD_CONTENT, RESET_PASSWORD);
         emailSender.send(email, RESET_NOTIFICATION, passwordResetLink);
 
-        return new ApiResponse(true, "Send successfully with link reset password: " + link);
+        return new EntityResponse(true, "Send successfully with link reset password: " + link);
     }
 
     /**
@@ -435,7 +435,7 @@ public class AuthServiceImpl implements AuthService {
      */
     @Transactional
     @Override
-    public ApiResponse resetPassword(String token, PasswordResetRequest passwordResetRequest) {
+    public EntityResponse resetPassword(String token, PasswordResetRequest passwordResetRequest) {
         // Get PasswordResetToken
         PasswordResetToken passwordResetToken = getPasswordResetToken(token);
 
@@ -462,7 +462,7 @@ public class AuthServiceImpl implements AuthService {
         // Delete token from cookie
         CookieUtils.deleteCookie(servletRequest, servletResponse, "jwtToken");
 
-        return new ApiResponse(true, "Reset password successfully");
+        return new EntityResponse(true, "Reset password successfully");
     }
 
     /**
