@@ -1,5 +1,11 @@
 package org.crochet.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.crochet.response.PatternFileResponse;
 import org.crochet.service.contact.PatternFileService;
 import org.springframework.http.ResponseEntity;
@@ -22,10 +28,16 @@ public class PatternFileController {
         this.patternFileService = patternFileService;
     }
 
+    @Operation(summary = "Create pattern files")
+    @ApiResponse(responseCode = "200", description = "Pattern files created successfully",
+                 content = @Content(mediaType = "application/json", schema = @Schema(implementation = List.class)))
     @PostMapping("/create")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<PatternFileResponse>> create(@RequestPart MultipartFile[] files,
-                                                            @RequestParam("patternId") String patternId) {
+    @SecurityRequirement(name = "BearerAuth")
+    public ResponseEntity<List<PatternFileResponse>> create(
+            @RequestPart("files") MultipartFile[] files,
+            @Parameter(description = "ID of the pattern to associate the files with")
+            @RequestParam("patternId") String patternId) {
         var responses = patternFileService.create(files, patternId);
         return ResponseEntity.ok(responses);
     }
