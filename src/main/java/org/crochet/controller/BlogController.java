@@ -34,9 +34,7 @@ public class BlogController {
     @PostMapping("/create")
     @PreAuthorize("hasRole('ADMIN')")
     @SecurityRequirement(name = "BearerAuth")
-    public ResponseEntity<String> createOrUpdatePost(
-            @RequestParam("filePath") String filePath,
-            @RequestBody BlogPostRequest request) {
+    public ResponseEntity<String> createOrUpdatePost(@RequestBody BlogPostRequest request) {
         blogPostService.createOrUpdatePost(request);
         return ResponseEntity.ok("Create post successfully");
     }
