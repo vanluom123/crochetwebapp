@@ -31,7 +31,7 @@ public interface FreePatternMapper {
                         .map(FreePatternFile::getBytes)
                         .collect(Collectors.toList())
                 )
-                .orElseThrow(() -> new IllegalArgumentException("Input list cannot be null"));
+                .orElse(null);
     }
 
     @Named("uuidToString")

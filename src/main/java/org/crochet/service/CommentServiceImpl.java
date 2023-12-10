@@ -22,7 +22,6 @@ import java.util.UUID;
  */
 @Service
 public class CommentServiceImpl implements CommentService {
-
     private final CommentRepository commentRepo;
 
     private final UserRepository userRepo;
