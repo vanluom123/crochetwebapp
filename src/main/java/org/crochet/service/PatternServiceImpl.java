@@ -1,5 +1,6 @@
 package org.crochet.service;
 
+import org.crochet.constant.AppConstant;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.PatternMapper;
 import org.crochet.model.Pattern;
@@ -25,7 +26,6 @@ import java.util.UUID;
  */
 @Service
 public class PatternServiceImpl implements PatternService {
-
     private final PatternRepository patternRepo;
 
     public PatternServiceImpl(PatternRepository patternRepo) {
@@ -82,6 +82,15 @@ public class PatternServiceImpl implements PatternService {
                 .totalPages(menuPage.getTotalPages())
                 .last(menuPage.isLast())
                 .build();
+    }
+
+    @Override
+    public List<PatternResponse> getLimitedPatterns() {
+        var patterns = patternRepo.findAll()
+                .stream()
+                .limit(AppConstant.PATTERN_SIZE)
+                .toList();
+        return PatternMapper.INSTANCE.toResponses(patterns);
     }
 
     /**

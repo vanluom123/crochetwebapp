@@ -20,6 +20,6 @@ public interface ProductFileMapper {
                 .map(file -> file.stream()
                         .map(this::toResponse)
                         .toList())
-                .orElseThrow(() -> new IllegalArgumentException("Input list cannot be null"));
+                .orElse(null);
     }
 }
