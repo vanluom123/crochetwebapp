@@ -17,7 +17,6 @@ import java.io.UnsupportedEncodingException;
 @Service
 @Slf4j
 public class EmailService implements EmailSender {
-
     private final JavaMailSender javaMailSender;
 
     /**

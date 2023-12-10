@@ -29,7 +29,7 @@ public interface PatternMapper {
                 .map(file -> file.stream()
                         .map(PatternFile::getBytes)
                         .toList())
-                .orElseThrow(() -> new IllegalArgumentException("Input list cannot be null"));
+                .orElse(null);
     }
 
     @Named("uuidToString")
