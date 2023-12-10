@@ -8,16 +8,17 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository<User, UUID> {
 
-  Optional<User> findByEmail(String email);
+    Optional<User> findByEmail(String email);
 
-  @Transactional
-  @Modifying
-  @Query("UPDATE User user " +
-      "SET user.emailVerified = TRUE WHERE user.email = ?1")
-  void verifyEmail(String email);
+    @Transactional
+    @Modifying
+    @Query("UPDATE User user " +
+            "SET user.emailVerified = TRUE WHERE user.email = ?1")
+    void verifyEmail(String email);
 
 }

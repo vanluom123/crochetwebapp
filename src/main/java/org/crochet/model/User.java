@@ -12,51 +12,67 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.experimental.Accessors;
 
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Table(name = "users", uniqueConstraints = {
-    @UniqueConstraint(columnNames = "email")
+        @UniqueConstraint(columnNames = "email")
 })
 @Getter
 @Setter
-@Accessors(chain = true)
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class User {
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", nullable = false)
+    private UUID id;
 
-  @Column(nullable = false)
-  private String name;
+    @Column(name = "name", nullable = false)
+    private String name;
 
-  @Email
-  @Column(nullable = false)
-  private String email;
+    @Email
+    @Column(name = "email", nullable = false)
+    private String email;
 
-  private String imageUrl;
+    @Column(name = "image_url")
+    private String imageUrl;
 
-  @Column(nullable = false)
-  private Boolean emailVerified = false;
+    @Column(name = "email_verified", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean emailVerified;
 
-  @JsonIgnore
-  private String password;
+    @JsonIgnore
+    @Column(name = "password", nullable = false)
+    private String password;
 
-  @NotNull
-  @Enumerated(EnumType.STRING)
-  private AuthProvider provider;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "provider", columnDefinition = "varchar(25) default 'local'")
+    private AuthProvider provider = AuthProvider.local;
 
-  private String providerId;
+    @Column(name = "provider_id")
+    private String providerId;
 
-  private String verificationCode;
+    @Column(name = "verification_code")
+    private String verificationCode;
 
-  @OneToMany(mappedBy = "user")
-  private Set<ConfirmationToken> confirmationTokens;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", columnDefinition = "varchar(10) default 'USER'")
+    private RoleType role = RoleType.USER;
 
-  @OneToMany(mappedBy = "user")
-  private Set<PasswordResetToken> passwordResetTokens;
+    @OneToMany(mappedBy = "user")
+    private Set<ConfirmationToken> confirmationTokens;
+
+    @OneToMany(mappedBy = "user")
+    private Set<PasswordResetToken> passwordResetTokens;
+
+    @OneToMany(mappedBy = "user")
+    private Set<Comment> comments;
 }

@@ -1,15 +1,20 @@
 package org.crochet.response;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.experimental.Accessors;
+import lombok.NoArgsConstructor;
 
 @Data
-@Accessors(chain = true)
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class AuthResponse {
-  private String accessToken;
-  private String tokenType = "Bearer";
+    private String accessToken;
 
-  public AuthResponse(String accessToken) {
-    this.accessToken = accessToken;
-  }
+    private String tokenType = "Bearer";
+
+    public AuthResponse(String accessToken) {
+        this.accessToken = accessToken;
+    }
 }

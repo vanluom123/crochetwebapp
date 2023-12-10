@@ -1,13 +1,13 @@
 package org.crochet.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.crochet.security.CustomUserDetailsService;
 import org.crochet.security.RestAuthenticationEntryPoint;
 import org.crochet.security.TokenAuthenticationFilter;
 import org.crochet.security.oauth2.CustomOAuth2UserService;
-import org.crochet.security.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
 import org.crochet.security.oauth2.OAuth2AuthenticationFailureHandler;
 import org.crochet.security.oauth2.OAuth2AuthenticationSuccessHandler;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.crochet.security.oauth2.OAuth2CookieRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,98 +25,109 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
+@Slf4j
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(
-    securedEnabled = true,
-    jsr250Enabled = true,
-    prePostEnabled = true
+        securedEnabled = true,
+        jsr250Enabled = true,
+        prePostEnabled = true
 )
 public class SecurityConfig {
 
-  private final CustomUserDetailsService customUserDetailsService;
+    private final CustomUserDetailsService customUserDetailsService;
 
-  private final CustomOAuth2UserService customOAuth2UserService;
+    private final CustomOAuth2UserService customOAuth2UserService;
 
-  private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+    private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
 
-  private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
+    private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
 
-  private final PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
-  @Autowired
-  public SecurityConfig(CustomUserDetailsService customUserDetailsService,
-                        CustomOAuth2UserService customOAuth2UserService,
-                        OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler,
-                        OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler,
-                        PasswordEncoder passwordEncoder) {
-    this.customUserDetailsService = customUserDetailsService;
-    this.customOAuth2UserService = customOAuth2UserService;
-    this.oAuth2AuthenticationSuccessHandler = oAuth2AuthenticationSuccessHandler;
-    this.oAuth2AuthenticationFailureHandler = oAuth2AuthenticationFailureHandler;
-    this.passwordEncoder = passwordEncoder;
-  }
+    private final OAuth2CookieRepository oAuth2CookieRepository;
 
-  @Bean
-  public TokenAuthenticationFilter tokenAuthenticationFilter() {
-    return new TokenAuthenticationFilter();
-  }
+    private final TokenAuthenticationFilter tokenAuthenticationFilter;
 
-  /*
-    By default, Spring OAuth2 uses HttpSessionOAuth2AuthorizationRequestRepository to save
-    the authorization request. But, since our service is stateless, we can't save it in
-    the session. We'll save the request in a Base64 encoded cookie instead.
-  */
-  @Bean
-  public HttpCookieOAuth2AuthorizationRequestRepository cookieAuthorizationRequestRepository() {
-    return new HttpCookieOAuth2AuthorizationRequestRepository();
-  }
+    public SecurityConfig(CustomUserDetailsService customUserDetailsService,
+                          CustomOAuth2UserService customOAuth2UserService,
+                          OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler,
+                          OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler,
+                          PasswordEncoder passwordEncoder,
+                          OAuth2CookieRepository oAuth2CookieRepository,
+                          TokenAuthenticationFilter tokenAuthenticationFilter) {
+        this.customUserDetailsService = customUserDetailsService;
+        this.customOAuth2UserService = customOAuth2UserService;
+        this.oAuth2AuthenticationSuccessHandler = oAuth2AuthenticationSuccessHandler;
+        this.oAuth2AuthenticationFailureHandler = oAuth2AuthenticationFailureHandler;
+        this.passwordEncoder = passwordEncoder;
+        this.oAuth2CookieRepository = oAuth2CookieRepository;
+        this.tokenAuthenticationFilter = tokenAuthenticationFilter;
+    }
 
-  @Bean
-  public AuthenticationProvider authenticationProvider() {
-    DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-    authProvider.setUserDetailsService(customUserDetailsService);
-    authProvider.setPasswordEncoder(passwordEncoder);
-    return authProvider;
-  }
 
-  @Bean
-  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    return http
-        .cors(withDefaults())
-        .sessionManagement(sessionManagementCustomizer -> sessionManagementCustomizer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .csrf(AbstractHttpConfigurer::disable)
-        .formLogin(AbstractHttpConfigurer::disable)
-        .httpBasic(AbstractHttpConfigurer::disable)
-        .exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(new RestAuthenticationEntryPoint()))
-        .authorizeHttpRequests(authReq -> authReq.requestMatchers("/",
-                "/error",
-                "/favicon.ico",
-                "/*.png",
-                "/*.gif",
-                "/*.svg",
-                "/*.jpg",
-                "/*.html",
-                "/*.css",
-                "/*.js").permitAll()
-            .requestMatchers("/auth/**", "/oauth2/**").permitAll()
-            .anyRequest().authenticated())
-        .oauth2Login(oauth -> oauth.authorizationEndpoint(authEndpointCustomizer ->
-                authEndpointCustomizer
-                    .baseUri("/oauth2/authorize")
-                    .authorizationRequestRepository(cookieAuthorizationRequestRepository()))
-            .redirectionEndpoint(redirectionEndpointCustomizer ->
-                redirectionEndpointCustomizer.baseUri("/oauth2/callback/*"))
-            .userInfoEndpoint(userInfoEndpointCustomizer -> userInfoEndpointCustomizer.userService(customOAuth2UserService))
-            .successHandler(oAuth2AuthenticationSuccessHandler)
-            .failureHandler(oAuth2AuthenticationFailureHandler))
-        .addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-        .authenticationProvider(authenticationProvider())
-        .build();
-  }
+    @Bean
+    public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(customUserDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder);
+        return authProvider;
+    }
 
-  @Bean
-  public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-    return config.getAuthenticationManager();
-  }
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        return http
+                .cors(withDefaults())
+                .sessionManagement(sessionManagementCustomizer -> sessionManagementCustomizer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .csrf(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(new RestAuthenticationEntryPoint()))
+                .authorizeHttpRequests(authReq -> authReq.requestMatchers("/",
+                                "/error",
+                                "/favicon.ico",
+                                "/*.png",
+                                "/*.gif",
+                                "/*.svg",
+                                "/*.jpg",
+                                "/*.html",
+                                "/*.css",
+                                "/*.js").permitAll()
+                        .requestMatchers("/auth/**", "/oauth2/**").permitAll()
+                        .requestMatchers("/blog/create",
+                                "/blog-file/create",
+                                "/comment/create",
+                                "/free-pattern/create",
+                                "/pattern/create",
+                                "/pattern-file/create",
+                                "/product-category/create",
+                                "/product/create",
+                                "/product-file/create").authenticated()
+                        .requestMatchers(
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "webjars/**",
+                                "/v3/api-docs/**",
+                                "/v3/api-docs",
+                                "/swagger-resources",
+                                "/swagger-resources/**").permitAll()
+                        .anyRequest().permitAll())
+                .oauth2Login(oauth -> oauth.authorizationEndpoint(authEndpointCustomizer ->
+                                authEndpointCustomizer
+                                        .baseUri("/oauth2/authorize")
+                                        .authorizationRequestRepository(oAuth2CookieRepository))
+                        .redirectionEndpoint(redirectionEndpointCustomizer ->
+                                redirectionEndpointCustomizer.baseUri("/oauth2/callback/*"))
+                        .userInfoEndpoint(userInfoEndpointCustomizer -> userInfoEndpointCustomizer.userService(customOAuth2UserService))
+                        .successHandler(oAuth2AuthenticationSuccessHandler)
+                        .failureHandler(oAuth2AuthenticationFailureHandler))
+                .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .authenticationProvider(authenticationProvider())
+                .build();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
 }
