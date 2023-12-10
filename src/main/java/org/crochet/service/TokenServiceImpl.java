@@ -25,7 +25,6 @@ import java.util.Date;
  */
 @Service
 public class TokenServiceImpl implements TokenService {
-
     private static final Logger logger = LoggerFactory.getLogger(TokenServiceImpl.class);
 
     private final AppProperties appProperties;

@@ -42,7 +42,7 @@ public class Product {
     private double price;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_category_id")
+    @JoinColumn(name = "product_category_id", nullable = false)
     private ProductCategory productCategory;
 
     @OneToMany(mappedBy = "product")

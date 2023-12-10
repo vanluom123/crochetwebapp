@@ -15,8 +15,6 @@ import java.util.Optional;
 public interface FreePatternFileMapper {
     FreePatternFileMapper INSTANCE = Mappers.getMapper(FreePatternFileMapper.class);
 
-    FreePatternFile toEntity(FreePatternFileResponse freePatternFileResponse);
-
     FreePatternFileResponse toResponse(FreePatternFile freePatternFile);
 
     default List<FreePatternFileResponse> toResponses(Collection<FreePatternFile> freePatternFiles) {
@@ -24,6 +22,6 @@ public interface FreePatternFileMapper {
                 .map(file -> file.stream()
                         .map(this::toResponse)
                         .toList())
-                .orElseThrow(() -> new IllegalArgumentException("Input list cannot be null"));
+                .orElse(null);
     }
 }

@@ -178,3 +178,6 @@ ALTER TABLE product_file
 ALTER TABLE product
     ADD CONSTRAINT FK_PRODUCT_ON_PRODUCT_CATEGORY FOREIGN KEY (product_category_id) REFERENCES product_category (id);
 
+-- Add a unique constraint on the 'category_name' column
+ALTER TABLE product_category
+ADD CONSTRAINT category_name_constraint UNIQUE (category_name);
