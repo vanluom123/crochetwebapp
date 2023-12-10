@@ -25,7 +25,6 @@ import java.util.UUID;
  */
 @Service
 public class BlogPostServiceImpl implements BlogPostService {
-
     private final BlogPostRepository blogPostRepo;
 
     /**

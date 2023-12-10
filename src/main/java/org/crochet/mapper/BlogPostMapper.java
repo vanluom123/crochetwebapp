@@ -2,10 +2,7 @@ package org.crochet.mapper;
 
 import org.crochet.model.BlogPost;
 import org.crochet.response.BlogPostResponse;
-import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 
@@ -24,11 +21,6 @@ public interface BlogPostMapper {
                 .map(file -> file.stream()
                         .map(this::toResponse)
                         .toList())
-                .orElseThrow(() -> new IllegalArgumentException("Input list cannot be null"));
+                .orElse(null);
     }
-
-    BlogPost toEntity(BlogPostResponse blogPostResponse);
-
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    BlogPost partialUpdate(BlogPostResponse blogPostResponse, @MappingTarget BlogPost blogPost);
 }

@@ -1,5 +1,6 @@
 package org.crochet.service;
 
+import org.crochet.constant.AppConstant;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.FreePatternMapper;
 import org.crochet.model.FreePattern;
@@ -25,7 +26,6 @@ import java.util.UUID;
  */
 @Service
 public class FreePatternServiceImpl implements FreePatternService {
-
     private final FreePatternRepository freePatternRepo;
 
     /**
@@ -88,6 +88,15 @@ public class FreePatternServiceImpl implements FreePatternService {
                 .totalPages(page.getTotalPages())
                 .last(page.isLast())
                 .build();
+    }
+
+    @Override
+    public List<FreePatternResponse> getLimitedFreePatterns() {
+        var freePatterns = freePatternRepo.findAll()
+                .stream()
+                .limit(AppConstant.FREE_PATTERN_SIZE)
+                .toList();
+        return FreePatternMapper.INSTANCE.toResponses(freePatterns);
     }
 
     /**
