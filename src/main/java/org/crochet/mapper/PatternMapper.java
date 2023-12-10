@@ -18,7 +18,7 @@ public interface PatternMapper {
     PatternMapper INSTANCE = Mappers.getMapper(PatternMapper.class);
 
     @Mapping(target = "id", source = "id", qualifiedByName = "uuidToString")
-    @Mapping(target = "encodingBytes", source = "patternFiles", qualifiedByName = "toList")
+    @Mapping(target = "bytes", source = "patternFiles", qualifiedByName = "toList")
     PatternResponse toResponse(Pattern pattern);
 
     List<PatternResponse> toResponses(List<Pattern> patterns);
