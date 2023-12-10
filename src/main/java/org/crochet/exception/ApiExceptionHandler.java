@@ -19,7 +19,7 @@ public class ApiExceptionHandler {
                 .statusCode(HttpStatus.INTERNAL_SERVER_ERROR)
                 .build();
         log.error(ex.getMessage());
-        return ResponseEntity.ok(error);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
 
     @ExceptionHandler({AccessDeniedException.class})
@@ -29,7 +29,7 @@ public class ApiExceptionHandler {
                 .statusCode(HttpStatus.FORBIDDEN)
                 .build();
         log.error(ex.getMessage());
-        return ResponseEntity.ok(error);
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
     }
 
     @ExceptionHandler({BadRequestException.class})
@@ -39,7 +39,7 @@ public class ApiExceptionHandler {
                 .statusCode(HttpStatus.BAD_REQUEST)
                 .build();
         log.error(ex.getMessage());
-        return ResponseEntity.ok(err);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(err);
     }
 
     @ExceptionHandler({OAuth2AuthenticationProcessingException.class})
@@ -49,7 +49,7 @@ public class ApiExceptionHandler {
                 .statusCode(HttpStatus.INTERNAL_SERVER_ERROR)
                 .build();
         log.error(ex.getMessage());
-        return ResponseEntity.ok(err);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(err);
     }
 
     @ExceptionHandler({ResourceNotFoundException.class})
@@ -59,7 +59,7 @@ public class ApiExceptionHandler {
                 .statusCode(HttpStatus.NOT_FOUND)
                 .build();
         log.error(ex.getMessage());
-        return ResponseEntity.ok(err);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(err);
     }
 
     @ExceptionHandler({EmailVerificationException.class})
@@ -69,7 +69,7 @@ public class ApiExceptionHandler {
                 .statusCode(HttpStatus.INTERNAL_SERVER_ERROR)
                 .build();
         log.error(ex.getMessage());
-        return ResponseEntity.ok(err);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(err);
     }
 
     @ExceptionHandler({TokenException.class})
@@ -79,7 +79,7 @@ public class ApiExceptionHandler {
                 .statusCode(HttpStatus.INTERNAL_SERVER_ERROR)
                 .build();
         log.error(ex.getMessage());
-        return ResponseEntity.ok(err);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(err);
     }
 
     @ExceptionHandler({UsernameNotFoundException.class})
@@ -89,6 +89,6 @@ public class ApiExceptionHandler {
                 .statusCode(HttpStatus.NOT_FOUND)
                 .build();
         log.error(ex.getMessage());
-        return ResponseEntity.ok(err);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(err);
     }
 }

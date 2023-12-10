@@ -19,7 +19,7 @@ public interface ProductMapper {
     ProductMapper INSTANCE = Mappers.getMapper(ProductMapper.class);
 
     @Mapping(target = "id", source = "id", qualifiedByName = "uuidToString")
-    @Mapping(target = "encodingBytes", source = "productFiles", qualifiedByName = "toList")
+    @Mapping(target = "bytes", source = "productFiles", qualifiedByName = "toList")
     ProductResponse toResponse(Product product);
 
     @Named("toList")
