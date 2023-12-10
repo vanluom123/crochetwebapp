@@ -19,7 +19,7 @@ public interface FreePatternMapper {
     FreePatternMapper INSTANCE = Mappers.getMapper(FreePatternMapper.class);
 
     @Mapping(target = "id", source = "id", qualifiedByName = "uuidToString")
-    @Mapping(target = "encodingBytes", source = "freePatternFiles", qualifiedByName = "toList")
+    @Mapping(target = "bytes", source = "freePatternFiles", qualifiedByName = "toList")
     FreePatternResponse toResponse(FreePattern pattern);
 
     List<FreePatternResponse> toResponses(Collection<FreePattern> freePatterns);
