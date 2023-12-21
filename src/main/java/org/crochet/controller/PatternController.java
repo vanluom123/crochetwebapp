@@ -18,7 +18,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/pattern")
@@ -36,9 +40,10 @@ public class PatternController {
     @PreAuthorize("hasRole('ADMIN')")
     @SecurityRequirement(name = "BearerAuth")
     public ResponseEntity<String> createPattern(
-            @RequestBody PatternRequest request) {
-        patternService.createOrUpdate(request);
-        return ResponseEntity.ok("Create pattern successfully");
+            @RequestPart PatternRequest request,
+            @RequestPart List<MultipartFile> files) {
+        var result = patternService.createOrUpdate(request, files);
+        return ResponseEntity.ok(result);
     }
 
     @Operation(summary = "Get paginated list of patterns")
