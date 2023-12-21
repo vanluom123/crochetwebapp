@@ -1,41 +1,29 @@
 package org.crochet.model;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "product_category",
-        uniqueConstraints = {@UniqueConstraint(name = "category_name_constraint", columnNames = {"categoryName"})})
-@Builder
-@AllArgsConstructor
+@Table(name = "product_category")
+@SuperBuilder
 @NoArgsConstructor
-public class ProductCategory {
-    @Id
-    @GeneratedValue(strategy =  GenerationType.UUID)
-    @Column(name = "id", nullable = false)
-    private UUID id;
-
-    @Column(name = "category_name", nullable = false)
+public class ProductCategory extends BaseEntity {
+    @Column(name = "category_name", unique = true, nullable = false)
     private String categoryName;
 
-    @OneToMany(mappedBy = "productCategory")
+    @OneToMany(mappedBy = "productCategory", cascade = CascadeType.ALL)
     private List<Product> products;
 
     @Override

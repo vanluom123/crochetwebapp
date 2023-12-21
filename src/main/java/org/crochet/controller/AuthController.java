@@ -1,20 +1,17 @@
 package org.crochet.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityScheme;
-import io.swagger.v3.oas.annotations.security.SecuritySchemes;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import org.crochet.request.LoginRequest;
-import org.crochet.request.PasswordResetRequest;
-import org.crochet.request.SignUpRequest;
-import org.crochet.response.AuthResponse;
-import org.crochet.response.EntityResponse;
+import org.crochet.payload.request.LoginRequest;
+import org.crochet.payload.request.PasswordResetRequest;
+import org.crochet.payload.request.SignUpRequest;
+import org.crochet.payload.response.AuthResponse;
+import org.crochet.payload.response.EntityResponse;
 import org.crochet.service.contact.AuthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;

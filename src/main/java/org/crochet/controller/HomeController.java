@@ -1,6 +1,6 @@
 package org.crochet.controller;
 
-import org.crochet.response.HomeResponse;
+import org.crochet.payload.response.HomeResponse;
 import org.crochet.service.contact.FreePatternService;
 import org.crochet.service.contact.PatternService;
 import org.crochet.service.contact.ProductService;

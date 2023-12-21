@@ -32,6 +32,13 @@ spring:
     multipart:
       max-file-size: 100MB
 
+  mvc:
+    converters:
+      preferred-json-mapper: gson
+  gson:
+    long-serialization-policy: string
+    enable-complex-map-key-serialization: true
+
 app:
   auth:
     tokenSecret: ${TOKEN_SECRET}

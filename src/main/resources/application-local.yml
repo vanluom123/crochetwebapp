@@ -6,8 +6,12 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
         format_sql: true
   datasource:
-    url: jdbc:mysql://localhost:3307/testDB
+    url: jdbc:mysql://localhost:3306/testDB
     username: root
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
+
+paypal:
+  username: AYw-XWRSOe3r11W37cF26rxf3tUBn8X1dPala2Lux2cGHbK6NYMiyYB_2SES46YjIx1a9zLuMSHSJpYD
+  password: EENLA_G2RtWbTYgY6i90ApZkYdctBuY2AcgnsHhct0sbCnwWiM_J55NTmmEsLbiDcNpnLEfBWPneTmwF
 

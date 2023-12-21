@@ -18,6 +18,14 @@ configurations {
 
 repositories {
     mavenCentral()
+    maven {
+        name = "GitHubPackages"
+        url = "https://maven.pkg.github.com/vanluom123/crochetwebclient"
+        credentials {
+            username = System.getenv("GITHUB_ACTOR")
+            password = System.getenv("GITHUB_TOKEN")
+        }
+    }
 }
 
 dependencies {
@@ -27,19 +35,17 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation 'org.springframework.security:spring-security-oauth2-client:6.2.0'
-
-    implementation 'mysql:mysql-connector-java:8.0.33'
-
-    implementation 'org.liquibase:liquibase-core:4.23.0'
-
-    compileOnly 'org.projectlombok:lombok:1.18.28'
-    annotationProcessor 'org.projectlombok:lombok:1.18.28'
-
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'jakarta.validation:jakarta.validation-api:3.0.2'
 
+    implementation 'mysql:mysql-connector-java:8.0.33'
+    implementation 'org.liquibase:liquibase-core:4.23.0'
     implementation 'com.h2database:h2:2.2.220'
-
     implementation 'org.postgresql:postgresql:42.2.27'
+
+    compileOnly 'org.projectlombok:lombok:1.18.30'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
 
     implementation 'org.mapstruct:mapstruct:1.5.5.Final'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
@@ -48,17 +54,19 @@ dependencies {
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
-    implementation 'com.google.firebase:firebase-admin:9.1.1'
-    implementation 'com.google.cloud:google-cloud-storage:2.20.1'
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0'
+    implementation 'com.google.inject:guice:7.0.0'
+    implementation 'com.google.inject.extensions:guice-servlet:7.0.0'
+    implementation 'com.google.code.gson:gson:2.10.1'
+
+    implementation 'com.github.crochetwebclient:crochetwebclient:1.0.3'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test:6.2.0'
     testImplementation 'org.mockito:mockito-core:5.7.0'
     testImplementation 'org.mockito:mockito-junit-jupiter:5.7.0'
 
-    testCompileOnly 'org.projectlombok:lombok:1.18.28'
-    testAnnotationProcessor 'org.projectlombok:lombok:1.18.28'
+    testCompileOnly 'org.projectlombok:lombok:1.18.30'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.30'
 
     liquibaseRuntime 'org.liquibase:liquibase-core:4.23.0'
     liquibaseRuntime 'org.liquibase:liquibase-groovy-dsl:3.0.3'
@@ -70,7 +78,7 @@ liquibase {
     activities {
         main {
             changelogFile 'src/main/resources/db/changelog/db.changelog-master.yaml'
-            url 'jdbc:mysql://localhost:3307/testDB'
+            url 'jdbc:mysql://localhost:3306/testDB'
             username 'root'
             password 'root'
         }
