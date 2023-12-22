@@ -65,6 +65,7 @@ public class ProductServiceImpl implements ProductService {
         product.setName(request.getName());
         product.setPrice(request.getPrice());
         product.setDescription(request.getDescription());
+        product.setCurrencyCode(request.getCurrencyCode());
         product.setFiles(ConvertUtils.convertMultipartToString(files));
         product = productRepo.save(product);
         return ProductMapper.INSTANCE.toResponse(product);

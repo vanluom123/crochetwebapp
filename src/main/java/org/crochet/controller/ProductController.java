@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.Valid;
 import org.crochet.constant.AppConstant;
 import org.crochet.payload.request.ProductRequest;
 import org.crochet.payload.response.ProductPaginationResponse;
@@ -39,10 +40,8 @@ public class ProductController {
     @PostMapping("/create")
     @PreAuthorize("hasRole('ADMIN')")
     @SecurityRequirement(name = "BearerAuth")
-    public ResponseEntity<ProductResponse> createProduct(@RequestParam("categoryId") String id,
-                                                         @RequestPart ProductRequest request,
+    public ResponseEntity<ProductResponse> createProduct(@Valid @RequestPart ProductRequest request,
                                                          @RequestPart List<MultipartFile> files) {
-        request.setProductCategoryId(id);
         var response = productService.createOrUpdate(request, files);
         return ResponseEntity.ok(response);
     }
