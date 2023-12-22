@@ -18,5 +18,5 @@ public class ProductResponse {
     private String name;
     private String description;
     private double price;
-    private List<String> bytes;
+    private List<String> files;
 }

@@ -1,10 +1,13 @@
 package org.crochet.model;
 
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -15,6 +18,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -44,6 +48,9 @@ public class BlogPost {
     @OneToMany(mappedBy = "blogPost")
     private Set<Comment> comments;
 
-    @OneToMany(mappedBy = "blogPost")
-    private Set<BlogFile> blogFiles;
+    @ElementCollection
+    @CollectionTable(name = "blog_post_file",
+            joinColumns = {@JoinColumn(name = "blog_post_id", nullable = false)})
+    @Column(name = "file_name", columnDefinition = "LONGBLOB")
+    private List<String> files;
 }
