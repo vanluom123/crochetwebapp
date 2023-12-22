@@ -10,6 +10,7 @@ import org.crochet.request.PatternRequest;
 import org.crochet.response.PatternPaginationResponse;
 import org.crochet.response.PatternResponse;
 import org.crochet.service.contact.PatternService;
+import org.crochet.util.ConvertUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -36,16 +38,19 @@ public class PatternServiceImpl implements PatternService {
      * Create or update pattern
      *
      * @param request PatternRequest
+     * @param files
      */
     @Transactional
     @Override
-    public void createOrUpdate(PatternRequest request) {
+    public String createOrUpdate(PatternRequest request, List<MultipartFile> files) {
         var pattern = (request.getId() == null) ? new Pattern()
                 : findOne(request.getId());
         pattern.setName(request.getName());
         pattern.setPrice(request.getPrice());
         pattern.setDescription(request.getDescription());
+        pattern.setFiles(ConvertUtils.convertMultipartToString(files));
         patternRepo.save(pattern);
+        return "Create pattern successfully";
     }
 
     /**
