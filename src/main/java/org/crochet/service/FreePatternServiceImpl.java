@@ -10,6 +10,7 @@ import org.crochet.request.FreePatternRequest;
 import org.crochet.response.FreePatternResponse;
 import org.crochet.response.PaginatedFreePatternResponse;
 import org.crochet.service.contact.FreePatternService;
+import org.crochet.util.ConvertUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -43,15 +45,19 @@ public class FreePatternServiceImpl implements FreePatternService {
      * If the request does not contain an ID, it creates a new FreePattern.
      *
      * @param request The {@link FreePatternRequest} containing information for creating or updating the FreePattern.
+     * @param files
+     * @return
      */
     @Transactional
     @Override
-    public void createOrUpdate(FreePatternRequest request) {
+    public String createOrUpdate(FreePatternRequest request, List<MultipartFile> files) {
         FreePattern freePattern = (request.getId() == null) ? new FreePattern()
                 : findOne(request.getId());
         freePattern.setName(request.getName());
         freePattern.setDescription(request.getDescription());
+        freePattern.setFiles(ConvertUtils.convertMultipartToString(files));
         freePatternRepo.save(freePattern);
+        return "Create free pattern success";
     }
 
     /**

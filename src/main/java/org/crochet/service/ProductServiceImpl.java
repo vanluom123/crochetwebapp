@@ -11,6 +11,7 @@ import org.crochet.request.ProductRequest;
 import org.crochet.response.ProductPaginationResponse;
 import org.crochet.response.ProductResponse;
 import org.crochet.service.contact.ProductService;
+import org.crochet.util.ConvertUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -49,11 +51,12 @@ public class ProductServiceImpl implements ProductService {
      * If no product with the specified ID is found, a new product will be created.
      *
      * @param request The {@link ProductRequest} containing information for creating or updating the product.
+     * @param files
      * @return A {@link ProductResponse} representing the created or updated product.
      */
     @Transactional
     @Override
-    public ProductResponse createOrUpdate(ProductRequest request) {
+    public ProductResponse createOrUpdate(ProductRequest request, List<MultipartFile> files) {
         var category = productCategoryRepo.findById(UUID.fromString(request.getProductCategoryId()))
                 .orElseThrow(() -> new ResourceNotFoundException("Product category not found"));
         var product = (request.getId() == null) ? new Product()
@@ -62,6 +65,7 @@ public class ProductServiceImpl implements ProductService {
         product.setName(request.getName());
         product.setPrice(request.getPrice());
         product.setDescription(request.getDescription());
+        product.setFiles(ConvertUtils.convertMultipartToString(files));
         product = productRepo.save(product);
         return ProductMapper.INSTANCE.toResponse(product);
     }
