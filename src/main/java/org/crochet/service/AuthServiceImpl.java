@@ -6,7 +6,7 @@ import org.crochet.exception.BadRequestException;
 import org.crochet.exception.EmailVerificationException;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.exception.TokenException;
-import org.crochet.model.AuthProvider;
+import org.crochet.enumerator.AuthProvider;
 import org.crochet.model.ConfirmationToken;
 import org.crochet.model.PasswordResetToken;
 import org.crochet.model.User;
@@ -359,7 +359,7 @@ public class AuthServiceImpl implements AuthService {
                 .email(signUpRequest.getEmail())
                 .emailVerified(false)
                 .password(passwordEncoder.encode(signUpRequest.getPassword()))
-                .provider(AuthProvider.local)
+                .provider(AuthProvider.LOCAL)
                 .role(signUpRequest.getRole())
                 .build();
         // Save the user to the repository

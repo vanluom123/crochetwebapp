@@ -1,4 +1,4 @@
-package org.crochet.model;
+package org.crochet.enumerator;
 
 public enum StatusType {
     COMPLETED,

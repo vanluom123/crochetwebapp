@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
-import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -24,7 +24,7 @@ public class ProductCategory extends BaseEntity {
     private String categoryName;
 
     @OneToMany(mappedBy = "productCategory", cascade = CascadeType.ALL)
-    private List<Product> products;
+    private Set<Product> products;
 
     @Override
     public boolean equals(Object o) {

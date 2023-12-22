@@ -6,7 +6,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
-import org.crochet.model.RoleType;
+import org.crochet.enumerator.RoleType;
 
 @Data
 public class SignUpRequest {

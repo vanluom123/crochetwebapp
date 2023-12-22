@@ -4,43 +4,43 @@ import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
+import org.crochet.enumerator.CurrencyCode;
 
 import java.util.List;
-import java.util.UUID;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "product")
-@Builder
+@SuperBuilder
 @NoArgsConstructor
-@AllArgsConstructor
-public class Product {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id", nullable = false)
-    private UUID id;
-
+public class Product extends BaseEntity {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "description")
+    @Lob
+    @Column(name = "description", columnDefinition = "LONGBLOB")
     private String description;
 
-    @Column(name = "price")
+    @Column(name = "price", columnDefinition = "double default 0", nullable = false)
     private double price;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "currency_code",
+            columnDefinition = "varchar(20) default 'USD'",
+            nullable = false)
+    private CurrencyCode currencyCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_category_id", nullable = false)

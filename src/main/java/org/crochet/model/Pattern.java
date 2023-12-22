@@ -1,11 +1,14 @@
 package org.crochet.model;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
@@ -13,10 +16,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.crochet.enumerator.CurrencyCode;
-import jakarta.persistence.CollectionTable;
-import jakarta.persistence.JoinColumn;
 
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -28,6 +30,7 @@ public class Pattern extends BaseEntity {
     @Column(name = "name")
     private String name;
 
+    @Lob
     @Column(name = "description", columnDefinition = "LONGBLOB")
     private String description;
 
@@ -49,5 +52,5 @@ public class Pattern extends BaseEntity {
     private List<String> files;
 
     @OneToMany(mappedBy = "pattern", cascade = CascadeType.ALL)
-    private List<OrderPatternDetail> orderPatternDetails;
+    private Set<OrderPatternDetail> orderPatternDetails;
 }

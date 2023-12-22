@@ -14,6 +14,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.crochet.enumerator.AuthProvider;
+import org.crochet.enumerator.RoleType;
 
 import java.util.Set;
 
@@ -44,8 +46,8 @@ public class User extends BaseEntity {
     private String password;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "provider", columnDefinition = "varchar(25) default 'local'")
-    private AuthProvider provider = AuthProvider.local;
+    @Column(name = "provider", columnDefinition = "varchar(25) default 'LOCAL'")
+    private AuthProvider provider = AuthProvider.LOCAL;
 
     @Column(name = "provider_id")
     private String providerId;
@@ -54,7 +56,7 @@ public class User extends BaseEntity {
     private String verificationCode;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "role", columnDefinition = "varchar(10) default 'USER'")
+    @Column(name = "roles", columnDefinition = "varchar(10) default 'USER'")
     private RoleType role = RoleType.USER;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)

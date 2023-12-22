@@ -1,8 +1,8 @@
 package org.crochet.security.oauth2;
 
 import org.crochet.exception.OAuth2AuthenticationProcessingException;
-import org.crochet.model.AuthProvider;
-import org.crochet.model.RoleType;
+import org.crochet.enumerator.AuthProvider;
+import org.crochet.enumerator.RoleType;
 import org.crochet.model.User;
 import org.crochet.repository.UserRepository;
 import org.crochet.security.UserPrincipal;
