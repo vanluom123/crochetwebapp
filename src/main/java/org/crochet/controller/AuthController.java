@@ -13,6 +13,7 @@ import org.crochet.payload.request.SignUpRequest;
 import org.crochet.payload.response.AuthResponse;
 import org.crochet.payload.response.EntityResponse;
 import org.crochet.service.contact.AuthService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -43,14 +44,15 @@ public class AuthController {
     }
 
     @Operation(summary = "Register user")
-    @ApiResponse(responseCode = "200",
+    @ApiResponse(responseCode = "201",
             description = "Registration successful",
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = ApiResponse.class)))
     @PostMapping("/signup")
     public ResponseEntity<EntityResponse> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
         EntityResponse response = authService.registerUser(signUpRequest);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(response);
     }
 
     @Operation(summary = "Confirm user registration")

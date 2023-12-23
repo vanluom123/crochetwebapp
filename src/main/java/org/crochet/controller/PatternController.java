@@ -11,6 +11,7 @@ import org.crochet.payload.request.PatternRequest;
 import org.crochet.payload.response.PatternPaginationResponse;
 import org.crochet.payload.response.PatternResponse;
 import org.crochet.service.contact.PatternService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,7 +35,7 @@ public class PatternController {
     }
 
     @Operation(summary = "Create a pattern")
-    @ApiResponse(responseCode = "200", description = "Pattern created successfully",
+    @ApiResponse(responseCode = "201", description = "Pattern created successfully",
                  content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class)))
     @PostMapping("/create")
     @PreAuthorize("hasRole('ADMIN')")
@@ -43,7 +44,7 @@ public class PatternController {
             @RequestPart PatternRequest request,
             @RequestPart List<MultipartFile> files) {
         var result = patternService.createOrUpdate(request, files);
-        return ResponseEntity.ok(result);
+        return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
 
     @Operation(summary = "Get paginated list of patterns")

@@ -11,6 +11,7 @@ import org.crochet.payload.request.FreePatternRequest;
 import org.crochet.payload.response.FreePatternResponse;
 import org.crochet.payload.response.PaginatedFreePatternResponse;
 import org.crochet.service.contact.FreePatternService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,7 +34,7 @@ public class FreePatternController {
     }
 
     @Operation(summary = "Create a pattern")
-    @ApiResponse(responseCode = "200", description = "Pattern created successfully",
+    @ApiResponse(responseCode = "201", description = "Pattern created successfully",
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class)))
     @PostMapping(value = "/create")
     @PreAuthorize("hasRole('ADMIN')")
@@ -42,7 +43,7 @@ public class FreePatternController {
             @RequestPart FreePatternRequest request,
             @RequestPart List<MultipartFile> files) {
         var result = freePatternService.createOrUpdate(request, files);
-        return ResponseEntity.ok(result);
+        return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
 
     @Operation(summary = "Get paginated list of patterns")

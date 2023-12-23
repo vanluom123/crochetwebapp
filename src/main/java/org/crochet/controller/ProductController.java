@@ -11,6 +11,7 @@ import org.crochet.payload.request.ProductRequest;
 import org.crochet.payload.response.ProductPaginationResponse;
 import org.crochet.payload.response.ProductResponse;
 import org.crochet.service.contact.ProductService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,7 +34,7 @@ public class ProductController {
     }
 
     @Operation(summary = "Create a new product")
-    @ApiResponse(responseCode = "200", description = "Product created successfully",
+    @ApiResponse(responseCode = "201", description = "Product created successfully",
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = ProductResponse.class)))
     @ApiResponse(responseCode = "400", description = "Invalid input")
@@ -43,7 +44,7 @@ public class ProductController {
     public ResponseEntity<ProductResponse> createProduct(@Valid @RequestPart ProductRequest request,
                                                          @RequestPart List<MultipartFile> files) {
         var response = productService.createOrUpdate(request, files);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @Operation(summary = "Get a list of products")

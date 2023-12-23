@@ -10,6 +10,7 @@ import org.crochet.constant.AppConstant;
 import org.crochet.payload.request.BlogPostRequest;
 import org.crochet.payload.response.BlogPostPaginationResponse;
 import org.crochet.service.contact.BlogPostService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,7 +33,7 @@ public class BlogController {
     }
 
     @Operation(summary = "Create or update a blog post")
-    @ApiResponse(responseCode = "200", description = "Post created or updated successfully",
+    @ApiResponse(responseCode = "201", description = "Post created or updated successfully",
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class)))
     @PostMapping(value = "/create")
     @PreAuthorize("hasRole('ADMIN')")
@@ -40,7 +41,8 @@ public class BlogController {
     public ResponseEntity<String> createOrUpdatePost(@RequestPart BlogPostRequest request,
                                                      @RequestPart List<MultipartFile> files) {
         var result = blogPostService.createOrUpdatePost(request, files);
-        return ResponseEntity.ok(result);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(result);
     }
 
     @Operation(summary = "Get paginated list of blog posts")
