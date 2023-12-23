@@ -58,9 +58,11 @@ public class OrderPatternServiceImpl implements OrderPatternService {
     @Override
     public OrderResponseDTO createPayment(String patternId) {
         var auth = SecurityContextHolder.getContext().getAuthentication();
-        UserPrincipal principal = (UserPrincipal) auth.getPrincipal();
+        if (auth == null || !(auth.getPrincipal() instanceof UserPrincipal principal)) {
+            throw new ResourceNotFoundException("User hasn't signed in");
+        }
         User user = userRepository.findById(principal.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not existed in database"));
 
         var pattern = patternRepository.findById(UUID.fromString(patternId))
                 .orElseThrow(() -> new RuntimeException("Pattern not found"));

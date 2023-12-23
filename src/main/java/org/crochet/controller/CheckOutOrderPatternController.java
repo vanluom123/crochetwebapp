@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.net.URI;
+
 @RestController
 @RequestMapping("/api/checkout/order-pattern")
 public class CheckOutOrderPatternController {
@@ -20,9 +22,11 @@ public class CheckOutOrderPatternController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<OrderResponseDTO> createPayment(@RequestParam("patternId") String patternId) {
+    public ResponseEntity<Object> createPayment(@RequestParam("patternId") String patternId) {
         var response = orderPatternService.createPayment(patternId);
-        return ResponseEntity.ok(response);
+        var location = response.getLinkAsMap().get("approve");
+        return ResponseEntity.created(URI.create(location))
+                .build();
     }
 
     @GetMapping("/success")

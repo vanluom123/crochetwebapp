@@ -70,7 +70,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         validateUserProvider(oAuth2UserRequest, user);
 
         // Create and return the user principal
-        return UserPrincipal.create(user, oAuth2User.getAttributes());
+        return UserPrincipal.builder()
+                .createUserWithAttributes(user, oAuth2User.getAttributes())
+                .build();
     }
 
     /**
