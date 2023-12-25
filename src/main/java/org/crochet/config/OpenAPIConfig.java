@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.info.Contact;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.annotations.security.SecuritySchemes;
-import org.springframework.context.annotation.Configuration;
 
 @OpenAPIDefinition(
         info = @Info(
@@ -18,7 +17,7 @@ import org.springframework.context.annotation.Configuration;
                 ),
                 description = "OpenApi documentation for crochet application",
                 title = "Crochet OpenApi specification",
-                version = "1.0"
+                version = "1.0.0"
         )
 )
 @SecuritySchemes({
@@ -31,6 +30,5 @@ import org.springframework.context.annotation.Configuration;
                 in = SecuritySchemeIn.COOKIE
         )
 })
-@Configuration
 public class OpenAPIConfig {
 }

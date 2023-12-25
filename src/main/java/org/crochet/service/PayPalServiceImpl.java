@@ -1,6 +1,5 @@
 package org.crochet.service;
 
-import com.google.gson.Gson;
 import org.crochet.payload.dto.OrderDTO;
 import org.crochet.service.contact.PayPalService;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,20 +17,17 @@ public class PayPalServiceImpl implements PayPalService {
     private String password;
 
     private final WebClientService webClientService;
-    private final Gson gson;
 
-    public PayPalServiceImpl(WebClientService webClientService, Gson gson) {
-        this.gson = gson;
+    public PayPalServiceImpl(WebClientService webClientService) {
         this.webClientService = webClientService;
     }
 
     @Override
     public String createOrder(OrderDTO orderDTO) {
-        String payload = gson.toJson(orderDTO);
         String uri = "https://api-m.sandbox.paypal.com/v2/checkout/orders";
         return webClientService.invokeApi(uri,
                 HttpMethod.POST,
-                payload,
+                orderDTO,
                 String.class,
                 header -> {
                     header.setBasicAuth(username, password);

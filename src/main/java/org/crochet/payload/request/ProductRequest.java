@@ -1,6 +1,6 @@
 package org.crochet.payload.request;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -15,6 +15,6 @@ public class ProductRequest {
     private String name;
     private String description;
     private double price;
-    @SerializedName("currency_code")
+    @JsonProperty("currency_code")
     private CurrencyCode currencyCode;
 }

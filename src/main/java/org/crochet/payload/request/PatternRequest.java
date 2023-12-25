@@ -1,6 +1,6 @@
 package org.crochet.payload.request;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import org.crochet.enumerator.CurrencyCode;
 
@@ -10,6 +10,6 @@ public class PatternRequest {
     private String name;
     private String description;
     private double price;
-    @SerializedName("currency_code")
+    @JsonProperty("currency_code")
     private CurrencyCode currencyCode;
 }

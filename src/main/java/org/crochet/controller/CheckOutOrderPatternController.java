@@ -1,7 +1,11 @@
 package org.crochet.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
-import org.crochet.payload.dto.OrderResponseDTO;
 import org.crochet.service.contact.OrderPatternService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.view.RedirectView;
 
 import java.net.URI;
 
@@ -21,14 +26,33 @@ public class CheckOutOrderPatternController {
         this.orderPatternService = orderPatternService;
     }
 
+    @Operation(summary = "Create payment")
+    @ApiResponse(responseCode = "201", description = "Payment created successfully",
+            content = @Content(mediaType = "application/json"))
     @PostMapping("/create")
-    public ResponseEntity<Object> createPayment(@RequestParam("patternId") String patternId) {
+    public ResponseEntity<Object> createPayment(
+            @Parameter(description = "ID of the pattern for which payment is being created")
+            @RequestParam("patternId") String patternId) {
         var response = orderPatternService.createPayment(patternId);
         var location = response.getLinkAsMap().get("approve");
-        return ResponseEntity.created(URI.create(location))
-                .build();
+        return ResponseEntity.created(URI.create(location)).build();
     }
 
+    @Operation(summary = "Create payment on PayPal")
+    @ApiResponse(responseCode = "302", description = "Redirect to PayPal for payment",
+            content = @Content(mediaType = "application/json"))
+    @GetMapping("/create-payment")
+    public RedirectView createPaymentOnPayPal(
+            @Parameter(description = "ID of the pattern for which payment is being created")
+            @RequestParam("patternId") String id) {
+        var response = orderPatternService.createPayment(id);
+        var location = response.getLinkAsMap().get("approve");
+        return new RedirectView(location);
+    }
+
+    @Operation(summary = "Handle payment success")
+    @ApiResponse(responseCode = "200", description = "Payment success",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class)))
     @GetMapping("/success")
     public ResponseEntity<String> paymentSuccess(HttpServletRequest httpServletRequest) {
         var transactionId = httpServletRequest.getParameter("token");

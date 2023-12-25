@@ -1,6 +1,7 @@
 package org.crochet.service;
 
-import com.google.gson.Gson;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 import org.crochet.enumerator.OrderIntent;
 import org.crochet.enumerator.PaymentLandingPage;
 import org.crochet.exception.ResourceNotFoundException;
@@ -38,22 +39,23 @@ public class OrderPatternServiceImpl implements OrderPatternService {
     private final PatternRepository patternRepository;
     private final OrderRepository orderRepository;
     private final OrderPatternDetailRepository orderPatternDetailRepository;
-    private final Gson gson;
+    private final ObjectMapper objectMapper;
 
     public OrderPatternServiceImpl(PayPalService payPalService,
                                    UserRepository userRepository,
                                    PatternRepository patternRepository,
                                    OrderRepository orderRepository,
                                    OrderPatternDetailRepository orderPatternDetailRepository,
-                                   Gson gson) {
+                                   ObjectMapper objectMapper) {
         this.payPalService = payPalService;
         this.userRepository = userRepository;
         this.patternRepository = patternRepository;
         this.orderRepository = orderRepository;
         this.orderPatternDetailRepository = orderPatternDetailRepository;
-        this.gson = gson;
+        this.objectMapper = objectMapper;
     }
 
+    @SneakyThrows
     @Transactional
     @Override
     public OrderResponseDTO createPayment(String patternId) {
@@ -71,7 +73,7 @@ public class OrderPatternServiceImpl implements OrderPatternService {
                 String.valueOf(pattern.getPrice()));
 
         var content = payPalService.createOrder(orderDTO);
-        var orderResponseDTO = gson.fromJson(content, OrderResponseDTO.class);
+        var orderResponseDTO = objectMapper.readValue(content, OrderResponseDTO.class);
 
         var order = Order.builder()
                 .user(user)
@@ -113,11 +115,12 @@ public class OrderPatternServiceImpl implements OrderPatternService {
                 .build();
     }
 
+    @SneakyThrows
     @Transactional
     @Override
     public String capturePayment(String transactionId) {
         var content = payPalService.capturePayment(transactionId);
-        var payload = gson.fromJson(content, CapturePaymentResponseDTO.class);
+        var payload = objectMapper.readValue(content, CapturePaymentResponseDTO.class);
         var orderPatternDetail = orderPatternDetailRepository.findByTransactionId(transactionId)
                 .orElseThrow(() -> new RuntimeException("Order not existed"));
         orderPatternDetail.setStatus(payload.getStatus());
