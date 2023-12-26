@@ -1,21 +1,19 @@
 package org.crochet.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityScheme;
-import io.swagger.v3.oas.annotations.security.SecuritySchemes;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import org.crochet.request.LoginRequest;
-import org.crochet.request.PasswordResetRequest;
-import org.crochet.request.SignUpRequest;
-import org.crochet.response.AuthResponse;
-import org.crochet.response.EntityResponse;
+import org.crochet.payload.request.LoginRequest;
+import org.crochet.payload.request.PasswordResetRequest;
+import org.crochet.payload.request.SignUpRequest;
+import org.crochet.payload.response.AuthResponse;
+import org.crochet.payload.response.EntityResponse;
 import org.crochet.service.contact.AuthService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -46,14 +44,15 @@ public class AuthController {
     }
 
     @Operation(summary = "Register user")
-    @ApiResponse(responseCode = "200",
+    @ApiResponse(responseCode = "201",
             description = "Registration successful",
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = ApiResponse.class)))
     @PostMapping("/signup")
     public ResponseEntity<EntityResponse> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
         EntityResponse response = authService.registerUser(signUpRequest);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(response);
     }
 
     @Operation(summary = "Confirm user registration")

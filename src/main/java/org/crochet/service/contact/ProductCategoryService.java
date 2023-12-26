@@ -1,7 +1,7 @@
 package org.crochet.service.contact;
 
-import org.crochet.request.ProductCategoryRequest;
-import org.crochet.response.ProductCategoryResponse;
+import org.crochet.payload.request.ProductCategoryRequest;
+import org.crochet.payload.response.ProductCategoryResponse;
 
 import java.util.List;
 

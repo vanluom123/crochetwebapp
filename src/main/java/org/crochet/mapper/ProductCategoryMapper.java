@@ -1,7 +1,7 @@
 package org.crochet.mapper;
 
 import org.crochet.model.ProductCategory;
-import org.crochet.response.ProductCategoryResponse;
+import org.crochet.payload.response.ProductCategoryResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;

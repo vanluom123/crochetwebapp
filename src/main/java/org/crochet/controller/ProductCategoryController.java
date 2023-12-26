@@ -6,9 +6,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
-import org.crochet.request.ProductCategoryRequest;
-import org.crochet.response.ProductCategoryResponse;
+import org.crochet.payload.request.ProductCategoryRequest;
+import org.crochet.payload.response.ProductCategoryResponse;
 import org.crochet.service.contact.ProductCategoryService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,7 +30,7 @@ public class ProductCategoryController {
     }
 
     @Operation(summary = "Create a product category")
-    @ApiResponse(responseCode = "200", description = "Product category created successfully",
+    @ApiResponse(responseCode = "201", description = "Product category created successfully",
                  content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = ProductCategoryResponse.class)))
     @PostMapping("/create")
@@ -38,7 +39,7 @@ public class ProductCategoryController {
     public ResponseEntity<ProductCategoryResponse> createProduct(
             @Valid @RequestBody ProductCategoryRequest request) {
         var response = productCategoryService.createOrUpdate(request);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @Operation(summary = "Get all product categories")

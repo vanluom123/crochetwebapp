@@ -2,12 +2,11 @@ package org.crochet.service;
 
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.model.Comment;
-import org.crochet.model.Product;
 import org.crochet.model.User;
 import org.crochet.repository.BlogPostRepository;
 import org.crochet.repository.CommentRepository;
 import org.crochet.repository.UserRepository;
-import org.crochet.request.CommentRequest;
+import org.crochet.payload.request.CommentRequest;
 import org.crochet.security.UserPrincipal;
 import org.crochet.service.contact.CommentService;
 import org.springframework.security.core.context.SecurityContextHolder;

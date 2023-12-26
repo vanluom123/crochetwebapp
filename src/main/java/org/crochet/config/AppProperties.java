@@ -40,5 +40,4 @@ public class AppProperties {
             return this;
         }
     }
-
 }

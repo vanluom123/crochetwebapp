@@ -1,7 +1,7 @@
 package org.crochet.mapper;
 
 import org.crochet.model.Pattern;
-import org.crochet.response.PatternResponse;
+import org.crochet.payload.response.PatternResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
