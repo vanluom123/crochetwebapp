@@ -4,11 +4,14 @@ import org.crochet.constant.AppConstant;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.PatternMapper;
 import org.crochet.model.Pattern;
+import org.crochet.model.User;
+import org.crochet.payload.request.PatternRequest;
+import org.crochet.payload.response.PatternPaginationResponse;
+import org.crochet.payload.response.PatternResponse;
 import org.crochet.repository.PatternRepository;
 import org.crochet.repository.PatternSpecifications;
-import org.crochet.request.PatternRequest;
-import org.crochet.response.PatternPaginationResponse;
-import org.crochet.response.PatternResponse;
+import org.crochet.repository.UserRepository;
+import org.crochet.security.UserPrincipal;
 import org.crochet.service.contact.PatternService;
 import org.crochet.util.ConvertUtils;
 import org.springframework.data.domain.Page;
@@ -16,6 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,9 +33,12 @@ import java.util.UUID;
 @Service
 public class PatternServiceImpl implements PatternService {
     private final PatternRepository patternRepo;
+    private final UserRepository userRepo;
 
-    public PatternServiceImpl(PatternRepository patternRepo) {
+    public PatternServiceImpl(PatternRepository patternRepo,
+                              UserRepository userRepo) {
         this.patternRepo = patternRepo;
+        this.userRepo = userRepo;
     }
 
     /**
@@ -48,6 +55,7 @@ public class PatternServiceImpl implements PatternService {
         pattern.setName(request.getName());
         pattern.setPrice(request.getPrice());
         pattern.setDescription(request.getDescription());
+        pattern.setCurrencyCode(request.getCurrencyCode());
         pattern.setFiles(ConvertUtils.convertMultipartToString(files));
         patternRepo.save(pattern);
         return "Create pattern successfully";
@@ -106,12 +114,24 @@ public class PatternServiceImpl implements PatternService {
      */
     @Override
     public PatternResponse getDetail(String id) {
-        var pattern = findOne(id);
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !(auth.getPrincipal() instanceof UserPrincipal principal)) {
+            throw new ResourceNotFoundException("User hasn't signed in");
+        }
+        User user = userRepo.findById(principal.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("User not existed in database"));
+        var pattern = findPatternByUserOrdered(user.getId(), id);
         return PatternMapper.INSTANCE.toResponse(pattern);
     }
 
     private Pattern findOne(String id) {
         return patternRepo.findById(UUID.fromString(id))
                 .orElseThrow(() -> new ResourceNotFoundException("Pattern not found"));
+    }
+
+    private Pattern findPatternByUserOrdered(UUID userId, String patternId) {
+        return patternRepo.findPatternByUserOrdered(userId,
+                UUID.fromString(patternId))
+                .orElseThrow(() -> new ResourceNotFoundException("User not payment for this pattern"));
     }
 }

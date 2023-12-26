@@ -1,10 +1,10 @@
 package org.crochet.service.contact;
 
-import org.crochet.request.LoginRequest;
-import org.crochet.request.PasswordResetRequest;
-import org.crochet.request.SignUpRequest;
-import org.crochet.response.EntityResponse;
-import org.crochet.response.AuthResponse;
+import org.crochet.payload.request.LoginRequest;
+import org.crochet.payload.request.PasswordResetRequest;
+import org.crochet.payload.request.SignUpRequest;
+import org.crochet.payload.response.EntityResponse;
+import org.crochet.payload.response.AuthResponse;
 
 public interface AuthService {
     AuthResponse authenticateUser(LoginRequest loginRequest);

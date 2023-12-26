@@ -7,9 +7,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.crochet.constant.AppConstant;
-import org.crochet.request.BlogPostRequest;
-import org.crochet.response.BlogPostPaginationResponse;
+import org.crochet.payload.request.BlogPostRequest;
+import org.crochet.payload.response.BlogPostPaginationResponse;
 import org.crochet.service.contact.BlogPostService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,15 +34,23 @@ public class BlogController {
     }
 
     @Operation(summary = "Create or update a blog post")
-    @ApiResponse(responseCode = "200", description = "Post created or updated successfully",
+    @ApiResponse(responseCode = "201", description = "Post created or updated successfully",
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class)))
-    @PostMapping(value = "/create")
+    @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
     @SecurityRequirement(name = "BearerAuth")
-    public ResponseEntity<String> createOrUpdatePost(@RequestPart BlogPostRequest request,
-                                                     @RequestPart List<MultipartFile> files) {
+    public ResponseEntity<String> createOrUpdatePost(@RequestParam(value = "id", required = false) String id,
+                                                     @RequestParam(value = "title") String title,
+                                                     @RequestParam(value = "content") String content,
+                                                     @RequestPart(required = false) List<MultipartFile> files) {
+        var request = BlogPostRequest.builder()
+                .id(id)
+                .title(title)
+                .content(content)
+                .build();
         var result = blogPostService.createOrUpdatePost(request, files);
-        return ResponseEntity.ok(result);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(result);
     }
 
     @Operation(summary = "Get paginated list of blog posts")

@@ -1,8 +1,8 @@
 package org.crochet.service.contact;
 
-import org.crochet.request.ProductRequest;
-import org.crochet.response.ProductPaginationResponse;
-import org.crochet.response.ProductResponse;
+import org.crochet.payload.request.ProductRequest;
+import org.crochet.payload.response.ProductPaginationResponse;
+import org.crochet.payload.response.ProductResponse;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;

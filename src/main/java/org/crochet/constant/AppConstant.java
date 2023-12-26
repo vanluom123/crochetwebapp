@@ -10,4 +10,5 @@ public class AppConstant {
     public static final int PRODUCT_SIZE = 10;
     public static final int PATTERN_SIZE = 10;
     public static final int FREE_PATTERN_SIZE = 10;
+    public static final long MAX_AGE_SECS = 3600;
 }

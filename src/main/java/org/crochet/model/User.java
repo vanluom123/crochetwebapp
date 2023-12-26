@@ -1,25 +1,23 @@
 package org.crochet.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.Email;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
+import org.crochet.enumerator.AuthProvider;
+import org.crochet.enumerator.RoleType;
 
 import java.util.Set;
-import java.util.UUID;
 
 @Entity
 @Table(name = "users", uniqueConstraints = {
@@ -27,15 +25,9 @@ import java.util.UUID;
 })
 @Getter
 @Setter
-@Builder
+@SuperBuilder
 @NoArgsConstructor
-@AllArgsConstructor
-public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id", nullable = false)
-    private UUID id;
-
+public class User extends BaseEntity {
     @Column(name = "name", nullable = false)
     private String name;
 
@@ -54,8 +46,8 @@ public class User {
     private String password;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "provider", columnDefinition = "varchar(25) default 'local'")
-    private AuthProvider provider = AuthProvider.local;
+    @Column(name = "provider", columnDefinition = "varchar(25) default 'LOCAL'")
+    private AuthProvider provider = AuthProvider.LOCAL;
 
     @Column(name = "provider_id")
     private String providerId;
@@ -64,15 +56,18 @@ public class User {
     private String verificationCode;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "role", columnDefinition = "varchar(10) default 'USER'")
+    @Column(name = "roles", columnDefinition = "varchar(10) default 'USER'")
     private RoleType role = RoleType.USER;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private Set<ConfirmationToken> confirmationTokens;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private Set<PasswordResetToken> passwordResetTokens;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private Set<Comment> comments;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private Set<Order> orders;
 }

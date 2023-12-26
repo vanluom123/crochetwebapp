@@ -34,6 +34,8 @@ jobs:
           GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
           TOKEN_SECRET: ${{ secrets.TOKEN_SECRET }}
           APP_PASSWORD: ${{ secrets.APP_PASSWORD }}
+          GITHUB_ACTOR: ${{ secrets.GIT_ACTOR }}
+          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
         run: |
           chmod +x gradlew
           ./gradlew build
