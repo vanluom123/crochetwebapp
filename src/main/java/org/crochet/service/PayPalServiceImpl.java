@@ -32,7 +32,6 @@ public class PayPalServiceImpl implements PayPalService {
         return webClientService.invokeApi(uri,
                 HttpMethod.POST,
                 payload,
-                String.class,
                 header -> {
                     header.setBasicAuth(username, password);
                     header.setContentType(MediaType.APPLICATION_JSON);
@@ -44,7 +43,6 @@ public class PayPalServiceImpl implements PayPalService {
         String uri = "https://api-m.sandbox.paypal.com/v2/checkout/orders/" + orderId + "/capture";
         return webClientService.invokeApi(uri,
                 HttpMethod.POST,
-                String.class,
                 header -> {
                     header.setBasicAuth(username, password);
                     header.setContentType(MediaType.APPLICATION_JSON);
