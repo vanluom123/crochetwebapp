@@ -10,9 +10,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface ConfirmationTokenRepository extends JpaRepository<ConfirmationToken, Long> {
+public interface ConfirmationTokenRepository extends JpaRepository<ConfirmationToken, UUID> {
   Optional<ConfirmationToken> findByUser(User user);
 
   Optional<ConfirmationToken> findByToken(String token);
