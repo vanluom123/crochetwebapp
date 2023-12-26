@@ -1,6 +1,5 @@
 package org.crochet.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import lombok.SneakyThrows;
 import org.crochet.enumerator.OrderIntent;

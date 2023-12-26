@@ -5,13 +5,14 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import jakarta.validation.Valid;
 import org.crochet.constant.AppConstant;
+import org.crochet.enumerator.CurrencyCode;
 import org.crochet.payload.request.ProductRequest;
 import org.crochet.payload.response.ProductPaginationResponse;
 import org.crochet.payload.response.ProductResponse;
 import org.crochet.service.contact.ProductService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,11 +39,24 @@ public class ProductController {
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = ProductResponse.class)))
     @ApiResponse(responseCode = "400", description = "Invalid input")
-    @PostMapping("/create")
+    @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
     @SecurityRequirement(name = "BearerAuth")
-    public ResponseEntity<ProductResponse> createProduct(@Valid @RequestPart ProductRequest request,
-                                                         @RequestPart List<MultipartFile> files) {
+    public ResponseEntity<ProductResponse> createProduct(@RequestParam(value = "id", required = false) String id,
+                                                         @RequestParam("categoryId") String categoryId,
+                                                         @RequestParam(value = "name", required = false) String name,
+                                                         @RequestParam(value = "description", required = false) String description,
+                                                         @RequestParam(value = "price") double price,
+                                                         @RequestParam(value = "currency_code") String currencyCode,
+                                                         @RequestPart(required = false) List<MultipartFile> files) {
+        var request = ProductRequest.builder()
+                .id(id)
+                .productCategoryId(categoryId)
+                .name(name)
+                .description(description)
+                .price(price)
+                .currencyCode(CurrencyCode.valueOf(currencyCode))
+                .build();
         var response = productService.createOrUpdate(request, files);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
