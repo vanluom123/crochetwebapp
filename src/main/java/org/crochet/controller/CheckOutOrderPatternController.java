@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.view.RedirectView;
 
 import java.net.URI;
 
@@ -36,18 +35,6 @@ public class CheckOutOrderPatternController {
         var response = orderPatternService.createPayment(patternId);
         var location = response.getLinkAsMap().get("approve");
         return ResponseEntity.created(URI.create(location)).build();
-    }
-
-    @Operation(summary = "Create payment on PayPal")
-    @ApiResponse(responseCode = "302", description = "Redirect to PayPal for payment",
-            content = @Content(mediaType = "application/json"))
-    @GetMapping("/create-payment")
-    public RedirectView createPaymentOnPayPal(
-            @Parameter(description = "ID of the pattern for which payment is being created")
-            @RequestParam("patternId") String id) {
-        var response = orderPatternService.createPayment(id);
-        var location = response.getLinkAsMap().get("approve");
-        return new RedirectView(location);
     }
 
     @Operation(summary = "Handle payment success")
