@@ -6,18 +6,18 @@ import org.crochet.exception.BadRequestException;
 import org.crochet.exception.EmailVerificationException;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.exception.TokenException;
-import org.crochet.model.AuthProvider;
+import org.crochet.enumerator.AuthProvider;
 import org.crochet.model.ConfirmationToken;
 import org.crochet.model.PasswordResetToken;
 import org.crochet.model.User;
 import org.crochet.repository.ConfirmationTokenRepository;
 import org.crochet.repository.PasswordResetTokenRepository;
 import org.crochet.repository.UserRepository;
-import org.crochet.request.LoginRequest;
-import org.crochet.request.PasswordResetRequest;
-import org.crochet.request.SignUpRequest;
-import org.crochet.response.EntityResponse;
-import org.crochet.response.AuthResponse;
+import org.crochet.payload.request.LoginRequest;
+import org.crochet.payload.request.PasswordResetRequest;
+import org.crochet.payload.request.SignUpRequest;
+import org.crochet.payload.response.EntityResponse;
+import org.crochet.payload.response.AuthResponse;
 import org.crochet.service.contact.AuthService;
 import org.crochet.service.contact.EmailSender;
 import org.crochet.service.contact.TokenService;
@@ -359,7 +359,7 @@ public class AuthServiceImpl implements AuthService {
                 .email(signUpRequest.getEmail())
                 .emailVerified(false)
                 .password(passwordEncoder.encode(signUpRequest.getPassword()))
-                .provider(AuthProvider.local)
+                .provider(AuthProvider.LOCAL)
                 .role(signUpRequest.getRole())
                 .build();
         // Save the user to the repository

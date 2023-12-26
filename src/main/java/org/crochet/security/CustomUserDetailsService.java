@@ -46,7 +46,7 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
 
         // Create a UserPrincipal object from the retrieved user
-        return UserPrincipal.create(user);
+        return UserPrincipal.builder().createUser(user).build();
     }
 
 
@@ -65,7 +65,7 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("User with %s not found", id)));
 
         // Create a UserPrincipal object from the retrieved user
-        return UserPrincipal.create(user);
+        return UserPrincipal.builder().createUser(user).build();
     }
 
 }

@@ -5,9 +5,15 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
         format_sql: true
+    hibernate:
+      ddl-auto: update
   datasource:
-    url: jdbc:mysql://localhost:3307/testDB
+    url: jdbc:mysql://localhost:3306/testDB
     username: root
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
+
+paypal:
+  username: ${PAYPAL_CLIENT_ID}
+  password: ${PAYPAL_CLIENT_SECRET}
 

@@ -1,8 +1,8 @@
 package org.crochet.service.contact;
 
-import org.crochet.request.FreePatternRequest;
-import org.crochet.response.FreePatternResponse;
-import org.crochet.response.PaginatedFreePatternResponse;
+import org.crochet.payload.request.FreePatternRequest;
+import org.crochet.payload.response.FreePatternResponse;
+import org.crochet.payload.response.PaginatedFreePatternResponse;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
