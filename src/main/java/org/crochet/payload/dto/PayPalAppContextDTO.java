@@ -1,6 +1,6 @@
 package org.crochet.payload.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.gson.annotations.SerializedName;
 import lombok.Builder;
 import lombok.Data;
 import org.crochet.enumerator.PaymentLandingPage;
@@ -8,12 +8,12 @@ import org.crochet.enumerator.PaymentLandingPage;
 @Data
 @Builder
 public class PayPalAppContextDTO {
-    @JsonProperty("brand_name")
+    @SerializedName("brand_name")
     private String brandName;
-    @JsonProperty("landing_page")
+    @SerializedName("landing_page")
     private PaymentLandingPage landingPage;
-    @JsonProperty("return_url")
+    @SerializedName("return_url")
     private String returnUrl;
-    @JsonProperty("cancel_url")
+    @SerializedName("cancel_url")
     private String cancelUrl;
 }

@@ -1,6 +1,6 @@
 package org.crochet.payload.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.gson.annotations.SerializedName;
 import lombok.Builder;
 import lombok.Data;
 import org.crochet.enumerator.OrderIntent;
@@ -11,8 +11,8 @@ import java.util.List;
 @Builder
 public class OrderDTO {
     private OrderIntent intent;
-    @JsonProperty("purchase_units")
+    @SerializedName("purchase_units")
     private List<PurchaseUnit> purchaseUnits;
-    @JsonProperty("application_context")
+    @SerializedName("application_context")
     private PayPalAppContextDTO applicationContext;
 }

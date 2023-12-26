@@ -1,13 +1,13 @@
 package org.crochet.payload.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.gson.annotations.SerializedName;
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Builder
 public class MoneyDTO {
-    @JsonProperty("currency_code")
+    @SerializedName("currency_code")
     private String currencyCode;
     private String value;
 }

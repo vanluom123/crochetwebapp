@@ -1,6 +1,7 @@
 package org.crochet.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import lombok.SneakyThrows;
 import org.crochet.enumerator.OrderIntent;
 import org.crochet.enumerator.PaymentLandingPage;
@@ -39,20 +40,20 @@ public class OrderPatternServiceImpl implements OrderPatternService {
     private final PatternRepository patternRepository;
     private final OrderRepository orderRepository;
     private final OrderPatternDetailRepository orderPatternDetailRepository;
-    private final ObjectMapper objectMapper;
+    private final Gson gson;
 
     public OrderPatternServiceImpl(PayPalService payPalService,
                                    UserRepository userRepository,
                                    PatternRepository patternRepository,
                                    OrderRepository orderRepository,
                                    OrderPatternDetailRepository orderPatternDetailRepository,
-                                   ObjectMapper objectMapper) {
+                                   Gson gson) {
         this.payPalService = payPalService;
         this.userRepository = userRepository;
         this.patternRepository = patternRepository;
         this.orderRepository = orderRepository;
         this.orderPatternDetailRepository = orderPatternDetailRepository;
-        this.objectMapper = objectMapper;
+        this.gson = gson;
     }
 
     @SneakyThrows
@@ -73,7 +74,7 @@ public class OrderPatternServiceImpl implements OrderPatternService {
                 String.valueOf(pattern.getPrice()));
 
         var content = payPalService.createOrder(orderDTO);
-        var orderResponseDTO = objectMapper.readValue(content, OrderResponseDTO.class);
+        var orderResponseDTO = gson.fromJson(content, OrderResponseDTO.class);
 
         var order = Order.builder()
                 .user(user)
@@ -120,7 +121,7 @@ public class OrderPatternServiceImpl implements OrderPatternService {
     @Override
     public String capturePayment(String transactionId) {
         var content = payPalService.capturePayment(transactionId);
-        var payload = objectMapper.readValue(content, CapturePaymentResponseDTO.class);
+        var payload = gson.fromJson(content, CapturePaymentResponseDTO.class);
         var orderPatternDetail = orderPatternDetailRepository.findByTransactionId(transactionId)
                 .orElseThrow(() -> new RuntimeException("Order not existed"));
         orderPatternDetail.setStatus(payload.getStatus());
