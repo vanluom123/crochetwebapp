@@ -34,15 +34,20 @@ public class BlogController {
     }
 
     @Operation(summary = "Create or update a blog post")
-    @ApiResponse(responseCode = "201", description = "Post created or updated successfully",
-            content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class)))
+    @ApiResponse(responseCode = "201", description = "Blog post created or updated successfully",
+            content = @Content(mediaType = "text/plain"))
     @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
     @SecurityRequirement(name = "BearerAuth")
-    public ResponseEntity<String> createOrUpdatePost(@RequestParam(value = "id", required = false) String id,
-                                                     @RequestParam(value = "title") String title,
-                                                     @RequestParam(value = "content") String content,
-                                                     @RequestPart(required = false) List<MultipartFile> files) {
+    public ResponseEntity<String> createOrUpdatePost(
+            @Parameter(description = "ID of the blog post (optional)")
+            @RequestParam(value = "id", required = false) String id,
+            @Parameter(description = "Title of the blog post", required = true)
+            @RequestParam(value = "title") String title,
+            @Parameter(description = "Content of the blog post", required = true)
+            @RequestParam(value = "content") String content,
+            @Parameter(description = "Files to upload (optional)")
+            @RequestPart(value = "files", required = false) List<MultipartFile> files) {
         var request = BlogPostRequest.builder()
                 .id(id)
                 .title(title)
