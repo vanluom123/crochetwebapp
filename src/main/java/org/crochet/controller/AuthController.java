@@ -11,7 +11,6 @@ import org.crochet.payload.request.LoginRequest;
 import org.crochet.payload.request.PasswordResetRequest;
 import org.crochet.payload.request.SignUpRequest;
 import org.crochet.payload.response.AuthResponse;
-import org.crochet.payload.response.EntityResponse;
 import org.crochet.service.contact.AuthService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -49,8 +48,8 @@ public class AuthController {
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = ApiResponse.class)))
     @PostMapping("/signup")
-    public ResponseEntity<EntityResponse> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
-        EntityResponse response = authService.registerUser(signUpRequest);
+    public ResponseEntity<String> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
+        String response = authService.registerUser(signUpRequest);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(response);
     }
@@ -61,7 +60,7 @@ public class AuthController {
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = ApiResponse.class)))
     @GetMapping(path = "/confirm")
-    public ResponseEntity<EntityResponse> confirm(@RequestParam("token") String token) {
+    public ResponseEntity<String> confirm(@RequestParam("token") String token) {
         return ResponseEntity.ok(authService.confirmToken(token));
     }
 
@@ -71,8 +70,8 @@ public class AuthController {
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = ApiResponse.class)))
     @GetMapping("/resendVerificationEmail")
-    public ResponseEntity<EntityResponse> resendVerificationEmail(@RequestParam("email") String email) {
-        EntityResponse response = authService.resendVerificationEmail(email);
+    public ResponseEntity<String> resendVerificationEmail(@RequestParam("email") String email) {
+        String response = authService.resendVerificationEmail(email);
         return ResponseEntity.ok(response);
     }
 
@@ -82,7 +81,7 @@ public class AuthController {
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = ApiResponse.class)))
     @GetMapping("/password-reset-request")
-    public ResponseEntity<EntityResponse> resetPasswordRequest(@RequestParam("email") String email) {
+    public ResponseEntity<String> resetPasswordRequest(@RequestParam("email") String email) {
         var response = authService.resetPasswordLink(email);
         return ResponseEntity.ok(response);
     }
@@ -93,7 +92,7 @@ public class AuthController {
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = ApiResponse.class)))
     @PostMapping("/reset-password")
-    public ResponseEntity<EntityResponse> resetPassword(@RequestParam("passwordResetToken") String passwordResetToken,
+    public ResponseEntity<String> resetPassword(@RequestParam("passwordResetToken") String passwordResetToken,
                                                         @RequestBody PasswordResetRequest passwordResetRequest) {
         var response = authService.resetPassword(passwordResetToken, passwordResetRequest);
         return ResponseEntity.ok(response);
