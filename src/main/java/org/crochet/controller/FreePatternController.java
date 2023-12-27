@@ -36,7 +36,7 @@ public class FreePatternController {
 
     @Operation(summary = "Create a pattern")
     @ApiResponse(responseCode = "201", description = "Pattern created successfully",
-            content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class)))
+            content = @Content(mediaType = "text/plain"))
     @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
     @SecurityRequirement(name = "BearerAuth")

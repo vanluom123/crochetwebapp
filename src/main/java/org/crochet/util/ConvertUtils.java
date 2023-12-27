@@ -1,6 +1,7 @@
 package org.crochet.util;
 
 import lombok.SneakyThrows;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
@@ -8,12 +9,15 @@ import java.util.Base64;
 import java.util.List;
 
 public class ConvertUtils {
-    @SneakyThrows
-    public static List<String> convertMultipartToString(List<MultipartFile> files) {
-        List<String> urls = new ArrayList<>();
-        for (var file : files) {
-            urls.add(Base64.getEncoder().encodeToString(file.getBytes()));
-        }
-        return urls;
+  @SneakyThrows
+  public static List<String> convertMultipartToString(List<MultipartFile> files) {
+    List<String> urls = new ArrayList<>();
+    if (ObjectUtils.isEmpty(files)) {
+      return null;
     }
+    for (var file : files) {
+      urls.add(Base64.getEncoder().encodeToString(file.getBytes()));
+    }
+    return urls;
+  }
 }

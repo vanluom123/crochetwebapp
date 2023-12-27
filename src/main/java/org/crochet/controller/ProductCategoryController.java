@@ -30,8 +30,7 @@ public class ProductCategoryController {
 
     @Operation(summary = "Create a product category")
     @ApiResponse(responseCode = "201", description = "Product category created successfully",
-            content = @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = ProductCategoryResponse.class)))
+            content = @Content(mediaType = "text/plain"))
     @PostMapping("/create")
     @PreAuthorize("hasRole('ADMIN')")
     @SecurityRequirement(name = "BearerAuth")
