@@ -8,11 +8,9 @@ import lombok.Data;
 @Builder
 @AllArgsConstructor
 public class AuthResponse {
+    private String email;
+    private String role;
     private String accessToken;
-
+    @Builder.Default
     private String tokenType = "Bearer";
-
-    public AuthResponse(String accessToken) {
-        this.accessToken = accessToken;
-    }
 }
