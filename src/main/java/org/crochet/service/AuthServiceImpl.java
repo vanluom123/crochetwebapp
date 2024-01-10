@@ -12,6 +12,7 @@ import org.crochet.payload.request.LoginRequest;
 import org.crochet.payload.request.PasswordResetRequest;
 import org.crochet.payload.request.SignUpRequest;
 import org.crochet.payload.response.AuthResponse;
+import org.crochet.security.UserPrincipal;
 import org.crochet.service.contact.AuthService;
 import org.crochet.service.contact.ConfirmTokenService;
 import org.crochet.service.contact.EmailSender;
@@ -96,8 +97,18 @@ public class AuthServiceImpl implements AuthService {
     // Add cookie for jwtToken
     CookieUtils.addCookie(servletResponse, "jwtToken", token, JWT_TOKEN_MAX_AGE);
 
+    if (authentication == null || !(authentication.getPrincipal() instanceof UserPrincipal principal)) {
+      throw new ResourceNotFoundException("User hasn't signed in");
+    }
+    // Get user
+    var user = userService.getById(principal.getId());
+
     // Return the authentication token in an AuthResponse
-    return new AuthResponse(token);
+    return AuthResponse.builder()
+            .accessToken(token)
+            .role(user.getRole().getValue())
+            .email(user.getEmail())
+            .build();
   }
 
   /**
