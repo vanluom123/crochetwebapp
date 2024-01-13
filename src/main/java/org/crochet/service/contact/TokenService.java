@@ -1,11 +1,25 @@
 package org.crochet.service.contact;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.crochet.model.Token;
+import org.crochet.model.User;
+import org.crochet.payload.response.TokenResponse;
 import org.springframework.security.core.Authentication;
 
+import java.io.IOException;
+import java.util.Optional;
+
 public interface TokenService {
-    String createToken(Authentication auth);
+  Optional<Token> getByToken(String token);
 
-    String getUserIdFromToken(String token);
+  TokenResponse createToken(User user);
 
-    boolean validateToken(String authToken);
+  TokenResponse refreshToken(HttpServletRequest request, HttpServletResponse response);
+
+  void logout(
+      HttpServletRequest request,
+      HttpServletResponse response,
+      Authentication authentication
+  );
 }

@@ -1,5 +1,6 @@
 package org.crochet.service;
 
+import com.google.gson.Gson;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.crochet.exception.EmailVerificationException;
@@ -12,21 +13,19 @@ import org.crochet.payload.request.LoginRequest;
 import org.crochet.payload.request.PasswordResetRequest;
 import org.crochet.payload.request.SignUpRequest;
 import org.crochet.payload.response.AuthResponse;
-import org.crochet.security.CustomUserDetailsService;
 import org.crochet.service.contact.AuthService;
 import org.crochet.service.contact.ConfirmTokenService;
 import org.crochet.service.contact.EmailSender;
 import org.crochet.service.contact.PasswordResetTokenService;
 import org.crochet.service.contact.TokenService;
 import org.crochet.service.contact.UserService;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 
 import static org.crochet.constant.MessageConstant.ACTIVE_NOW;
@@ -41,34 +40,28 @@ import static org.crochet.constant.MessageConstant.RESET_YOUR_PASSWORD_CONTENT;
  */
 @Service
 public class AuthServiceImpl implements AuthService {
-  private final TokenService tokenService;
   private final ConfirmTokenService confirmTokenService;
   private final PasswordResetTokenService passwordResetTokenService;
   private final UserService userService;
-  private final CustomUserDetailsService customUserDetailsService;
+  private final TokenService tokenService;
   private final EmailSender emailSender;
   private final PasswordEncoder passwordEncoder;
-  private final HttpServletResponse servletResponse;
-  private final HttpServletRequest servletRequest;
+  private final Gson gson;
 
-  public AuthServiceImpl(TokenService tokenService,
-                         ConfirmTokenService confirmTokenService,
+  public AuthServiceImpl(ConfirmTokenService confirmTokenService,
                          PasswordResetTokenService passwordResetTokenService,
                          UserService userService,
-                         CustomUserDetailsService customUserDetailsService,
+                         TokenService tokenService,
                          EmailSender emailSender,
                          PasswordEncoder passwordEncoder,
-                         HttpServletResponse servletResponse,
-                         HttpServletRequest servletRequest) {
-    this.tokenService = tokenService;
+                         Gson gson) {
     this.confirmTokenService = confirmTokenService;
     this.passwordResetTokenService = passwordResetTokenService;
     this.userService = userService;
-    this.customUserDetailsService = customUserDetailsService;
+    this.tokenService = tokenService;
     this.emailSender = emailSender;
     this.passwordEncoder = passwordEncoder;
-    this.servletResponse = servletResponse;
-    this.servletRequest = servletRequest;
+    this.gson = gson;
   }
 
   /**
@@ -81,20 +74,14 @@ public class AuthServiceImpl implements AuthService {
   public AuthResponse authenticateUser(LoginRequest loginRequest) {
     // Check email and password
     var user = userService.checkLogin(loginRequest.getEmail(), loginRequest.getPassword());
-    // Get UserDetails from User
-    UserDetails userDetails = customUserDetailsService.loadUserByUsername(user.getEmail());
-    // Create an authentication token with the user details and set the authentication details
-    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-    // Set the authenticated authentication object in the security context
-    SecurityContextHolder.getContext().setAuthentication(authentication);
-    // Create a token for the authenticated user
-    String token = tokenService.createToken(authentication);
+    var tokenResponse = tokenService.createToken(user);
     // Return the authentication token in an AuthResponse
     return AuthResponse.builder()
-            .accessToken(token)
-            .role(user.getRole().getValue())
-            .email(user.getEmail())
-            .build();
+        .accessToken(tokenResponse.getJwtToken())
+        .refreshToken(tokenResponse.getRefreshToken())
+        .role(user.getRole().getValue())
+        .email(user.getEmail())
+        .build();
   }
 
   /**
@@ -336,5 +323,26 @@ public class AuthServiceImpl implements AuthService {
     passwordResetTokenService.deletePasswordToken(passwordResetToken);
 
     return "Reset password successfully";
+  }
+
+  @Override
+  public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    var tokenResponse = tokenService.refreshToken(request, response);
+    var authResponse = AuthResponse.builder()
+        .accessToken(tokenResponse.getJwtToken())
+        .refreshToken(tokenResponse.getRefreshToken())
+        .build();
+    String jsonResponse = gson.toJson(authResponse);
+
+    // Set Content-Type to application/json
+    response.setContentType("application/json");
+
+    // Write JSON to outputStream of HttpServletResponse
+    response.getWriter().write(jsonResponse);
+  }
+
+  @Override
+  public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+    tokenService.logout(request, response, authentication);
   }
 }
