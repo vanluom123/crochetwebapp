@@ -2,11 +2,10 @@ package org.crochet.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.crochet.service.contact.TokenService;
-import org.crochet.util.CookieUtils;
+import org.crochet.util.TokenUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -47,8 +46,8 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
-            // Get jwtToken from cookie
-            var jwtToken = extractJwtTokenFromCookie(request);
+            // Get jwtToken
+            var jwtToken = TokenUtils.getJwtFromAuthorizationHeader(request);
 
             // Check if the JWT exists and is valid
             if (StringUtils.hasText(jwtToken) && tokenService.validateToken(jwtToken)) {
@@ -71,32 +70,4 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         // Continue the filter chain
         filterChain.doFilter(request, response);
     }
-
-
-    /**
-     * Retrieves the JWT (JSON Web Token) from the "Authorization" header of an HTTP request.
-     *
-     * @param request The HttpServletRequest representing the HTTP request.
-     * @return The extracted JWT, or null if it is not found.
-     */
-    private String getJwtFromAuthorizationHeader(HttpServletRequest request) {
-        // Retrieve the value of the "Authorization" header from the request
-        String bearerToken = request.getHeader("Authorization");
-
-        // Check if the "Authorization" header value is not empty and starts with "Bearer "
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-            // Extract and return the JWT by removing the "Bearer " prefix
-            return bearerToken.substring(7);
-        }
-
-        // Return null if the JWT is not found or the "Authorization" header is missing or malformed
-        return null;
-    }
-
-    private String extractJwtTokenFromCookie(HttpServletRequest request) {
-        return CookieUtils.getCookie(request, "jwtToken")
-                .map(Cookie::getValue)
-                .orElse(null);
-    }
-
 }
