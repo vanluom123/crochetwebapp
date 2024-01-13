@@ -97,19 +97,4 @@ public class AuthController {
         var response = authService.resetPassword(passwordResetToken, passwordResetRequest);
         return ResponseEntity.ok(response);
     }
-
-    @Operation(summary = "Logout")
-    @GetMapping("/logout")
-    public String logout(HttpServletResponse response,
-                         @CookieValue(name = "jwtToken", required = false) String jwtToken) {
-        if (jwtToken != null) {
-            Cookie cookie = new Cookie("jwtToken", null);
-            cookie.setMaxAge(0);
-            cookie.setPath("/");
-            response.addCookie(cookie);
-            return "Logged out successfully.";
-        } else {
-            return "No JWT token found in the cookie.";
-        }
-    }
 }

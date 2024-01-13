@@ -12,18 +12,16 @@ import org.crochet.payload.request.LoginRequest;
 import org.crochet.payload.request.PasswordResetRequest;
 import org.crochet.payload.request.SignUpRequest;
 import org.crochet.payload.response.AuthResponse;
-import org.crochet.security.UserPrincipal;
+import org.crochet.security.CustomUserDetailsService;
 import org.crochet.service.contact.AuthService;
 import org.crochet.service.contact.ConfirmTokenService;
 import org.crochet.service.contact.EmailSender;
 import org.crochet.service.contact.PasswordResetTokenService;
 import org.crochet.service.contact.TokenService;
 import org.crochet.service.contact.UserService;
-import org.crochet.util.CookieUtils;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,7 +32,6 @@ import java.time.LocalDateTime;
 import static org.crochet.constant.MessageConstant.ACTIVE_NOW;
 import static org.crochet.constant.MessageConstant.CLICK_TO_ACTIVE_CONTENT;
 import static org.crochet.constant.MessageConstant.CONFIRM_YOUR_EMAIL;
-import static org.crochet.constant.MessageConstant.JWT_TOKEN_MAX_AGE;
 import static org.crochet.constant.MessageConstant.RESET_NOTIFICATION;
 import static org.crochet.constant.MessageConstant.RESET_PASSWORD;
 import static org.crochet.constant.MessageConstant.RESET_YOUR_PASSWORD_CONTENT;
@@ -44,30 +41,30 @@ import static org.crochet.constant.MessageConstant.RESET_YOUR_PASSWORD_CONTENT;
  */
 @Service
 public class AuthServiceImpl implements AuthService {
-  private final AuthenticationManager authenticationManager;
   private final TokenService tokenService;
   private final ConfirmTokenService confirmTokenService;
   private final PasswordResetTokenService passwordResetTokenService;
   private final UserService userService;
+  private final CustomUserDetailsService customUserDetailsService;
   private final EmailSender emailSender;
   private final PasswordEncoder passwordEncoder;
   private final HttpServletResponse servletResponse;
   private final HttpServletRequest servletRequest;
 
-  public AuthServiceImpl(AuthenticationManager authenticationManager,
-                         TokenService tokenService,
+  public AuthServiceImpl(TokenService tokenService,
                          ConfirmTokenService confirmTokenService,
                          PasswordResetTokenService passwordResetTokenService,
                          UserService userService,
+                         CustomUserDetailsService customUserDetailsService,
                          EmailSender emailSender,
                          PasswordEncoder passwordEncoder,
                          HttpServletResponse servletResponse,
                          HttpServletRequest servletRequest) {
-    this.authenticationManager = authenticationManager;
     this.tokenService = tokenService;
     this.confirmTokenService = confirmTokenService;
     this.passwordResetTokenService = passwordResetTokenService;
     this.userService = userService;
+    this.customUserDetailsService = customUserDetailsService;
     this.emailSender = emailSender;
     this.passwordEncoder = passwordEncoder;
     this.servletResponse = servletResponse;
@@ -82,27 +79,16 @@ public class AuthServiceImpl implements AuthService {
    */
   @Override
   public AuthResponse authenticateUser(LoginRequest loginRequest) {
-    // Create an authentication token with the provided email and password
-    UsernamePasswordAuthenticationToken authToken =
-        new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword());
-    // Authenticate the token using the authentication manager
-    Authentication authentication = authenticationManager.authenticate(authToken);
-
+    // Check email and password
+    var user = userService.checkLogin(loginRequest.getEmail(), loginRequest.getPassword());
+    // Get UserDetails from User
+    UserDetails userDetails = customUserDetailsService.loadUserByUsername(user.getEmail());
+    // Create an authentication token with the user details and set the authentication details
+    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
     // Set the authenticated authentication object in the security context
     SecurityContextHolder.getContext().setAuthentication(authentication);
-
     // Create a token for the authenticated user
     String token = tokenService.createToken(authentication);
-
-    // Add cookie for jwtToken
-    CookieUtils.addCookie(servletResponse, "jwtToken", token, JWT_TOKEN_MAX_AGE);
-
-    if (authentication == null || !(authentication.getPrincipal() instanceof UserPrincipal principal)) {
-      throw new ResourceNotFoundException("User hasn't signed in");
-    }
-    // Get user
-    var user = userService.getById(principal.getId());
-
     // Return the authentication token in an AuthResponse
     return AuthResponse.builder()
             .accessToken(token)
@@ -348,9 +334,6 @@ public class AuthServiceImpl implements AuthService {
 
     // Delete password reset token
     passwordResetTokenService.deletePasswordToken(passwordResetToken);
-
-    // Delete token from cookie
-    CookieUtils.deleteCookie(servletRequest, servletResponse, "jwtToken");
 
     return "Reset password successfully";
   }

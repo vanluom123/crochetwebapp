@@ -15,4 +15,6 @@ public interface UserService {
     void updatePassword(String password, String email);
 
     void verifyEmail(String email);
+
+    User checkLogin(String email, String password);
 }
