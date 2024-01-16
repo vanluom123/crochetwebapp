@@ -5,9 +5,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.crochet.model.Token;
 import org.crochet.model.User;
 import org.crochet.payload.response.TokenResponse;
-import org.springframework.security.core.Authentication;
 
-import java.io.IOException;
 import java.util.Optional;
 
 public interface TokenService {
@@ -19,7 +17,6 @@ public interface TokenService {
 
   void logout(
       HttpServletRequest request,
-      HttpServletResponse response,
-      Authentication authentication
+      HttpServletResponse response
   );
 }

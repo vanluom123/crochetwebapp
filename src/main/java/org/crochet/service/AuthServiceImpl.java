@@ -19,7 +19,6 @@ import org.crochet.service.contact.EmailSender;
 import org.crochet.service.contact.PasswordResetTokenService;
 import org.crochet.service.contact.TokenService;
 import org.crochet.service.contact.UserService;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -342,7 +341,7 @@ public class AuthServiceImpl implements AuthService {
   }
 
   @Override
-  public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
-    tokenService.logout(request, response, authentication);
+  public void logout(HttpServletRequest request, HttpServletResponse response) {
+    tokenService.logout(request, response);
   }
 }

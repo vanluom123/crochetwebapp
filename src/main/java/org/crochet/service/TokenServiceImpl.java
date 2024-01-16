@@ -13,7 +13,6 @@ import org.crochet.service.contact.JwtTokenService;
 import org.crochet.service.contact.TokenService;
 import org.crochet.service.contact.UserService;
 import org.springframework.http.HttpHeaders;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -76,8 +75,7 @@ public class TokenServiceImpl implements TokenService {
   @Override
   public void logout(
       HttpServletRequest request,
-      HttpServletResponse response,
-      Authentication authentication
+      HttpServletResponse response
   ) {
     final String authHeader = request.getHeader("Authorization");
 
