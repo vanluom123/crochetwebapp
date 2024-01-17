@@ -64,6 +64,16 @@ public class UserServiceImpl implements UserService {
         userRepository.verifyEmail(email);
     }
 
+    @Override
+    public User checkLogin(String email, String password) {
+        var user = this.getByEmail(email);
+        var isMatch = passwordEncoder.matches(password, user.getPassword());
+        if (!isMatch) {
+            throw new BadRequestException("Incorrect password");
+        }
+        return user;
+    }
+
     private boolean isValidEmail(String email) {
         return userRepository.findByEmail(email).isPresent();
     }
