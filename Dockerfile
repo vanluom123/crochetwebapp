@@ -4,7 +4,7 @@ WORKDIR /workspace/app
 COPY . /workspace/app
 RUN --mount=type=cache,target=/root/.gradle
 RUN chmod +x ./gradlew
-RUN ./gradlew clean build
+RUN ./gradlew clean build || (cat build/reports/tests/test/classes/org/crochet/CrochetApplicationIntegrationTests.html && exit 1)
 RUN mkdir -p build/dependency && (cd build/dependency; jar -xf ../libs/*-SNAPSHOT.jar)
 
 FROM eclipse-temurin:17-jdk-alpine
