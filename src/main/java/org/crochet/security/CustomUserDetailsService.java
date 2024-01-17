@@ -57,6 +57,7 @@ public class CustomUserDetailsService implements UserDetailsService {
      * @return The UserDetails object representing the user.
      * @throws ResourceNotFoundException If the user is not found for the given ID.
      */
+    @Deprecated
     @Transactional
     public UserDetails loadUserById(String id) {
         // Retrieve the user by ID from the UserRepository

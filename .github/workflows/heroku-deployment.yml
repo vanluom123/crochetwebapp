@@ -33,6 +33,8 @@ jobs:
           APP_PASSWORD: ${{ secrets.APP_PASSWORD }}
           GITHUB_ACTOR: ${{ secrets.GIT_ACTOR }}
           GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
+          PAYPAL_CLIENT_ID: ${{ secrets.PAYPAL_CLIENT_ID }}
+          PAYPAL_CLIENT_SECRET: ${{ secrets.PAYPAL_CLIENT_SECRET }}
         run: |
           chmod +x gradlew
           ./gradlew build
