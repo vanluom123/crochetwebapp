@@ -41,8 +41,8 @@ spring:
 app:
   auth:
     tokenSecret: ${TOKEN_SECRET}
-    tokenExpirationMs: 864000000
-    refresh-token-expiration-ms: 864000000
+    tokenExpirationMs: 864000000 # 1 day
+    refresh-token-expiration-ms: 604800000 # 7 days
   cors:
     allowedOrigins: http://localhost:3000,http://localhost:8080
   oauth2:
@@ -54,3 +54,7 @@ app:
       - http://localhost:3000/oauth2/redirect
       - myandroidapp://oauth2/redirect
       - myiosapp://oauth2/redirect
+
+paypal:
+  username: ${PAYPAL_CLIENT_ID}
+  password: ${PAYPAL_CLIENT_SECRET}
