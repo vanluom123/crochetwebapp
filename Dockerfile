@@ -1,10 +1,16 @@
 FROM eclipse-temurin:17-jdk-alpine AS build
 WORKDIR /workspace/app
 
+ARG GITHUB_ACTOR
+ARG GITHUB_TOKEN
+
+ENV GITHUB_ACTOR ${GITHUB_ACTOR}
+ENV GITHUB_TOKEN ${GITHUB_TOKEN}
+
 COPY . /workspace/app
 RUN --mount=type=cache,target=/root/.gradle
 RUN chmod +x ./gradlew
-RUN ./gradlew clean build || (cat build/reports/tests/test/classes/org/crochet/CrochetApplicationIntegrationTests.html && exit 1)
+RUN ./gradlew clean build
 RUN mkdir -p build/dependency && (cd build/dependency; jar -xf ../libs/*-SNAPSHOT.jar)
 
 FROM eclipse-temurin:17-jdk-alpine
