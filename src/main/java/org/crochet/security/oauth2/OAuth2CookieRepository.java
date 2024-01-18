@@ -38,13 +38,15 @@ public class OAuth2CookieRepository implements AuthorizationRequestRepository<OA
      * @param response             the {@code HttpServletResponse}
      */
     @Override
-    public void saveAuthorizationRequest(OAuth2AuthorizationRequest authorizationRequest, HttpServletRequest request, HttpServletResponse response) {
+    public void saveAuthorizationRequest(OAuth2AuthorizationRequest authorizationRequest, HttpServletRequest request,
+                                         HttpServletResponse response) {
         if (authorizationRequest == null) {
             removeAuthorizationRequestCookies(request, response);
             return;
         }
 
-        CookieUtils.addCookie(response, OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME, CookieUtils.serialize(authorizationRequest), cookieExpireSeconds);
+        CookieUtils.addCookie(response, OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME,
+                CookieUtils.serialize(authorizationRequest), cookieExpireSeconds);
 
         String redirectUriAfterLogin = request.getParameter(REDIRECT_URI_PARAM_COOKIE_NAME);
         if (!redirectUriAfterLogin.isBlank()) {
@@ -62,7 +64,8 @@ public class OAuth2CookieRepository implements AuthorizationRequestRepository<OA
      * @return the {@link OAuth2AuthorizationRequest} or {@code null} if not available
      */
     @Override
-    public OAuth2AuthorizationRequest removeAuthorizationRequest(HttpServletRequest request, HttpServletResponse response) {
+    public OAuth2AuthorizationRequest removeAuthorizationRequest(HttpServletRequest request,
+                                                                 HttpServletResponse response) {
         return this.loadAuthorizationRequest(request);
     }
 

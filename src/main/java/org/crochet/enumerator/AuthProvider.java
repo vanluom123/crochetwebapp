@@ -9,9 +9,9 @@ public enum AuthProvider {
     GOOGLE("GOOGLE"),
     GITHUB("GITHUB");
 
+    private final String value;
+
     AuthProvider(String value) {
         this.value = value;
     }
-
-    private final String value;
 }
