@@ -36,7 +36,8 @@ public class ProductController {
 
     @Operation(summary = "Create a new product")
     @ApiResponse(responseCode = "201", description = "Product created successfully",
-            content = @Content(mediaType = "text/plain"))
+            content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = ProductResponse.class)))
     @ApiResponse(responseCode = "400", description = "Invalid input")
     @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
@@ -44,9 +45,11 @@ public class ProductController {
     public ResponseEntity<ProductResponse> createProduct(@RequestParam(value = "id", required = false) String id,
                                                          @RequestParam("categoryId") String categoryId,
                                                          @RequestParam(value = "name", required = false) String name,
-                                                         @RequestParam(value = "description", required = false) String description,
+                                                         @RequestParam(value = "description", required = false)
+                                                         String description,
                                                          @RequestParam(value = "price") double price,
-                                                         @RequestParam(value = "currency_code") String currencyCode,
+                                                         @RequestParam(value = "currency_code")
+                                                         CurrencyCode currencyCode,
                                                          @RequestPart(required = false) List<MultipartFile> files) {
         var request = ProductRequest.builder()
                 .id(id)
@@ -54,7 +57,7 @@ public class ProductController {
                 .name(name)
                 .description(description)
                 .price(price)
-                .currencyCode(CurrencyCode.valueOf(currencyCode))
+                .currencyCode(currencyCode)
                 .build();
         var response = productService.createOrUpdate(request, files);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);

@@ -4,11 +4,11 @@ import lombok.Getter;
 
 @Getter
 public enum TokenType {
-  BEARER("Bearer");
+    BEARER("Bearer");
 
-  TokenType(String value) {
-    this.value = value;
-  }
+    private final String value;
 
-  private final String value;
+    TokenType(String value) {
+        this.value = value;
+    }
 }

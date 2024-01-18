@@ -1,7 +1,6 @@
 package org.crochet.security;
 
 import lombok.Getter;
-import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -22,15 +21,6 @@ public class UserPrincipal implements OAuth2User, UserDetails {
     private final Map<String, Object> attributes;
 
     /**
-     * Returns a new instance of {@link UserPrincipalBuilder} to build a {@link UserPrincipal}.
-     *
-     * @return A new instance of {@link UserPrincipalBuilder}.
-     */
-    public static UserPrincipalBuilder builder() {
-        return new UserPrincipalBuilder();
-    }
-
-    /**
      * Constructor of UserPrincipal class
      *
      * @param id          id
@@ -48,6 +38,15 @@ public class UserPrincipal implements OAuth2User, UserDetails {
         this.password = password;
         this.authorities = authorities;
         this.attributes = attributes;
+    }
+
+    /**
+     * Returns a new instance of {@link UserPrincipalBuilder} to build a {@link UserPrincipal}.
+     *
+     * @return A new instance of {@link UserPrincipalBuilder}.
+     */
+    public static UserPrincipalBuilder builder() {
+        return new UserPrincipalBuilder();
     }
 
     @Override

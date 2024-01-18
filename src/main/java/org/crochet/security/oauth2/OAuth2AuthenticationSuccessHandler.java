@@ -32,7 +32,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     /**
      * Constructor of OAuth2AuthenticationSuccessHandler class
      *
-     * @param jwtTokenService           TokenProvider
+     * @param jwtTokenService        TokenProvider
      * @param appProperties          AppProperties
      * @param OAuth2CookieRepository HttpCookieOAuth2AuthorizationRequestRepository
      */
@@ -54,7 +54,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
      * @throws IOException I/O exception
      */
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
+                                        Authentication authentication) throws IOException {
         String targetUrl = determineTargetUrl(request, response, authentication);
 
         if (response.isCommitted()) {
@@ -75,11 +76,13 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
      * @return url string
      * @throws BadRequestException Can't proceed with the authentication
      */
-    protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+    protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response,
+                                        Authentication authentication) {
         String redirectUri = CookieUtils.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
                 .map(Cookie::getValue)
                 .filter(this::isAuthorizedRedirectUri)
-                .orElseThrow(() -> new BadRequestException("Sorry! We've got an Unauthorized Redirect URI and can't proceed with the authentication"));
+                .orElseThrow(() -> new BadRequestException(
+                        "Sorry! We've got an Unauthorized Redirect URI and can't proceed with the authentication"));
 
         String targetUrl = redirectUri.isEmpty() ? getDefaultTargetUrl() : redirectUri;
         String token = jwtTokenService.createToken(authentication);
