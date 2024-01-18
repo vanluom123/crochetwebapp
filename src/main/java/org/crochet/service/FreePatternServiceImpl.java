@@ -4,11 +4,11 @@ import org.crochet.constant.AppConstant;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.FreePatternMapper;
 import org.crochet.model.FreePattern;
-import org.crochet.repository.FreePatternRepository;
-import org.crochet.repository.FreePatternSpecifications;
 import org.crochet.payload.request.FreePatternRequest;
 import org.crochet.payload.response.FreePatternResponse;
 import org.crochet.payload.response.PaginatedFreePatternResponse;
+import org.crochet.repository.FreePatternRepository;
+import org.crochet.repository.FreePatternSpecifications;
 import org.crochet.service.contact.FreePatternService;
 import org.crochet.util.ConvertUtils;
 import org.springframework.data.domain.Page;
@@ -71,7 +71,8 @@ public class FreePatternServiceImpl implements FreePatternService {
      * @return A {@link PaginatedFreePatternResponse} containing the paginated list of FreePatterns.
      */
     @Override
-    public PaginatedFreePatternResponse getFreePatterns(int pageNo, int pageSize, String sortBy, String sortDir, String text) {
+    public PaginatedFreePatternResponse getFreePatterns(int pageNo, int pageSize, String sortBy, String sortDir,
+                                                        String text) {
         // create Sort instance
         Sort sort = Sort.by(sortBy);
         sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? sort.ascending() : sort.descending();

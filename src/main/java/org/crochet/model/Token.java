@@ -22,18 +22,18 @@ import org.crochet.enumerator.TokenType;
 @AllArgsConstructor
 @Entity
 public class Token extends BaseEntity {
-  @Column(unique = true)
-  public String token;
+    @Column(unique = true)
+    public String token;
 
-  @Enumerated(EnumType.STRING)
-  @Builder.Default
-  public TokenType tokenType = TokenType.BEARER;
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    public TokenType tokenType = TokenType.BEARER;
 
-  public boolean revoked;
+    public boolean revoked;
 
-  public boolean expired;
+    public boolean expired;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id")
-  public User user;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    public User user;
 }
