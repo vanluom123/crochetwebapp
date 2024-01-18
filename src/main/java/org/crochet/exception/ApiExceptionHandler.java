@@ -1,6 +1,7 @@
 package org.crochet.exception;
 
 import lombok.extern.slf4j.Slf4j;
+import org.crochet.constant.MessageConstant;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -11,7 +12,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 @RestControllerAdvice
 public class ApiExceptionHandler {
-
     @ExceptionHandler({Exception.class})
     public ResponseEntity<ApiError> handleException(Exception ex) {
         ApiError error = ApiError.builder()
@@ -25,7 +25,7 @@ public class ApiExceptionHandler {
     @ExceptionHandler({AccessDeniedException.class})
     public ResponseEntity<ApiError> handleAccessDeniedException(AccessDeniedException ex) {
         ApiError error = ApiError.builder()
-                .message(ex.getMessage())
+                .message(MessageConstant.NOT_HAVE_PERMISSION_TO_ACCESS)
                 .statusCode(HttpStatus.FORBIDDEN)
                 .build();
         log.error(ex.getMessage());
@@ -43,7 +43,8 @@ public class ApiExceptionHandler {
     }
 
     @ExceptionHandler({OAuth2AuthenticationProcessingException.class})
-    public ResponseEntity<ApiError> handleOAuth2AuthenticationProcessingException(OAuth2AuthenticationProcessingException ex) {
+    public ResponseEntity<ApiError> handleOAuth2AuthenticationProcessingException(
+            OAuth2AuthenticationProcessingException ex) {
         ApiError err = ApiError.builder()
                 .message(ex.getMessage())
                 .statusCode(HttpStatus.INTERNAL_SERVER_ERROR)

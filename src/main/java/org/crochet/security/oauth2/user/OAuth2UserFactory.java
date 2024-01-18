@@ -1,7 +1,7 @@
 package org.crochet.security.oauth2.user;
 
-import org.crochet.exception.OAuth2AuthenticationProcessingException;
 import org.crochet.enumerator.AuthProvider;
+import org.crochet.exception.OAuth2AuthenticationProcessingException;
 
 import java.util.Map;
 
@@ -15,7 +15,8 @@ public class OAuth2UserFactory {
         } else if (registrationId.equalsIgnoreCase(AuthProvider.GITHUB.getValue())) {
             return new GithubOAuth2User(attributes);
         } else {
-            throw new OAuth2AuthenticationProcessingException("Sorry! Login with " + registrationId + " is not supported yet.");
+            throw new OAuth2AuthenticationProcessingException(
+                    "Sorry! Login with " + registrationId + " is not supported yet.");
         }
     }
 }

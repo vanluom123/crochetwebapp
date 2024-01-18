@@ -22,7 +22,7 @@ public interface AuthService {
 
     String resetPassword(String token, PasswordResetRequest passwordResetRequest);
 
-  void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException;
+    void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException;
 
     void logout(HttpServletRequest request, HttpServletResponse response);
 }

@@ -38,7 +38,7 @@ public class PatternController {
     @Operation(summary = "Create a pattern")
     @ApiResponse(responseCode = "201", description = "Pattern created successfully",
             content = @Content(mediaType = "application/json",
-                schema = @Schema(implementation = String.class)))
+                    schema = @Schema(implementation = String.class)))
     @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
     @SecurityRequirement(name = "BearerAuth")
@@ -47,14 +47,14 @@ public class PatternController {
             @RequestParam(value = "name", required = false) String name,
             @RequestParam(value = "description", required = false) String description,
             @RequestParam(value = "price") double price,
-            @RequestParam(value = "currency_code") String currencyCode,
+            @RequestParam(value = "currency_code") CurrencyCode currencyCode,
             @RequestPart(required = false) List<MultipartFile> files) {
         var request = PatternRequest.builder()
                 .id(id)
                 .name(name)
                 .description(description)
                 .price(price)
-                .currencyCode(CurrencyCode.valueOf(currencyCode))
+                .currencyCode(currencyCode)
                 .build();
         var result = patternService.createOrUpdate(request, files);
         return ResponseEntity.status(HttpStatus.CREATED).body(result);

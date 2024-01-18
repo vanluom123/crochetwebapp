@@ -7,9 +7,9 @@ public enum RoleType {
     USER("USER"),
     ADMIN("ADMIN");
 
+    private final String value;
+
     RoleType(String value) {
         this.value = value;
     }
-
-    private final String value;
 }

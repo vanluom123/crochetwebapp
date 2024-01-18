@@ -6,9 +6,9 @@ import lombok.Getter;
 public enum CurrencyCode {
     USD("USD");
 
+    private final String value;
+
     CurrencyCode(String value) {
         this.value = value;
     }
-
-    private final String value;
 }

@@ -11,9 +11,9 @@ public enum OrderStatus {
     COMPLETED("COMPLETED"),
     PAYER_ACTION_REQUIRED("PAYER_ACTION_REQUIRED");
 
+    private final String value;
+
     OrderStatus(String value) {
         this.value = value;
     }
-
-    private final String value;
 }

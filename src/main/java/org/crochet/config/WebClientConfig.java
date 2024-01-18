@@ -11,10 +11,10 @@ import org.xiaofeng.webclient.service.WebClientServiceImpl;
 
 @Configuration
 public class WebClientConfig {
-  @Bean
-  @Scope(scopeName = "prototype")
-  public WebClientService webClientService() {
-    Injector injector = Guice.createInjector(new WebClientModule());
-    return injector.getInstance(WebClientServiceImpl.class);
-  }
+    @Bean
+    @Scope(scopeName = "prototype")
+    public WebClientService webClientService() {
+        Injector injector = Guice.createInjector(new WebClientModule());
+        return injector.getInstance(WebClientServiceImpl.class);
+    }
 }

@@ -8,6 +8,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties(prefix = "paypal")
 public class PayPalProperties {
-  private String username;
-  private String password;
+    private String username;
+    private String password;
 }

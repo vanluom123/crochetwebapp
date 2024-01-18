@@ -36,7 +36,7 @@ public class BlogController {
     @Operation(summary = "Create or update a blog post")
     @ApiResponse(responseCode = "201", description = "Blog post created or updated successfully",
             content = @Content(mediaType = "application/json",
-                schema = @Schema(implementation = String.class)))
+                    schema = @Schema(implementation = String.class)))
     @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
     @SecurityRequirement(name = "BearerAuth")
