@@ -25,7 +25,8 @@ public class CommentController {
 
     @Operation(summary = "Create a comment")
     @ApiResponse(responseCode = "201", description = "Comment created successfully",
-                 content = @Content(mediaType = "text/plain"))
+                 content = @Content(mediaType = "application/json",
+                     schema = @Schema(implementation = String.class)))
     @PostMapping("/create")
     @SecurityRequirement(name = "BearerAuth")
     public ResponseEntity<String> createComment(

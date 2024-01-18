@@ -7,7 +7,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.crochet.service.contact.JwtTokenService;
 import org.crochet.service.contact.TokenService;
 import org.crochet.util.TokenUtils;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -48,9 +47,9 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
    * @throws IOException      If an I/O exception occurs.
    */
   @Override
-  protected void doFilterInternal(@NotNull HttpServletRequest request,
-                                  @NotNull HttpServletResponse response,
-                                  @NotNull FilterChain filterChain)
+  protected void doFilterInternal(HttpServletRequest request,
+                                  HttpServletResponse response,
+                                  FilterChain filterChain)
       throws ServletException, IOException {
     try {
       // Get jwtToken

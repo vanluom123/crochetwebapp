@@ -36,7 +36,8 @@ public class ProductController {
 
     @Operation(summary = "Create a new product")
     @ApiResponse(responseCode = "201", description = "Product created successfully",
-            content = @Content(mediaType = "text/plain"))
+            content = @Content(mediaType = "application/json",
+                schema = @Schema(implementation = ProductResponse.class)))
     @ApiResponse(responseCode = "400", description = "Invalid input")
     @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
