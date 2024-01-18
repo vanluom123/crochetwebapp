@@ -131,7 +131,7 @@ public class PatternServiceImpl implements PatternService {
 
     private Pattern findPatternByUserOrdered(UUID userId, String patternId) {
         return patternRepo.findPatternByUserOrdered(userId,
-                UUID.fromString(patternId))
+                        UUID.fromString(patternId))
                 .orElseThrow(() -> new ResourceNotFoundException("User not payment for this pattern"));
     }
 }

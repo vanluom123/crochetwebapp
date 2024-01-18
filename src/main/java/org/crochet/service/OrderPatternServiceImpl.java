@@ -55,6 +55,29 @@ public class OrderPatternServiceImpl implements OrderPatternService {
         this.gson = gson;
     }
 
+    private static OrderDTO createOrderDTO(String currencyCode, String value) {
+        String baseUri = ServletUriComponentsBuilder.fromCurrentContextPath().toUriString();
+        var appContext = PayPalAppContextDTO.builder()
+                .returnUrl(baseUri + "/api/checkout/order-pattern/success")
+                .brandName("Little Crochet")
+                .landingPage(PaymentLandingPage.BILLING)
+                .build();
+        MoneyDTO moneyDTO = MoneyDTO.builder()
+                .currencyCode(currencyCode)
+                .value(String.valueOf(value))
+                .build();
+        PurchaseUnit purchaseUnit = PurchaseUnit.builder()
+                .amount(moneyDTO)
+                .build();
+        List<PurchaseUnit> purchaseUnits = new ArrayList<>();
+        purchaseUnits.add(purchaseUnit);
+        return OrderDTO.builder()
+                .intent(OrderIntent.CAPTURE)
+                .applicationContext(appContext)
+                .purchaseUnits(purchaseUnits)
+                .build();
+    }
+
     @SneakyThrows
     @Transactional
     @Override
@@ -90,29 +113,6 @@ public class OrderPatternServiceImpl implements OrderPatternService {
         orderPatternDetailRepository.save(orderPatternDetail);
 
         return orderResponseDTO;
-    }
-
-    private static OrderDTO createOrderDTO(String currencyCode, String value) {
-        String baseUri = ServletUriComponentsBuilder.fromCurrentContextPath().toUriString();
-        var appContext = PayPalAppContextDTO.builder()
-                .returnUrl(baseUri + "/api/checkout/order-pattern/success")
-                .brandName("Little Crochet")
-                .landingPage(PaymentLandingPage.BILLING)
-                .build();
-        MoneyDTO moneyDTO = MoneyDTO.builder()
-                .currencyCode(currencyCode)
-                .value(String.valueOf(value))
-                .build();
-        PurchaseUnit purchaseUnit = PurchaseUnit.builder()
-                .amount(moneyDTO)
-                .build();
-        List<PurchaseUnit> purchaseUnits = new ArrayList<>();
-        purchaseUnits.add(purchaseUnit);
-        return OrderDTO.builder()
-                .intent(OrderIntent.CAPTURE)
-                .applicationContext(appContext)
-                .purchaseUnits(purchaseUnits)
-                .build();
     }
 
     @SneakyThrows

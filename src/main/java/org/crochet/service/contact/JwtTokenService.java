@@ -8,29 +8,29 @@ import java.util.Map;
 import java.util.function.Function;
 
 public interface JwtTokenService {
-  @Deprecated
-  String createToken(Authentication auth);
+    @Deprecated
+    String createToken(Authentication auth);
 
-  String extractUsername(String token);
+    String extractUsername(String token);
 
-  <T> T extractClaim(String token, Function<Claims, T> claimsResolver);
+    <T> T extractClaim(String token, Function<Claims, T> claimsResolver);
 
-  boolean isTokenValid(String token, UserDetails userDetails);
+    boolean isTokenValid(String token, UserDetails userDetails);
 
-  String generateToken(UserDetails userDetails);
+    String generateToken(UserDetails userDetails);
 
-  String generateToken(
-      Map<String, Object> extraClaims,
-      UserDetails userDetails
-  );
+    String generateToken(
+            Map<String, Object> extraClaims,
+            UserDetails userDetails
+    );
 
-  String generateRefreshToken(
-      UserDetails userDetails
-  );
+    String generateRefreshToken(
+            UserDetails userDetails
+    );
 
-  @Deprecated
-  String getUserIdFromToken(String token);
+    @Deprecated
+    String getUserIdFromToken(String token);
 
-  @Deprecated
-  boolean validateToken(String authToken);
+    @Deprecated
+    boolean validateToken(String authToken);
 }
