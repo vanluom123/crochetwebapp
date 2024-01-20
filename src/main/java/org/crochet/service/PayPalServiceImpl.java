@@ -1,7 +1,8 @@
 package org.crochet.service;
 
-import com.google.gson.Gson;
+import org.crochet.payload.dto.CapturePaymentResponseDTO;
 import org.crochet.payload.dto.OrderDTO;
+import org.crochet.payload.dto.OrderResponseDTO;
 import org.crochet.properties.PayPalProperties;
 import org.crochet.service.contact.PayPalService;
 import org.springframework.stereotype.Service;
@@ -11,10 +12,8 @@ import reactor.core.publisher.Mono;
 @Service
 public class PayPalServiceImpl implements PayPalService {
     private final WebClient webClient;
-    private final Gson gson;
 
     public PayPalServiceImpl(WebClient.Builder builder,
-                             Gson gson,
                              PayPalProperties paypalProps) {
         this.webClient = builder.defaultHeaders(header -> {
             header.setBasicAuth(
@@ -23,26 +22,24 @@ public class PayPalServiceImpl implements PayPalService {
             );
             header.add("Content-Type", "application/json");
         }).build();
-        this.gson = gson;
     }
 
     @Override
-    public Mono<String> createOrder(OrderDTO orderDTO) {
-        String payload = gson.toJson(orderDTO);
+    public Mono<OrderResponseDTO> createOrder(OrderDTO orderDTO) {
         String uri = "https://api-m.sandbox.paypal.com/v2/checkout/orders";
         return webClient.post()
                 .uri(uri)
-                .body(Mono.just(payload), String.class)
+                .body(Mono.just(orderDTO), OrderDTO.class)
                 .retrieve()
-                .bodyToMono(String.class);
+                .bodyToMono(OrderResponseDTO.class);
     }
 
     @Override
-    public Mono<String> capturePayment(String orderId) {
+    public Mono<CapturePaymentResponseDTO> capturePayment(String orderId) {
         String uri = "https://api-m.sandbox.paypal.com/v2/checkout/orders/" + orderId + "/capture";
         return webClient.post()
                 .uri(uri)
                 .retrieve()
-                .bodyToMono(String.class);
+                .bodyToMono(CapturePaymentResponseDTO.class);
     }
 }

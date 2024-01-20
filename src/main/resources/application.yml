@@ -32,12 +32,6 @@ spring:
     multipart:
       max-file-size: 100MB
 
-  autoconfigure:
-    exclude: org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration
-  mvc:
-    converters:
-      preferred-json-mapper: gson
-
 app:
   auth:
     tokenSecret: ${TOKEN_SECRET}
