@@ -11,4 +11,10 @@ public class AppConstant {
     public static final int PATTERN_SIZE = 10;
     public static final int FREE_PATTERN_SIZE = 10;
     public static final long MAX_AGE_SECS = 3600;
+    public static final int READ_TIMEOUT_SECONDS = 10;
+    public static final int WRITE_TIMEOUT_SECONDS = 10;
+    public static final int CONNECT_TIMEOUT_MILLIS = 10000;
+    public static final int MAX_ATTEMPTS = 3;
+    public static final int BACKOFF_DURATION_SECONDS = 2;
+    public static final int TIMEOUT_SECONDS = 10;
 }
