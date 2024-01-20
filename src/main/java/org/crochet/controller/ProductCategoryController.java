@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.crochet.payload.request.ProductCategoryRequest;
 import org.crochet.payload.response.ProductCategoryResponse;
+import org.crochet.payload.response.ProductCategoryResponseDto;
 import org.crochet.service.contact.ProductCategoryService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,15 +31,19 @@ public class ProductCategoryController {
 
     @Operation(summary = "Create a product category")
     @ApiResponse(responseCode = "201", description = "Product category created successfully",
-            content = @Content(mediaType = "text/plain"))
+            content = @Content(mediaType = "application/json"))
     @PostMapping("/create")
     @PreAuthorize("hasRole('ADMIN')")
     @SecurityRequirement(name = "BearerAuth")
-    public ResponseEntity<String> createProduct(@RequestParam(value = "id", required = false) String id,
-                                                @RequestParam(value = "categoryName") String categoryName) {
+    public ResponseEntity<String> createCategory(
+            @RequestParam(value = "id", required = false) String id,
+            @RequestParam(value = "categoryName") String categoryName,
+            @RequestParam(value = "parentCategoryName", required = false) String parentCategoryName
+    ) {
         var request = ProductCategoryRequest.builder()
                 .id(id)
                 .categoryName(categoryName)
+                .parentCategoryName(parentCategoryName)
                 .build();
         var response = productCategoryService.createOrUpdate(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -50,6 +55,15 @@ public class ProductCategoryController {
     @GetMapping("/getAll")
     public ResponseEntity<List<ProductCategoryResponse>> getAll() {
         var responses = productCategoryService.getAll();
+        return ResponseEntity.ok(responses);
+    }
+
+    @Operation(summary = "Get all product categories")
+    @ApiResponse(responseCode = "200", description = "List of all product categories",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = List.class)))
+    @GetMapping("/getCategories")
+    public ResponseEntity<List<ProductCategoryResponseDto>> getCategories() {
+        var responses = productCategoryService.getCategories();
         return ResponseEntity.ok(responses);
     }
 }
