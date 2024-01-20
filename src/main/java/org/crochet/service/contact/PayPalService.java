@@ -1,9 +1,10 @@
 package org.crochet.service.contact;
 
 import org.crochet.payload.dto.OrderDTO;
+import reactor.core.publisher.Mono;
 
 public interface PayPalService {
-    String createOrder(OrderDTO orderDTO);
+    Mono<String> createOrder(OrderDTO orderDTO);
 
-    String capturePayment(String orderId);
+    Mono<String> capturePayment(String orderId);
 }
