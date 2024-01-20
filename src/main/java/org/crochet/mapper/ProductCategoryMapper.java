@@ -2,7 +2,9 @@ package org.crochet.mapper;
 
 import org.crochet.model.ProductCategory;
 import org.crochet.payload.response.ProductCategoryResponse;
+import org.crochet.payload.response.ProductCategoryResponseDto;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 
@@ -23,4 +25,7 @@ public interface ProductCategoryMapper {
                         .toList())
                 .orElse(null);
     }
+
+    @Mapping(target = "parent", source = "parentCategory")
+    ProductCategoryResponseDto toDto(ProductCategory category);
 }
