@@ -1,6 +1,6 @@
 package org.crochet.service;
 
-import com.google.gson.Gson;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.crochet.exception.EmailVerificationException;
@@ -45,22 +45,19 @@ public class AuthServiceImpl implements AuthService {
     private final TokenService tokenService;
     private final EmailSender emailSender;
     private final PasswordEncoder passwordEncoder;
-    private final Gson gson;
 
     public AuthServiceImpl(ConfirmTokenService confirmTokenService,
                            PasswordResetTokenService passwordResetTokenService,
                            UserService userService,
                            TokenService tokenService,
                            EmailSender emailSender,
-                           PasswordEncoder passwordEncoder,
-                           Gson gson) {
+                           PasswordEncoder passwordEncoder) {
         this.confirmTokenService = confirmTokenService;
         this.passwordResetTokenService = passwordResetTokenService;
         this.userService = userService;
         this.tokenService = tokenService;
         this.emailSender = emailSender;
         this.passwordEncoder = passwordEncoder;
-        this.gson = gson;
     }
 
     /**
@@ -331,7 +328,8 @@ public class AuthServiceImpl implements AuthService {
                 .accessToken(tokenResponse.getJwtToken())
                 .refreshToken(tokenResponse.getRefreshToken())
                 .build();
-        String jsonResponse = gson.toJson(authResponse);
+        ObjectMapper om = new ObjectMapper();
+        String jsonResponse = om.writeValueAsString(authResponse);
 
         // Set Content-Type to application/json
         response.setContentType("application/json");
