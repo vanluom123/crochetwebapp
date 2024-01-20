@@ -21,6 +21,7 @@ import org.crochet.repository.UserRepository;
 import org.crochet.security.UserPrincipal;
 import org.crochet.service.contact.OrderPatternService;
 import org.crochet.service.contact.PayPalService;
+import org.crochet.util.MonoUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -96,7 +97,7 @@ public class OrderPatternServiceImpl implements OrderPatternService {
                 String.valueOf(pattern.getPrice()));
 
         var content = payPalService.createOrder(orderDTO);
-        var orderResponseDTO = gson.fromJson(content, OrderResponseDTO.class);
+        var orderResponseDTO = gson.fromJson(MonoUtils.block(content), OrderResponseDTO.class);
 
         var order = Order.builder()
                 .user(user)
@@ -120,7 +121,7 @@ public class OrderPatternServiceImpl implements OrderPatternService {
     @Override
     public String capturePayment(String transactionId) {
         var content = payPalService.capturePayment(transactionId);
-        var payload = gson.fromJson(content, CapturePaymentResponseDTO.class);
+        var payload = gson.fromJson(MonoUtils.block(content), CapturePaymentResponseDTO.class);
         var orderPatternDetail = orderPatternDetailRepository.findByTransactionId(transactionId)
                 .orElseThrow(() -> new RuntimeException("Order not existed"));
         orderPatternDetail.setStatus(payload.getStatus());
