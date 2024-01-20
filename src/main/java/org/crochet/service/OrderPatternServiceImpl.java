@@ -1,6 +1,5 @@
 package org.crochet.service;
 
-import com.google.gson.Gson;
 import lombok.SneakyThrows;
 import org.crochet.enumerator.OrderIntent;
 import org.crochet.enumerator.PaymentLandingPage;
@@ -8,7 +7,6 @@ import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.model.Order;
 import org.crochet.model.OrderPatternDetail;
 import org.crochet.model.User;
-import org.crochet.payload.dto.CapturePaymentResponseDTO;
 import org.crochet.payload.dto.MoneyDTO;
 import org.crochet.payload.dto.OrderDTO;
 import org.crochet.payload.dto.OrderResponseDTO;
@@ -40,20 +38,17 @@ public class OrderPatternServiceImpl implements OrderPatternService {
     private final PatternRepository patternRepository;
     private final OrderRepository orderRepository;
     private final OrderPatternDetailRepository orderPatternDetailRepository;
-    private final Gson gson;
 
     public OrderPatternServiceImpl(PayPalService payPalService,
                                    UserRepository userRepository,
                                    PatternRepository patternRepository,
                                    OrderRepository orderRepository,
-                                   OrderPatternDetailRepository orderPatternDetailRepository,
-                                   Gson gson) {
+                                   OrderPatternDetailRepository orderPatternDetailRepository) {
         this.payPalService = payPalService;
         this.userRepository = userRepository;
         this.patternRepository = patternRepository;
         this.orderRepository = orderRepository;
         this.orderPatternDetailRepository = orderPatternDetailRepository;
-        this.gson = gson;
     }
 
     private static OrderDTO createOrderDTO(String currencyCode, String value) {
@@ -96,8 +91,7 @@ public class OrderPatternServiceImpl implements OrderPatternService {
         var orderDTO = createOrderDTO(pattern.getCurrencyCode().getValue(),
                 String.valueOf(pattern.getPrice()));
 
-        var content = payPalService.createOrder(orderDTO);
-        var orderResponseDTO = gson.fromJson(MonoUtils.block(content), OrderResponseDTO.class);
+        var orderResponseDTO = MonoUtils.block(payPalService.createOrder(orderDTO));
 
         var order = Order.builder()
                 .user(user)
@@ -120,8 +114,7 @@ public class OrderPatternServiceImpl implements OrderPatternService {
     @Transactional
     @Override
     public String capturePayment(String transactionId) {
-        var content = payPalService.capturePayment(transactionId);
-        var payload = gson.fromJson(MonoUtils.block(content), CapturePaymentResponseDTO.class);
+        var payload = MonoUtils.block(payPalService.capturePayment(transactionId));
         var orderPatternDetail = orderPatternDetailRepository.findByTransactionId(transactionId)
                 .orElseThrow(() -> new RuntimeException("Order not existed"));
         orderPatternDetail.setStatus(payload.getStatus());
