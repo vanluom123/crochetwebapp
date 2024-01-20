@@ -8,4 +8,5 @@ import lombok.Data;
 public class ProductCategoryRequest {
     private String id;
     private String categoryName;
+    private String parentCategoryName;
 }

@@ -3,6 +3,9 @@ package org.crochet.model;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
@@ -26,18 +29,7 @@ public class ProductCategory extends BaseEntity {
     @OneToMany(mappedBy = "productCategory", cascade = CascadeType.ALL)
     private Set<Product> products;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        ProductCategory that = (ProductCategory) o;
-
-        return Objects.equals(categoryName, that.categoryName);
-    }
-
-    @Override
-    public int hashCode() {
-        return categoryName != null ? categoryName.hashCode() : 0;
-    }
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "parent_category_id", columnDefinition = "BINARY(16) NULL")
+    private ProductCategory parentCategory;
 }
