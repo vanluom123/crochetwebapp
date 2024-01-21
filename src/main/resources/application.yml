@@ -35,8 +35,8 @@ spring:
 app:
   auth:
     tokenSecret: ${TOKEN_SECRET}
-    tokenExpirationMs: 864000000 # 1 day
-    refresh-token-expiration-ms: 604800000 # 7 days
+    tokenExpirationMs: 900000 # 15 minutes
+    refresh-token-expiration-ms: 86400000 # 1 day
   cors:
     allowedOrigins: http://localhost:3000,http://localhost:8080
   oauth2:

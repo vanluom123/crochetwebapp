@@ -5,12 +5,12 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.crochet.payload.request.LoginRequest;
 import org.crochet.payload.request.PasswordResetRequest;
 import org.crochet.payload.request.SignUpRequest;
 import org.crochet.payload.response.AuthResponse;
+import org.crochet.payload.response.TokenResponse;
 import org.crochet.service.contact.AuthService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,8 +20,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.io.IOException;
 
 @RestController
 @RequestMapping("/auth")
@@ -100,18 +98,14 @@ public class AuthController {
     }
 
     @PostMapping("/refresh-token")
-    public void refreshToken(
-            HttpServletRequest request,
-            HttpServletResponse response
-    ) throws IOException {
-        authService.refreshToken(request, response);
+    public ResponseEntity<TokenResponse> refreshToken(@RequestParam("refreshToken") String refreshToken) {
+        var tokenResponse = authService.refreshToken(refreshToken);
+        return ResponseEntity.ok(tokenResponse);
     }
 
     @GetMapping("/logout")
-    public void logout(
-            HttpServletRequest request,
-            HttpServletResponse response
-    ) {
-        authService.logout(request, response);
+    public ResponseEntity<String> logout(HttpServletRequest request) {
+        authService.logout(request);
+        return ResponseEntity.ok("Logout successful");
     }
 }

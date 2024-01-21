@@ -28,14 +28,11 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     private static final Logger logger = LoggerFactory.getLogger(TokenAuthenticationFilter.class);
     private final JwtTokenService jwtTokenService;
     private final CustomUserDetailsService customUserDetailsService;
-    private final TokenService tokenService;
 
     public TokenAuthenticationFilter(JwtTokenService jwtTokenService,
-                                     CustomUserDetailsService customUserDetailsService,
-                                     TokenService tokenService) {
+                                     CustomUserDetailsService customUserDetailsService) {
         this.jwtTokenService = jwtTokenService;
         this.customUserDetailsService = customUserDetailsService;
-        this.tokenService = tokenService;
     }
 
     /**
@@ -58,14 +55,11 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
             // Check if the JWT exists and is valid
             if (hasText(jwtToken) && jwtTokenService.validateToken(jwtToken)) {
-                String userEmail = jwtTokenService.extractUsername(jwtToken);
+                String username = jwtTokenService.extractUsername(jwtToken);
 
                 // Load the user details by email
-                UserDetails userDetails = customUserDetailsService.loadUserByUsername(userEmail);
-                var isTokenValid = tokenService.getByToken(jwtToken)
-                        .map(t -> !t.isExpired() && !t.isRevoked())
-                        .orElse(false);
-                if (jwtTokenService.isTokenValid(jwtToken, userDetails) && isTokenValid) {
+                UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
+                if (jwtTokenService.isTokenValid(jwtToken, userDetails)) {
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                             userDetails,
                             null,
