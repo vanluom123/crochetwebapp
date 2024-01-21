@@ -1,30 +1,31 @@
 package org.crochet.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.crochet.exception.EmailVerificationException;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.exception.TokenException;
 import org.crochet.model.ConfirmationToken;
 import org.crochet.model.PasswordResetToken;
+import org.crochet.model.RefreshToken;
 import org.crochet.model.User;
 import org.crochet.payload.request.LoginRequest;
 import org.crochet.payload.request.PasswordResetRequest;
 import org.crochet.payload.request.SignUpRequest;
 import org.crochet.payload.response.AuthResponse;
+import org.crochet.payload.response.TokenResponse;
 import org.crochet.service.contact.AuthService;
 import org.crochet.service.contact.ConfirmTokenService;
 import org.crochet.service.contact.EmailSender;
+import org.crochet.service.contact.JwtTokenService;
 import org.crochet.service.contact.PasswordResetTokenService;
-import org.crochet.service.contact.TokenService;
+import org.crochet.service.contact.RefreshTokenService;
 import org.crochet.service.contact.UserService;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 
 import static org.crochet.constant.MessageConstant.ACTIVE_NOW;
@@ -33,6 +34,7 @@ import static org.crochet.constant.MessageConstant.CONFIRM_YOUR_EMAIL;
 import static org.crochet.constant.MessageConstant.RESET_NOTIFICATION;
 import static org.crochet.constant.MessageConstant.RESET_PASSWORD;
 import static org.crochet.constant.MessageConstant.RESET_YOUR_PASSWORD_CONTENT;
+import static org.springframework.util.StringUtils.hasText;
 
 /**
  * AuthServiceImpl class
@@ -42,22 +44,25 @@ public class AuthServiceImpl implements AuthService {
     private final ConfirmTokenService confirmTokenService;
     private final PasswordResetTokenService passwordResetTokenService;
     private final UserService userService;
-    private final TokenService tokenService;
     private final EmailSender emailSender;
     private final PasswordEncoder passwordEncoder;
+    private final RefreshTokenService refreshTokenService;
+    private final JwtTokenService jwtTokenService;
 
     public AuthServiceImpl(ConfirmTokenService confirmTokenService,
                            PasswordResetTokenService passwordResetTokenService,
                            UserService userService,
-                           TokenService tokenService,
                            EmailSender emailSender,
-                           PasswordEncoder passwordEncoder) {
+                           PasswordEncoder passwordEncoder,
+                           RefreshTokenService refreshTokenService,
+                           JwtTokenService jwtTokenService) {
         this.confirmTokenService = confirmTokenService;
         this.passwordResetTokenService = passwordResetTokenService;
         this.userService = userService;
-        this.tokenService = tokenService;
         this.emailSender = emailSender;
         this.passwordEncoder = passwordEncoder;
+        this.refreshTokenService = refreshTokenService;
+        this.jwtTokenService = jwtTokenService;
     }
 
     /**
@@ -70,11 +75,18 @@ public class AuthServiceImpl implements AuthService {
     public AuthResponse authenticateUser(LoginRequest loginRequest) {
         // Check email and password
         var user = userService.checkLogin(loginRequest.getEmail(), loginRequest.getPassword());
-        var tokenResponse = tokenService.createToken(user);
+        // Check email verified
+        if (!user.getEmailVerified()) {
+            throw new ResourceNotFoundException("Email not verified");
+        }
+        // Create refresh token
+        var refreshToken = refreshTokenService.createRefreshToken(user.getEmail());
+        // Get access token
+        var accessToken = jwtTokenService.generateToken(user.getEmail());
         // Return the authentication token in an AuthResponse
         return AuthResponse.builder()
-                .accessToken(tokenResponse.getJwtToken())
-                .refreshToken(tokenResponse.getRefreshToken())
+                .accessToken(accessToken)
+                .refreshToken(refreshToken.getToken())
                 .role(user.getRole().getValue())
                 .email(user.getEmail())
                 .build();
@@ -322,24 +334,25 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        var tokenResponse = tokenService.refreshToken(request, response);
-        var authResponse = AuthResponse.builder()
-                .accessToken(tokenResponse.getJwtToken())
-                .refreshToken(tokenResponse.getRefreshToken())
-                .build();
-        ObjectMapper om = new ObjectMapper();
-        String jsonResponse = om.writeValueAsString(authResponse);
-
-        // Set Content-Type to application/json
-        response.setContentType("application/json");
-
-        // Write JSON to outputStream of HttpServletResponse
-        response.getWriter().write(jsonResponse);
+    public TokenResponse refreshToken(String refreshToken) {
+        return refreshTokenService.findByToken(refreshToken)
+                .map(refreshTokenService::verifyExpiration)
+                .map(RefreshToken::getUser)
+                .map(user -> {
+                    String accessToken = jwtTokenService.generateToken(user.getEmail());
+                    return TokenResponse.builder()
+                            .jwtToken(accessToken)
+                            .refreshToken(refreshToken)
+                            .build();
+                }).orElseThrow(() -> new ResourceNotFoundException("Refresh Token is not in DB..!!"));
     }
 
     @Override
-    public void logout(HttpServletRequest request, HttpServletResponse response) {
-        tokenService.logout(request, response);
+    public void logout(HttpServletRequest request) {
+        var token = request.getHeader("refresh_token");
+        if (hasText(token)) {
+            refreshTokenService.revokeByToken(token);
+            SecurityContextHolder.clearContext();
+        }
     }
 }

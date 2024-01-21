@@ -17,15 +17,11 @@ public interface JwtTokenService {
 
     boolean isTokenValid(String token, UserDetails userDetails);
 
-    String generateToken(UserDetails userDetails);
+    String generateToken(String username);
 
     String generateToken(
             Map<String, Object> extraClaims,
-            UserDetails userDetails
-    );
-
-    String generateRefreshToken(
-            UserDetails userDetails
+            String username
     );
 
     @Deprecated
