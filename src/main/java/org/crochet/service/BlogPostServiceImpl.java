@@ -16,13 +16,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
-
-import static org.crochet.util.ConvertUtils.convertMultipartToString;
 
 /**
  * BlogPostServiceImpl class
@@ -46,19 +42,18 @@ public class BlogPostServiceImpl implements BlogPostService {
      * If the request does not contain an ID, it creates a new blog post.
      *
      * @param request The {@link BlogPostRequest} containing information for creating or updating the blog post.
-     * @param files
      * @return
      */
     @Transactional
     @Override
-    public String createOrUpdatePost(BlogPostRequest request, List<MultipartFile> files) {
+    public BlogPostResponse createOrUpdatePost(BlogPostRequest request) {
         var blogPost = (request.getId() == null) ? new BlogPost() : findOne(request.getId());
         blogPost.setTitle(request.getTitle());
         blogPost.setContent(request.getContent());
         blogPost.setCreationDate(LocalDateTime.now());
-        blogPost.setFiles(convertMultipartToString(files));
-        blogPostRepo.save(blogPost);
-        return "Create blog successfully";
+        blogPost.setFiles(request.getFiles());
+        blogPost = blogPostRepo.save(blogPost);
+        return BlogPostMapper.INSTANCE.toResponse(blogPost);
     }
 
     /**

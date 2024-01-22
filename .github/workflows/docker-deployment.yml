@@ -23,9 +23,6 @@ jobs:
         uses: docker/build-push-action@v5
         id: docker_build
         with:
-          build-args: |
-            GITHUB_ACTOR=${{ secrets.GIT_ACTOR }}
-            GITHUB_TOKEN=${{ secrets.GIT_TOKEN }}
           builder: ${{ steps.buildx.outputs.name }}
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/crochet:latest

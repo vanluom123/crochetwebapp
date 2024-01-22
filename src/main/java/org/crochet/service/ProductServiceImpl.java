@@ -19,7 +19,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -51,12 +50,11 @@ public class ProductServiceImpl implements ProductService {
      * If no product with the specified ID is found, a new product will be created.
      *
      * @param request The {@link ProductRequest} containing information for creating or updating the product.
-     * @param files
      * @return A {@link ProductResponse} representing the created or updated product.
      */
     @Transactional
     @Override
-    public ProductResponse createOrUpdate(ProductRequest request, List<MultipartFile> files) {
+    public ProductResponse createOrUpdate(ProductRequest request) {
         var category = productCategoryRepo.findById(UUID.fromString(request.getProductCategoryId()))
                 .orElseThrow(() -> new ResourceNotFoundException("Product category not found"));
         var product = (request.getId() == null) ? new Product()
@@ -66,7 +64,7 @@ public class ProductServiceImpl implements ProductService {
         product.setPrice(request.getPrice());
         product.setDescription(request.getDescription());
         product.setCurrencyCode(request.getCurrencyCode());
-        product.setFiles(ConvertUtils.convertMultipartToString(files));
+        product.setFiles(request.getFiles());
         product = productRepo.save(product);
         return ProductMapper.INSTANCE.toResponse(product);
     }
