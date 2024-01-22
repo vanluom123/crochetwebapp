@@ -40,7 +40,7 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
      */
     @Transactional
     @Override
-    public String createOrUpdate(ProductCategoryRequest request) {
+    public ProductCategoryResponseDto createOrUpdate(ProductCategoryRequest request) {
         var category = (request.getId() == null) ? new ProductCategory() : findOne(request.getId());
         if (validateCategoryName(request.getCategoryName())) {
             throw new IllegalArgumentException("Category name is duplicated");
@@ -58,8 +58,8 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
 
         category.setCategoryName(request.getCategoryName());
         category.setParentCategory(parentCategory);
-        productCategoryRepo.save(category);
-        return "Create success";
+        category = productCategoryRepo.save(category);
+        return ProductCategoryMapper.INSTANCE.toDto(category);
     }
 
     /**

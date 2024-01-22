@@ -7,7 +7,7 @@ import org.crochet.payload.response.ProductCategoryResponseDto;
 import java.util.List;
 
 public interface ProductCategoryService {
-    String createOrUpdate(ProductCategoryRequest request);
+    ProductCategoryResponseDto createOrUpdate(ProductCategoryRequest request);
 
     List<ProductCategoryResponse> getAll();
 
