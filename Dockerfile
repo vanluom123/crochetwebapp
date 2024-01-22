@@ -1,12 +1,6 @@
 FROM eclipse-temurin:17-jdk-alpine AS build
 WORKDIR /workspace/app
 
-ARG GITHUB_ACTOR
-ARG GITHUB_TOKEN
-
-ENV GITHUB_ACTOR ${GITHUB_ACTOR}
-ENV GITHUB_TOKEN ${GITHUB_TOKEN}
-
 COPY . /workspace/app
 RUN --mount=type=cache,target=/root/.gradle
 RUN chmod +x ./gradlew

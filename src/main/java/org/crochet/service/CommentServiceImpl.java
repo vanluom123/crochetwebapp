@@ -1,9 +1,11 @@
 package org.crochet.service;
 
 import org.crochet.exception.ResourceNotFoundException;
+import org.crochet.mapper.CommentMapper;
 import org.crochet.model.Comment;
 import org.crochet.model.User;
 import org.crochet.payload.request.CommentRequest;
+import org.crochet.payload.response.CommentResponse;
 import org.crochet.repository.BlogPostRepository;
 import org.crochet.repository.CommentRepository;
 import org.crochet.repository.UserRepository;
@@ -48,11 +50,12 @@ public class CommentServiceImpl implements CommentService {
      * If the request does not contain an ID, it creates a new comment.
      *
      * @param request The {@link CommentRequest} containing information for creating or updating the comment.
+     * @return
      * @throws ResourceNotFoundException If an existing comment is to be updated, and the specified ID is not found.
      */
     @Transactional
     @Override
-    public void createOrUpdate(CommentRequest request) {
+    public CommentResponse createOrUpdate(CommentRequest request) {
         var auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !(auth.getPrincipal() instanceof UserPrincipal principal)) {
             throw new ResourceNotFoundException("User hasn't signed in");
@@ -74,7 +77,8 @@ public class CommentServiceImpl implements CommentService {
         }
         comment.setContent(request.getContent());
         comment.setCreatedDate(LocalDateTime.now());
-        commentRepo.save(comment);
+        comment = commentRepo.save(comment);
+        return CommentMapper.INSTANCE.toResponse(comment);
     }
 
     private Comment findOne(String id) {

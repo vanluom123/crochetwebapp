@@ -9,20 +9,17 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.crochet.constant.AppConstant;
 import org.crochet.payload.request.BlogPostRequest;
 import org.crochet.payload.response.BlogPostPaginationResponse;
+import org.crochet.payload.response.BlogPostResponse;
 import org.crochet.service.contact.BlogPostService;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/blog")
@@ -37,26 +34,14 @@ public class BlogController {
     @ApiResponse(responseCode = "201", description = "Blog post created or updated successfully",
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = String.class)))
-    @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/create")
     @PreAuthorize("hasRole('ADMIN')")
     @SecurityRequirement(name = "BearerAuth")
-    public ResponseEntity<String> createOrUpdatePost(
-            @Parameter(description = "ID of the blog post (optional)")
-            @RequestParam(value = "id", required = false) String id,
-            @Parameter(description = "Title of the blog post", required = true)
-            @RequestParam(value = "title") String title,
-            @Parameter(description = "Content of the blog post", required = true)
-            @RequestParam(value = "content") String content,
-            @Parameter(description = "Files to upload (optional)")
-            @RequestPart(value = "files", required = false) List<MultipartFile> files) {
-        var request = BlogPostRequest.builder()
-                .id(id)
-                .title(title)
-                .content(content)
-                .build();
-        var result = blogPostService.createOrUpdatePost(request, files);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(result);
+    public ResponseEntity<BlogPostResponse> createOrUpdatePost(
+            @RequestBody BlogPostRequest request
+    ) {
+        var result = blogPostService.createOrUpdatePost(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
 
     @Operation(summary = "Get paginated list of blog posts")

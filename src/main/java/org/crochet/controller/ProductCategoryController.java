@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.Valid;
 import org.crochet.payload.request.ProductCategoryRequest;
 import org.crochet.payload.response.ProductCategoryResponse;
 import org.crochet.payload.response.ProductCategoryResponseDto;
@@ -14,8 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -35,16 +36,9 @@ public class ProductCategoryController {
     @PostMapping("/create")
     @PreAuthorize("hasRole('ADMIN')")
     @SecurityRequirement(name = "BearerAuth")
-    public ResponseEntity<String> createCategory(
-            @RequestParam(value = "id", required = false) String id,
-            @RequestParam(value = "categoryName") String categoryName,
-            @RequestParam(value = "parentCategoryName", required = false) String parentCategoryName
+    public ResponseEntity<ProductCategoryResponseDto> createCategory(
+            @Valid @RequestBody ProductCategoryRequest request
     ) {
-        var request = ProductCategoryRequest.builder()
-                .id(id)
-                .categoryName(categoryName)
-                .parentCategoryName(parentCategoryName)
-                .build();
         var response = productCategoryService.createOrUpdate(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
