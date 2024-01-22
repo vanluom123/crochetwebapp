@@ -7,24 +7,19 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.crochet.constant.AppConstant;
-import org.crochet.enumerator.CurrencyCode;
 import org.crochet.payload.request.PatternRequest;
 import org.crochet.payload.response.PatternPaginationResponse;
 import org.crochet.payload.response.PatternResponse;
 import org.crochet.service.contact.PatternService;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/pattern")
@@ -39,24 +34,12 @@ public class PatternController {
     @ApiResponse(responseCode = "201", description = "Pattern created successfully",
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = String.class)))
-    @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/create")
     @PreAuthorize("hasRole('ADMIN')")
     @SecurityRequirement(name = "BearerAuth")
-    public ResponseEntity<String> createPattern(
-            @RequestParam(value = "id", required = false) String id,
-            @RequestParam(value = "name", required = false) String name,
-            @RequestParam(value = "description", required = false) String description,
-            @RequestParam(value = "price") double price,
-            @RequestParam(value = "currency_code") CurrencyCode currencyCode,
-            @RequestPart(required = false) List<MultipartFile> files) {
-        var request = PatternRequest.builder()
-                .id(id)
-                .name(name)
-                .description(description)
-                .price(price)
-                .currencyCode(currencyCode)
-                .build();
-        var result = patternService.createOrUpdate(request, files);
+    public ResponseEntity<PatternResponse> createPattern(
+            @RequestBody PatternRequest request) {
+        var result = patternService.createOrUpdate(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
 

@@ -4,6 +4,8 @@ import lombok.Builder;
 import lombok.Data;
 import org.crochet.enumerator.CurrencyCode;
 
+import java.util.List;
+
 @Data
 @Builder
 public class PatternRequest {
@@ -12,4 +14,5 @@ public class PatternRequest {
     private String description;
     private double price;
     private CurrencyCode currencyCode;
+    private List<String> files;
 }
