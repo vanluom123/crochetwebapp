@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/product")
 public class ProductController {
@@ -71,7 +73,7 @@ public class ProductController {
                     schema = @Schema(implementation = ProductResponse.class)))
     @ApiResponse(responseCode = "404", description = "Product not found")
     @GetMapping("/detail")
-    public ResponseEntity<ProductResponse> getProductDetail(@RequestParam("id") String id) {
+    public ResponseEntity<ProductResponse> getProductDetail(@RequestParam("id") UUID id) {
         return ResponseEntity.ok(productService.getDetail(id));
     }
 }

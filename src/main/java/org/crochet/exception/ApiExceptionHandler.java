@@ -2,6 +2,7 @@ package org.crochet.exception;
 
 import lombok.extern.slf4j.Slf4j;
 import org.crochet.constant.MessageConstant;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -21,19 +22,19 @@ public class ApiExceptionHandler {
                 .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
                 .build();
         log.error(ex.getMessage());
-        log.error(ex.getCause().toString());
+        log.error(ex.toString());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
 
     @ExceptionHandler({AuthenticationException.class})
     public ResponseEntity<ApiError> handleAuthenticationException(AuthenticationException ex) {
         ApiError error = ApiError.builder()
-            .message(ex.getMessage())
-            .code(HttpStatus.UNAUTHORIZED.value())
-            .error(HttpStatus.UNAUTHORIZED.getReasonPhrase())
-            .build();
+                .message(ex.getMessage())
+                .code(HttpStatus.UNAUTHORIZED.value())
+                .error(HttpStatus.UNAUTHORIZED.getReasonPhrase())
+                .build();
         log.error(ex.getMessage());
-        log.error(ex.getCause().toString());
+        log.error(ex.toString());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
     }
 
@@ -45,7 +46,7 @@ public class ApiExceptionHandler {
                 .error(HttpStatus.FORBIDDEN.getReasonPhrase())
                 .build();
         log.error(ex.getMessage());
-        log.error(ex.getCause().toString());
+        log.error(ex.toString());
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
     }
 
@@ -57,7 +58,7 @@ public class ApiExceptionHandler {
                 .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
                 .build();
         log.error(ex.getMessage());
-        log.error(ex.getCause().toString());
+        log.error(ex.toString());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(err);
     }
 
@@ -70,7 +71,7 @@ public class ApiExceptionHandler {
                 .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
                 .build();
         log.error(ex.getMessage());
-        log.error(ex.getCause().toString());
+        log.error(ex.toString());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(err);
     }
 
@@ -82,7 +83,7 @@ public class ApiExceptionHandler {
                 .error(HttpStatus.NOT_FOUND.getReasonPhrase())
                 .build();
         log.error(ex.getMessage());
-        log.error(ex.getCause().toString());
+        log.error(ex.toString());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(err);
     }
 
@@ -94,7 +95,7 @@ public class ApiExceptionHandler {
                 .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
                 .build();
         log.error(ex.getMessage());
-        log.error(ex.getCause().toString());
+        log.error(ex.toString());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(err);
     }
 
@@ -106,7 +107,7 @@ public class ApiExceptionHandler {
                 .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
                 .build();
         log.error(ex.getMessage());
-        log.error(ex.getCause().toString());
+        log.error(ex.toString());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(err);
     }
 
@@ -118,7 +119,19 @@ public class ApiExceptionHandler {
                 .error(HttpStatus.NOT_FOUND.getReasonPhrase())
                 .build();
         log.error(ex.getMessage());
-        log.error(ex.getCause().toString());
+        log.error(ex.toString());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(err);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ApiError> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
+        ApiError err = ApiError.builder()
+                .message(ex.getRootCause().getMessage())
+                .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
+                .build();
+        log.error(ex.getMessage());
+        log.error(ex.toString());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(err);
     }
 }
