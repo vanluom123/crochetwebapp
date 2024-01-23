@@ -2,7 +2,7 @@ version: '3'
 services:
   # Spring Boot application
   web:
-    image: phanvanluom97bd/crochet
+    image: phanvanluom97bd/crochet:latest
     ports:
       - "8080:8080"
     depends_on:
@@ -10,12 +10,12 @@ services:
     environment:
       ENV: local
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/testDB?autoReconnect=true&useSSL=false
-      APP_PASSWORD: bnptvnwccmxgwuxq
-      GOOGLE_CLIENT_SECRET: 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
-      GOOGLE_CLIENT_ID: 782330301173-u95n2p5pc6obg6nim17bq7m4kmm861tt.apps.googleusercontent.com
-      TOKEN_SECRET: 37e2a786c5dc962fac3cfcf5c72b592339abbd7433148e8ed2dd0fc13f1d7402a53de020cb3b0b75f534b9937e191943f3feff64c88af6fbb3eb9e47dccadfa2
-      PAYPAL_CLIENT_ID: AYw-XWRSOe3r11W37cF26rxf3tUBn8X1dPala2Lux2cGHbK6NYMiyYB_2SES46YjIx1a9zLuMSHSJpYD
-      PAYPAL_CLIENT_SECRET: EENLA_G2RtWbTYgY6i90ApZkYdctBuY2AcgnsHhct0sbCnwWiM_J55NTmmEsLbiDcNpnLEfBWPneTmwF
+      APP_PASSWORD: ${APP_PASSWORD}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      TOKEN_SECRET: ${TOKEN_SECRET}
+      PAYPAL_CLIENT_ID: ${PAYPAL_CLIENT_ID}
+      PAYPAL_CLIENT_SECRET: ${PAYPAL_CLIENT_SECRET}
 
   # MySQL database
   mysql:

@@ -23,6 +23,8 @@ jobs:
         uses: docker/build-push-action@v5
         id: docker_build
         with:
+          build-args: |
+            AZURE_STORAGE_CONNECTION_STRING=${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
           builder: ${{ steps.buildx.outputs.name }}
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/crochet:latest
