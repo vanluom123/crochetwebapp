@@ -35,6 +35,7 @@ jobs:
           APP_PASSWORD: ${{ secrets.APP_PASSWORD }}
           PAYPAL_CLIENT_ID: ${{ secrets.PAYPAL_CLIENT_ID }}
           PAYPAL_CLIENT_SECRET: ${{ secrets.PAYPAL_CLIENT_SECRET }}
+          AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
         run: |
           chmod +x gradlew
           ./gradlew build
