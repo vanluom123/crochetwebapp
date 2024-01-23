@@ -52,3 +52,8 @@ app:
 paypal:
   username: ${PAYPAL_CLIENT_ID}
   password: ${PAYPAL_CLIENT_SECRET}
+
+azure:
+  storage:
+    azure-storage-connection-string: ${AZURE_STORAGE_CONNECTION_STRING}
+    azure-storage-container-name: crochetcontainers
