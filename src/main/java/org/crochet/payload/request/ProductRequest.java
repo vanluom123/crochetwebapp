@@ -2,21 +2,20 @@ package org.crochet.payload.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
 import org.crochet.enumerator.CurrencyCode;
 
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @Builder
 public class ProductRequest {
-    private String id;
+    private UUID id;
     @NotBlank
-    @NotNull
-    @JsonProperty("product_category_id")
-    private String productCategoryId;
+    @JsonProperty("category_id")
+    private UUID categoryId;
     private String name;
     private String description;
     private double price;

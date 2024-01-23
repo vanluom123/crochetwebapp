@@ -5,6 +5,7 @@ import org.crochet.payload.response.ProductPaginationResponse;
 import org.crochet.payload.response.ProductResponse;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface ProductService {
     ProductResponse createOrUpdate(ProductRequest request);
@@ -13,5 +14,5 @@ public interface ProductService {
 
     List<ProductResponse> getLimitedProducts();
 
-    ProductResponse getDetail(String id);
+    ProductResponse getDetail(UUID id);
 }
