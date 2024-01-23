@@ -97,14 +97,13 @@ public class SecurityConfig {
                                 "/*.js").permitAll()
                         .requestMatchers("/auth/**", "/oauth2/**").permitAll()
                         .requestMatchers("/blog/create",
-                                "/blog-file/create",
                                 "/comment/create",
                                 "/free-pattern/create",
                                 "/pattern/create",
-                                "/pattern-file/create",
-                                "/product-category/create",
-                                "/product/create",
-                                "/product-file/create").authenticated()
+                                "/category/create-with-parent",
+                                "/category/create-not-parent",
+                                "/category/update-not-parent",
+                                "/product/create").authenticated()
                         .requestMatchers(
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
