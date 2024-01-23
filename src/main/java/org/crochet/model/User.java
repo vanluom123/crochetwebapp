@@ -75,8 +75,5 @@ public class User extends BaseEntity {
     private Set<Order> orders;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private Set<Token> tokens;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private Set<RefreshToken> refreshTokens;
 }

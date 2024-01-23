@@ -7,11 +7,10 @@ import org.crochet.model.Product;
 import org.crochet.payload.request.ProductRequest;
 import org.crochet.payload.response.ProductPaginationResponse;
 import org.crochet.payload.response.ProductResponse;
-import org.crochet.repository.ProductCategoryRepository;
 import org.crochet.repository.ProductRepository;
 import org.crochet.repository.ProductSpecifications;
+import org.crochet.service.contact.CategoryService;
 import org.crochet.service.contact.ProductService;
-import org.crochet.util.ConvertUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,18 +28,17 @@ import java.util.UUID;
 @Service
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepo;
-    private final ProductCategoryRepository productCategoryRepo;
+    private final CategoryService categoryService;
 
     /**
      * Constructs a new {@code ProductServiceImpl} with the specified product repository.
      *
-     * @param productRepo         The repository for handling product-related operations.
-     * @param productCategoryRepo The repository for handling product category.
+     * @param productRepo The repository for handling product-related operations.
      */
     public ProductServiceImpl(ProductRepository productRepo,
-                              ProductCategoryRepository productCategoryRepo) {
+                              CategoryService categoryService) {
         this.productRepo = productRepo;
-        this.productCategoryRepo = productCategoryRepo;
+        this.categoryService = categoryService;
     }
 
     /**
@@ -55,11 +53,10 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     @Override
     public ProductResponse createOrUpdate(ProductRequest request) {
-        var category = productCategoryRepo.findById(UUID.fromString(request.getProductCategoryId()))
-                .orElseThrow(() -> new ResourceNotFoundException("Product category not found"));
+        var category = categoryService.findById(request.getCategoryId());
         var product = (request.getId() == null) ? new Product()
                 : findOne(request.getId());
-        product.setProductCategory(category);
+        product.setCategory(category);
         product.setName(request.getName());
         product.setPrice(request.getPrice());
         product.setDescription(request.getDescription());
@@ -121,13 +118,13 @@ public class ProductServiceImpl implements ProductService {
      * @return A {@link ProductResponse} containing detailed information about the product.
      */
     @Override
-    public ProductResponse getDetail(String id) {
+    public ProductResponse getDetail(UUID id) {
         var product = findOne(id);
         return ProductMapper.INSTANCE.toResponse(product);
     }
 
-    private Product findOne(String id) {
-        return productRepo.findById(UUID.fromString(id))
+    private Product findOne(UUID id) {
+        return productRepo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
     }
 }
