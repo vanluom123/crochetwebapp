@@ -43,8 +43,8 @@ public class Product extends BaseEntity {
     private CurrencyCode currencyCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_category_id", nullable = false)
-    private ProductCategory productCategory;
+    @JoinColumn(name = "category_id", columnDefinition = "BINARY(16) NOT NULL")
+    private Category category;
 
     @ElementCollection
     @CollectionTable(name = "product_file",
