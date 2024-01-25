@@ -3,7 +3,7 @@ package org.crochet.security.oauth2;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.crochet.config.AppProperties;
+import org.crochet.properties.AppProperties;
 import org.crochet.exception.BadRequestException;
 import org.crochet.service.contact.JwtTokenService;
 import org.crochet.util.CookieUtils;

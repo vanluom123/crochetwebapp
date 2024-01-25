@@ -1,5 +1,9 @@
 package org.crochet.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.crochet.payload.response.HomeResponse;
 import org.crochet.service.contact.FreePatternService;
 import org.crochet.service.contact.PatternService;
@@ -20,6 +24,9 @@ public class HomeController {
     @Autowired
     private FreePatternService freePatternService;
 
+    @Operation(summary = "Get home page data")
+    @ApiResponse(responseCode = "200", description = "Get home page data successfully",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = HomeResponse.class)))
     @GetMapping
     public ResponseEntity<HomeResponse> getHomes() {
         var products = productService.getLimitedProducts();

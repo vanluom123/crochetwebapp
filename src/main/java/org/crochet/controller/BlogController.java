@@ -37,9 +37,7 @@ public class BlogController {
     @PostMapping(value = "/create")
     @PreAuthorize("hasRole('ADMIN')")
     @SecurityRequirement(name = "BearerAuth")
-    public ResponseEntity<BlogPostResponse> createOrUpdatePost(
-            @RequestBody BlogPostRequest request
-    ) {
+    public ResponseEntity<BlogPostResponse> createOrUpdatePost(@RequestBody BlogPostRequest request) {
         var result = blogPostService.createOrUpdatePost(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
