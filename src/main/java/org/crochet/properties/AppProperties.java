@@ -1,4 +1,4 @@
-package org.crochet.config;
+package org.crochet.properties;
 
 import lombok.Getter;
 import org.springframework.boot.context.properties.ConfigurationProperties;

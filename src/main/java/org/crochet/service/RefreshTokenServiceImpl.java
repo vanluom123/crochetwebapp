@@ -1,6 +1,6 @@
 package org.crochet.service;
 
-import org.crochet.config.AppProperties;
+import org.crochet.properties.AppProperties;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.model.RefreshToken;
 import org.crochet.model.User;
@@ -10,13 +10,10 @@ import org.crochet.service.contact.RefreshTokenService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 @Service
 public class RefreshTokenServiceImpl implements RefreshTokenService {

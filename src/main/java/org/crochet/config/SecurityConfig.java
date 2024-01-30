@@ -100,9 +100,9 @@ public class SecurityConfig {
                                 "/comment/create",
                                 "/free-pattern/create",
                                 "/pattern/create",
-                                "/category/create-with-parent",
-                                "/category/create-not-parent",
-                                "/category/update-not-parent",
+                                "/category/create",
+                                "/category/update",
+                                "/firebase-storage/upload-file",
                                 "/product/create").authenticated()
                         .requestMatchers(
                                 "/swagger-ui/**",
