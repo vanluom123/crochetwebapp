@@ -1,6 +1,6 @@
 package org.crochet;
 
-import org.crochet.config.AppProperties;
+import org.crochet.properties.AppProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;

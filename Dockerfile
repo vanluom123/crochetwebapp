@@ -1,9 +1,6 @@
 FROM eclipse-temurin:17-jdk-alpine AS build
 WORKDIR /workspace/app
 
-ARG AZURE_STORAGE_CONNECTION_STRING
-ENV AZURE_STORAGE_CONNECTION_STRING=$AZURE_STORAGE_CONNECTION_STRING
-
 COPY . /workspace/app
 RUN --mount=type=cache,target=/root/.gradle
 RUN chmod +x ./gradlew

@@ -33,8 +33,7 @@ public class AuthController {
     @Operation(summary = "Authenticate user")
     @ApiResponse(responseCode = "200",
             description = "Authentication successful",
-            content = @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = AuthResponse.class)))
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuthResponse.class)))
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
         AuthResponse authResponse = authService.authenticateUser(loginRequest);
@@ -44,8 +43,7 @@ public class AuthController {
     @Operation(summary = "Register user")
     @ApiResponse(responseCode = "201",
             description = "Registration successful",
-            content = @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = ApiResponse.class)))
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponse.class)))
     @PostMapping("/signup")
     public ResponseEntity<String> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
         String response = authService.registerUser(signUpRequest);
@@ -56,8 +54,7 @@ public class AuthController {
     @Operation(summary = "Confirm user registration")
     @ApiResponse(responseCode = "200",
             description = "Confirmation successful",
-            content = @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = ApiResponse.class)))
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponse.class)))
     @GetMapping(path = "/confirm")
     public ResponseEntity<String> confirm(@RequestParam("token") String token) {
         return ResponseEntity.ok(authService.confirmToken(token));
@@ -66,8 +63,7 @@ public class AuthController {
     @Operation(summary = "Resend email verification")
     @ApiResponse(responseCode = "200",
             description = "Email verification resent successfully",
-            content = @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = ApiResponse.class)))
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponse.class)))
     @GetMapping("/resendVerificationEmail")
     public ResponseEntity<String> resendVerificationEmail(@RequestParam("email") String email) {
         String response = authService.resendVerificationEmail(email);
@@ -77,8 +73,7 @@ public class AuthController {
     @Operation(summary = "Request password reset link")
     @ApiResponse(responseCode = "200",
             description = "Password reset link sent successfully",
-            content = @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = ApiResponse.class)))
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponse.class)))
     @GetMapping("/password-reset-request")
     public ResponseEntity<String> resetPasswordRequest(@RequestParam("email") String email) {
         var response = authService.resetPasswordLink(email);
@@ -88,8 +83,7 @@ public class AuthController {
     @Operation(summary = "Reset password")
     @ApiResponse(responseCode = "200",
             description = "Password reset successful",
-            content = @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = ApiResponse.class)))
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponse.class)))
     @PostMapping("/reset-password")
     public ResponseEntity<String> resetPassword(@RequestParam("passwordResetToken") String passwordResetToken,
                                                 @RequestBody PasswordResetRequest passwordResetRequest) {
@@ -97,12 +91,20 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "Refresh access token")
+    @ApiResponse(responseCode = "200",
+            description = "Access token refreshed successfully",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = TokenResponse.class)))
     @PostMapping("/refresh-token")
     public ResponseEntity<TokenResponse> refreshToken(@RequestParam("refreshToken") String refreshToken) {
         var tokenResponse = authService.refreshToken(refreshToken);
         return ResponseEntity.ok(tokenResponse);
     }
 
+    @Operation(summary = "Logout")
+    @ApiResponse(responseCode = "200",
+            description = "Logout successful",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponse.class)))
     @GetMapping("/logout")
     public ResponseEntity<String> logout(HttpServletRequest request) {
         authService.logout(request);
