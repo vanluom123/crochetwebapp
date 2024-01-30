@@ -4,7 +4,6 @@ import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.CategoryMapper;
 import org.crochet.model.Category;
 import org.crochet.payload.request.CategoryCreationRequest;
-import org.crochet.payload.request.CategoryCreationWithParentRequest;
 import org.crochet.payload.request.CategoryUpdateRequest;
 import org.crochet.payload.response.CategoryResponse;
 import org.crochet.repository.CategoryRepo;
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -29,19 +27,8 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Transactional
     @Override
-    public CategoryResponse createWithParent(CategoryCreationWithParentRequest request) {
-        /*
-            Create child with parent
-            1. Check parent is existed
-                1.1. If existed, create child with parent
-                1.2. If not existed, create parent and create child with parent
-         */
-        Category parent = findByName(request.getParentName())
-                .orElseGet(() -> {
-                    var newParent = new Category();
-                    newParent.setName(request.getParentName());
-                    return categoryRepo.save(newParent);
-                }); // 1.2
+    public CategoryResponse create(CategoryCreationRequest request) {
+        Category parent = (request.getParentId() == null) ? null : findById(request.getParentId());
         var child = new Category();
         child.setName(request.getName());
         child.setParent(parent);
@@ -51,24 +38,11 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Transactional
     @Override
-    public CategoryResponse createNotParent(CategoryCreationRequest request) {
-        var category = new Category();
-        category.setName(request.getName());
-        category = categoryRepo.save(category);
-        return categoryMapper.toResponse(category);
-    }
-
-    @Transactional
-    @Override
-    public CategoryResponse updateNotParent(CategoryUpdateRequest request) {
+    public CategoryResponse update(CategoryUpdateRequest request) {
         var category = findById(request.getId());
         category.setName(request.getName());
         category = categoryRepo.save(category);
         return categoryMapper.toResponse(category);
-    }
-
-    public Optional<Category> findByName(String name) {
-        return categoryRepo.findByName(name);
     }
 
     @Override

@@ -2,20 +2,18 @@ package org.crochet.service.contact;
 
 import org.crochet.model.Category;
 import org.crochet.payload.request.CategoryCreationRequest;
-import org.crochet.payload.request.CategoryCreationWithParentRequest;
 import org.crochet.payload.request.CategoryUpdateRequest;
 import org.crochet.payload.response.CategoryResponse;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface CategoryService {
+    @Transactional
+    CategoryResponse create(CategoryCreationRequest request);
 
-    CategoryResponse createWithParent(CategoryCreationWithParentRequest request);
-
-    CategoryResponse createNotParent(CategoryCreationRequest request);
-
-    CategoryResponse updateNotParent(CategoryUpdateRequest request);
+    CategoryResponse update(CategoryUpdateRequest request);
 
     List<CategoryResponse> getParentCategories();
 
