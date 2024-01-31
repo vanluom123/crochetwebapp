@@ -11,7 +11,7 @@ import org.crochet.exception.ApiError;
 import org.crochet.payload.request.CategoryCreationRequest;
 import org.crochet.payload.request.CategoryUpdateRequest;
 import org.crochet.payload.response.CategoryResponse;
-import org.crochet.service.contact.CategoryService;
+import org.crochet.service.CategoryService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

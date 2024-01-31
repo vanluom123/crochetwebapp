@@ -10,7 +10,7 @@ import org.crochet.constant.AppConstant;
 import org.crochet.payload.request.PatternRequest;
 import org.crochet.payload.response.PatternPaginationResponse;
 import org.crochet.payload.response.PatternResponse;
-import org.crochet.service.contact.PatternService;
+import org.crochet.service.PatternService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

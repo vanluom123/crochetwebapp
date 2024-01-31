@@ -10,7 +10,7 @@ import org.crochet.constant.AppConstant;
 import org.crochet.payload.request.BlogPostRequest;
 import org.crochet.payload.response.BlogPostPaginationResponse;
 import org.crochet.payload.response.BlogPostResponse;
-import org.crochet.service.contact.BlogPostService;
+import org.crochet.service.BlogPostService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

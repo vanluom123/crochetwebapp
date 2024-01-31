@@ -11,7 +11,7 @@ import org.crochet.payload.request.PasswordResetRequest;
 import org.crochet.payload.request.SignUpRequest;
 import org.crochet.payload.response.AuthResponse;
 import org.crochet.payload.response.TokenResponse;
-import org.crochet.service.contact.AuthService;
+import org.crochet.service.AuthService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
