@@ -1,26 +1,22 @@
 package org.crochet.service.impl;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.NoSuchElementException;
-
-import org.crochet.client.paypal.PaymentOrder;
-import org.crochet.client.paypal.CompleteOrder;
-import org.crochet.service.PayPalService;
-import org.springframework.stereotype.Service;
-
 import com.paypal.core.PayPalHttpClient;
 import com.paypal.http.HttpResponse;
-import com.paypal.orders.AmountWithBreakdown;
-import com.paypal.orders.ApplicationContext;
-import com.paypal.orders.Order;
-import com.paypal.orders.OrderRequest;
-import com.paypal.orders.OrdersCaptureRequest;
-import com.paypal.orders.OrdersCreateRequest;
-import com.paypal.orders.PurchaseUnitRequest;
-
+import com.paypal.orders.*;
+import com.paypal.payments.CapturesRefundRequest;
+import com.paypal.payments.Money;
+import com.paypal.payments.Refund;
+import com.paypal.payments.RefundRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.crochet.client.paypal.CompleteOrder;
+import org.crochet.client.paypal.PaymentOrder;
+import org.crochet.exception.ResourceNotFoundException;
+import org.crochet.service.PayPalService;
+import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.io.IOException;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -51,7 +47,7 @@ public class PayPalServiceImpl implements PayPalService {
             String redirectUrl = order.links().stream()
                     .filter(link -> "approve".equals(link.rel()))
                     .findFirst()
-                    .orElseThrow(NoSuchElementException::new)
+                    .orElseThrow(() -> new ResourceNotFoundException("approve link not found"))
                     .href();
 
             return new PaymentOrder(order.status(), order.id(), redirectUrl);
@@ -66,7 +62,8 @@ public class PayPalServiceImpl implements PayPalService {
         OrdersCaptureRequest ordersCaptureRequest = new OrdersCaptureRequest(token);
         try {
             HttpResponse<Order> httpResponse = payPalHttpClient.execute(ordersCaptureRequest);
-            String status = httpResponse.result().status();
+            Order orderResult = httpResponse.result();
+            String status = orderResult.status();
             if (status != null) {
                 return new CompleteOrder(status, token);
             }
@@ -74,5 +71,23 @@ public class PayPalServiceImpl implements PayPalService {
             log.error(e.getMessage());
         }
         return new CompleteOrder("VOIDED");
+    }
+
+    @Override
+    public Refund refundPayment(String captureId, double refundAmount) {
+        RefundRequest request = new RefundRequest();
+        Money money = new Money();
+        money.currencyCode("USD");
+        money.value(String.valueOf(refundAmount));
+        request.amount(money);
+
+        CapturesRefundRequest capturesRefundRequest = new CapturesRefundRequest(captureId).requestBody(request);
+        try {
+            HttpResponse<Refund> refundHttpResponse = payPalHttpClient.execute(capturesRefundRequest);
+            return refundHttpResponse.result();
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            return new Refund();
+        }
     }
 }
