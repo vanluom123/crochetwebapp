@@ -1,9 +1,9 @@
 package org.crochet.service.contact;
 
-import org.crochet.payload.dto.OrderResponseDTO;
+import org.crochet.client.paypal.PaymentOrder;
 
 public interface OrderPatternService {
-    OrderResponseDTO createPayment(String patternId);
+    PaymentOrder createPayment(String patternId);
 
-    String capturePayment(String transactionId);
+    String completePayment(String transactionId);
 }

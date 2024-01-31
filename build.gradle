@@ -36,6 +36,8 @@ dependencies {
     implementation 'com.h2database:h2:2.2.220'
     implementation 'org.postgresql:postgresql:42.2.27'
 
+    implementation 'com.paypal.sdk:checkout-sdk:2.0.0'
+
     compileOnly 'org.projectlombok:lombok:1.18.30'
     annotationProcessor 'org.projectlombok:lombok:1.18.30'
 
@@ -52,7 +54,6 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test:6.2.0'
     testImplementation 'org.mockito:mockito-core:5.7.0'
     testImplementation 'org.mockito:mockito-junit-jupiter:5.7.0'
-    testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
 
     testCompileOnly 'org.projectlombok:lombok:1.18.30'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.30'

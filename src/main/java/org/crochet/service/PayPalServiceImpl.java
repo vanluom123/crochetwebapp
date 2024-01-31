@@ -1,45 +1,78 @@
 package org.crochet.service;
 
-import org.crochet.payload.dto.CapturePaymentResponseDTO;
-import org.crochet.payload.dto.OrderDTO;
-import org.crochet.payload.dto.OrderResponseDTO;
-import org.crochet.properties.PayPalProperties;
+import java.io.IOException;
+import java.util.List;
+import java.util.NoSuchElementException;
+
+import org.crochet.client.paypal.PaymentOrder;
+import org.crochet.client.paypal.CompleteOrder;
 import org.crochet.service.contact.PayPalService;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
+import com.paypal.core.PayPalHttpClient;
+import com.paypal.http.HttpResponse;
+import com.paypal.orders.AmountWithBreakdown;
+import com.paypal.orders.ApplicationContext;
+import com.paypal.orders.Order;
+import com.paypal.orders.OrderRequest;
+import com.paypal.orders.OrdersCaptureRequest;
+import com.paypal.orders.OrdersCreateRequest;
+import com.paypal.orders.PurchaseUnitRequest;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+@Slf4j
 @Service
 public class PayPalServiceImpl implements PayPalService {
-    private final WebClient webClient;
+    private final PayPalHttpClient payPalHttpClient;
 
-    public PayPalServiceImpl(WebClient.Builder builder,
-                             PayPalProperties paypalProps) {
-        this.webClient = builder.defaultHeaders(header -> {
-            header.setBasicAuth(
-                    paypalProps.getUsername(),
-                    paypalProps.getPassword()
-            );
-            header.add("Content-Type", "application/json");
-        }).build();
+    public PayPalServiceImpl(PayPalHttpClient payPalHttpClient) {
+        this.payPalHttpClient = payPalHttpClient;
     }
 
     @Override
-    public Mono<OrderResponseDTO> createOrder(OrderDTO orderDTO) {
-        String uri = "https://api-m.sandbox.paypal.com/v2/checkout/orders";
-        return webClient.post()
-                .uri(uri)
-                .body(Mono.just(orderDTO), OrderDTO.class)
-                .retrieve()
-                .bodyToMono(OrderResponseDTO.class);
+    public PaymentOrder createPayment(double fee) {
+        OrderRequest orderRequest = new OrderRequest();
+        orderRequest.checkoutPaymentIntent("CAPTURE");
+        AmountWithBreakdown amountBreakdown = new AmountWithBreakdown().currencyCode("USD").value(String.valueOf(fee));
+        PurchaseUnitRequest purchaseUnitRequest = new PurchaseUnitRequest().amountWithBreakdown(amountBreakdown);
+        orderRequest.purchaseUnits(List.of(purchaseUnitRequest));
+        String baseUri = ServletUriComponentsBuilder.fromCurrentContextPath().toUriString();
+        ApplicationContext applicationContext = new ApplicationContext()
+                .returnUrl(baseUri + "/api/checkout/order-pattern/success")
+                .cancelUrl("https://localhost:3000/cancel");
+        orderRequest.applicationContext(applicationContext);
+        OrdersCreateRequest ordersCreateRequest = new OrdersCreateRequest().requestBody(orderRequest);
+        try {
+            HttpResponse<Order> orderHttpResponse = payPalHttpClient.execute(ordersCreateRequest);
+            Order order = orderHttpResponse.result();
+
+            String redirectUrl = order.links().stream()
+                    .filter(link -> "approve".equals(link.rel()))
+                    .findFirst()
+                    .orElseThrow(NoSuchElementException::new)
+                    .href();
+
+            return new PaymentOrder(order.status(), order.id(), redirectUrl);
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            return new PaymentOrder("VOIDED");
+        }
     }
 
     @Override
-    public Mono<CapturePaymentResponseDTO> capturePayment(String orderId) {
-        String uri = "https://api-m.sandbox.paypal.com/v2/checkout/orders/" + orderId + "/capture";
-        return webClient.post()
-                .uri(uri)
-                .retrieve()
-                .bodyToMono(CapturePaymentResponseDTO.class);
+    public CompleteOrder completePayment(String token) {
+        OrdersCaptureRequest ordersCaptureRequest = new OrdersCaptureRequest(token);
+        try {
+            HttpResponse<Order> httpResponse = payPalHttpClient.execute(ordersCaptureRequest);
+            String status = httpResponse.result().status();
+            if (status != null) {
+                return new CompleteOrder(status, token);
+            }
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+        return new CompleteOrder("VOIDED");
     }
 }

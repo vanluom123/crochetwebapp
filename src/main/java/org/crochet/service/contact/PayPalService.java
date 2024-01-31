@@ -1,12 +1,9 @@
 package org.crochet.service.contact;
 
-import org.crochet.payload.dto.CapturePaymentResponseDTO;
-import org.crochet.payload.dto.OrderDTO;
-import org.crochet.payload.dto.OrderResponseDTO;
-import reactor.core.publisher.Mono;
+import org.crochet.client.paypal.CompleteOrder;
+import org.crochet.client.paypal.PaymentOrder;
 
 public interface PayPalService {
-    Mono<OrderResponseDTO> createOrder(OrderDTO orderDTO);
-
-    Mono<CapturePaymentResponseDTO> capturePayment(String orderId);
+    PaymentOrder createPayment(double fee);
+    CompleteOrder completePayment(String token);
 }

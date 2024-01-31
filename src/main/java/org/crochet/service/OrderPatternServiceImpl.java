@@ -1,17 +1,12 @@
 package org.crochet.service;
 
 import lombok.SneakyThrows;
-import org.crochet.enumerator.OrderIntent;
-import org.crochet.enumerator.PaymentLandingPage;
+import org.crochet.client.paypal.PaymentOrder;
+import org.crochet.enumerator.OrderStatus;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.model.Order;
 import org.crochet.model.OrderPatternDetail;
 import org.crochet.model.User;
-import org.crochet.payload.dto.MoneyDTO;
-import org.crochet.payload.dto.OrderDTO;
-import org.crochet.payload.dto.OrderResponseDTO;
-import org.crochet.payload.dto.PayPalAppContextDTO;
-import org.crochet.payload.dto.PurchaseUnit;
 import org.crochet.repository.OrderPatternDetailRepository;
 import org.crochet.repository.OrderRepository;
 import org.crochet.repository.PatternRepository;
@@ -19,16 +14,12 @@ import org.crochet.repository.UserRepository;
 import org.crochet.security.UserPrincipal;
 import org.crochet.service.contact.OrderPatternService;
 import org.crochet.service.contact.PayPalService;
-import org.crochet.util.MonoUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -51,33 +42,10 @@ public class OrderPatternServiceImpl implements OrderPatternService {
         this.orderPatternDetailRepository = orderPatternDetailRepository;
     }
 
-    private static OrderDTO createOrderDTO(String currencyCode, String value) {
-        String baseUri = ServletUriComponentsBuilder.fromCurrentContextPath().toUriString();
-        var appContext = PayPalAppContextDTO.builder()
-                .returnUrl(baseUri + "/api/checkout/order-pattern/success")
-                .brandName("Little Crochet")
-                .landingPage(PaymentLandingPage.BILLING)
-                .build();
-        MoneyDTO moneyDTO = MoneyDTO.builder()
-                .currencyCode(currencyCode)
-                .value(String.valueOf(value))
-                .build();
-        PurchaseUnit purchaseUnit = PurchaseUnit.builder()
-                .amount(moneyDTO)
-                .build();
-        List<PurchaseUnit> purchaseUnits = new ArrayList<>();
-        purchaseUnits.add(purchaseUnit);
-        return OrderDTO.builder()
-                .intent(OrderIntent.CAPTURE)
-                .applicationContext(appContext)
-                .purchaseUnits(purchaseUnits)
-                .build();
-    }
-
     @SneakyThrows
     @Transactional
     @Override
-    public OrderResponseDTO createPayment(String patternId) {
+    public PaymentOrder createPayment(String patternId) {
         var auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !(auth.getPrincipal() instanceof UserPrincipal principal)) {
             throw new ResourceNotFoundException("User hasn't signed in");
@@ -88,10 +56,7 @@ public class OrderPatternServiceImpl implements OrderPatternService {
         var pattern = patternRepository.findById(UUID.fromString(patternId))
                 .orElseThrow(() -> new RuntimeException("Pattern not found"));
 
-        var orderDTO = createOrderDTO(pattern.getCurrencyCode().getValue(),
-                String.valueOf(pattern.getPrice()));
-
-        var orderResponseDTO = MonoUtils.block(payPalService.createOrder(orderDTO));
+        var orderResponseDTO = payPalService.createPayment(pattern.getPrice());
 
         var order = Order.builder()
                 .user(user)
@@ -101,8 +66,8 @@ public class OrderPatternServiceImpl implements OrderPatternService {
         var orderPatternDetail = OrderPatternDetail.builder()
                 .order(order)
                 .pattern(pattern)
-                .transactionId(orderResponseDTO.getId())
-                .status(orderResponseDTO.getStatus())
+                .transactionId(orderResponseDTO.getPayId())
+                .status(OrderStatus.valueOf(orderResponseDTO.getStatus()))
                 .orderDate(Date.from(Instant.now()))
                 .build();
         orderPatternDetailRepository.save(orderPatternDetail);
@@ -113,11 +78,11 @@ public class OrderPatternServiceImpl implements OrderPatternService {
     @SneakyThrows
     @Transactional
     @Override
-    public String capturePayment(String transactionId) {
-        var payload = MonoUtils.block(payPalService.capturePayment(transactionId));
+    public String completePayment(String transactionId) {
+        var completeOrder = payPalService.completePayment(transactionId);
         var orderPatternDetail = orderPatternDetailRepository.findByTransactionId(transactionId)
                 .orElseThrow(() -> new RuntimeException("Order not existed"));
-        orderPatternDetail.setStatus(payload.getStatus());
+        orderPatternDetail.setStatus(OrderStatus.valueOf(completeOrder.getStatus()));
         orderPatternDetailRepository.save(orderPatternDetail);
         return "Payment success";
     }
