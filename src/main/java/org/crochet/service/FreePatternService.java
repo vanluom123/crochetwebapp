@@ -5,6 +5,7 @@ import org.crochet.payload.response.FreePatternResponse;
 import org.crochet.payload.response.PaginatedFreePatternResponse;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface FreePatternService {
     FreePatternResponse createOrUpdate(FreePatternRequest request);
@@ -14,4 +15,6 @@ public interface FreePatternService {
     List<FreePatternResponse> getLimitedFreePatterns();
 
     FreePatternResponse getDetail(String id);
+
+    void delete(UUID id);
 }

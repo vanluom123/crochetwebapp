@@ -127,4 +127,10 @@ public class ProductServiceImpl implements ProductService {
         return productRepo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
     }
+
+    @Transactional
+    @Override
+    public void delete(UUID id) {
+        productRepo.deleteById(id);
+    }
 }

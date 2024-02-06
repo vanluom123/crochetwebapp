@@ -131,4 +131,10 @@ public class PatternServiceImpl implements PatternService {
                         UUID.fromString(patternId))
                 .orElseThrow(() -> new ResourceNotFoundException("User not payment for this pattern"));
     }
+
+    @Transactional
+    @Override
+    public void deletePattern(UUID id) {
+        patternRepo.deleteById(id);
+    }
 }

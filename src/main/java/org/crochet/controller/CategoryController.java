@@ -88,4 +88,15 @@ public class CategoryController {
         var response = categoryService.getSubCategories(parentId);
         return ResponseEntity.ok(response);
     }
+
+    @Operation(summary = "Delete category")
+    @ApiResponse(responseCode = "200", description = "Category deleted",
+            content = {@Content(mediaType = "application/json", schema = @Schema(implementation = String.class))})
+    @ApiResponse(responseCode = "400", description = "Bad request",
+            content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))})
+    @DeleteMapping("/delete")
+    public ResponseEntity<String> delete(UUID id) {
+        categoryService.delete(id);
+        return ResponseEntity.ok("Category deleted");
+    }
 }

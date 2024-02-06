@@ -119,4 +119,10 @@ public class FreePatternServiceImpl implements FreePatternService {
         return freePatternRepo.findById(UUID.fromString(id))
                 .orElseThrow(() -> new ResourceNotFoundException("Free pattern not found"));
     }
+
+    @Transactional
+    @Override
+    public void delete(UUID id) {
+        freePatternRepo.deleteById(id);
+    }
 }

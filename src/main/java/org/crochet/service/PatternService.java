@@ -5,6 +5,7 @@ import org.crochet.payload.response.PatternPaginationResponse;
 import org.crochet.payload.response.PatternResponse;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface PatternService {
     PatternResponse createOrUpdate(PatternRequest request);
@@ -14,4 +15,6 @@ public interface PatternService {
     List<PatternResponse> getLimitedPatterns();
 
     PatternResponse getDetail(String id);
+
+    void deletePattern(UUID id);
 }

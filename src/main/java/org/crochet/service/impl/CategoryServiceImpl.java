@@ -72,4 +72,11 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryRepo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
     }
+
+    @Transactional
+    @Override
+    public void delete(UUID id) {
+        var category = findById(id);
+        categoryRepo.delete(category);
+    }
 }

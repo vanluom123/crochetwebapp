@@ -22,4 +22,6 @@ public interface CategoryService {
     CategoryResponse getById(UUID id);
 
     Category findById(UUID id);
+
+    void delete(UUID id);
 }

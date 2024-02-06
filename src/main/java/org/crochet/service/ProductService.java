@@ -15,4 +15,6 @@ public interface ProductService {
     List<ProductResponse> getLimitedProducts();
 
     ProductResponse getDetail(UUID id);
+
+    void delete(UUID id);
 }
