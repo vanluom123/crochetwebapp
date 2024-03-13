@@ -1,12 +1,6 @@
 package org.crochet.model;
 
-import jakarta.persistence.CollectionTable;
-import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -42,4 +36,8 @@ public class FreePattern extends BaseEntity {
             joinColumns = {@JoinColumn(name = "free_pattern_id", nullable = false)})
     @Column(name = "file_name", columnDefinition = "LONGBLOB")
     private List<String> files;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_free_pattern_id", columnDefinition = "BINARY(16) NOT NULL")
+    private CategoryFreePattern categoryFreePattern;
 }

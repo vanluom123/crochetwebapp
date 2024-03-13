@@ -1,16 +1,6 @@
 package org.crochet.model;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.CollectionTable;
-import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -53,4 +43,8 @@ public class Pattern extends BaseEntity {
 
     @OneToMany(mappedBy = "pattern", cascade = CascadeType.ALL)
     private Set<OrderPatternDetail> orderPatternDetails;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_pattern_id", columnDefinition = "BINARY(16) NOT NULL")
+    private CategoryPattern categoryPattern;
 }
