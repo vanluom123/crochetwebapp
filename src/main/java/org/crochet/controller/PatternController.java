@@ -10,16 +10,13 @@ import org.crochet.constant.AppConstant;
 import org.crochet.payload.request.PatternRequest;
 import org.crochet.payload.response.PatternPaginationResponse;
 import org.crochet.payload.response.PatternResponse;
-import org.crochet.service.contact.PatternService;
+import org.crochet.service.PatternService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/pattern")
@@ -75,5 +72,22 @@ public class PatternController {
             @Parameter(description = "ID of the pattern to retrieve")
             @RequestParam("id") String id) {
         return ResponseEntity.ok(patternService.getDetail(id));
+    }
+
+    @Operation(summary = "Delete a pattern")
+    @ApiResponse(responseCode = "200", description = "Pattern deleted successfully",
+            content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = String.class)))
+    @ApiResponse(responseCode = "400", description = "Pattern not found",
+            content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = String.class)))
+    @DeleteMapping("/delete")
+    @PreAuthorize("hasRole('ADMIN')")
+    @SecurityRequirement(name = "BearerAuth")
+    public ResponseEntity<String> deletePattern(
+            @Parameter(description = "ID of the pattern to delete")
+            @RequestParam("id") UUID id) {
+        patternService.deletePattern(id);
+        return ResponseEntity.ok("Pattern deleted successfully");
     }
 }

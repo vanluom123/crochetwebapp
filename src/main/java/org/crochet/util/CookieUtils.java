@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.Base64;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 public class CookieUtils {
 
@@ -23,20 +24,12 @@ public class CookieUtils {
     public static Optional<Cookie> getCookie(HttpServletRequest request, String name) {
         // Get all the cookies from the request
         Cookie[] cookies = request.getCookies();
-
-        if (cookies != null) {
-            // Iterate over the cookies array
-            for (Cookie cookie : cookies) {
-                // Check if the current cookie matches the provided name
-                if (cookie.getName().equals(name)) {
-                    // Return an Optional containing the cookie
-                    return Optional.of(cookie);
-                }
-            }
-        }
-
-        // Return an empty Optional if the cookie is not found
-        return Optional.empty();
+        return Stream.of(cookies)
+                .parallel()
+                .filter(cookie -> cookie.getName().equals(name))
+                .map(Optional::of)
+                .findFirst()
+                .orElse(Optional.empty());
     }
 
 
@@ -66,22 +59,17 @@ public class CookieUtils {
     public static void deleteCookie(HttpServletRequest request, HttpServletResponse response, String name) {
         // Get all the cookies from the request
         Cookie[] cookies = request.getCookies();
-
-        if (cookies != null) {
-            // Iterate over the cookies array
-            for (Cookie cookie : cookies) {
-                // Check if the current cookie matches the provided name
-                if (cookie.getName().equals(name)) {
+        Stream.of(cookies)
+                .parallel()
+                .filter(cookie -> cookie.getName().equals(name))
+                .forEach(cookie -> {
                     // Clear the value, set the path to root, and set max age to 0 to delete the cookie
                     cookie.setValue("");
                     cookie.setPath("/");
                     cookie.setMaxAge(0);
-
                     // Add the modified cookie to the response to delete it
                     response.addCookie(cookie);
-                }
-            }
-        }
+                });
     }
 
 
