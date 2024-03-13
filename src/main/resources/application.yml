@@ -1,14 +1,14 @@
 spring:
   profiles:
-    active: ${ENV}
+    active: local
 
   security:
     oauth2:
       client:
         registration:
           google:
-            clientId: ${GOOGLE_CLIENT_ID}
-            clientSecret: ${GOOGLE_CLIENT_SECRET}
+            clientId: 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
+            clientSecret: 782330301173-u95n2p5pc6obg6nim17bq7m4kmm861tt.apps.googleusercontent.com
             redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
             scope:
               - email
@@ -17,7 +17,7 @@ spring:
     host: smtp.gmail.com
     port: 587
     username: phanvanluom97bd@gmail.com
-    password: ${APP_PASSWORD}
+    password: bnptvnwccmxgwuxq
     properties:
       mail:
         smtp:
@@ -34,7 +34,7 @@ spring:
 
 app:
   auth:
-    tokenSecret: ${TOKEN_SECRET}
+    tokenSecret: 37e2a786c5dc962fac3cfcf5c72b592339abbd7433148e8ed2dd0fc13f1d7402a53de020cb3b0b75f534b9937e191943f3feff64c88af6fbb3eb9e47dccadfa2
     tokenExpirationMs: 900000 # 15 minutes
     refresh-token-expiration-ms: 86400000 # 1 day
   cors:
@@ -50,10 +50,5 @@ app:
       - myiosapp://oauth2/redirect
 
 paypal:
-  username: ${PAYPAL_CLIENT_ID}
-  password: ${PAYPAL_CLIENT_SECRET}
-
-azure:
-  storage:
-    azure-storage-connection-string: ${AZURE_STORAGE_CONNECTION_STRING}
-    azure-storage-container-name: crochetcontainers
+  username: AYw-XWRSOe3r11W37cF26rxf3tUBn8X1dPala2Lux2cGHbK6NYMiyYB_2SES46YjIx1a9zLuMSHSJpYD
+  password: EENLA_G2RtWbTYgY6i90ApZkYdctBuY2AcgnsHhct0sbCnwWiM_J55NTmmEsLbiDcNpnLEfBWPneTmwF

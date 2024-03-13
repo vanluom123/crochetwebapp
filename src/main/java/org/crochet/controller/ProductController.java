@@ -10,16 +10,11 @@ import org.crochet.constant.AppConstant;
 import org.crochet.payload.request.ProductRequest;
 import org.crochet.payload.response.ProductPaginationResponse;
 import org.crochet.payload.response.ProductResponse;
-import org.crochet.service.contact.ProductService;
+import org.crochet.service.ProductService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
@@ -75,5 +70,16 @@ public class ProductController {
     @GetMapping("/detail")
     public ResponseEntity<ProductResponse> getProductDetail(@RequestParam("id") UUID id) {
         return ResponseEntity.ok(productService.getDetail(id));
+    }
+
+    @Operation(summary = "Delete a product by ID")
+    @ApiResponse(responseCode = "200", description = "Product deleted successfully", content = @Content(mediaType = "application/json"))
+    @ApiResponse(responseCode = "404", description = "Product not found", content = @Content(mediaType = "application/json"))
+    @DeleteMapping("/delete")
+    @PreAuthorize("hasRole('ADMIN')")
+    @SecurityRequirement(name = "BearerAuth")
+    public ResponseEntity<String> deleteProduct(@RequestParam("id") UUID id) {
+        productService.delete(id);
+        return ResponseEntity.ok("Product deleted successfully");
     }
 }
