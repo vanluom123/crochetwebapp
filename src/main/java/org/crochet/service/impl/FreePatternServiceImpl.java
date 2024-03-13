@@ -9,6 +9,7 @@ import org.crochet.payload.response.FreePatternResponse;
 import org.crochet.payload.response.PaginatedFreePatternResponse;
 import org.crochet.repository.FreePatternRepository;
 import org.crochet.repository.FreePatternSpecifications;
+import org.crochet.service.CategoryFreePatternService;
 import org.crochet.service.FreePatternService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -27,14 +28,17 @@ import java.util.UUID;
 @Service
 public class FreePatternServiceImpl implements FreePatternService {
     private final FreePatternRepository freePatternRepo;
+    private final CategoryFreePatternService categoryFreePatternService;
 
     /**
      * Constructs a new {@code FreePatternServiceImpl} with the specified FreePattern repository.
      *
      * @param freePatternRepo The repository for handling FreePattern-related operations.
      */
-    public FreePatternServiceImpl(FreePatternRepository freePatternRepo) {
+    public FreePatternServiceImpl(FreePatternRepository freePatternRepo,
+                                  CategoryFreePatternService categoryFreePatternService) {
         this.freePatternRepo = freePatternRepo;
+        this.categoryFreePatternService = categoryFreePatternService;
     }
 
     /**
@@ -48,8 +52,10 @@ public class FreePatternServiceImpl implements FreePatternService {
     @Transactional
     @Override
     public FreePatternResponse createOrUpdate(FreePatternRequest request) {
+        var category = categoryFreePatternService.findById(request.getCategoryId());
         FreePattern freePattern = (request.getId() == null) ? new FreePattern()
                 : findOne(request.getId());
+        freePattern.setCategoryFreePattern(category);
         freePattern.setName(request.getName());
         freePattern.setDescription(request.getDescription());
         freePattern.setAuthor(request.getAuthor());

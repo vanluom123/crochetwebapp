@@ -12,6 +12,7 @@ import org.crochet.repository.PatternRepository;
 import org.crochet.repository.PatternSpecifications;
 import org.crochet.repository.UserRepository;
 import org.crochet.security.UserPrincipal;
+import org.crochet.service.CategoryPatternService;
 import org.crochet.service.PatternService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,11 +33,14 @@ import java.util.UUID;
 public class PatternServiceImpl implements PatternService {
     private final PatternRepository patternRepo;
     private final UserRepository userRepo;
+    private final CategoryPatternService categoryPatternService;
 
     public PatternServiceImpl(PatternRepository patternRepo,
-                              UserRepository userRepo) {
+                              UserRepository userRepo,
+                              CategoryPatternService categoryPatternService) {
         this.patternRepo = patternRepo;
         this.userRepo = userRepo;
+        this.categoryPatternService = categoryPatternService;
     }
 
     /**
@@ -47,8 +51,10 @@ public class PatternServiceImpl implements PatternService {
     @Transactional
     @Override
     public PatternResponse createOrUpdate(PatternRequest request) {
+        var category = categoryPatternService.findById(request.getCategoryId());
         var pattern = (request.getId() == null) ? new Pattern()
                 : findOne(request.getId());
+        pattern.setCategoryPattern(category);
         pattern.setName(request.getName());
         pattern.setPrice(request.getPrice());
         pattern.setDescription(request.getDescription());
