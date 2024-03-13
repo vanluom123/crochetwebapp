@@ -27,7 +27,7 @@ import io.swagger.v3.oas.annotations.security.SecuritySchemes;
                 type = SecuritySchemeType.HTTP,
                 scheme = "bearer",
                 bearerFormat = "JWT",
-                in = SecuritySchemeIn.COOKIE
+                in = SecuritySchemeIn.HEADER
         )
 })
 public class OpenAPIConfig {
