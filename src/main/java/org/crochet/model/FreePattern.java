@@ -26,9 +26,9 @@ public class FreePattern extends BaseEntity {
     private String author;
 
     @ElementCollection
-    @CollectionTable(name = "photos",
+    @CollectionTable(name = "free_pattern_photos",
             joinColumns = {@JoinColumn(name = "free_pattern_id", nullable = false)})
-    @Column(name = "file_name", columnDefinition = "LONGBLOB")
+    @Column(name = "photo_name", columnDefinition = "LONGBLOB")
     private List<String> photos;
 
     @ElementCollection
