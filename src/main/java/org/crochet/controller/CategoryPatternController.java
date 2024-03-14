@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.crochet.exception.ApiError;
 import org.crochet.payload.request.CategoryCreationRequest;
@@ -13,6 +14,7 @@ import org.crochet.payload.response.CategoryResponse;
 import org.crochet.service.CategoryPatternService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -40,8 +42,8 @@ public class CategoryPatternController {
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))})
     })
-//    @PreAuthorize("hasRole('ADMIN')")
-//    @SecurityRequirement(name = "BearerAuth")
+    @PreAuthorize("hasRole('ADMIN')")
+    @SecurityRequirement(name = "BearerAuth")
     @PostMapping("/create")
     public ResponseEntity<CategoryResponse> create(@Valid @RequestBody CategoryCreationRequest request) {
         var response = categoryPatternService.create(request);
@@ -61,8 +63,8 @@ public class CategoryPatternController {
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))})
     })
-//    @PreAuthorize("hasRole('ADMIN')")
-//    @SecurityRequirement(name = "BearerAuth")
+    @PreAuthorize("hasRole('ADMIN')")
+    @SecurityRequirement(name = "BearerAuth")
     @PutMapping("/update")
     public ResponseEntity<CategoryResponse> update(@Valid @RequestBody CategoryUpdateRequest request) {
         var response = categoryPatternService.update(request);
