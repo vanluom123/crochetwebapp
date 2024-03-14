@@ -136,6 +136,9 @@ buildNumber.properties
 **/build/
 !src/**/build/
 
+# Ignore bin
+**/bin
+
 # Ignore Gradle GUI config
 gradle-app.setting
 
