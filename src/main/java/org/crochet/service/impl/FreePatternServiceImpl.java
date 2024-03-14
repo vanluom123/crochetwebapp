@@ -133,4 +133,10 @@ public class FreePatternServiceImpl implements FreePatternService {
     public void delete(UUID id) {
         freePatternRepo.deleteById(id);
     }
+
+    @Override
+    public List<FreePatternResponse> filterByCategory(UUID categoryId) {
+        var freePattern = freePatternRepo.findFreePatternByCategoryFreePattern(categoryId);
+        return FreePatternMapper.INSTANCE.toResponses(freePattern);
+    }
 }

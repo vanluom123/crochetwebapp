@@ -17,4 +17,6 @@ public interface FreePatternService {
     FreePatternResponse getDetail(String id);
 
     void delete(UUID id);
+
+    List<FreePatternResponse> filterByCategory(UUID categoryId);
 }
