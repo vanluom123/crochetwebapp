@@ -22,7 +22,7 @@ public class OpenAPIConfig {
     public OpenAPI openAPI() {
         return new OpenAPI().addSecurityItem(new SecurityRequirement().addList("BearerAuth"))
                 .components(new Components().addSecuritySchemes
-                        ("Bearer Authentication", createAPIKeyScheme()))
+                        ("BearerAuth", createAPIKeyScheme()))
                 .info(new Info().title("My REST API")
                         .description("Some custom description of API.")
                         .version("1.0").contact(new Contact().name("Crochet")
