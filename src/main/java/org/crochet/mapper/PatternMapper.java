@@ -7,6 +7,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,7 +18,7 @@ public interface PatternMapper {
     @Mapping(target = "id", source = "id", qualifiedByName = "uuidToString")
     PatternResponse toResponse(Pattern pattern);
 
-    List<PatternResponse> toResponses(List<Pattern> patterns);
+    List<PatternResponse> toResponses(Collection<Pattern> patterns);
 
     @Named("uuidToString")
     default String uuidToString(UUID uuid) {
