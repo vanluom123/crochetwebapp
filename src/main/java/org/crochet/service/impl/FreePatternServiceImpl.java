@@ -43,7 +43,7 @@ public class FreePatternServiceImpl implements FreePatternService {
      * If the request does not contain an ID, it creates a new FreePattern.
      *
      * @param request The {@link FreePatternRequest} containing information for creating or updating the FreePattern.
-     * @return
+     * @return FreePatternResponse
      */
     @Transactional
     @Override
@@ -52,6 +52,8 @@ public class FreePatternServiceImpl implements FreePatternService {
                 : findOne(request.getId());
         freePattern.setName(request.getName());
         freePattern.setDescription(request.getDescription());
+        freePattern.setAuthor(request.getAuthor());
+        freePattern.setPhotos(request.getPhotos());
         freePattern.setFiles(request.getFiles());
         freePattern = freePatternRepo.save(freePattern);
         return FreePatternMapper.INSTANCE.toResponse(freePattern);

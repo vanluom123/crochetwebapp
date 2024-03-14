@@ -11,5 +11,7 @@ public class FreePatternRequest {
     private String id;
     private String name;
     private String description;
+    private String author;
+    private List<String> photos;
     private List<String> files;
 }
