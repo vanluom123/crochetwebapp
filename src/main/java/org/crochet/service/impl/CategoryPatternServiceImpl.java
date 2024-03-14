@@ -53,8 +53,7 @@ public class CategoryPatternServiceImpl implements CategoryPatternService {
 
     @Override
     public List<CategoryResponse> getSubCategories(UUID parentId) {
-        var category = findById(parentId);
-        var subcategories = category.getChildren();
+        var subcategories = categoryPatternRepo.findSubCategoryPatternsByParent(parentId);
         return CategoryPatternMapper.INSTANCE.toResponses(subcategories);
     }
 

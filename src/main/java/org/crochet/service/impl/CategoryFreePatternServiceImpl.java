@@ -53,8 +53,7 @@ public class CategoryFreePatternServiceImpl implements CategoryFreePatternServic
 
     @Override
     public List<CategoryResponse> getSubCategories(UUID parentId) {
-        var category = findById(parentId);
-        var subcategories = category.getChildren();
+        var subcategories = categoryFreePatternRepo.findSubCategoryFreePatternsByParent(parentId);
         return CategoryFreePatternMapper.INSTANCE.toResponses(subcategories);
     }
 

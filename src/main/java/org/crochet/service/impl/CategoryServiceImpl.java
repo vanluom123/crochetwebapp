@@ -56,8 +56,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public List<CategoryResponse> getSubCategories(UUID parentId) {
-        var category = findById(parentId);
-        var subcategories = category.getChildren();
+        var subcategories = categoryRepo.findSubCategoriesByParent(parentId);
         return categoryMapper.toResponses(subcategories);
     }
 
