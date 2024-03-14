@@ -36,6 +36,12 @@ public class Pattern extends BaseEntity {
     private CurrencyCode currencyCode;
 
     @ElementCollection
+    @CollectionTable(name = "pattern_photos",
+            joinColumns = {@JoinColumn(name = "pattern_id", nullable = false)})
+    @Column(name = "photo_name", columnDefinition = "LONGBLOB")
+    private List<String> photos;
+
+    @ElementCollection
     @CollectionTable(name = "pattern_file",
             joinColumns = {@JoinColumn(name = "pattern_id", nullable = false)})
     @Column(name = "file_name", columnDefinition = "LONGBLOB")
