@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collection;
 import java.util.UUID;
 
 @RestController
@@ -89,5 +90,11 @@ public class PatternController {
             @RequestParam("id") UUID id) {
         patternService.deletePattern(id);
         return ResponseEntity.ok("Pattern deleted successfully");
+    }
+
+    @GetMapping("/filter")
+    public ResponseEntity<Collection<PatternResponse>> filterByCategory(@RequestParam("category_id") UUID categoryId) {
+        var response = patternService.filterByCategory(categoryId);
+        return ResponseEntity.ok(response);
     }
 }

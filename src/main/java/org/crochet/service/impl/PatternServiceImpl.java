@@ -23,6 +23,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -142,5 +143,11 @@ public class PatternServiceImpl implements PatternService {
     @Override
     public void deletePattern(UUID id) {
         patternRepo.deleteById(id);
+    }
+
+    @Override
+    public Collection<PatternResponse> filterByCategory(UUID categoryId) {
+        var patterns = patternRepo.findPatternsByCategoryPattern(categoryId);
+        return PatternMapper.INSTANCE.toResponses(patterns);
     }
 }

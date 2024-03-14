@@ -4,6 +4,7 @@ import org.crochet.payload.request.PatternRequest;
 import org.crochet.payload.response.PatternPaginationResponse;
 import org.crochet.payload.response.PatternResponse;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,4 +18,6 @@ public interface PatternService {
     PatternResponse getDetail(String id);
 
     void deletePattern(UUID id);
+
+    Collection<PatternResponse> filterByCategory(UUID categoryId);
 }
