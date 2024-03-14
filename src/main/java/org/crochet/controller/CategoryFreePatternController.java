@@ -11,7 +11,7 @@ import org.crochet.exception.ApiError;
 import org.crochet.payload.request.CategoryCreationRequest;
 import org.crochet.payload.request.CategoryUpdateRequest;
 import org.crochet.payload.response.CategoryResponse;
-import org.crochet.service.CategoryPatternService;
+import org.crochet.service.CategoryFreePatternService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,10 +23,10 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/category-free-pattern")
 public class CategoryFreePatternController {
-    private final CategoryPatternService categoryPatternService;
+    private final CategoryFreePatternService categoryFreePatternService;
 
-    public CategoryFreePatternController(CategoryPatternService categoryPatternService) {
-        this.categoryPatternService = categoryPatternService;
+    public CategoryFreePatternController(CategoryFreePatternService categoryFreePatternService) {
+        this.categoryFreePatternService = categoryFreePatternService;
     }
 
     @Operation(summary = "Create category with parent")
@@ -42,11 +42,11 @@ public class CategoryFreePatternController {
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))})
     })
-//    @PreAuthorize("hasRole('ADMIN')")
-//    @SecurityRequirement(name = "BearerAuth")
+    @PreAuthorize("hasRole('ADMIN')")
+    @SecurityRequirement(name = "BearerAuth")
     @PostMapping("/create")
     public ResponseEntity<CategoryResponse> create(@Valid @RequestBody CategoryCreationRequest request) {
-        var response = categoryPatternService.create(request);
+        var response = categoryFreePatternService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -63,11 +63,11 @@ public class CategoryFreePatternController {
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))})
     })
-//    @PreAuthorize("hasRole('ADMIN')")
-//    @SecurityRequirement(name = "BearerAuth")
+    @PreAuthorize("hasRole('ADMIN')")
+    @SecurityRequirement(name = "BearerAuth")
     @PutMapping("/update")
     public ResponseEntity<CategoryResponse> update(@Valid @RequestBody CategoryUpdateRequest request) {
-        var response = categoryPatternService.update(request);
+        var response = categoryFreePatternService.update(request);
         return ResponseEntity.ok(response);
     }
 
@@ -76,7 +76,7 @@ public class CategoryFreePatternController {
             content = {@Content(mediaType = "application/json", schema = @Schema(implementation = List.class))})
     @GetMapping("/get-parent-categories")
     public ResponseEntity<List<CategoryResponse>> getParentCategories() {
-        var response = categoryPatternService.getParentCategories();
+        var response = categoryFreePatternService.getParentCategories();
         return ResponseEntity.ok(response);
     }
 
@@ -85,7 +85,7 @@ public class CategoryFreePatternController {
             content = {@Content(mediaType = "application/json", schema = @Schema(implementation = List.class))})
     @GetMapping("/get-sub-categories")
     public ResponseEntity<List<CategoryResponse>> getSubCategories(UUID parentId) {
-        var response = categoryPatternService.getSubCategories(parentId);
+        var response = categoryFreePatternService.getSubCategories(parentId);
         return ResponseEntity.ok(response);
     }
 
@@ -96,7 +96,7 @@ public class CategoryFreePatternController {
             content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))})
     @DeleteMapping("/delete")
     public ResponseEntity<String> delete(UUID id) {
-        categoryPatternService.delete(id);
+        categoryFreePatternService.delete(id);
         return ResponseEntity.ok("Category deleted");
     }
 }
