@@ -1,7 +1,6 @@
 package org.crochet.payload.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.Data;
 
@@ -12,7 +11,6 @@ import java.util.UUID;
 @Builder
 public class FreePatternRequest {
     private String id;
-    @NotBlank
     @JsonProperty("category_id")
     private UUID categoryId;
     private String name;
