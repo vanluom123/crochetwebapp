@@ -17,4 +17,6 @@ public interface ProductService {
     ProductResponse getDetail(UUID id);
 
     void delete(UUID id);
+
+    List<ProductResponse> filterByCategory(UUID categoryId);
 }

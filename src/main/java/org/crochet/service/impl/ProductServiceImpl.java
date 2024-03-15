@@ -133,4 +133,10 @@ public class ProductServiceImpl implements ProductService {
     public void delete(UUID id) {
         productRepo.deleteById(id);
     }
+
+    @Override
+    public List<ProductResponse> filterByCategory(UUID categoryId) {
+        var products = productRepo.findProductByCategory(categoryId);
+        return ProductMapper.INSTANCE.toResponses(products);
+    }
 }

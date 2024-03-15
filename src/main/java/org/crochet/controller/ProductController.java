@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import jakarta.validation.Valid;
 import org.crochet.constant.AppConstant;
 import org.crochet.payload.request.ProductRequest;
 import org.crochet.payload.response.ProductPaginationResponse;
@@ -16,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -36,7 +36,7 @@ public class ProductController {
     @PreAuthorize("hasRole('ADMIN')")
     @SecurityRequirement(name = "BearerAuth")
     public ResponseEntity<ProductResponse> createProduct(
-            @Valid @RequestBody ProductRequest request
+            @RequestBody ProductRequest request
     ) {
         var response = productService.createOrUpdate(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -81,5 +81,11 @@ public class ProductController {
     public ResponseEntity<String> deleteProduct(@RequestParam("id") UUID id) {
         productService.delete(id);
         return ResponseEntity.ok("Product deleted successfully");
+    }
+
+    @GetMapping("/filter")
+    public ResponseEntity<List<ProductResponse>> filterByCategory(@RequestParam("category_id") UUID categoryId) {
+        var responses = productService.filterByCategory(categoryId);
+        return ResponseEntity.ok(responses);
     }
 }
