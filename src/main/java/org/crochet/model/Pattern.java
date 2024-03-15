@@ -51,6 +51,6 @@ public class Pattern extends BaseEntity {
     private Set<OrderPatternDetail> orderPatternDetails;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_pattern_id", columnDefinition = "BINARY(16) NOT NULL")
-    private CategoryPattern categoryPattern;
+    @JoinColumn(name = "category_id", columnDefinition = "BINARY(16) NOT NULL")
+    private Category category;
 }

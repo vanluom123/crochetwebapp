@@ -56,8 +56,9 @@ public class ProductController {
             @RequestParam(value = "sortBy", defaultValue = AppConstant.DEFAULT_SORT_BY, required = false) String sortBy,
             @RequestParam(value = "sortDir", defaultValue = AppConstant.DEFAULT_SORT_DIRECTION,
                     required = false) String sortDir,
-            @RequestParam(value = "text", required = false) String text) {
-        var response = productService.getProducts(pageNo, pageSize, sortBy, sortDir, text);
+            @RequestParam(value = "text", required = false) String text,
+            @RequestParam(value = "categoryIds", required = false) List<UUID> categoryIds) {
+        var response = productService.getProducts(pageNo, pageSize, sortBy, sortDir, text, categoryIds);
         return ResponseEntity.ok(response);
     }
 
@@ -81,11 +82,5 @@ public class ProductController {
     public ResponseEntity<String> deleteProduct(@RequestParam("id") UUID id) {
         productService.delete(id);
         return ResponseEntity.ok("Product deleted successfully");
-    }
-
-    @GetMapping("/filter")
-    public ResponseEntity<List<ProductResponse>> filterByCategory(@RequestParam("category_id") UUID categoryId) {
-        var responses = productService.filterByCategory(categoryId);
-        return ResponseEntity.ok(responses);
     }
 }

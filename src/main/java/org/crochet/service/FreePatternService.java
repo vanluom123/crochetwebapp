@@ -10,13 +10,11 @@ import java.util.UUID;
 public interface FreePatternService {
     FreePatternResponse createOrUpdate(FreePatternRequest request);
 
-    PaginatedFreePatternResponse getFreePatterns(int pageNo, int pageSize, String sortBy, String sortDir, String text);
+    PaginatedFreePatternResponse getFreePatterns(int pageNo, int pageSize, String sortBy, String sortDir, String text, List<UUID> categoryIds);
 
     List<FreePatternResponse> getLimitedFreePatterns();
 
     FreePatternResponse getDetail(String id);
 
     void delete(UUID id);
-
-    List<FreePatternResponse> filterByCategory(UUID categoryId);
 }

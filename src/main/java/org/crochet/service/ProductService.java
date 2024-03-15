@@ -10,13 +10,11 @@ import java.util.UUID;
 public interface ProductService {
     ProductResponse createOrUpdate(ProductRequest request);
 
-    ProductPaginationResponse getProducts(int pageNo, int pageSize, String sortBy, String sortDir, String text);
+    ProductPaginationResponse getProducts(int pageNo, int pageSize, String sortBy, String sortDir, String text, List<UUID> categoryIds);
 
     List<ProductResponse> getLimitedProducts();
 
     ProductResponse getDetail(UUID id);
 
     void delete(UUID id);
-
-    List<ProductResponse> filterByCategory(UUID categoryId);
 }

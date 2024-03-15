@@ -16,7 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -59,8 +59,10 @@ public class PatternController {
             @RequestParam(value = "sortDir", defaultValue = AppConstant.DEFAULT_SORT_DIRECTION,
                     required = false) String sortDir,
             @Parameter(description = "Search text")
-            @RequestParam(value = "text", required = false) String text) {
-        var response = patternService.getPatterns(pageNo, pageSize, sortBy, sortDir, text);
+            @RequestParam(value = "text", required = false) String text,
+            @Parameter(description = "Category IDs")
+            @RequestParam(value = "categoryIds", required = false) List<UUID> categoryIds) {
+        var response = patternService.getPatterns(pageNo, pageSize, sortBy, sortDir, text, categoryIds);
         return ResponseEntity.ok(response);
     }
 
@@ -90,11 +92,5 @@ public class PatternController {
             @RequestParam("id") UUID id) {
         patternService.deletePattern(id);
         return ResponseEntity.ok("Pattern deleted successfully");
-    }
-
-    @GetMapping("/filter")
-    public ResponseEntity<Collection<PatternResponse>> filterByCategory(@RequestParam("category_id") UUID categoryId) {
-        var response = patternService.filterByCategory(categoryId);
-        return ResponseEntity.ok(response);
     }
 }

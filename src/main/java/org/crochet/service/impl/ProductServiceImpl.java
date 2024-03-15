@@ -69,15 +69,16 @@ public class ProductServiceImpl implements ProductService {
     /**
      * Retrieves a paginated list of products based on the provided parameters.
      *
-     * @param pageNo   The page number to retrieve (0-indexed).
-     * @param pageSize The number of products to include in each page.
-     * @param sortBy   The attribute by which the products should be sorted.
-     * @param sortDir  The sorting direction, either "ASC" (ascending) or "DESC" (descending).
-     * @param text     The search text used to filter products by name or other criteria.
+     * @param pageNo      The page number to retrieve (0-indexed).
+     * @param pageSize    The number of products to include in each page.
+     * @param sortBy      The attribute by which the products should be sorted.
+     * @param sortDir     The sorting direction, either "ASC" (ascending) or "DESC" (descending).
+     * @param text        The search text used to filter products by name or other criteria.
+     * @param categoryIds
      * @return A {@link ProductPaginationResponse} containing the paginated list of products.
      */
     @Override
-    public ProductPaginationResponse getProducts(int pageNo, int pageSize, String sortBy, String sortDir, String text) {
+    public ProductPaginationResponse getProducts(int pageNo, int pageSize, String sortBy, String sortDir, String text, List<UUID> categoryIds) {
         // create Sort instance
         Sort sort = Sort.by(sortBy);
         sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? sort.ascending() : sort.descending();
@@ -87,6 +88,10 @@ public class ProductServiceImpl implements ProductService {
         Specification<Product> spec = Specification.where(null);
         if (text != null && !text.isEmpty()) {
             spec = spec.and(ProductSpecifications.searchBy(text));
+        }
+
+        if (categoryIds != null && !categoryIds.isEmpty()) {
+            spec = spec.and(ProductSpecifications.filterBy(categoryIds));
         }
 
         Page<Product> menuPage = productRepo.findAll(spec, pageable);
@@ -132,11 +137,5 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void delete(UUID id) {
         productRepo.deleteById(id);
-    }
-
-    @Override
-    public List<ProductResponse> filterByCategory(UUID categoryId) {
-        var products = productRepo.findProductByCategory(categoryId);
-        return ProductMapper.INSTANCE.toResponses(products);
     }
 }

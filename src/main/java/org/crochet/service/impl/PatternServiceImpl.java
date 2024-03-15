@@ -12,7 +12,7 @@ import org.crochet.repository.PatternRepository;
 import org.crochet.repository.PatternSpecifications;
 import org.crochet.repository.UserRepository;
 import org.crochet.security.UserPrincipal;
-import org.crochet.service.CategoryPatternService;
+import org.crochet.service.CategoryService;
 import org.crochet.service.PatternService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,7 +23,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -34,14 +33,14 @@ import java.util.UUID;
 public class PatternServiceImpl implements PatternService {
     private final PatternRepository patternRepo;
     private final UserRepository userRepo;
-    private final CategoryPatternService categoryPatternService;
+    private final CategoryService categoryService;
 
     public PatternServiceImpl(PatternRepository patternRepo,
                               UserRepository userRepo,
-                              CategoryPatternService categoryPatternService) {
+                              CategoryService categoryService) {
         this.patternRepo = patternRepo;
         this.userRepo = userRepo;
-        this.categoryPatternService = categoryPatternService;
+        this.categoryService = categoryService;
     }
 
     /**
@@ -52,10 +51,10 @@ public class PatternServiceImpl implements PatternService {
     @Transactional
     @Override
     public PatternResponse createOrUpdate(PatternRequest request) {
-        var category = categoryPatternService.findById(request.getCategoryId());
+        var category = categoryService.findById(request.getCategoryId());
         var pattern = (request.getId() == null) ? new Pattern()
                 : findOne(request.getId());
-        pattern.setCategoryPattern(category);
+        pattern.setCategory(category);
         pattern.setName(request.getName());
         pattern.setPrice(request.getPrice());
         pattern.setDescription(request.getDescription());
@@ -68,15 +67,16 @@ public class PatternServiceImpl implements PatternService {
     /**
      * Get patterns
      *
-     * @param pageNo   Page number
-     * @param pageSize The size of page
-     * @param sortBy   Sort by
-     * @param sortDir  Sort directory
-     * @param text     Text
+     * @param pageNo      Page number
+     * @param pageSize    The size of page
+     * @param sortBy      Sort by
+     * @param sortDir     Sort directory
+     * @param text        Text
+     * @param categoryIds
      * @return Pattern is paginated
      */
     @Override
-    public PatternPaginationResponse getPatterns(int pageNo, int pageSize, String sortBy, String sortDir, String text) {
+    public PatternPaginationResponse getPatterns(int pageNo, int pageSize, String sortBy, String sortDir, String text, List<UUID> categoryIds) {
         // create Sort instance
         Sort sort = Sort.by(sortBy);
         sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? sort.ascending() : sort.descending();
@@ -86,6 +86,10 @@ public class PatternServiceImpl implements PatternService {
         Specification<Pattern> spec = Specification.where(null);
         if (text != null && !text.isEmpty()) {
             spec = spec.and(PatternSpecifications.searchBy(text));
+        }
+
+        if (categoryIds != null && !categoryIds.isEmpty()) {
+            spec = spec.and(PatternSpecifications.filterBy(categoryIds));
         }
 
         Page<Pattern> menuPage = patternRepo.findAll(spec, pageable);
@@ -143,11 +147,5 @@ public class PatternServiceImpl implements PatternService {
     @Override
     public void deletePattern(UUID id) {
         patternRepo.deleteById(id);
-    }
-
-    @Override
-    public Collection<PatternResponse> filterByCategory(UUID categoryId) {
-        var patterns = patternRepo.findPatternsByCategoryPattern(categoryId);
-        return PatternMapper.INSTANCE.toResponses(patterns);
     }
 }

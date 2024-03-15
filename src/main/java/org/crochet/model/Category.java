@@ -33,4 +33,10 @@ public class Category extends BaseEntity {
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
     private Set<Product> products;
+
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
+    private Set<Pattern> patterns;
+
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
+    private Set<FreePattern> freePatterns;
 }

@@ -18,7 +18,4 @@ public interface PatternRepository extends JpaRepository<Pattern, UUID>, JpaSpec
             "join fetch o.user u " +
             "where u.id = ?1 and p.id = ?2 and opd.status = 'COMPLETED'")
     Optional<Pattern> findPatternByUserOrdered(UUID userId, UUID patternId);
-
-    @Query("select p from Pattern p where p.categoryPattern.id = ?1")
-    List<Pattern> findPatternsByCategoryPattern(UUID categoryId);
 }

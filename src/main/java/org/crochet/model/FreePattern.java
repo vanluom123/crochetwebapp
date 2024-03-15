@@ -38,6 +38,6 @@ public class FreePattern extends BaseEntity {
     private List<String> files;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_free_pattern_id", columnDefinition = "BINARY(16) NOT NULL")
-    private CategoryFreePattern categoryFreePattern;
+    @JoinColumn(name = "category_id", columnDefinition = "BINARY(16) NOT NULL")
+    private Category category;
 }

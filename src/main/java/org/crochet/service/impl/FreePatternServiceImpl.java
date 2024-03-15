@@ -9,7 +9,7 @@ import org.crochet.payload.response.FreePatternResponse;
 import org.crochet.payload.response.PaginatedFreePatternResponse;
 import org.crochet.repository.FreePatternRepository;
 import org.crochet.repository.FreePatternSpecifications;
-import org.crochet.service.CategoryFreePatternService;
+import org.crochet.service.CategoryService;
 import org.crochet.service.FreePatternService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -28,7 +28,7 @@ import java.util.UUID;
 @Service
 public class FreePatternServiceImpl implements FreePatternService {
     private final FreePatternRepository freePatternRepo;
-    private final CategoryFreePatternService categoryFreePatternService;
+    private final CategoryService categoryService;
 
     /**
      * Constructs a new {@code FreePatternServiceImpl} with the specified FreePattern repository.
@@ -36,9 +36,9 @@ public class FreePatternServiceImpl implements FreePatternService {
      * @param freePatternRepo The repository for handling FreePattern-related operations.
      */
     public FreePatternServiceImpl(FreePatternRepository freePatternRepo,
-                                  CategoryFreePatternService categoryFreePatternService) {
+                                  CategoryService categoryService) {
         this.freePatternRepo = freePatternRepo;
-        this.categoryFreePatternService = categoryFreePatternService;
+        this.categoryService = categoryService;
     }
 
     /**
@@ -52,10 +52,10 @@ public class FreePatternServiceImpl implements FreePatternService {
     @Transactional
     @Override
     public FreePatternResponse createOrUpdate(FreePatternRequest request) {
-        var category = categoryFreePatternService.findById(request.getCategoryId());
+        var category = categoryService.findById(request.getCategoryId());
         FreePattern freePattern = (request.getId() == null) ? new FreePattern()
                 : findOne(request.getId());
-        freePattern.setCategoryFreePattern(category);
+        freePattern.setCategory(category);
         freePattern.setName(request.getName());
         freePattern.setDescription(request.getDescription());
         freePattern.setAuthor(request.getAuthor());
@@ -68,16 +68,17 @@ public class FreePatternServiceImpl implements FreePatternService {
     /**
      * Retrieves a paginated list of FreePatterns based on the provided parameters.
      *
-     * @param pageNo   The page number to retrieve (0-indexed).
-     * @param pageSize The number of FreePatterns to include in each page.
-     * @param sortBy   The attribute by which the FreePatterns should be sorted.
-     * @param sortDir  The sorting direction, either "ASC" (ascending) or "DESC" (descending).
-     * @param text     The search text used to filter FreePatterns by name or other criteria.
+     * @param pageNo      The page number to retrieve (0-indexed).
+     * @param pageSize    The number of FreePatterns to include in each page.
+     * @param sortBy      The attribute by which the FreePatterns should be sorted.
+     * @param sortDir     The sorting direction, either "ASC" (ascending) or "DESC" (descending).
+     * @param text        The search text used to filter FreePatterns by name or other criteria.
+     * @param categoryIds
      * @return A {@link PaginatedFreePatternResponse} containing the paginated list of FreePatterns.
      */
     @Override
     public PaginatedFreePatternResponse getFreePatterns(int pageNo, int pageSize, String sortBy, String sortDir,
-                                                        String text) {
+                                                        String text, List<UUID> categoryIds) {
         // create Sort instance
         Sort sort = Sort.by(sortBy);
         sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? sort.ascending() : sort.descending();
@@ -87,6 +88,9 @@ public class FreePatternServiceImpl implements FreePatternService {
         Specification<FreePattern> spec = Specification.where(null);
         if (text != null && !text.isEmpty()) {
             spec = spec.and(FreePatternSpecifications.searchBy(text));
+        }
+        if (categoryIds != null && !categoryIds.isEmpty()) {
+            spec = spec.and(FreePatternSpecifications.filterBy(categoryIds));
         }
 
         Page<FreePattern> page = freePatternRepo.findAll(spec, pageable);
@@ -132,11 +136,5 @@ public class FreePatternServiceImpl implements FreePatternService {
     @Override
     public void delete(UUID id) {
         freePatternRepo.deleteById(id);
-    }
-
-    @Override
-    public List<FreePatternResponse> filterByCategory(UUID categoryId) {
-        var freePattern = freePatternRepo.findFreePatternByCategoryFreePattern(categoryId);
-        return FreePatternMapper.INSTANCE.toResponses(freePattern);
     }
 }

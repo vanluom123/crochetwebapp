@@ -59,8 +59,10 @@ public class FreePatternController {
             @RequestParam(value = "sortDir", defaultValue = AppConstant.DEFAULT_SORT_DIRECTION,
                     required = false) String sortDir,
             @Parameter(description = "Search text")
-            @RequestParam(value = "text", required = false) String text) {
-        var response = freePatternService.getFreePatterns(pageNo, pageSize, sortBy, sortDir, text);
+            @RequestParam(value = "text", required = false) String text,
+            @Parameter(description = "Category IDs")
+            @RequestParam(value = "categoryIds", required = false) List<UUID> categoryIds) {
+        var response = freePatternService.getFreePatterns(pageNo, pageSize, sortBy, sortDir, text, categoryIds);
         return ResponseEntity.ok(response);
     }
 
@@ -90,11 +92,5 @@ public class FreePatternController {
             @RequestParam("id") UUID id) {
         freePatternService.delete(id);
         return ResponseEntity.ok("Pattern deleted successfully");
-    }
-
-    @GetMapping("/filter")
-    public ResponseEntity<List<FreePatternResponse>> filterByCategory(@RequestParam("category_id") UUID categoryId) {
-        var response = freePatternService.filterByCategory(categoryId);
-        return ResponseEntity.ok(response);
     }
 }

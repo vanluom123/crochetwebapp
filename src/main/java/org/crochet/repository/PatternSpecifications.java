@@ -3,6 +3,9 @@ package org.crochet.repository;
 import org.crochet.model.Pattern;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.util.List;
+import java.util.UUID;
+
 public class PatternSpecifications {
     public static Specification<Pattern> searchBy(String text) {
         return (r, q, cb) -> {
@@ -10,5 +13,9 @@ public class PatternSpecifications {
             var desc = cb.like(r.get("description"), "%" + text + "%");
             return cb.or(name, desc);
         };
+    }
+
+    public static Specification<Pattern> filterBy(List<UUID> categoryIds) {
+        return (r, q, cb) -> r.get("category").get("id").in(categoryIds);
     }
 }
