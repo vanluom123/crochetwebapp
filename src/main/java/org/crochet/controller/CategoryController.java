@@ -71,6 +71,15 @@ public class CategoryController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "Get all categories")
+    @ApiResponse(responseCode = "200", description = "Get all categories",
+            content = {@Content(mediaType = "application/json", schema = @Schema(implementation = List.class))})
+    @GetMapping("/get-all-categories")
+    public ResponseEntity<List<CategoryResponse>> getAllCategories() {
+        var response = categoryService.getAllCategories();
+        return ResponseEntity.ok(response);
+    }
+
     @Operation(summary = "Update category without parent")
     @ApiResponse(responseCode = "200", description = "Get parent categories",
             content = {@Content(mediaType = "application/json", schema = @Schema(implementation = List.class))})
