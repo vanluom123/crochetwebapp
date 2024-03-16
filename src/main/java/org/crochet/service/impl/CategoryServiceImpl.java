@@ -14,15 +14,15 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.UUID;
 
+import static org.crochet.constant.MessageCode.CATEGORY_NOT_FOUND_CODE;
+import static org.crochet.constant.MessageConstant.CATEGORY_NOT_FOUND_MESSAGE;
+
 @Service
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepo categoryRepo;
-    private final CategoryMapper categoryMapper;
 
-    public CategoryServiceImpl(CategoryRepo categoryRepo,
-                               CategoryMapper categoryMapper) {
+    public CategoryServiceImpl(CategoryRepo categoryRepo) {
         this.categoryRepo = categoryRepo;
-        this.categoryMapper = categoryMapper;
     }
 
     @Transactional
@@ -33,7 +33,7 @@ public class CategoryServiceImpl implements CategoryService {
         child.setName(request.getName());
         child.setParent(parent);
         child = categoryRepo.save(child);
-        return categoryMapper.toResponse(child);
+        return CategoryMapper.INSTANCE.toResponse(child);
     }
 
     @Transactional
@@ -42,7 +42,7 @@ public class CategoryServiceImpl implements CategoryService {
         var category = findById(request.getId());
         category.setName(request.getName());
         category = categoryRepo.save(category);
-        return categoryMapper.toResponse(category);
+        return CategoryMapper.INSTANCE.toResponse(category);
     }
 
     @Override
@@ -51,25 +51,33 @@ public class CategoryServiceImpl implements CategoryService {
                 .parallelStream()
                 .filter(category -> category.getParent() == null)
                 .toList();
-        return categoryMapper.toResponses(categories);
+        return CategoryMapper.INSTANCE.toResponses(categories);
     }
 
     @Override
     public List<CategoryResponse> getSubCategories(UUID parentId) {
-        var subcategories = categoryRepo.findSubCategoriesByParent(parentId);
-        return categoryMapper.toResponses(subcategories);
+        var parent = findById(parentId);
+        var subcategories = parent.getChildren();
+        return CategoryMapper.INSTANCE.toResponses(subcategories);
+    }
+
+    @Override
+    public List<CategoryResponse> getAllCategories() {
+        var categories = categoryRepo.findAll();
+        return CategoryMapper.INSTANCE.toResponses(categories);
     }
 
     @Override
     public CategoryResponse getById(UUID id) {
         var category = findById(id);
-        return categoryMapper.toResponse(category);
+        return CategoryMapper.INSTANCE.toResponse(category);
     }
 
     @Override
     public Category findById(UUID id) {
         return categoryRepo.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(CATEGORY_NOT_FOUND_MESSAGE,
+                        CATEGORY_NOT_FOUND_CODE));
     }
 
     @Transactional

@@ -1,5 +1,6 @@
 package org.crochet.service.impl;
 
+import org.crochet.constant.MessageConstant;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.BlogPostMapper;
 import org.crochet.model.BlogPost;
@@ -19,6 +20,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
+
+import static org.crochet.constant.MessageCode.BLOG_NOT_FOUND_CODE;
+import static org.crochet.constant.MessageConstant.BLOG_NOT_FOUND_MESSAGE;
 
 /**
  * BlogPostServiceImpl class
@@ -106,6 +110,6 @@ public class BlogPostServiceImpl implements BlogPostService {
 
     private BlogPost findOne(String id) {
         return blogPostRepo.findById(UUID.fromString(id))
-                .orElseThrow(() -> new ResourceNotFoundException("Blog not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(BLOG_NOT_FOUND_MESSAGE, BLOG_NOT_FOUND_CODE));
     }
 }

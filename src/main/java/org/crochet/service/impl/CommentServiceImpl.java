@@ -18,6 +18,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import static org.crochet.constant.MessageCode.*;
+import static org.crochet.constant.MessageConstant.*;
+
 /**
  * CommentServiceImpl class
  */
@@ -58,13 +61,13 @@ public class CommentServiceImpl implements CommentService {
     public CommentResponse createOrUpdate(CommentRequest request) {
         var auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !(auth.getPrincipal() instanceof UserPrincipal principal)) {
-            throw new ResourceNotFoundException("User hasn't signed in");
+            throw new ResourceNotFoundException(PLEASE_LOGIN_TO_COMMENT_MESSAGE, PLEASE_LOGIN_TO_COMMENT_CODE);
         }
         User user = userRepo.findById(principal.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE, USER_NOT_FOUND_CODE));
 
         var blog = blogPostRepo.findById(UUID.fromString(request.getBlogPostId()))
-                .orElseThrow(() -> new ResourceNotFoundException("Blog not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(BLOG_NOT_FOUND_MESSAGE, BLOG_NOT_FOUND_CODE));
 
         var id = request.getId();
         Comment comment;
@@ -83,6 +86,6 @@ public class CommentServiceImpl implements CommentService {
 
     private Comment findOne(String id) {
         return commentRepo.findById(UUID.fromString(id))
-                .orElseThrow(() -> new ResourceNotFoundException("Comment not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(COMMENT_NOT_FOUND_MESSAGE, COMMENT_NOT_FOUND_CODE));
     }
 }

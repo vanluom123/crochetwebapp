@@ -1,5 +1,6 @@
 package org.crochet.service.impl;
 
+import org.crochet.constant.MessageConstant;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.model.ConfirmationToken;
 import org.crochet.model.User;
@@ -9,6 +10,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
+
+import static org.crochet.constant.MessageCode.CONFIRM_TOKEN_NOT_FOUND_CODE;
+import static org.crochet.constant.MessageConstant.CONFIRM_TOKEN_NOT_FOUND_MESSAGE;
 
 @Service
 public class ConfirmTokenServiceImpl implements ConfirmTokenService {
@@ -54,6 +58,6 @@ public class ConfirmTokenServiceImpl implements ConfirmTokenService {
     @Override
     public ConfirmationToken getToken(String token) {
         return confirmationTokenRepository.findByToken(token)
-                .orElseThrow(() -> new ResourceNotFoundException("Token not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(CONFIRM_TOKEN_NOT_FOUND_MESSAGE, CONFIRM_TOKEN_NOT_FOUND_CODE));
     }
 }

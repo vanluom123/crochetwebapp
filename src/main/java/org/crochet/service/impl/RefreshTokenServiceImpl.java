@@ -1,9 +1,10 @@
 package org.crochet.service.impl;
 
-import org.crochet.properties.AppProperties;
 import org.crochet.exception.ResourceNotFoundException;
+import org.crochet.exception.TokenException;
 import org.crochet.model.RefreshToken;
 import org.crochet.model.User;
+import org.crochet.properties.AppProperties;
 import org.crochet.repository.RefreshTokenRepo;
 import org.crochet.repository.UserRepository;
 import org.crochet.service.RefreshTokenService;
@@ -14,6 +15,12 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.UUID;
+
+import static org.crochet.constant.MessageCode.REFRESH_TOKEN_IS_EXPIRED_CODE;
+import static org.crochet.constant.MessageCode.REFRESH_TOKEN_NOT_FOUND_CODE;
+import static org.crochet.constant.MessageConstant.REFRESH_TOKEN_IS_EXPIRED_MESSAGE;
+import static org.crochet.constant.MessageConstant.REFRESH_TOKEN_NOT_FOUND_MESSAGE;
+import static org.crochet.constant.MessageConstant.USER_NOT_FOUND_WITH_EMAIL_MESSAGE;
 
 @Service
 public class RefreshTokenServiceImpl implements RefreshTokenService {
@@ -33,7 +40,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     @Override
     public RefreshToken createRefreshToken(String username) {
         var user = userRepository.findByEmail(username)
-                .orElseThrow(() -> new RuntimeException("User not found with username: " + username));
+                .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_WITH_EMAIL_MESSAGE + username));
         LocalDateTime now = LocalDateTime.now();
         var expiryDate = now.plus(appProps.getAuth().getRefreshTokenExpirationMs(), ChronoUnit.MILLIS);
         RefreshToken refreshToken = RefreshToken.builder()
@@ -54,7 +61,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     public RefreshToken verifyExpiration(RefreshToken token) {
         if (token.getExpiryDate().isBefore(LocalDateTime.now())) {
             refreshTokenRepo.delete(token);
-            throw new ResourceNotFoundException(token.getToken() + " Refresh token is expired. Please make a new login..!");
+            throw new TokenException(token.getToken() + REFRESH_TOKEN_IS_EXPIRED_MESSAGE, REFRESH_TOKEN_IS_EXPIRED_CODE);
         }
         return token;
     }
@@ -62,7 +69,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     @Override
     public void revokeByToken(String token) {
         var refreshToken = findByToken(token)
-                .orElseThrow(() -> new ResourceNotFoundException("Refresh token not found: " + token));
+                .orElseThrow(() -> new ResourceNotFoundException(REFRESH_TOKEN_NOT_FOUND_MESSAGE + token, REFRESH_TOKEN_NOT_FOUND_CODE));
         refreshToken.setRevoked(true);
         refreshTokenRepo.save(refreshToken);
     }

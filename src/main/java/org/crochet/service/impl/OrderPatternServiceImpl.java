@@ -2,6 +2,7 @@ package org.crochet.service.impl;
 
 import org.crochet.client.paypal.PaymentOrder;
 import org.crochet.enumerator.OrderStatus;
+import org.crochet.exception.BaseException;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.model.Order;
 import org.crochet.model.OrderPatternDetail;
@@ -20,6 +21,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.Date;
 import java.util.UUID;
+
+import static org.crochet.constant.MessageCode.*;
+import static org.crochet.constant.MessageConstant.*;
 
 @Service
 public class OrderPatternServiceImpl implements OrderPatternService {
@@ -50,18 +54,18 @@ public class OrderPatternServiceImpl implements OrderPatternService {
         // Check if the authentication object is null or if the principal is not an instance of UserPrincipal
         // If either condition is true, throw a ResourceNotFoundException
         if (auth == null || !(auth.getPrincipal() instanceof UserPrincipal principal)) {
-            throw new ResourceNotFoundException("Please login to order pattern");
+            throw new ResourceNotFoundException(LOGIN_TO_ORDER_PATTERN_MESSAGE, LOGIN_TO_ORDER_PATTERN_CODE);
         }
 
         // Fetch the user from the database using the ID from the UserPrincipal
         // If the user is not found, throw a ResourceNotFoundException
         User user = userRepository.findById(principal.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE, USER_NOT_FOUND_CODE));
 
         // Fetch the pattern from the database using the provided pattern ID
         // If the pattern is not found, throw a ResourceNotFoundException
         var pattern = patternRepository.findById(UUID.fromString(patternId))
-                .orElseThrow(() -> new ResourceNotFoundException("Pattern not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(PATTERN_NOT_FOUND_MESSAGE, PATTERN_NOT_FOUND_CODE));
 
         // Create a payment order using the price of the pattern
         var paymentOrder = payPalService.createPayment(pattern.getPrice());
@@ -96,9 +100,10 @@ public class OrderPatternServiceImpl implements OrderPatternService {
     public String completePayment(String transactionId) {
         var completeOrder = payPalService.completePayment(transactionId);
         var orderPatternDetail = orderPatternDetailRepository.findByTransactionId(transactionId)
-                .orElseThrow(() -> new RuntimeException("Order pattern detail not found for transaction ID " + transactionId));
+                .orElseThrow(() -> new BaseException(ORDER_PATTERN_DETAIL_NOT_FOUND_FOR_TRANSACTION_ID_MESSAGE + transactionId,
+                        ORDER_PATTERN_DETAIL_NOT_FOUND_FOR_TRANSACTION_ID_CODE));
         orderPatternDetail.setStatus(OrderStatus.valueOf(completeOrder.getStatus()));
         orderPatternDetailRepository.save(orderPatternDetail);
-        return "Payment success";
+        return PAYMENT_SUCCESS_MESSAGE;
     }
 }

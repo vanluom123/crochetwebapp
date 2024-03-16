@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
 
+import static org.crochet.constant.MessageConstant.FAILED_TO_SEND_EMAIL_MESSAGE;
+
 /**
  * EmailService class
  */
@@ -50,7 +52,7 @@ public class EmailService implements EmailSender {
             javaMailSender.send(mimeMessage);
         } catch (MessagingException e) {
             log.error("failed to send email", e);
-            throw new IllegalStateException("failed to send email");
+            throw new IllegalStateException(FAILED_TO_SEND_EMAIL_MESSAGE);
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
