@@ -3,7 +3,7 @@ package org.crochet.payload.response;
 import lombok.Builder;
 import lombok.Data;
 
-import java.util.List;
+import java.util.Set;
 
 @Data
 @Builder
@@ -12,5 +12,6 @@ public class PatternResponse {
     private String name;
     private String description;
     private double price;
-    private List<String> files;
+    private Set<FileResponse> images;
+    private Set<FileResponse> files;
 }

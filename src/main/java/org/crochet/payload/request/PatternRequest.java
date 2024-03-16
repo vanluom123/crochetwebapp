@@ -4,8 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 import org.crochet.enumerator.CurrencyCode;
+import org.crochet.payload.response.FileResponse;
 
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Data
@@ -19,5 +20,6 @@ public class PatternRequest {
     private double price;
     @JsonProperty("currency_code")
     private CurrencyCode currencyCode;
-    private List<String> files;
+    private Set<FileResponse> images;
+    private Set<FileResponse> files;
 }
