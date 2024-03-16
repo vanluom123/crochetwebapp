@@ -2,7 +2,11 @@ package org.crochet.service.impl;
 
 import org.crochet.constant.AppConstant;
 import org.crochet.exception.ResourceNotFoundException;
+import org.crochet.mapper.FileMapper;
+import org.crochet.mapper.ImageMapper;
 import org.crochet.mapper.PatternMapper;
+import org.crochet.model.File;
+import org.crochet.model.Image;
 import org.crochet.model.Pattern;
 import org.crochet.model.User;
 import org.crochet.payload.request.PatternRequest;
@@ -24,7 +28,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+
+import static org.crochet.constant.MessageCode.*;
+import static org.crochet.constant.MessageConstant.*;
 
 /**
  * PatternServiceImpl class
@@ -59,7 +67,20 @@ public class PatternServiceImpl implements PatternService {
         pattern.setPrice(request.getPrice());
         pattern.setDescription(request.getDescription());
         pattern.setCurrencyCode(request.getCurrencyCode());
-        pattern.setFiles(request.getFiles());
+
+        Set<File> files = FileMapper.INSTANCE.toEntities(request.getFiles());
+        for (var file : files) {
+            file.setPattern(pattern);
+        }
+        pattern.setFiles(files);
+
+
+        Set<Image> images = ImageMapper.INSTANCE.toEntities(request.getImages());
+        for (var image : images) {
+            image.setPattern(pattern);
+        }
+        pattern.setImages(images);
+
         pattern = patternRepo.save(pattern);
         return PatternMapper.INSTANCE.toResponse(pattern);
     }
@@ -124,23 +145,23 @@ public class PatternServiceImpl implements PatternService {
     public PatternResponse getDetail(String id) {
         var auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !(auth.getPrincipal() instanceof UserPrincipal principal)) {
-            throw new ResourceNotFoundException("User hasn't signed in");
+            throw new ResourceNotFoundException(USER_NOT_LOGGED_IN_MESSAGE, USER_NOT_LOGGED_IN_CODE);
         }
         User user = userRepo.findById(principal.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("User not existed in database"));
+                .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE, USER_NOT_FOUND_CODE));
         var pattern = findPatternByUserOrdered(user.getId(), id);
         return PatternMapper.INSTANCE.toResponse(pattern);
     }
 
     private Pattern findOne(String id) {
         return patternRepo.findById(UUID.fromString(id))
-                .orElseThrow(() -> new ResourceNotFoundException("Pattern not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(PATTERN_NOT_FOUND_MESSAGE, PATTERN_NOT_FOUND_CODE));
     }
 
     private Pattern findPatternByUserOrdered(UUID userId, String patternId) {
         return patternRepo.findPatternByUserOrdered(userId,
                         UUID.fromString(patternId))
-                .orElseThrow(() -> new ResourceNotFoundException("User not payment for this pattern"));
+                .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_PAYMENT_FOR_THIS_PATTERN_MESSAGE, USER_NOT_PAYMENT_FOR_THIS_PATTERN_CODE));
     }
 
     @Transactional

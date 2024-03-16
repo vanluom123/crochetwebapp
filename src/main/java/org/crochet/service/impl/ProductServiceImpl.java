@@ -1,8 +1,11 @@
 package org.crochet.service.impl;
 
 import org.crochet.constant.AppConstant;
+import org.crochet.constant.MessageConstant;
 import org.crochet.exception.ResourceNotFoundException;
+import org.crochet.mapper.FileMapper;
 import org.crochet.mapper.ProductMapper;
+import org.crochet.model.File;
 import org.crochet.model.Product;
 import org.crochet.payload.request.ProductRequest;
 import org.crochet.payload.response.ProductPaginationResponse;
@@ -20,7 +23,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+
+import static org.crochet.constant.MessageCode.PRODUCT_NOT_FOUND_CODE;
+import static org.crochet.constant.MessageConstant.PRODUCT_NOT_FOUND_MESSAGE;
 
 /**
  * ProductServiceImpl class
@@ -61,7 +68,13 @@ public class ProductServiceImpl implements ProductService {
         product.setPrice(request.getPrice());
         product.setDescription(request.getDescription());
         product.setCurrencyCode(request.getCurrencyCode());
-        product.setFiles(request.getFiles());
+
+        Set<File> files = FileMapper.INSTANCE.toEntities(request.getFiles());
+        for (var file : files) {
+            file.setProduct(product);
+        }
+        product.setFiles(files);
+
         product = productRepo.save(product);
         return ProductMapper.INSTANCE.toResponse(product);
     }
@@ -74,7 +87,7 @@ public class ProductServiceImpl implements ProductService {
      * @param sortBy      The attribute by which the products should be sorted.
      * @param sortDir     The sorting direction, either "ASC" (ascending) or "DESC" (descending).
      * @param text        The search text used to filter products by name or other criteria.
-     * @param categoryIds
+     * @param categoryIds The unique identifiers of the categories used to filter products.
      * @return A {@link ProductPaginationResponse} containing the paginated list of products.
      */
     @Override
@@ -130,7 +143,7 @@ public class ProductServiceImpl implements ProductService {
 
     private Product findOne(UUID id) {
         return productRepo.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(PRODUCT_NOT_FOUND_MESSAGE, PRODUCT_NOT_FOUND_CODE));
     }
 
     @Transactional

@@ -2,8 +2,12 @@ package org.crochet.service.impl;
 
 import org.crochet.constant.AppConstant;
 import org.crochet.exception.ResourceNotFoundException;
+import org.crochet.mapper.FileMapper;
 import org.crochet.mapper.FreePatternMapper;
+import org.crochet.mapper.ImageMapper;
+import org.crochet.model.File;
 import org.crochet.model.FreePattern;
+import org.crochet.model.Image;
 import org.crochet.payload.request.FreePatternRequest;
 import org.crochet.payload.response.FreePatternResponse;
 import org.crochet.payload.response.PaginatedFreePatternResponse;
@@ -20,7 +24,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+
+import static org.crochet.constant.MessageCode.FREE_PATTERN_NOT_FOUND_CODE;
+import static org.crochet.constant.MessageConstant.FREE_PATTERN_NOT_FOUND_MESSAGE;
 
 /**
  * FreePatternServiceImpl class
@@ -59,8 +67,20 @@ public class FreePatternServiceImpl implements FreePatternService {
         freePattern.setName(request.getName());
         freePattern.setDescription(request.getDescription());
         freePattern.setAuthor(request.getAuthor());
-        freePattern.setPhotos(request.getPhotos());
-        freePattern.setFiles(request.getFiles());
+
+        Set<File> files = FileMapper.INSTANCE.toEntities(request.getFiles());
+        for (var file : files) {
+            file.setFreePattern(freePattern);
+        }
+        freePattern.setFiles(files);
+
+
+        Set<Image> images = ImageMapper.INSTANCE.toEntities(request.getImages());
+        for (var image : images) {
+            image.setFreePattern(freePattern);
+        }
+        freePattern.setImages(images);
+
         freePattern = freePatternRepo.save(freePattern);
         return FreePatternMapper.INSTANCE.toResponse(freePattern);
     }
@@ -73,7 +93,7 @@ public class FreePatternServiceImpl implements FreePatternService {
      * @param sortBy      The attribute by which the FreePatterns should be sorted.
      * @param sortDir     The sorting direction, either "ASC" (ascending) or "DESC" (descending).
      * @param text        The search text used to filter FreePatterns by name or other criteria.
-     * @param categoryIds
+     * @param categoryIds The list of category IDs used to filter FreePatterns by category.
      * @return A {@link PaginatedFreePatternResponse} containing the paginated list of FreePatterns.
      */
     @Override
@@ -129,7 +149,7 @@ public class FreePatternServiceImpl implements FreePatternService {
 
     private FreePattern findOne(String id) {
         return freePatternRepo.findById(UUID.fromString(id))
-                .orElseThrow(() -> new ResourceNotFoundException("Free pattern not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(FREE_PATTERN_NOT_FOUND_MESSAGE, FREE_PATTERN_NOT_FOUND_CODE));
     }
 
     @Transactional
