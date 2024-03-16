@@ -35,22 +35,16 @@ public class Pattern extends BaseEntity {
             nullable = false)
     private CurrencyCode currencyCode;
 
-    @ElementCollection
-    @CollectionTable(name = "pattern_photos",
-            joinColumns = {@JoinColumn(name = "pattern_id", nullable = false)})
-    @Column(name = "photo_name", columnDefinition = "LONGBLOB")
-    private List<String> photos;
-
-    @ElementCollection
-    @CollectionTable(name = "pattern_file",
-            joinColumns = {@JoinColumn(name = "pattern_id", nullable = false)})
-    @Column(name = "file_name", columnDefinition = "LONGBLOB")
-    private List<String> files;
-
     @OneToMany(mappedBy = "pattern", cascade = CascadeType.ALL)
     private Set<OrderPatternDetail> orderPatternDetails;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", columnDefinition = "BINARY(16) NOT NULL")
     private Category category;
+
+    @OneToMany(mappedBy = "pattern", cascade = CascadeType.ALL)
+    private Set<File> files;
+
+    @OneToMany(mappedBy = "pattern", cascade = CascadeType.ALL)
+    private Set<Image> images;
 }
