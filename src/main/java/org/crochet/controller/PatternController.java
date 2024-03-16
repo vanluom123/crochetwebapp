@@ -31,7 +31,7 @@ public class PatternController {
     @Operation(summary = "Create a pattern")
     @ApiResponse(responseCode = "201", description = "Pattern created successfully",
             content = @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = String.class)))
+                    schema = @Schema(implementation = PatternResponse.class)))
     @PostMapping(value = "/create")
     @PreAuthorize("hasRole('ADMIN')")
     @SecurityRequirement(name = "BearerAuth")
