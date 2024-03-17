@@ -80,21 +80,21 @@ public class CategoryController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Update category without parent")
-    @ApiResponse(responseCode = "200", description = "Get parent categories",
-            content = {@Content(mediaType = "application/json", schema = @Schema(implementation = List.class))})
-    @GetMapping("/get-parent-categories")
-    public ResponseEntity<List<CategoryResponse>> getParentCategories() {
-        var response = categoryService.getParentCategories();
-        return ResponseEntity.ok(response);
-    }
-
     @Operation(summary = "Get sub categories")
     @ApiResponse(responseCode = "200", description = "Get sub categories",
             content = {@Content(mediaType = "application/json", schema = @Schema(implementation = List.class))})
     @GetMapping("/get-sub-categories")
     public ResponseEntity<List<CategoryResponse>> getSubCategories(UUID parentId) {
         var response = categoryService.getSubCategories(parentId);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Get category by id")
+    @ApiResponse(responseCode = "200", description = "Get category by id",
+            content = {@Content(mediaType = "application/json", schema = @Schema(implementation = CategoryResponse.class))})
+    @GetMapping("/getById")
+    public ResponseEntity<CategoryResponse> getById(UUID id) {
+        var response = categoryService.getById(id);
         return ResponseEntity.ok(response);
     }
 
