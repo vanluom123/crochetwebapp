@@ -14,4 +14,5 @@ public class FreePatternResponse {
     private String author;
     private Set<FileResponse> images;
     private Set<FileResponse> files;
+    private CategoryResponse category;
 }

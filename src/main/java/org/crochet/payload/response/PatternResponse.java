@@ -14,4 +14,5 @@ public class PatternResponse {
     private double price;
     private Set<FileResponse> images;
     private Set<FileResponse> files;
+    private CategoryResponse category;
 }

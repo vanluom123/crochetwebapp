@@ -13,4 +13,5 @@ public class ProductResponse {
     private String description;
     private double price;
     private Set<FileResponse> files;
+    private CategoryResponse category;
 }
