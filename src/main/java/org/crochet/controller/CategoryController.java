@@ -45,7 +45,7 @@ public class CategoryController {
     @PreAuthorize("hasRole('ADMIN')")
     @SecurityRequirement(name = "BearerAuth")
     @PostMapping("/create")
-    public ResponseEntity<CategoryResponse> create(@Valid @RequestBody CategoryCreationRequest request) {
+    public ResponseEntity<List<CategoryResponse>> create(@Valid @RequestBody CategoryCreationRequest request) {
         var response = categoryService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
