@@ -21,7 +21,7 @@ import java.util.Set;
 @SuperBuilder
 @NoArgsConstructor
 public class Category extends BaseEntity {
-    @Column(name = "name", unique = true, nullable = false)
+    @Column(name = "name", nullable = false)
     private String name;
 
     @ManyToOne
