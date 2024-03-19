@@ -1,6 +1,5 @@
 package org.crochet.service.impl;
 
-import org.crochet.constant.MessageConstant;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.BlogPostMapper;
 import org.crochet.model.BlogPost;
