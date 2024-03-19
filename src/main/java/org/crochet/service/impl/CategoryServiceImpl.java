@@ -11,8 +11,9 @@ import org.crochet.service.CategoryService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static org.crochet.constant.MessageCode.CATEGORY_NOT_FOUND_CODE;
 import static org.crochet.constant.MessageConstant.CATEGORY_NOT_FOUND_MESSAGE;
@@ -27,13 +28,51 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Transactional
     @Override
-    public CategoryResponse create(CategoryCreationRequest request) {
-        Category parent = (request.getParentId() == null) ? null : findById(request.getParentId());
-        var child = new Category();
-        child.setName(request.getName());
-        child.setParent(parent);
-        child = categoryRepo.save(child);
-        return CategoryMapper.INSTANCE.toResponse(child);
+    public List<CategoryResponse> create(CategoryCreationRequest request) {
+        // Extract parent IDs and category name from the request
+        List<UUID> parentIds = request.getParentIds();
+        String name = request.getName();
+
+        // Check if a category with the same name already exists as a parent
+        List<Category> allCategories = categoryRepo.findAll();
+        if (allCategories.parallelStream().anyMatch(category -> category.getName().equals(name) && category.getParent() == null)) {
+            throw new IllegalArgumentException("A category with the same name already exists as a parent.");
+        }
+
+        // Retrieve parent categories from the database
+        List<Category> parents = categoryRepo.findAllById(parentIds);
+
+        // Convert parents list to a map for faster lookup
+        Map<UUID, Category> parentMap = parents.parallelStream()
+                .collect(Collectors.toMap(Category::getId, Function.identity()));
+
+        // Create a new category
+        Category category = new Category();
+        category.setName(name);
+
+        // Create child categories and add them to their respective parents
+        Set<Category> children = new HashSet<>();
+        if (parentIds.isEmpty()) {
+            children.add(category);
+        } else {
+            for (UUID parentId : parentIds) {
+                if (parentMap.containsKey(parentId)) {
+                    Category parent = parentMap.get(parentId);
+                    category.setParent(parent);
+                    // Check if a child category with the same name already exists
+                    if (parent.getChildren().parallelStream().anyMatch(child -> child.getName().equals(name))) {
+                        throw new IllegalArgumentException("A child category with the same name already exists within the parent category.");
+                    }
+                }
+                children.add(category);
+            }
+        }
+
+        // Save all categories to the database at once
+        categoryRepo.saveAll(children);
+
+        // Map child categories to CategoryResponse objects and return them
+        return CategoryMapper.INSTANCE.toResponses(new ArrayList<>(children));
     }
 
     @Transactional
