@@ -10,10 +10,12 @@ import org.crochet.constant.AppConstant;
 import org.crochet.payload.request.PatternRequest;
 import org.crochet.payload.response.PatternPaginationResponse;
 import org.crochet.payload.response.PatternResponse;
+import org.crochet.security.UserPrincipal;
 import org.crochet.service.PatternService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -71,10 +73,13 @@ public class PatternController {
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = PatternResponse.class)))
     @GetMapping("/detail")
+    @PreAuthorize("hasRole('USER')")
+    @SecurityRequirement(name = "BearerAuth")
     public ResponseEntity<PatternResponse> getDetail(
+            @AuthenticationPrincipal UserPrincipal principal,
             @Parameter(description = "ID of the pattern to retrieve")
             @RequestParam("id") String id) {
-        return ResponseEntity.ok(patternService.getDetail(id));
+        return ResponseEntity.ok(patternService.getDetail(principal, id));
     }
 
     @Operation(summary = "Delete a pattern")
