@@ -1,5 +1,6 @@
 package org.crochet.service.impl;
 
+import org.crochet.properties.MessageCodeProperties;
 import org.crochet.constant.AppConstant;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.FileMapper;
@@ -27,7 +28,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import static org.crochet.constant.MessageCode.FREE_PATTERN_NOT_FOUND_CODE;
 import static org.crochet.constant.MessageConstant.FREE_PATTERN_NOT_FOUND_MESSAGE;
 
 /**
@@ -37,16 +37,21 @@ import static org.crochet.constant.MessageConstant.FREE_PATTERN_NOT_FOUND_MESSAG
 public class FreePatternServiceImpl implements FreePatternService {
     private final FreePatternRepository freePatternRepo;
     private final CategoryService categoryService;
+    private final MessageCodeProperties msgCodeProps;
 
     /**
      * Constructs a new {@code FreePatternServiceImpl} with the specified FreePattern repository.
      *
      * @param freePatternRepo The repository for handling FreePattern-related operations.
+     * @param categoryService The service for handling Category-related operations.
+     * @param msgCodeProps    The properties for retrieving message codes.
      */
     public FreePatternServiceImpl(FreePatternRepository freePatternRepo,
-                                  CategoryService categoryService) {
+                                  CategoryService categoryService,
+                                  MessageCodeProperties msgCodeProps) {
         this.freePatternRepo = freePatternRepo;
         this.categoryService = categoryService;
+        this.msgCodeProps = msgCodeProps;
     }
 
     /**
@@ -68,18 +73,23 @@ public class FreePatternServiceImpl implements FreePatternService {
         freePattern.setDescription(request.getDescription());
         freePattern.setAuthor(request.getAuthor());
 
-        Set<File> files = FileMapper.INSTANCE.toEntities(request.getFiles());
-        for (var file : files) {
-            file.setFreePattern(freePattern);
+        // Set files
+        if (!request.getFiles().isEmpty()) {
+            Set<File> files = FileMapper.INSTANCE.toEntities(request.getFiles());
+            for (var file : files) {
+                file.setFreePattern(freePattern);
+            }
+            freePattern.setFiles(files);
         }
-        freePattern.setFiles(files);
 
-
-        Set<Image> images = ImageMapper.INSTANCE.toEntities(request.getImages());
-        for (var image : images) {
-            image.setFreePattern(freePattern);
+        // Set images
+        if (!request.getImages().isEmpty()) {
+            Set<Image> images = ImageMapper.INSTANCE.toEntities(request.getImages());
+            for (var image : images) {
+                image.setFreePattern(freePattern);
+            }
+            freePattern.setImages(images);
         }
-        freePattern.setImages(images);
 
         freePattern = freePatternRepo.save(freePattern);
         return FreePatternMapper.INSTANCE.toResponse(freePattern);
@@ -149,7 +159,8 @@ public class FreePatternServiceImpl implements FreePatternService {
 
     private FreePattern findOne(String id) {
         return freePatternRepo.findById(UUID.fromString(id))
-                .orElseThrow(() -> new ResourceNotFoundException(FREE_PATTERN_NOT_FOUND_MESSAGE, FREE_PATTERN_NOT_FOUND_CODE));
+                .orElseThrow(() -> new ResourceNotFoundException(FREE_PATTERN_NOT_FOUND_MESSAGE,
+                        msgCodeProps.getCode("FREE_PATTERN_NOT_FOUND_MESSAGE")));
     }
 
     @Transactional

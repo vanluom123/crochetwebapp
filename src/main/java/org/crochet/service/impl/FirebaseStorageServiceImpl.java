@@ -3,6 +3,8 @@ package org.crochet.service.impl;
 import com.google.cloud.storage.Blob;
 import com.google.firebase.cloud.StorageClient;
 import lombok.extern.slf4j.Slf4j;
+import org.crochet.properties.MessageCodeProperties;
+import org.crochet.exception.StorageException;
 import org.crochet.payload.response.FileResponse;
 import org.crochet.service.FirebaseStorageService;
 import org.springframework.stereotype.Service;
@@ -18,10 +20,13 @@ import java.util.stream.Stream;
 @Service
 public class FirebaseStorageServiceImpl implements FirebaseStorageService {
     private static final String BUCKET_NAME = "littlecrochet.appspot.com";
+    public static final String CANNOT_UPLOAD_FILE_MESSAGE = "Cannot upload image to Firebase Cloud Storage";
     private final StorageClient storageClient;
+    private final MessageCodeProperties msgCodeProps;
 
-    public FirebaseStorageServiceImpl(StorageClient storageClient) {
+    public FirebaseStorageServiceImpl(StorageClient storageClient, MessageCodeProperties msgCodeProps) {
         this.storageClient = storageClient;
+        this.msgCodeProps = msgCodeProps;
     }
 
     public FileResponse uploadFile(MultipartFile imageFile) {
@@ -34,8 +39,9 @@ public class FirebaseStorageServiceImpl implements FirebaseStorageService {
             blob = storageClient.bucket(BUCKET_NAME)
                     .create(fileName, imageFile.getInputStream(), imageFile.getContentType());
         } catch (IOException e) {
-            log.error("Cannot upload image to Firebase Cloud Storage");
-            throw new RuntimeException("Cannot upload image to Firebase Cloud Storage");
+            log.error(CANNOT_UPLOAD_FILE_MESSAGE);
+            throw new StorageException(CANNOT_UPLOAD_FILE_MESSAGE,
+                    msgCodeProps.getCode("CANNOT_UPLOAD_FILE_MESSAGE"));
         }
 
         log.info("image name: {}", blob.getName());
@@ -50,7 +56,6 @@ public class FirebaseStorageServiceImpl implements FirebaseStorageService {
     public List<FileResponse> uploadMultipleFiles(MultipartFile[] files) {
         List<FileResponse> fileNames;
         fileNames = Stream.of(files)
-                .parallel()
                 .map(this::uploadFile)
                 .toList();
         return fileNames;
@@ -58,7 +63,7 @@ public class FirebaseStorageServiceImpl implements FirebaseStorageService {
 
     @Override
     public List<String> deleteMultipleFiles(List<String> fileNames) {
-        return fileNames.parallelStream()
+        return fileNames.stream()
                 .map(this::tryDeleteFile)
                 .filter(Optional::isPresent)
                 .map(Optional::get)

@@ -1,5 +1,6 @@
 package org.crochet.service.impl;
 
+import org.crochet.properties.MessageCodeProperties;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.exception.TokenException;
 import org.crochet.model.RefreshToken;
@@ -16,8 +17,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.crochet.constant.MessageCode.REFRESH_TOKEN_IS_EXPIRED_CODE;
-import static org.crochet.constant.MessageCode.REFRESH_TOKEN_NOT_FOUND_CODE;
 import static org.crochet.constant.MessageConstant.REFRESH_TOKEN_IS_EXPIRED_MESSAGE;
 import static org.crochet.constant.MessageConstant.REFRESH_TOKEN_NOT_FOUND_MESSAGE;
 import static org.crochet.constant.MessageConstant.USER_NOT_FOUND_WITH_EMAIL_MESSAGE;
@@ -27,13 +26,16 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     private final RefreshTokenRepo refreshTokenRepo;
     private final UserRepository userRepository;
     private final AppProperties appProps;
+    private final MessageCodeProperties msgCodeProps;
 
     public RefreshTokenServiceImpl(RefreshTokenRepo refreshTokenRepo,
                                    UserRepository userRepository,
-                                   AppProperties appProps) {
+                                   AppProperties appProps,
+                                   MessageCodeProperties msgCodeProps) {
         this.refreshTokenRepo = refreshTokenRepo;
         this.userRepository = userRepository;
         this.appProps = appProps;
+        this.msgCodeProps = msgCodeProps;
     }
 
     @Transactional
@@ -61,7 +63,8 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     public RefreshToken verifyExpiration(RefreshToken token) {
         if (token.getExpiryDate().isBefore(LocalDateTime.now())) {
             refreshTokenRepo.delete(token);
-            throw new TokenException(token.getToken() + REFRESH_TOKEN_IS_EXPIRED_MESSAGE, REFRESH_TOKEN_IS_EXPIRED_CODE);
+            throw new TokenException(token.getToken() + REFRESH_TOKEN_IS_EXPIRED_MESSAGE,
+                    msgCodeProps.getCode("REFRESH_TOKEN_IS_EXPIRED_MESSAGE"));
         }
         return token;
     }
@@ -69,7 +72,8 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     @Override
     public void revokeByToken(String token) {
         var refreshToken = findByToken(token)
-                .orElseThrow(() -> new ResourceNotFoundException(REFRESH_TOKEN_NOT_FOUND_MESSAGE + token, REFRESH_TOKEN_NOT_FOUND_CODE));
+                .orElseThrow(() -> new ResourceNotFoundException(REFRESH_TOKEN_NOT_FOUND_MESSAGE + token,
+                        msgCodeProps.getCode("REFRESH_TOKEN_NOT_FOUND_MESSAGE")));
         refreshToken.setRevoked(true);
         refreshTokenRepo.save(refreshToken);
     }

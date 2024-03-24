@@ -1,7 +1,7 @@
 package org.crochet.service.impl;
 
+import org.crochet.properties.MessageCodeProperties;
 import org.crochet.constant.AppConstant;
-import org.crochet.constant.MessageConstant;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.FileMapper;
 import org.crochet.mapper.ProductMapper;
@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import static org.crochet.constant.MessageCode.PRODUCT_NOT_FOUND_CODE;
 import static org.crochet.constant.MessageConstant.PRODUCT_NOT_FOUND_MESSAGE;
 
 /**
@@ -36,16 +35,21 @@ import static org.crochet.constant.MessageConstant.PRODUCT_NOT_FOUND_MESSAGE;
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepo;
     private final CategoryService categoryService;
+    private final MessageCodeProperties msgCodeProps;
 
     /**
-     * Constructs a new {@code ProductServiceImpl} with the specified product repository.
+     * Constructor
      *
-     * @param productRepo The repository for handling product-related operations.
+     * @param productRepo     The {@link ProductRepository} instance.
+     * @param categoryService The {@link CategoryService} instance.
+     * @param msgCodeProps    The {@link MessageCodeProperties} instance.
      */
     public ProductServiceImpl(ProductRepository productRepo,
-                              CategoryService categoryService) {
+                              CategoryService categoryService,
+                              MessageCodeProperties msgCodeProps) {
         this.productRepo = productRepo;
         this.categoryService = categoryService;
+        this.msgCodeProps = msgCodeProps;
     }
 
     /**
@@ -69,11 +73,13 @@ public class ProductServiceImpl implements ProductService {
         product.setDescription(request.getDescription());
         product.setCurrencyCode(request.getCurrencyCode());
 
-        Set<File> files = FileMapper.INSTANCE.toEntities(request.getFiles());
-        for (var file : files) {
-            file.setProduct(product);
+        if (!request.getFiles().isEmpty()) {
+            Set<File> files = FileMapper.INSTANCE.toEntities(request.getFiles());
+            for (var file : files) {
+                file.setProduct(product);
+            }
+            product.setFiles(files);
         }
-        product.setFiles(files);
 
         product = productRepo.save(product);
         return ProductMapper.INSTANCE.toResponse(product);
@@ -143,7 +149,8 @@ public class ProductServiceImpl implements ProductService {
 
     private Product findOne(UUID id) {
         return productRepo.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(PRODUCT_NOT_FOUND_MESSAGE, PRODUCT_NOT_FOUND_CODE));
+                .orElseThrow(() -> new ResourceNotFoundException(PRODUCT_NOT_FOUND_MESSAGE,
+                        msgCodeProps.getCode("PRODUCT_NOT_FOUND_MESSAGE")));
     }
 
     @Transactional

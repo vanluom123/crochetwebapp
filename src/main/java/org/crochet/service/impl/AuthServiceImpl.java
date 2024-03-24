@@ -1,6 +1,7 @@
 package org.crochet.service.impl;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.crochet.properties.MessageCodeProperties;
 import org.crochet.exception.EmailVerificationException;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.exception.TokenException;
@@ -22,7 +23,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.time.LocalDateTime;
 
-import static org.crochet.constant.MessageCode.*;
 import static org.crochet.constant.MessageConstant.*;
 import static org.springframework.util.StringUtils.hasText;
 
@@ -38,6 +38,7 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenService refreshTokenService;
     private final JwtTokenService jwtTokenService;
+    private final MessageCodeProperties msgCodeProps;
 
     public AuthServiceImpl(ConfirmTokenService confirmTokenService,
                            PasswordResetTokenService passwordResetTokenService,
@@ -45,7 +46,8 @@ public class AuthServiceImpl implements AuthService {
                            EmailSender emailSender,
                            PasswordEncoder passwordEncoder,
                            RefreshTokenService refreshTokenService,
-                           JwtTokenService jwtTokenService) {
+                           JwtTokenService jwtTokenService,
+                           MessageCodeProperties msgCodeProps) {
         this.confirmTokenService = confirmTokenService;
         this.passwordResetTokenService = passwordResetTokenService;
         this.userService = userService;
@@ -53,6 +55,7 @@ public class AuthServiceImpl implements AuthService {
         this.passwordEncoder = passwordEncoder;
         this.refreshTokenService = refreshTokenService;
         this.jwtTokenService = jwtTokenService;
+        this.msgCodeProps = msgCodeProps;
     }
 
     /**
@@ -67,7 +70,8 @@ public class AuthServiceImpl implements AuthService {
         var user = userService.checkLogin(loginRequest.getEmail(), loginRequest.getPassword());
         // Check email verified
         if (!user.getEmailVerified()) {
-            throw new EmailVerificationException(EMAIL_NOT_VERIFIED_MESSAGE, EMAIL_NOT_VERIFIED_CODE);
+            throw new EmailVerificationException(EMAIL_NOT_VERIFIED_MESSAGE,
+                    msgCodeProps.getCode("EMAIL_NOT_VERIFIED_MESSAGE"));
         }
         // Create refresh token
         var refreshToken = refreshTokenService.createRefreshToken(user.getEmail());
@@ -157,11 +161,13 @@ public class AuthServiceImpl implements AuthService {
         LocalDateTime confirmedAt = confirmationToken.getConfirmedAt();
 
         if (confirmedAt != null) {
-            throw new EmailVerificationException(EMAIL_ALREADY_CONFIRMED_MESSAGE, EMAIL_ALREADY_CONFIRMED_CODE);
+            throw new EmailVerificationException(EMAIL_ALREADY_CONFIRMED_MESSAGE,
+                    msgCodeProps.getCode("EMAIL_ALREADY_CONFIRMED_MESSAGE"));
         }
 
         if (expiredAt.isBefore(now)) {
-            throw new TokenException(TOKEN_EXPIRED_MESSAGE, TOKEN_EXPIRED_CODE);
+            throw new TokenException(TOKEN_EXPIRED_MESSAGE,
+                    msgCodeProps.getCode("TOKEN_EXPIRED_MESSAGE"));
         }
 
         // Update confirmedAt
@@ -305,7 +311,8 @@ public class AuthServiceImpl implements AuthService {
         LocalDateTime expiredAt = passwordResetToken.getExpiresAt();
 
         if (expiredAt.isBefore(now)) {
-            throw new TokenException(PASSWORD_RESET_TOKEN_IS_EXPIRED_MESSAGE, PASSWORD_RESET_TOKEN_IS_EXPIRED_CODE);
+            throw new TokenException(PASSWORD_RESET_TOKEN_IS_EXPIRED_MESSAGE,
+                    msgCodeProps.getCode("PASSWORD_RESET_TOKEN_IS_EXPIRED_MESSAGE"));
         }
 
         // Get email by token
@@ -334,7 +341,8 @@ public class AuthServiceImpl implements AuthService {
                             .jwtToken(accessToken)
                             .refreshToken(refreshToken)
                             .build();
-                }).orElseThrow(() -> new ResourceNotFoundException(REFRESH_TOKEN_IS_NOT_IN_DB_MESSAGE, REFRESH_TOKEN_IS_NOT_IN_DB_CODE));
+                }).orElseThrow(() -> new ResourceNotFoundException(REFRESH_TOKEN_IS_NOT_IN_DB_MESSAGE,
+                        msgCodeProps.getCode("REFRESH_TOKEN_IS_NOT_IN_DB_MESSAGE")));
     }
 
     @Override
