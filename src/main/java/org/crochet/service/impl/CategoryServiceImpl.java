@@ -77,7 +77,7 @@ public class CategoryServiceImpl implements CategoryService {
         categoryRepo.saveAll(children);
 
         // Map child categories to CategoryResponse objects and return them
-        return CategoryMapper.INSTANCE.toResponses(new ArrayList<>(children));
+        return CategoryMapper.INSTANCE.toResponses(children);
     }
 
     @Transactional
