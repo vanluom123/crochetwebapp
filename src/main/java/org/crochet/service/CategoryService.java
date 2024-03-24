@@ -15,10 +15,6 @@ public interface CategoryService {
 
     CategoryResponse update(CategoryUpdateRequest request);
 
-    List<CategoryResponse> getParentCategories();
-
-    List<CategoryResponse> getSubCategories(UUID parentId);
-
     List<CategoryResponse> getAllCategories();
 
     CategoryResponse getById(UUID id);
