@@ -34,12 +34,10 @@ public class CategoryServiceImpl implements CategoryService {
         String name = request.getName();
 
         // Check if a category with the same name already exists as a parent
-        List<Category> allCategories = categoryRepo.findAll();
-        if (allCategories.stream().anyMatch(category -> category.getName().equals(name) && category.getParent() == null)) {
+        if (categoryRepo.existsByNameAndParentIsNull(name)) {
             throw new IllegalArgumentException(EXISTS_AS_A_PARENT_MESSAGE,
                     msgCodeProps.getCode("EXISTS_AS_A_PARENT_MESSAGE"));
         }
-
         // Retrieve parent categories from the database
         List<Category> parents = categoryRepo.findAllById(request.getParentIds());
 
@@ -47,6 +45,10 @@ public class CategoryServiceImpl implements CategoryService {
         Set<Category> children = new HashSet<>();
 
         if (parents.isEmpty()) {
+            if (categoryRepo.existsByNameAndParentIsNotNull(name)) {
+                throw new IllegalArgumentException(EXISTS_AS_A_CHILD_MESSAGE,
+                        msgCodeProps.getCode("EXISTS_AS_A_CHILD_MESSAGE"));
+            }
             // Create a new category
             Category category = new Category();
             category.setName(name);
@@ -100,7 +102,7 @@ public class CategoryServiceImpl implements CategoryService {
     public List<CategoryResponse> getAllCategories() {
         var categories = categoryRepo.findAll();
         // get categories with no parent
-        var parentCategories = categories.parallelStream()
+        var parentCategories = categories.stream()
                 .filter(category -> category.getParent() == null)
                 .toList();
         return CategoryMapper.INSTANCE.toResponses(parentCategories);
