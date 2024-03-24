@@ -43,4 +43,6 @@ public class MessageConstant {
     public static final String PRODUCT_NOT_FOUND_MESSAGE = "Product not found";
     public static final String REFRESH_TOKEN_IS_EXPIRED_MESSAGE = " Refresh token is expired. Please make a new login..!";
     public static final String REFRESH_TOKEN_NOT_FOUND_MESSAGE = "Refresh token not found: ";
+    public static final String EXISTS_AS_A_PARENT_MESSAGE = "A category with the same name already exists as a parent.";
+    public static final String EXISTS_AS_A_CHILD_MESSAGE = "A category with the same name already exists as a child.";
 }
