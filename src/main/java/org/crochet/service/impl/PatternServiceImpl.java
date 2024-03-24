@@ -1,5 +1,6 @@
 package org.crochet.service.impl;
 
+import org.crochet.properties.MessageCodeProperties;
 import org.crochet.constant.AppConstant;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.FileMapper;
@@ -31,7 +32,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import static org.crochet.constant.MessageCode.*;
 import static org.crochet.constant.MessageConstant.*;
 
 /**
@@ -42,13 +42,16 @@ public class PatternServiceImpl implements PatternService {
     private final PatternRepository patternRepo;
     private final UserRepository userRepo;
     private final CategoryService categoryService;
+    private final MessageCodeProperties msgCodeProps;
 
     public PatternServiceImpl(PatternRepository patternRepo,
                               UserRepository userRepo,
-                              CategoryService categoryService) {
+                              CategoryService categoryService,
+                              MessageCodeProperties msgCodeProps) {
         this.patternRepo = patternRepo;
         this.userRepo = userRepo;
         this.categoryService = categoryService;
+        this.msgCodeProps = msgCodeProps;
     }
 
     /**
@@ -68,18 +71,21 @@ public class PatternServiceImpl implements PatternService {
         pattern.setDescription(request.getDescription());
         pattern.setCurrencyCode(request.getCurrencyCode());
 
-        Set<File> files = FileMapper.INSTANCE.toEntities(request.getFiles());
-        for (var file : files) {
-            file.setPattern(pattern);
+        if (!request.getFiles().isEmpty()) {
+            Set<File> files = FileMapper.INSTANCE.toEntities(request.getFiles());
+            for (var file : files) {
+                file.setPattern(pattern);
+            }
+            pattern.setFiles(files);
         }
-        pattern.setFiles(files);
 
-
-        Set<Image> images = ImageMapper.INSTANCE.toEntities(request.getImages());
-        for (var image : images) {
-            image.setPattern(pattern);
+        if (!request.getImages().isEmpty()) {
+            Set<Image> images = ImageMapper.INSTANCE.toEntities(request.getImages());
+            for (var image : images) {
+                image.setPattern(pattern);
+            }
+            pattern.setImages(images);
         }
-        pattern.setImages(images);
 
         pattern = patternRepo.save(pattern);
         return PatternMapper.INSTANCE.toResponse(pattern);
@@ -93,7 +99,7 @@ public class PatternServiceImpl implements PatternService {
      * @param sortBy      Sort by
      * @param sortDir     Sort directory
      * @param text        Text
-     * @param categoryIds
+     * @param categoryIds The list of category ids
      * @return Pattern is paginated
      */
     @Override
@@ -138,30 +144,34 @@ public class PatternServiceImpl implements PatternService {
     /**
      * Get pattern detail
      *
-     * @param id Id
+     * @param principal
+     * @param id        Id
      * @return Pattern response
      */
     @Override
-    public PatternResponse getDetail(String id) {
-        var auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null || !(auth.getPrincipal() instanceof UserPrincipal principal)) {
-            throw new ResourceNotFoundException(USER_NOT_LOGGED_IN_MESSAGE, USER_NOT_LOGGED_IN_CODE);
+    public PatternResponse getDetail(UserPrincipal principal, String id) {
+        if (principal == null) {
+            throw new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE,
+                    msgCodeProps.getCode("USER_NOT_FOUND_MESSAGE"));
         }
         User user = userRepo.findById(principal.getId())
-                .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE, USER_NOT_FOUND_CODE));
+                .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE,
+                        msgCodeProps.getCode("USER_NOT_FOUND_MESSAGE")));
         var pattern = findPatternByUserOrdered(user.getId(), id);
         return PatternMapper.INSTANCE.toResponse(pattern);
     }
 
     private Pattern findOne(String id) {
         return patternRepo.findById(UUID.fromString(id))
-                .orElseThrow(() -> new ResourceNotFoundException(PATTERN_NOT_FOUND_MESSAGE, PATTERN_NOT_FOUND_CODE));
+                .orElseThrow(() -> new ResourceNotFoundException(PATTERN_NOT_FOUND_MESSAGE,
+                        msgCodeProps.getCode("PATTERN_NOT_FOUND_MESSAGE")));
     }
 
     private Pattern findPatternByUserOrdered(UUID userId, String patternId) {
         return patternRepo.findPatternByUserOrdered(userId,
                         UUID.fromString(patternId))
-                .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_PAYMENT_FOR_THIS_PATTERN_MESSAGE, USER_NOT_PAYMENT_FOR_THIS_PATTERN_CODE));
+                .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_PAYMENT_FOR_THIS_PATTERN_MESSAGE,
+                        msgCodeProps.getCode("USER_NOT_PAYMENT_FOR_THIS_PATTERN_MESSAGE")));
     }
 
     @Transactional
