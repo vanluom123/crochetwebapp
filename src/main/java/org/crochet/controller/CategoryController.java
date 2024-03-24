@@ -80,15 +80,6 @@ public class CategoryController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Get sub categories")
-    @ApiResponse(responseCode = "200", description = "Get sub categories",
-            content = {@Content(mediaType = "application/json", schema = @Schema(implementation = List.class))})
-    @GetMapping("/get-sub-categories")
-    public ResponseEntity<List<CategoryResponse>> getSubCategories(UUID parentId) {
-        var response = categoryService.getSubCategories(parentId);
-        return ResponseEntity.ok(response);
-    }
-
     @Operation(summary = "Get category by id")
     @ApiResponse(responseCode = "200", description = "Get category by id",
             content = {@Content(mediaType = "application/json", schema = @Schema(implementation = CategoryResponse.class))})
