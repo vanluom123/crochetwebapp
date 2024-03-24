@@ -1,6 +1,6 @@
 package org.crochet.exception;
 
-public class EmailVerificationException extends BaseException {
+public class EmailVerificationException extends DecoratedRuntimeException {
     public EmailVerificationException(String message) {
         super(message);
     }

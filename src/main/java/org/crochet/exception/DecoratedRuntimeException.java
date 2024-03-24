@@ -5,14 +5,14 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class BaseException extends RuntimeException {
+public class DecoratedRuntimeException extends RuntimeException {
     private int messageCode;
 
-    public BaseException(String message) {
+    public DecoratedRuntimeException(String message) {
         super(message);
     }
 
-    public BaseException(String message, int messageCode) {
+    public DecoratedRuntimeException(String message, int messageCode) {
         super(message);
         this.messageCode = messageCode;
     }

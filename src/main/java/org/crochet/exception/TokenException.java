@@ -1,6 +1,6 @@
 package org.crochet.exception;
 
-public class TokenException extends BaseException {
+public class TokenException extends DecoratedRuntimeException {
     public TokenException(String tokenExpired) {
         super(tokenExpired);
     }
