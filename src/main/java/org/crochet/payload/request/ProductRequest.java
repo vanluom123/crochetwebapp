@@ -1,19 +1,18 @@
 package org.crochet.payload.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.Data;
 import org.crochet.enumerator.CurrencyCode;
+import org.crochet.payload.response.FileResponse;
 
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Data
 @Builder
 public class ProductRequest {
     private UUID id;
-    @NotBlank
     @JsonProperty("category_id")
     private UUID categoryId;
     private String name;
@@ -21,5 +20,5 @@ public class ProductRequest {
     private double price;
     @JsonProperty("currency_code")
     private CurrencyCode currencyCode;
-    private List<String> files;
+    private Set<FileResponse> files;
 }

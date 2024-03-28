@@ -10,12 +10,15 @@ import org.crochet.constant.AppConstant;
 import org.crochet.payload.request.PatternRequest;
 import org.crochet.payload.response.PatternPaginationResponse;
 import org.crochet.payload.response.PatternResponse;
+import org.crochet.security.CurrentUser;
+import org.crochet.security.UserPrincipal;
 import org.crochet.service.PatternService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -30,7 +33,7 @@ public class PatternController {
     @Operation(summary = "Create a pattern")
     @ApiResponse(responseCode = "201", description = "Pattern created successfully",
             content = @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = String.class)))
+                    schema = @Schema(implementation = PatternResponse.class)))
     @PostMapping(value = "/create")
     @PreAuthorize("hasRole('ADMIN')")
     @SecurityRequirement(name = "BearerAuth")
@@ -58,8 +61,10 @@ public class PatternController {
             @RequestParam(value = "sortDir", defaultValue = AppConstant.DEFAULT_SORT_DIRECTION,
                     required = false) String sortDir,
             @Parameter(description = "Search text")
-            @RequestParam(value = "text", required = false) String text) {
-        var response = patternService.getPatterns(pageNo, pageSize, sortBy, sortDir, text);
+            @RequestParam(value = "text", required = false) String text,
+            @Parameter(description = "Category IDs")
+            @RequestParam(value = "categoryIds", required = false) List<UUID> categoryIds) {
+        var response = patternService.getPatterns(pageNo, pageSize, sortBy, sortDir, text, categoryIds);
         return ResponseEntity.ok(response);
     }
 
@@ -68,10 +73,13 @@ public class PatternController {
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = PatternResponse.class)))
     @GetMapping("/detail")
+    @PreAuthorize("hasRole('USER')")
+    @SecurityRequirement(name = "BearerAuth")
     public ResponseEntity<PatternResponse> getDetail(
+            @CurrentUser UserPrincipal principal,
             @Parameter(description = "ID of the pattern to retrieve")
             @RequestParam("id") String id) {
-        return ResponseEntity.ok(patternService.getDetail(id));
+        return ResponseEntity.ok(patternService.getDetail(principal, id));
     }
 
     @Operation(summary = "Delete a pattern")

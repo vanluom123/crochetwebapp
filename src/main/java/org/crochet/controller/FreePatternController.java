@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -30,7 +31,7 @@ public class FreePatternController {
     @Operation(summary = "Create a pattern")
     @ApiResponse(responseCode = "201", description = "Pattern created successfully",
             content = @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = String.class)))
+                    schema = @Schema(implementation = FreePatternResponse.class)))
     @PostMapping(value = "/create")
     @PreAuthorize("hasRole('ADMIN')")
     @SecurityRequirement(name = "BearerAuth")
@@ -58,8 +59,10 @@ public class FreePatternController {
             @RequestParam(value = "sortDir", defaultValue = AppConstant.DEFAULT_SORT_DIRECTION,
                     required = false) String sortDir,
             @Parameter(description = "Search text")
-            @RequestParam(value = "text", required = false) String text) {
-        var response = freePatternService.getFreePatterns(pageNo, pageSize, sortBy, sortDir, text);
+            @RequestParam(value = "text", required = false) String text,
+            @Parameter(description = "Category IDs")
+            @RequestParam(value = "categoryIds", required = false) List<UUID> categoryIds) {
+        var response = freePatternService.getFreePatterns(pageNo, pageSize, sortBy, sortDir, text, categoryIds);
         return ResponseEntity.ok(response);
     }
 

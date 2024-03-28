@@ -45,7 +45,7 @@ public class CategoryController {
     @PreAuthorize("hasRole('ADMIN')")
     @SecurityRequirement(name = "BearerAuth")
     @PostMapping("/create")
-    public ResponseEntity<CategoryResponse> create(@Valid @RequestBody CategoryCreationRequest request) {
+    public ResponseEntity<List<CategoryResponse>> create(@Valid @RequestBody CategoryCreationRequest request) {
         var response = categoryService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -71,21 +71,21 @@ public class CategoryController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Update category without parent")
-    @ApiResponse(responseCode = "200", description = "Get parent categories",
+    @Operation(summary = "Get all categories")
+    @ApiResponse(responseCode = "200", description = "Get all categories",
             content = {@Content(mediaType = "application/json", schema = @Schema(implementation = List.class))})
-    @GetMapping("/get-parent-categories")
-    public ResponseEntity<List<CategoryResponse>> getParentCategories() {
-        var response = categoryService.getParentCategories();
+    @GetMapping("/get-all-categories")
+    public ResponseEntity<List<CategoryResponse>> getAllCategories() {
+        var response = categoryService.getAllCategories();
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Get sub categories")
-    @ApiResponse(responseCode = "200", description = "Get sub categories",
-            content = {@Content(mediaType = "application/json", schema = @Schema(implementation = List.class))})
-    @GetMapping("/get-sub-categories")
-    public ResponseEntity<List<CategoryResponse>> getSubCategories(UUID parentId) {
-        var response = categoryService.getSubCategories(parentId);
+    @Operation(summary = "Get category by id")
+    @ApiResponse(responseCode = "200", description = "Get category by id",
+            content = {@Content(mediaType = "application/json", schema = @Schema(implementation = CategoryResponse.class))})
+    @GetMapping("/getById")
+    public ResponseEntity<CategoryResponse> getById(UUID id) {
+        var response = categoryService.getById(id);
         return ResponseEntity.ok(response);
     }
 
@@ -95,6 +95,8 @@ public class CategoryController {
     @ApiResponse(responseCode = "400", description = "Bad request",
             content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))})
     @DeleteMapping("/delete")
+    @PreAuthorize("hasRole('ADMIN')")
+    @SecurityRequirement(name = "BearerAuth")
     public ResponseEntity<String> delete(UUID id) {
         categoryService.delete(id);
         return ResponseEntity.ok("Category deleted");

@@ -1,16 +1,6 @@
 package org.crochet.model;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.CollectionTable;
-import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -45,12 +35,16 @@ public class Pattern extends BaseEntity {
             nullable = false)
     private CurrencyCode currencyCode;
 
-    @ElementCollection
-    @CollectionTable(name = "pattern_file",
-            joinColumns = {@JoinColumn(name = "pattern_id", nullable = false)})
-    @Column(name = "file_name", columnDefinition = "LONGBLOB")
-    private List<String> files;
-
     @OneToMany(mappedBy = "pattern", cascade = CascadeType.ALL)
     private Set<OrderPatternDetail> orderPatternDetails;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", columnDefinition = "BINARY(16) NOT NULL")
+    private Category category;
+
+    @OneToMany(mappedBy = "pattern", cascade = CascadeType.ALL)
+    private Set<File> files;
+
+    @OneToMany(mappedBy = "pattern", cascade = CascadeType.ALL)
+    private Set<Image> images;
 }
