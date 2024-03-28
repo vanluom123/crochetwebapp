@@ -1,7 +1,9 @@
 package org.crochet.exception;
 
 import lombok.extern.slf4j.Slf4j;
+import org.crochet.properties.MessageCodeProperties;
 import org.crochet.constant.MessageConstant;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +16,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 @RestControllerAdvice
 public class ApiExceptionHandler {
+    @Autowired
+    private MessageCodeProperties messageCodeProperties;
+
     @ExceptionHandler({Exception.class})
     public ResponseEntity<ApiError> handleException(Exception ex) {
         ApiError error = ApiError.builder()
@@ -32,6 +37,7 @@ public class ApiExceptionHandler {
                 .message(ex.getMessage())
                 .code(HttpStatus.UNAUTHORIZED.value())
                 .error(HttpStatus.UNAUTHORIZED.getReasonPhrase())
+                .messageCode(messageCodeProperties.getCode("UNAUTHORIZED"))
                 .build();
         log.error(ex.getMessage());
         log.error(ex.toString());
@@ -41,9 +47,10 @@ public class ApiExceptionHandler {
     @ExceptionHandler({AccessDeniedException.class})
     public ResponseEntity<ApiError> handleAccessDeniedException(AccessDeniedException ex) {
         ApiError error = ApiError.builder()
-                .message(MessageConstant.NOT_HAVE_PERMISSION_TO_ACCESS)
+                .message(MessageConstant.NOT_HAVE_PERMISSION_TO_ACCESS_MESSAGE)
                 .code(HttpStatus.FORBIDDEN.value())
                 .error(HttpStatus.FORBIDDEN.getReasonPhrase())
+                .messageCode(messageCodeProperties.getCode("FORBIDDEN"))
                 .build();
         log.error(ex.getMessage());
         log.error(ex.toString());
@@ -56,6 +63,7 @@ public class ApiExceptionHandler {
                 .message(ex.getMessage())
                 .code(HttpStatus.BAD_REQUEST.value())
                 .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
+                .messageCode(ex.getMessageCode())
                 .build();
         log.error(ex.getMessage());
         log.error(ex.toString());
@@ -69,6 +77,7 @@ public class ApiExceptionHandler {
                 .message(ex.getMessage())
                 .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
+                .messageCode(ex.getMessageCode())
                 .build();
         log.error(ex.getMessage());
         log.error(ex.toString());
@@ -81,6 +90,7 @@ public class ApiExceptionHandler {
                 .message(ex.getMessage())
                 .code(HttpStatus.NOT_FOUND.value())
                 .error(HttpStatus.NOT_FOUND.getReasonPhrase())
+                .messageCode(ex.getMessageCode())
                 .build();
         log.error(ex.getMessage());
         log.error(ex.toString());
@@ -89,26 +99,12 @@ public class ApiExceptionHandler {
 
     @ExceptionHandler({EmailVerificationException.class})
     public ResponseEntity<ApiError> handleEmailVerificationException(EmailVerificationException ex) {
-        ApiError err = ApiError.builder()
-                .message(ex.getMessage())
-                .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
-                .build();
-        log.error(ex.getMessage());
-        log.error(ex.toString());
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(err);
+        return handleInternalError(ex, ex.getMessageCode());
     }
 
     @ExceptionHandler({TokenException.class})
     public ResponseEntity<ApiError> handleTokenException(TokenException ex) {
-        ApiError err = ApiError.builder()
-                .message(ex.getMessage())
-                .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
-                .build();
-        log.error(ex.getMessage());
-        log.error(ex.toString());
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(err);
+        return handleInternalError(ex, ex.getMessageCode());
     }
 
     @ExceptionHandler({UsernameNotFoundException.class})
@@ -117,6 +113,7 @@ public class ApiExceptionHandler {
                 .message(ex.getMessage())
                 .code(HttpStatus.NOT_FOUND.value())
                 .error(HttpStatus.NOT_FOUND.getReasonPhrase())
+                .messageCode(messageCodeProperties.getCode("USER_NOT_FOUND"))
                 .build();
         log.error(ex.getMessage());
         log.error(ex.toString());
@@ -129,6 +126,19 @@ public class ApiExceptionHandler {
                 .message(ex.getRootCause().getMessage())
                 .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
+                .messageCode(messageCodeProperties.getCode("DATA_INTEGRITY_VIOLATION"))
+                .build();
+        log.error(ex.getMessage());
+        log.error(ex.toString());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(err);
+    }
+
+    private ResponseEntity<ApiError> handleInternalError(RuntimeException ex, int messageCode) {
+        ApiError err = ApiError.builder()
+                .message(ex.getMessage())
+                .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
+                .messageCode(messageCode)
                 .build();
         log.error(ex.getMessage());
         log.error(ex.toString());

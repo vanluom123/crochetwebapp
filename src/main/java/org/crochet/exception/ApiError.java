@@ -9,4 +9,5 @@ public class ApiError {
     private String message;
     private int code;
     private String error;
+    private int messageCode;
 }

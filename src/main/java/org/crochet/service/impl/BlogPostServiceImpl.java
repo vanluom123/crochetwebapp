@@ -1,5 +1,6 @@
 package org.crochet.service.impl;
 
+import org.crochet.properties.MessageCodeProperties;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.BlogPostMapper;
 import org.crochet.model.BlogPost;
@@ -20,20 +21,25 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import static org.crochet.constant.MessageConstant.BLOG_NOT_FOUND_MESSAGE;
+
 /**
  * BlogPostServiceImpl class
  */
 @Service
 public class BlogPostServiceImpl implements BlogPostService {
     private final BlogPostRepository blogPostRepo;
+    private final MessageCodeProperties msgCodeProps;
 
     /**
      * Constructs a new {@code BlogPostServiceImpl} with the specified BlogPost repository.
      *
      * @param blogPostRepo The repository for handling BlogPost-related operations.
+     * @param msgCodeProps The properties for retrieving message codes.
      */
-    public BlogPostServiceImpl(BlogPostRepository blogPostRepo) {
+    public BlogPostServiceImpl(BlogPostRepository blogPostRepo, MessageCodeProperties msgCodeProps) {
         this.blogPostRepo = blogPostRepo;
+        this.msgCodeProps = msgCodeProps;
     }
 
     /**
@@ -106,6 +112,7 @@ public class BlogPostServiceImpl implements BlogPostService {
 
     private BlogPost findOne(String id) {
         return blogPostRepo.findById(UUID.fromString(id))
-                .orElseThrow(() -> new ResourceNotFoundException("Blog not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(BLOG_NOT_FOUND_MESSAGE,
+                        msgCodeProps.getCode("BLOG_NOT_FOUND_MESSAGE")));
     }
 }

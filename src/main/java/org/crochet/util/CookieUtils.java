@@ -25,7 +25,6 @@ public class CookieUtils {
         // Get all the cookies from the request
         Cookie[] cookies = request.getCookies();
         return Stream.of(cookies)
-                .parallel()
                 .filter(cookie -> cookie.getName().equals(name))
                 .map(Optional::of)
                 .findFirst()
@@ -60,7 +59,6 @@ public class CookieUtils {
         // Get all the cookies from the request
         Cookie[] cookies = request.getCookies();
         Stream.of(cookies)
-                .parallel()
                 .filter(cookie -> cookie.getName().equals(name))
                 .forEach(cookie -> {
                     // Clear the value, set the path to root, and set max age to 0 to delete the cookie
