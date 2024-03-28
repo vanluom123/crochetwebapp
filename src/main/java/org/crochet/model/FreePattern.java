@@ -1,18 +1,12 @@
 package org.crochet.model;
 
-import jakarta.persistence.CollectionTable;
-import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
-import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -31,15 +25,13 @@ public class FreePattern extends BaseEntity {
     @Column(name = "author")
     private String author;
 
-    @ElementCollection
-    @CollectionTable(name = "photos",
-            joinColumns = {@JoinColumn(name = "free_pattern_id", nullable = false)})
-    @Column(name = "file_name", columnDefinition = "LONGBLOB")
-    private List<String> photos;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", columnDefinition = "BINARY(16) NOT NULL")
+    private Category category;
 
-    @ElementCollection
-    @CollectionTable(name = "free_pattern_file",
-            joinColumns = {@JoinColumn(name = "free_pattern_id", nullable = false)})
-    @Column(name = "file_name", columnDefinition = "LONGBLOB")
-    private List<String> files;
+    @OneToMany(mappedBy = "freePattern", cascade = CascadeType.ALL)
+    private Set<File> files;
+
+    @OneToMany(mappedBy = "freePattern", cascade = CascadeType.ALL)
+    private Set<Image> images;
 }

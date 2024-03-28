@@ -21,6 +21,11 @@ import java.util.List;
 @Slf4j
 @Service
 public class PayPalServiceImpl implements PayPalService {
+    public static final String USD = "USD";
+    public static final String CAPTURE = "CAPTURE";
+    public static final String VOIDED = "VOIDED";
+    public static final String APPROVE = "approve";
+    public static final String LINK_NOT_FOUND_MESSAGE = "approve link not found";
     private final PayPalHttpClient payPalHttpClient;
 
     public PayPalServiceImpl(PayPalHttpClient payPalHttpClient) {
@@ -30,8 +35,8 @@ public class PayPalServiceImpl implements PayPalService {
     @Override
     public PaymentOrder createPayment(double fee) {
         OrderRequest orderRequest = new OrderRequest();
-        orderRequest.checkoutPaymentIntent("CAPTURE");
-        AmountWithBreakdown amountBreakdown = new AmountWithBreakdown().currencyCode("USD").value(String.valueOf(fee));
+        orderRequest.checkoutPaymentIntent(CAPTURE);
+        AmountWithBreakdown amountBreakdown = new AmountWithBreakdown().currencyCode(USD).value(String.valueOf(fee));
         PurchaseUnitRequest purchaseUnitRequest = new PurchaseUnitRequest().amountWithBreakdown(amountBreakdown);
         orderRequest.purchaseUnits(List.of(purchaseUnitRequest));
         String baseUri = ServletUriComponentsBuilder.fromCurrentContextPath().toUriString();
@@ -45,15 +50,15 @@ public class PayPalServiceImpl implements PayPalService {
             Order order = orderHttpResponse.result();
 
             String redirectUrl = order.links().stream()
-                    .filter(link -> "approve".equals(link.rel()))
+                    .filter(link -> APPROVE.equals(link.rel()))
                     .findFirst()
-                    .orElseThrow(() -> new ResourceNotFoundException("approve link not found"))
+                    .orElseThrow(() -> new ResourceNotFoundException(LINK_NOT_FOUND_MESSAGE))
                     .href();
 
             return new PaymentOrder(order.status(), order.id(), redirectUrl);
         } catch (IOException e) {
             log.error(e.getMessage());
-            return new PaymentOrder("VOIDED");
+            return new PaymentOrder(VOIDED);
         }
     }
 
@@ -70,14 +75,14 @@ public class PayPalServiceImpl implements PayPalService {
         } catch (IOException e) {
             log.error(e.getMessage());
         }
-        return new CompleteOrder("VOIDED");
+        return new CompleteOrder(VOIDED);
     }
 
     @Override
     public Refund refundPayment(String captureId, double refundAmount) {
         RefundRequest request = new RefundRequest();
         Money money = new Money();
-        money.currencyCode("USD");
+        money.currencyCode(USD);
         money.value(String.valueOf(refundAmount));
         request.amount(money);
 

@@ -1,23 +1,13 @@
 package org.crochet.model;
 
-import jakarta.persistence.CollectionTable;
-import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.crochet.enumerator.CurrencyCode;
 
-import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -46,9 +36,6 @@ public class Product extends BaseEntity {
     @JoinColumn(name = "category_id", columnDefinition = "BINARY(16) NOT NULL")
     private Category category;
 
-    @ElementCollection
-    @CollectionTable(name = "product_file",
-            joinColumns = {@JoinColumn(name = "product_id", nullable = false)})
-    @Column(name = "file_name", columnDefinition = "LONGBLOB")
-    private List<String> files;
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    private Set<File> files;
 }

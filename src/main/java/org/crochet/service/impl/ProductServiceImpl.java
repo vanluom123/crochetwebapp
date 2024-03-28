@@ -1,8 +1,11 @@
 package org.crochet.service.impl;
 
+import org.crochet.properties.MessageCodeProperties;
 import org.crochet.constant.AppConstant;
 import org.crochet.exception.ResourceNotFoundException;
+import org.crochet.mapper.FileMapper;
 import org.crochet.mapper.ProductMapper;
+import org.crochet.model.File;
 import org.crochet.model.Product;
 import org.crochet.payload.request.ProductRequest;
 import org.crochet.payload.response.ProductPaginationResponse;
@@ -18,9 +21,13 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+
+import static org.crochet.constant.MessageConstant.PRODUCT_NOT_FOUND_MESSAGE;
 
 /**
  * ProductServiceImpl class
@@ -29,16 +36,21 @@ import java.util.UUID;
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepo;
     private final CategoryService categoryService;
+    private final MessageCodeProperties msgCodeProps;
 
     /**
-     * Constructs a new {@code ProductServiceImpl} with the specified product repository.
+     * Constructor
      *
-     * @param productRepo The repository for handling product-related operations.
+     * @param productRepo     The {@link ProductRepository} instance.
+     * @param categoryService The {@link CategoryService} instance.
+     * @param msgCodeProps    The {@link MessageCodeProperties} instance.
      */
     public ProductServiceImpl(ProductRepository productRepo,
-                              CategoryService categoryService) {
+                              CategoryService categoryService,
+                              MessageCodeProperties msgCodeProps) {
         this.productRepo = productRepo;
         this.categoryService = categoryService;
+        this.msgCodeProps = msgCodeProps;
     }
 
     /**
@@ -61,7 +73,15 @@ public class ProductServiceImpl implements ProductService {
         product.setPrice(request.getPrice());
         product.setDescription(request.getDescription());
         product.setCurrencyCode(request.getCurrencyCode());
-        product.setFiles(request.getFiles());
+
+        if (!ObjectUtils.isEmpty(request.getFiles())) {
+            Set<File> files = FileMapper.INSTANCE.toEntities(request.getFiles());
+            for (var file : files) {
+                file.setProduct(product);
+            }
+            product.setFiles(files);
+        }
+
         product = productRepo.save(product);
         return ProductMapper.INSTANCE.toResponse(product);
     }
@@ -69,15 +89,16 @@ public class ProductServiceImpl implements ProductService {
     /**
      * Retrieves a paginated list of products based on the provided parameters.
      *
-     * @param pageNo   The page number to retrieve (0-indexed).
-     * @param pageSize The number of products to include in each page.
-     * @param sortBy   The attribute by which the products should be sorted.
-     * @param sortDir  The sorting direction, either "ASC" (ascending) or "DESC" (descending).
-     * @param text     The search text used to filter products by name or other criteria.
+     * @param pageNo      The page number to retrieve (0-indexed).
+     * @param pageSize    The number of products to include in each page.
+     * @param sortBy      The attribute by which the products should be sorted.
+     * @param sortDir     The sorting direction, either "ASC" (ascending) or "DESC" (descending).
+     * @param text        The search text used to filter products by name or other criteria.
+     * @param categoryIds The unique identifiers of the categories used to filter products.
      * @return A {@link ProductPaginationResponse} containing the paginated list of products.
      */
     @Override
-    public ProductPaginationResponse getProducts(int pageNo, int pageSize, String sortBy, String sortDir, String text) {
+    public ProductPaginationResponse getProducts(int pageNo, int pageSize, String sortBy, String sortDir, String text, List<UUID> categoryIds) {
         // create Sort instance
         Sort sort = Sort.by(sortBy);
         sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? sort.ascending() : sort.descending();
@@ -87,6 +108,10 @@ public class ProductServiceImpl implements ProductService {
         Specification<Product> spec = Specification.where(null);
         if (text != null && !text.isEmpty()) {
             spec = spec.and(ProductSpecifications.searchBy(text));
+        }
+
+        if (categoryIds != null && !categoryIds.isEmpty()) {
+            spec = spec.and(ProductSpecifications.filterBy(categoryIds));
         }
 
         Page<Product> menuPage = productRepo.findAll(spec, pageable);
@@ -125,7 +150,8 @@ public class ProductServiceImpl implements ProductService {
 
     private Product findOne(UUID id) {
         return productRepo.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(PRODUCT_NOT_FOUND_MESSAGE,
+                        msgCodeProps.getCode("PRODUCT_NOT_FOUND_MESSAGE")));
     }
 
     @Transactional

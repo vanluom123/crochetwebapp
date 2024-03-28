@@ -14,12 +14,7 @@ import org.crochet.payload.response.TokenResponse;
 import org.crochet.service.AuthService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
@@ -43,7 +38,7 @@ public class AuthController {
     @Operation(summary = "Register user")
     @ApiResponse(responseCode = "201",
             description = "Registration successful",
-            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponse.class)))
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class)))
     @PostMapping("/signup")
     public ResponseEntity<String> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
         String response = authService.registerUser(signUpRequest);
@@ -54,7 +49,7 @@ public class AuthController {
     @Operation(summary = "Confirm user registration")
     @ApiResponse(responseCode = "200",
             description = "Confirmation successful",
-            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponse.class)))
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class)))
     @GetMapping(path = "/confirm")
     public ResponseEntity<String> confirm(@RequestParam("token") String token) {
         return ResponseEntity.ok(authService.confirmToken(token));
@@ -63,7 +58,7 @@ public class AuthController {
     @Operation(summary = "Resend email verification")
     @ApiResponse(responseCode = "200",
             description = "Email verification resent successfully",
-            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponse.class)))
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class)))
     @GetMapping("/resendVerificationEmail")
     public ResponseEntity<String> resendVerificationEmail(@RequestParam("email") String email) {
         String response = authService.resendVerificationEmail(email);
@@ -73,7 +68,7 @@ public class AuthController {
     @Operation(summary = "Request password reset link")
     @ApiResponse(responseCode = "200",
             description = "Password reset link sent successfully",
-            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponse.class)))
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class)))
     @GetMapping("/password-reset-request")
     public ResponseEntity<String> resetPasswordRequest(@RequestParam("email") String email) {
         var response = authService.resetPasswordLink(email);
@@ -83,7 +78,7 @@ public class AuthController {
     @Operation(summary = "Reset password")
     @ApiResponse(responseCode = "200",
             description = "Password reset successful",
-            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponse.class)))
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class)))
     @PostMapping("/reset-password")
     public ResponseEntity<String> resetPassword(@RequestParam("passwordResetToken") String passwordResetToken,
                                                 @RequestBody PasswordResetRequest passwordResetRequest) {
@@ -104,7 +99,7 @@ public class AuthController {
     @Operation(summary = "Logout")
     @ApiResponse(responseCode = "200",
             description = "Logout successful",
-            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponse.class)))
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class)))
     @GetMapping("/logout")
     public ResponseEntity<String> logout(HttpServletRequest request) {
         authService.logout(request);

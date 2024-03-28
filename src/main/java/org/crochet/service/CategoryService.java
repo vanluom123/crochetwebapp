@@ -11,13 +11,11 @@ import java.util.UUID;
 
 public interface CategoryService {
     @Transactional
-    CategoryResponse create(CategoryCreationRequest request);
+    List<CategoryResponse> create(CategoryCreationRequest request);
 
     CategoryResponse update(CategoryUpdateRequest request);
 
-    List<CategoryResponse> getParentCategories();
-
-    List<CategoryResponse> getSubCategories(UUID parentId);
+    List<CategoryResponse> getAllCategories();
 
     CategoryResponse getById(UUID id);
 

@@ -102,6 +102,10 @@ public class SecurityConfig {
                                 "/pattern/create",
                                 "/category/create",
                                 "/category/update",
+                                "/category-pattern/create",
+                                "/category-pattern/update",
+                                "/category-free-pattern/create",
+                                "/category-free-pattern/update",
                                 "/firebase-storage/upload-file",
                                 "/product/create").authenticated()
                         .requestMatchers(
