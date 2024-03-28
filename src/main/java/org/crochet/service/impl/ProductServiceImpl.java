@@ -21,6 +21,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 
 import java.util.List;
 import java.util.Set;
@@ -73,7 +74,7 @@ public class ProductServiceImpl implements ProductService {
         product.setDescription(request.getDescription());
         product.setCurrencyCode(request.getCurrencyCode());
 
-        if (!request.getFiles().isEmpty()) {
+        if (!ObjectUtils.isEmpty(request.getFiles())) {
             Set<File> files = FileMapper.INSTANCE.toEntities(request.getFiles());
             for (var file : files) {
                 file.setProduct(product);

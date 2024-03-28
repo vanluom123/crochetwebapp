@@ -12,6 +12,7 @@ import org.crochet.service.UserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 import static org.crochet.constant.MessageConstant.*;
@@ -49,6 +50,10 @@ public class UserServiceImpl implements UserService {
                 .build();
         // Save the user to the repository
         return userRepository.save(user);
+    }
+
+    public List<User> getAll() {
+        return userRepository.findAll();
     }
 
     @Override

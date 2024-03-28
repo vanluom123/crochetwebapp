@@ -1,6 +1,5 @@
 package org.crochet.service.impl;
 
-import org.crochet.properties.MessageCodeProperties;
 import org.crochet.constant.AppConstant;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.FileMapper;
@@ -13,6 +12,7 @@ import org.crochet.model.User;
 import org.crochet.payload.request.PatternRequest;
 import org.crochet.payload.response.PatternPaginationResponse;
 import org.crochet.payload.response.PatternResponse;
+import org.crochet.properties.MessageCodeProperties;
 import org.crochet.repository.PatternRepository;
 import org.crochet.repository.PatternSpecifications;
 import org.crochet.repository.UserRepository;
@@ -24,9 +24,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 
 import java.util.List;
 import java.util.Set;
@@ -71,7 +71,7 @@ public class PatternServiceImpl implements PatternService {
         pattern.setDescription(request.getDescription());
         pattern.setCurrencyCode(request.getCurrencyCode());
 
-        if (!request.getFiles().isEmpty()) {
+        if (!ObjectUtils.isEmpty(request.getFiles())) {
             Set<File> files = FileMapper.INSTANCE.toEntities(request.getFiles());
             for (var file : files) {
                 file.setPattern(pattern);
@@ -79,7 +79,7 @@ public class PatternServiceImpl implements PatternService {
             pattern.setFiles(files);
         }
 
-        if (!request.getImages().isEmpty()) {
+        if (!ObjectUtils.isEmpty(request.getImages())) {
             Set<Image> images = ImageMapper.INSTANCE.toEntities(request.getImages());
             for (var image : images) {
                 image.setPattern(pattern);
@@ -144,9 +144,9 @@ public class PatternServiceImpl implements PatternService {
     /**
      * Get pattern detail
      *
-     * @param principal
-     * @param id        Id
-     * @return Pattern response
+     * @param principal UserPrincipal
+     * @param id        Pattern id
+     * @return PatternResponse
      */
     @Override
     public PatternResponse getDetail(UserPrincipal principal, String id) {

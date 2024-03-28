@@ -23,6 +23,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 
 import java.util.List;
 import java.util.Set;
@@ -74,7 +75,7 @@ public class FreePatternServiceImpl implements FreePatternService {
         freePattern.setAuthor(request.getAuthor());
 
         // Set files
-        if (!request.getFiles().isEmpty()) {
+        if (!ObjectUtils.isEmpty(request.getFiles())) {
             Set<File> files = FileMapper.INSTANCE.toEntities(request.getFiles());
             for (var file : files) {
                 file.setFreePattern(freePattern);
@@ -83,7 +84,7 @@ public class FreePatternServiceImpl implements FreePatternService {
         }
 
         // Set images
-        if (!request.getImages().isEmpty()) {
+        if (!ObjectUtils.isEmpty(request.getImages())) {
             Set<Image> images = ImageMapper.INSTANCE.toEntities(request.getImages());
             for (var image : images) {
                 image.setFreePattern(freePattern);

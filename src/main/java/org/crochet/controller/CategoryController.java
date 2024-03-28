@@ -95,6 +95,8 @@ public class CategoryController {
     @ApiResponse(responseCode = "400", description = "Bad request",
             content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))})
     @DeleteMapping("/delete")
+    @PreAuthorize("hasRole('ADMIN')")
+    @SecurityRequirement(name = "BearerAuth")
     public ResponseEntity<String> delete(UUID id) {
         categoryService.delete(id);
         return ResponseEntity.ok("Category deleted");
