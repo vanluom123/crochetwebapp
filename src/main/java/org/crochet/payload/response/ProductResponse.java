@@ -1,5 +1,6 @@
 package org.crochet.payload.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 
@@ -12,6 +13,8 @@ public class ProductResponse {
     private String name;
     private String description;
     private double price;
+    @JsonProperty("currency_code")
+    private String currencyCode;
     private Set<FileResponse> files;
     private CategoryResponse category;
 }
