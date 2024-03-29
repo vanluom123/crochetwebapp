@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 
-import java.util.Set;
+import java.util.List;
 
 @Data
 @Builder
@@ -15,7 +15,7 @@ public class PatternResponse {
     private double price;
     @JsonProperty("currency_code")
     private String currencyCode;
-    private Set<FileResponse> images;
-    private Set<FileResponse> files;
+    private List<FileResponse> images;
+    private List<FileResponse> files;
     private CategoryResponse category;
 }

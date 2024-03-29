@@ -29,10 +29,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
-import static org.crochet.constant.MessageConstant.*;
+import static org.crochet.constant.MessageConstant.PATTERN_NOT_FOUND_MESSAGE;
+import static org.crochet.constant.MessageConstant.USER_NOT_FOUND_MESSAGE;
+import static org.crochet.constant.MessageConstant.USER_NOT_PAYMENT_FOR_THIS_PATTERN_MESSAGE;
 
 /**
  * PatternServiceImpl class
@@ -72,7 +73,7 @@ public class PatternServiceImpl implements PatternService {
         pattern.setCurrencyCode(request.getCurrencyCode());
 
         if (!ObjectUtils.isEmpty(request.getFiles())) {
-            Set<File> files = FileMapper.INSTANCE.toEntities(request.getFiles());
+            List<File> files = FileMapper.INSTANCE.toEntities(request.getFiles());
             for (var file : files) {
                 file.setPattern(pattern);
             }
@@ -80,7 +81,7 @@ public class PatternServiceImpl implements PatternService {
         }
 
         if (!ObjectUtils.isEmpty(request.getImages())) {
-            Set<Image> images = ImageMapper.INSTANCE.toEntities(request.getImages());
+            List<Image> images = ImageMapper.INSTANCE.toEntities(request.getImages());
             for (var image : images) {
                 image.setPattern(pattern);
             }

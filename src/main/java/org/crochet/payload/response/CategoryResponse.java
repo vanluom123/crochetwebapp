@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Set;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -13,5 +13,5 @@ import java.util.UUID;
 public class CategoryResponse {
     private UUID id;
     private String name;
-    private Set<CategoryResponse> children;
+    private List<CategoryResponse> children;
 }
