@@ -2,9 +2,9 @@ package org.crochet.service.impl;
 
 import org.crochet.constant.AppConstant;
 import org.crochet.exception.ResourceNotFoundException;
-import org.crochet.mapper.FileMapper;
+import org.crochet.mapper.ImageMapper;
 import org.crochet.mapper.ProductMapper;
-import org.crochet.model.File;
+import org.crochet.model.Image;
 import org.crochet.model.Product;
 import org.crochet.payload.request.ProductRequest;
 import org.crochet.payload.response.ProductPaginationResponse;
@@ -73,12 +73,12 @@ public class ProductServiceImpl implements ProductService {
         product.setDescription(request.getDescription());
         product.setCurrencyCode(request.getCurrencyCode());
 
-        if (!ObjectUtils.isEmpty(request.getFiles())) {
-            List<File> files = FileMapper.INSTANCE.toEntities(request.getFiles());
-            for (var file : files) {
-                file.setProduct(product);
+        if (!ObjectUtils.isEmpty(request.getImages())) {
+            List<Image> images = ImageMapper.INSTANCE.toEntities(request.getImages());
+            for (var image : images) {
+                image.setProduct(product);
             }
-            product.setFiles(files);
+            product.setImages(images);
         }
 
         product = productRepo.save(product);

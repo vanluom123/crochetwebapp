@@ -7,7 +7,6 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -29,18 +28,17 @@ public class Pattern extends BaseEntity {
     @Column(name = "name")
     private String name;
 
-    @Lob
-    @Column(name = "description", columnDefinition = "LONGBLOB")
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
     @Column(name = "price",
-            columnDefinition = "double default 0",
+            columnDefinition = "DOUBLE DEFAULT 0",
             nullable = false)
     private double price;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "currency_code",
-            columnDefinition = "varchar(20) default 'USD'",
+            columnDefinition = "VARCHAR(20) DEFAULT 'USD'",
             nullable = false)
     private CurrencyCode currencyCode;
 

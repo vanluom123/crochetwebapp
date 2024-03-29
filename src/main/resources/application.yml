@@ -53,7 +53,6 @@ paypal:
   username: AYw-XWRSOe3r11W37cF26rxf3tUBn8X1dPala2Lux2cGHbK6NYMiyYB_2SES46YjIx1a9zLuMSHSJpYD
   password: EENLA_G2RtWbTYgY6i90ApZkYdctBuY2AcgnsHhct0sbCnwWiM_J55NTmmEsLbiDcNpnLEfBWPneTmwF
 
-
 message:
   codes:
     NOT_HAVE_PERMISSION_TO_ACCESS_MESSAGE: 1001
@@ -97,3 +96,41 @@ message:
     NOT_FOUND: 1039
     DATA_INTEGRITY_VIOLATION: 1040
     CANNOT_UPLOAD_FILE_MESSAGE: 1041
+
+authorize:
+  http-request:
+    authenticated:
+      - "/blog/create"
+      - "/comment/create"
+      - "/free-pattern/create"
+      - "/pattern/create"
+      - "/pattern/detail"
+      - "/category/create"
+      - "/category/update"
+      - "/category-pattern/create"
+      - "/category-pattern/update"
+      - "/category-free-pattern/create"
+      - "/category-free-pattern/update"
+      - "/firebase-storage/upload-file"
+      - "/product/create"
+      - "/users/**"
+    permit-all:
+      - "/"
+      - "/auth/**"
+      - "/oauth2/**"
+      - "/error"
+      - "/favicon.ico"
+      - "/*.png"
+      - "/*.gif"
+      - "/*.svg"
+      - "/*.jpg"
+      - "/*.html"
+      - "/*.css"
+      - "/*.js"
+      - "/swagger-ui/**"
+      - "/swagger-ui.html"
+      - "webjars/**"
+      - "/v3/api-docs/**"
+      - "/v3/api-docs"
+      - "/swagger-resources"
+      - "/swagger-resources/**"

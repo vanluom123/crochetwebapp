@@ -29,25 +29,19 @@ public class PasswordResetTokenServiceImpl implements PasswordResetTokenService 
     public PasswordResetToken createOrUpdatePasswordResetToken(User user) {
         var passwordResetToken = passwordResetTokenRepository.findByUser(user)
                 .orElse(null);
-
-        String token = UUID.randomUUID().toString();
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime expirationTime = now.plusMinutes(15);
-
         if (passwordResetToken == null) {
             // Create a new token
+            String token = UUID.randomUUID().toString();
             passwordResetToken = PasswordResetToken.builder()
                     .token(token)
-                    .createdAt(now)
                     .expiresAt(expirationTime)
                     .user(user)
                     .build();
         } else {
-            passwordResetToken.setToken(token);
-            passwordResetToken.setCreatedAt(now);
             passwordResetToken.setExpiresAt(expirationTime);
         }
-
         return passwordResetTokenRepository.save(passwordResetToken);
     }
 

@@ -47,7 +47,7 @@ public class User extends BaseEntity {
     private String password;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "provider", columnDefinition = "varchar(25) default 'LOCAL'")
+    @Column(name = "provider", columnDefinition = "VARCHAR(25) DEFAULT 'LOCAL'")
     @Builder.Default
     private AuthProvider provider = AuthProvider.LOCAL;
 
@@ -58,7 +58,7 @@ public class User extends BaseEntity {
     private String verificationCode;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "roles", columnDefinition = "varchar(10) default 'USER'")
+    @Column(name = "roles", columnDefinition = "VARCHAR(10) DEFAULT 'USER'")
     @Builder.Default
     private RoleType role = RoleType.USER;
 

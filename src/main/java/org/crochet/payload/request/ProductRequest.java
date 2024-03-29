@@ -20,5 +20,5 @@ public class ProductRequest {
     private double price;
     @JsonProperty("currency_code")
     private CurrencyCode currencyCode;
-    private List<FileResponse> files;
+    private List<FileResponse> images;
 }

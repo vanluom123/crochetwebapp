@@ -15,8 +15,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.crochet.enumerator.OrderStatus;
-import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Getter
@@ -29,10 +29,9 @@ public class OrderPatternDetail extends BaseEntity {
     @Column(name = "transaction_id", nullable = false, unique = true)
     private String transactionId;
 
-    @CreationTimestamp
-    @Temporal(TemporalType.DATE)
-    @Column(name = "order_date", nullable = false)
-    private Date orderDate;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "order_date")
+    private LocalDateTime orderDate;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)

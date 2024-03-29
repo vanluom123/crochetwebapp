@@ -6,6 +6,8 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,11 +24,15 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RefreshToken extends BaseEntity {
-    @Column(unique = true)
+    @Column(name = "token",
+            unique = true,
+            updatable = false,
+            nullable = false)
     private String token;
 
-    @Column(name = "expiry_date")
-    private LocalDateTime expiryDate;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "expires_at")
+    private LocalDateTime expiresAt;
 
     @Column(name = "revoked", columnDefinition = "BOOLEAN DEFAULT FALSE")
     public boolean revoked;

@@ -48,7 +48,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         RefreshToken refreshToken = RefreshToken.builder()
                 .user(user)
                 .token(UUID.randomUUID().toString())
-                .expiryDate(expiryDate) // set expiry of refresh token to 10 minutes - you can configure it application.properties file
+                .expiresAt(expiryDate) // set expiry of refresh token to 10 minutes - you can configure it application.properties file
                 .build();
         revokeRefreshToken(user);
         return refreshTokenRepo.save(refreshToken);
@@ -61,7 +61,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     @Override
     public RefreshToken verifyExpiration(RefreshToken token) {
-        if (token.getExpiryDate().isBefore(LocalDateTime.now())) {
+        if (token.getExpiresAt().isBefore(LocalDateTime.now())) {
             refreshTokenRepo.delete(token);
             throw new TokenException(token.getToken() + REFRESH_TOKEN_IS_EXPIRED_MESSAGE,
                     msgCodeProps.getCode("REFRESH_TOKEN_IS_EXPIRED_MESSAGE"));

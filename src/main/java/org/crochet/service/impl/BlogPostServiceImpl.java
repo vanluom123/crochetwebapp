@@ -1,12 +1,14 @@
 package org.crochet.service.impl;
 
-import org.crochet.properties.MessageCodeProperties;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.BlogPostMapper;
+import org.crochet.mapper.FileMapper;
 import org.crochet.model.BlogPost;
+import org.crochet.model.File;
 import org.crochet.payload.request.BlogPostRequest;
 import org.crochet.payload.response.BlogPostPaginationResponse;
 import org.crochet.payload.response.BlogPostResponse;
+import org.crochet.properties.MessageCodeProperties;
 import org.crochet.repository.BlogPostRepository;
 import org.crochet.repository.BlogPostSpecifications;
 import org.crochet.service.BlogPostService;
@@ -17,8 +19,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.crochet.constant.MessageConstant.BLOG_NOT_FOUND_MESSAGE;
@@ -56,8 +58,13 @@ public class BlogPostServiceImpl implements BlogPostService {
         var blogPost = (request.getId() == null) ? new BlogPost() : findOne(request.getId());
         blogPost.setTitle(request.getTitle());
         blogPost.setContent(request.getContent());
-        blogPost.setCreationDate(LocalDateTime.now());
-        blogPost.setFiles(request.getFiles());
+        if (!ObjectUtils.isEmpty(request.getFiles())) {
+            var files = FileMapper.INSTANCE.toEntities(request.getFiles());
+            for (File file : files) {
+                file.setBlogPost(blogPost);
+            }
+            blogPost.setFiles(files);
+        }
         blogPost = blogPostRepo.save(blogPost);
         return BlogPostMapper.INSTANCE.toResponse(blogPost);
     }

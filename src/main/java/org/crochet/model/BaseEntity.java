@@ -12,14 +12,14 @@ import lombok.experimental.SuperBuilder;
 
 import java.util.UUID;
 
-@Getter
-@Setter
-@SuperBuilder
 @MappedSuperclass
 @NoArgsConstructor
-public class BaseEntity {
+@SuperBuilder
+@Getter
+@Setter
+public class BaseEntity extends AuditTable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false)
-    protected UUID id;
+    private UUID id;
 }

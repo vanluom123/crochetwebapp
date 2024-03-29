@@ -25,30 +25,24 @@ public class ConfirmTokenServiceImpl implements ConfirmTokenService {
     }
 
     @Override
-    public ConfirmationToken createOrUpdateToken(User user) {
+    public ConfirmationToken createOrUpdate(User user) {
         ConfirmationToken confirmationToken = confirmationTokenRepository
                 .findByUser(user)
                 .orElse(null);
-
-        String token = UUID.randomUUID().toString();
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime expirationTime = now.plusMinutes(15);
-
         if (confirmationToken == null) {
             // Create a new token
+            String token = UUID.randomUUID().toString();
             confirmationToken = ConfirmationToken.builder()
                     .token(token)
-                    .createdAt(now)
                     .expiresAt(expirationTime)
                     .user(user)
                     .build();
         } else {
             // Update the existing token
-            confirmationToken.setToken(token);
-            confirmationToken.setCreatedAt(now);
             confirmationToken.setExpiresAt(expirationTime);
         }
-
         return confirmationTokenRepository.save(confirmationToken);
     }
 

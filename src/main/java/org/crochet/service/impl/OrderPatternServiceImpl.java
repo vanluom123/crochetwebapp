@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.UUID;
 
@@ -83,7 +84,7 @@ public class OrderPatternServiceImpl implements OrderPatternService {
                 .pattern(pattern)
                 .transactionId(paymentOrder.getPayId())
                 .status(OrderStatus.valueOf(paymentOrder.getStatus()))
-                .orderDate(Date.from(Instant.now()))
+                .orderDate(LocalDateTime.now())
                 .build();
         orderPatternDetailRepository.save(orderPatternDetail);
 
