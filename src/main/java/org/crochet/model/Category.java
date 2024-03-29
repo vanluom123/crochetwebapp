@@ -1,12 +1,18 @@
 package org.crochet.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
-import java.util.Set;
+import java.util.List;
 
 @Getter
 @Setter
@@ -23,14 +29,14 @@ public class Category extends BaseEntity {
     private Category parent;
 
     @OneToMany(mappedBy = "parent", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private Set<Category> children;
+    private List<Category> children;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
-    private Set<Product> products;
+    private List<Product> products;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
-    private Set<Pattern> patterns;
+    private List<Pattern> patterns;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
-    private Set<FreePattern> freePatterns;
+    private List<FreePattern> freePatterns;
 }

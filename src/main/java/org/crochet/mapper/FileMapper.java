@@ -7,14 +7,14 @@ import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 
 import java.util.Collection;
-import java.util.Set;
+import java.util.List;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface FileMapper {
     FileMapper INSTANCE = Mappers.getMapper(FileMapper.class);
 
     File toEntity(FileResponse fileResponse);
-    Set<File> toEntities(Collection<FileResponse> fileResponses);
+    List<File> toEntities(Collection<FileResponse> fileResponses);
 
     FileResponse toResponse(File file);
 }
