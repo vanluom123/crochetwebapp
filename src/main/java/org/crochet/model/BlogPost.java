@@ -18,7 +18,6 @@ import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 @Getter
@@ -44,7 +43,7 @@ public class BlogPost {
     private LocalDateTime creationDate;
 
     @OneToMany(mappedBy = "blogPost")
-    private Set<Comment> comments;
+    private List<Comment> comments;
 
     @ElementCollection
     @CollectionTable(name = "blog_post_file",
