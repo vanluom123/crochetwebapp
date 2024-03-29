@@ -6,7 +6,7 @@ import lombok.Data;
 import org.crochet.enumerator.CurrencyCode;
 import org.crochet.payload.response.FileResponse;
 
-import java.util.Set;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -20,5 +20,5 @@ public class ProductRequest {
     private double price;
     @JsonProperty("currency_code")
     private CurrencyCode currencyCode;
-    private Set<FileResponse> files;
+    private List<FileResponse> files;
 }

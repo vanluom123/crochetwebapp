@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import org.crochet.payload.response.FileResponse;
 
-import java.util.Set;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -17,6 +17,6 @@ public class FreePatternRequest {
     private String name;
     private String description;
     private String author;
-    private Set<FileResponse> images;
-    private Set<FileResponse> files;
+    private List<FileResponse> images;
+    private List<FileResponse> files;
 }
