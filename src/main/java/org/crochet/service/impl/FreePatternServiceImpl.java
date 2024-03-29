@@ -1,6 +1,5 @@
 package org.crochet.service.impl;
 
-import org.crochet.properties.MessageCodeProperties;
 import org.crochet.constant.AppConstant;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.FileMapper;
@@ -12,6 +11,7 @@ import org.crochet.model.Image;
 import org.crochet.payload.request.FreePatternRequest;
 import org.crochet.payload.response.FreePatternResponse;
 import org.crochet.payload.response.PaginatedFreePatternResponse;
+import org.crochet.properties.MessageCodeProperties;
 import org.crochet.repository.FreePatternRepository;
 import org.crochet.repository.FreePatternSpecifications;
 import org.crochet.service.CategoryService;
@@ -26,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import static org.crochet.constant.MessageConstant.FREE_PATTERN_NOT_FOUND_MESSAGE;
@@ -76,7 +75,7 @@ public class FreePatternServiceImpl implements FreePatternService {
 
         // Set files
         if (!ObjectUtils.isEmpty(request.getFiles())) {
-            Set<File> files = FileMapper.INSTANCE.toEntities(request.getFiles());
+            List<File> files = FileMapper.INSTANCE.toEntities(request.getFiles());
             for (var file : files) {
                 file.setFreePattern(freePattern);
             }
@@ -85,7 +84,7 @@ public class FreePatternServiceImpl implements FreePatternService {
 
         // Set images
         if (!ObjectUtils.isEmpty(request.getImages())) {
-            Set<Image> images = ImageMapper.INSTANCE.toEntities(request.getImages());
+            List<Image> images = ImageMapper.INSTANCE.toEntities(request.getImages());
             for (var image : images) {
                 image.setFreePattern(freePattern);
             }

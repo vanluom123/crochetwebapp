@@ -18,7 +18,7 @@ import lombok.experimental.SuperBuilder;
 import org.crochet.enumerator.AuthProvider;
 import org.crochet.enumerator.RoleType;
 
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Table(name = "users", uniqueConstraints = {
@@ -63,17 +63,17 @@ public class User extends BaseEntity {
     private RoleType role = RoleType.USER;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private Set<ConfirmationToken> confirmationTokens;
+    private List<ConfirmationToken> confirmationTokens;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private Set<PasswordResetToken> passwordResetTokens;
+    private List<PasswordResetToken> passwordResetTokens;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private Set<Comment> comments;
+    private List<Comment> comments;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private Set<Order> orders;
+    private List<Order> orders;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private Set<RefreshToken> refreshTokens;
+    private List<RefreshToken> refreshTokens;
 }

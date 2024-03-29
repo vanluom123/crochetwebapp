@@ -1,6 +1,5 @@
 package org.crochet.service.impl;
 
-import org.crochet.properties.MessageCodeProperties;
 import org.crochet.constant.AppConstant;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.FileMapper;
@@ -10,6 +9,7 @@ import org.crochet.model.Product;
 import org.crochet.payload.request.ProductRequest;
 import org.crochet.payload.response.ProductPaginationResponse;
 import org.crochet.payload.response.ProductResponse;
+import org.crochet.properties.MessageCodeProperties;
 import org.crochet.repository.ProductRepository;
 import org.crochet.repository.ProductSpecifications;
 import org.crochet.service.CategoryService;
@@ -24,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import static org.crochet.constant.MessageConstant.PRODUCT_NOT_FOUND_MESSAGE;
@@ -75,7 +74,7 @@ public class ProductServiceImpl implements ProductService {
         product.setCurrencyCode(request.getCurrencyCode());
 
         if (!ObjectUtils.isEmpty(request.getFiles())) {
-            Set<File> files = FileMapper.INSTANCE.toEntities(request.getFiles());
+            List<File> files = FileMapper.INSTANCE.toEntities(request.getFiles());
             for (var file : files) {
                 file.setProduct(product);
             }
