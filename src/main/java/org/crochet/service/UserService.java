@@ -5,8 +5,10 @@ import org.crochet.payload.request.SignUpRequest;
 import org.crochet.payload.request.UserUpdateRequest;
 import org.crochet.payload.response.UserPaginationResponse;
 import org.crochet.payload.response.UserResponse;
+import org.crochet.repository.Filter;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
@@ -15,10 +17,7 @@ public interface UserService {
     UserPaginationResponse getAll(int pageNo,
                                   int pageSize,
                                   String sortBy,
-                                  String sortDir,
-                                  String userName,
-                                  String email,
-                                  String role);
+                                  String sortDir, List<Filter> filters);
 
     @Transactional
     void updateUser(UserUpdateRequest request);

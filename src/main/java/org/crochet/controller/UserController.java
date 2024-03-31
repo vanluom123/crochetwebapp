@@ -10,17 +10,20 @@ import org.crochet.constant.AppConstant;
 import org.crochet.payload.request.UserUpdateRequest;
 import org.crochet.payload.response.UserPaginationResponse;
 import org.crochet.payload.response.UserResponse;
+import org.crochet.repository.Filter;
 import org.crochet.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -38,7 +41,7 @@ public class UserController {
     @ApiResponse(responseCode = "200", description = "List of users",
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = UserPaginationResponse.class)))
-    @GetMapping("/pagination")
+    @PostMapping("/pagination")
     public ResponseEntity<UserPaginationResponse> getAll(
             @Parameter(description = "Page number (default: 0)")
             @RequestParam(value = "pageNo", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER,
@@ -52,12 +55,8 @@ public class UserController {
             @RequestParam(value = "sortDir", defaultValue = AppConstant.DEFAULT_SORT_DIRECTION,
                     required = false) String sortDir,
             @Parameter(description = "Search username")
-            @RequestParam(value = "username", required = false) String userName,
-            @Parameter(description = "Search email")
-            @RequestParam(value = "email", required = false) String email,
-            @Parameter(description = "Search role")
-            @RequestParam(value = "role", required = false) String role) {
-        var response = userService.getAll(pageNo, pageSize, sortBy, sortDir, userName, email, role);
+            @RequestBody(required = false) List<Filter> filters) {
+        var response = userService.getAll(pageNo, pageSize, sortBy, sortDir, filters);
         return ResponseEntity.ok(response);
     }
 

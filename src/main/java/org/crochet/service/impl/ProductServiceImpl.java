@@ -10,8 +10,10 @@ import org.crochet.payload.request.ProductRequest;
 import org.crochet.payload.response.ProductPaginationResponse;
 import org.crochet.payload.response.ProductResponse;
 import org.crochet.properties.MessageCodeProperties;
+import org.crochet.repository.Filter;
 import org.crochet.repository.ProductRepository;
 import org.crochet.repository.ProductSpecifications;
+import org.crochet.repository.Specifications;
 import org.crochet.service.CategoryService;
 import org.crochet.service.ProductService;
 import org.springframework.data.domain.Page;
@@ -23,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -88,34 +91,28 @@ public class ProductServiceImpl implements ProductService {
     /**
      * Retrieves a paginated list of products based on the provided parameters.
      *
-     * @param pageNo      The page number to retrieve (0-indexed).
-     * @param pageSize    The number of products to include in each page.
-     * @param sortBy      The attribute by which the products should be sorted.
-     * @param sortDir     The sorting direction, either "ASC" (ascending) or "DESC" (descending).
-     * @param text        The search text used to filter products by name or other criteria.
-     * @param categoryIds The unique identifiers of the categories used to filter products.
+     * @param pageNo     The page number to retrieve (0-indexed).
+     * @param pageSize   The number of products to include in each page.
+     * @param sortBy     The attribute by which the products should be sorted.
+     * @param sortDir    The sorting direction, either "ASC" (ascending) or "DESC" (descending).
+     * @param categoryId The unique identifiers of the categories used to filter products.
+     * @param filters    The list of filters
      * @return A {@link ProductPaginationResponse} containing the paginated list of products.
      */
     @Override
-    public ProductPaginationResponse getProducts(int pageNo, int pageSize, String sortBy, String sortDir, String text, List<UUID> categoryIds) {
+    public ProductPaginationResponse getProducts(int pageNo, int pageSize, String sortBy, String sortDir,
+                                                 UUID categoryId, List<Filter> filters) {
         // create Sort instance
         Sort sort = Sort.by(sortBy);
         sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? sort.ascending() : sort.descending();
         // create Pageable instance
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
-
-        Specification<Product> spec = Specification.where(null);
-        if (text != null && !text.isEmpty()) {
-            spec = spec.and(ProductSpecifications.searchBy(text));
+        Specification<Product> spec = Specifications.getSpecificationFromFilters(filters);
+        if (categoryId != null) {
+            spec = spec.and(ProductSpecifications.in(getProductsByCategory(categoryId)));
         }
-
-        if (categoryIds != null && !categoryIds.isEmpty()) {
-            spec = spec.and(ProductSpecifications.filterBy(categoryIds));
-        }
-
         Page<Product> menuPage = productRepo.findAll(spec, pageable);
         List<ProductResponse> contents = ProductMapper.INSTANCE.toResponses(menuPage.getContent());
-
         return ProductPaginationResponse.builder()
                 .contents(contents)
                 .pageNo(menuPage.getNumber())
@@ -124,6 +121,15 @@ public class ProductServiceImpl implements ProductService {
                 .totalPages(menuPage.getTotalPages())
                 .last(menuPage.isLast())
                 .build();
+    }
+
+    private List<Product> getProductsByCategory(UUID categoryId) {
+        var category = categoryService.findById(categoryId);
+        List<Product> products = new ArrayList<>(category.getProducts());
+        for (var subCategory : category.getChildren()) {
+            products.addAll(getProductsByCategory(subCategory.getId()));
+        }
+        return products;
     }
 
     @Override

@@ -11,8 +11,9 @@ import org.crochet.payload.request.UserUpdateRequest;
 import org.crochet.payload.response.UserPaginationResponse;
 import org.crochet.payload.response.UserResponse;
 import org.crochet.properties.MessageCodeProperties;
+import org.crochet.repository.Filter;
+import org.crochet.repository.Specifications;
 import org.crochet.repository.UserRepository;
-import org.crochet.repository.UserSpecification;
 import org.crochet.service.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -72,32 +73,15 @@ public class UserServiceImpl implements UserService {
      * @param pageSize The number of records to retrieve per page.
      * @param sortBy   The field by which to sort the records.
      * @param sortDir  The direction of the sort. Can be 'ASC' for ascending or 'DESC' for descending.
-     * @param userName An optional filter. If provided, only records with this username will be retrieved.
-     * @param email    An optional filter. If provided, only records with this email will be retrieved.
-     * @param role     An optional filter. If provided, only records with this role will be retrieved.
+     * @param filters  The list of filters.
      * @return A UserPaginationResponse object containing the retrieved records and pagination details.
      */
     @Override
-    public UserPaginationResponse getAll(int pageNo,
-                                         int pageSize,
-                                         String sortBy,
-                                         String sortDir,
-                                         String userName,
-                                         String email,
-                                         String role) {
+    public UserPaginationResponse getAll(int pageNo, int pageSize, String sortBy, String sortDir, List<Filter> filters) {
         Sort sort = Sort.by(sortBy);
         sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? sort.ascending() : sort.descending();
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
-        Specification<User> spec = Specification.where(null);
-        if (userName != null && !userName.isEmpty()) {
-            spec = spec.and(UserSpecification.searchByUserName(userName));
-        }
-        if (email != null && !email.isEmpty()) {
-            spec = spec.and(UserSpecification.searchByEmail(email));
-        }
-        if (role != null && !role.isEmpty()) {
-            spec = spec.and(UserSpecification.searchByRole(role));
-        }
+        Specification<User> spec = Specifications.getSpecificationFromFilters(filters);
         Page<User> page = userRepository.findAll(spec, pageable);
         List<UserResponse> users = UserMapper.INSTANCE.toResponses(page.getContent());
         return UserPaginationResponse.builder()
