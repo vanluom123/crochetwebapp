@@ -54,9 +54,11 @@ public class UserController {
             @Parameter(description = "Sort direction (default: ASC)")
             @RequestParam(value = "sortDir", defaultValue = AppConstant.DEFAULT_SORT_DIRECTION,
                     required = false) String sortDir,
-            @Parameter(description = "Search username")
+            @Parameter(description = "Search name or email address (default: null)")
+            @RequestParam(value = "searchText", required = false) String searchText,
+            @Parameter(description = "List of filters")
             @RequestBody(required = false) List<Filter> filters) {
-        var response = userService.getAll(pageNo, pageSize, sortBy, sortDir, filters);
+        var response = userService.getAll(pageNo, pageSize, sortBy, sortDir, searchText, filters);
         return ResponseEntity.ok(response);
     }
 

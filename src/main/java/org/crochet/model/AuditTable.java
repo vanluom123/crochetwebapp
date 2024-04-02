@@ -8,7 +8,7 @@ import jakarta.persistence.TemporalType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.experimental.SuperBuilder;
+import lombok.experimental.Accessors;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -18,12 +18,12 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
-@EntityListeners(AuditingEntityListener.class)
-@MappedSuperclass
-@SuperBuilder
 @Getter
 @Setter
+@EntityListeners(AuditingEntityListener.class)
+@MappedSuperclass
 @NoArgsConstructor
+@Accessors(chain = true)
 public abstract class AuditTable {
     @CreatedBy
     private String createdBy;

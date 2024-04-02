@@ -10,11 +10,10 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.Email;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.experimental.SuperBuilder;
+import lombok.experimental.Accessors;
 import org.crochet.enumerator.AuthProvider;
 import org.crochet.enumerator.RoleType;
 
@@ -26,8 +25,8 @@ import java.util.List;
 })
 @Getter
 @Setter
-@SuperBuilder
 @NoArgsConstructor
+@Accessors(chain = true)
 public class User extends BaseEntity {
     @Column(name = "name", nullable = false)
     private String name;
@@ -48,7 +47,6 @@ public class User extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "provider", columnDefinition = "VARCHAR(25) DEFAULT 'LOCAL'")
-    @Builder.Default
     private AuthProvider provider = AuthProvider.LOCAL;
 
     @Column(name = "provider_id")
@@ -59,7 +57,6 @@ public class User extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "roles", columnDefinition = "VARCHAR(10) DEFAULT 'USER'")
-    @Builder.Default
     private RoleType role = RoleType.USER;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)

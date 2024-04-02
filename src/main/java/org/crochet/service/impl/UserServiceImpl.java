@@ -14,6 +14,7 @@ import org.crochet.properties.MessageCodeProperties;
 import org.crochet.repository.Filter;
 import org.crochet.repository.Specifications;
 import org.crochet.repository.UserRepository;
+import org.crochet.repository.UserSpecification;
 import org.crochet.service.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -54,14 +55,13 @@ public class UserServiceImpl implements UserService {
         }
 
         // Creating user's account
-        User user = User.builder()
-                .name(signUpRequest.getName())
-                .email(signUpRequest.getEmail())
-                .emailVerified(false)
-                .password(passwordEncoder.encode(signUpRequest.getPassword()))
-                .provider(AuthProvider.LOCAL)
-                .role(signUpRequest.getRole())
-                .build();
+        User user = new User()
+                .setName(signUpRequest.getName())
+                .setEmail(signUpRequest.getEmail())
+                .setEmailVerified(false)
+                .setPassword(passwordEncoder.encode(signUpRequest.getPassword()))
+                .setProvider(AuthProvider.LOCAL)
+                .setRole(signUpRequest.getRole());
         // Save the user to the repository
         return userRepository.save(user);
     }
@@ -69,19 +69,25 @@ public class UserServiceImpl implements UserService {
     /**
      * Retrieves all users with pagination and optional filters.
      *
-     * @param pageNo   The page number to retrieve. Page numbers start from 0.
-     * @param pageSize The number of records to retrieve per page.
-     * @param sortBy   The field by which to sort the records.
-     * @param sortDir  The direction of the sort. Can be 'ASC' for ascending or 'DESC' for descending.
-     * @param filters  The list of filters.
+     * @param pageNo     The page number to retrieve. Page numbers start from 0.
+     * @param pageSize   The number of records to retrieve per page.
+     * @param sortBy     The field by which to sort the records.
+     * @param sortDir    The direction of the sort. Can be 'ASC' for ascending or 'DESC' for descending.
+     * @param searchText The text to search for in the name or email fields.
+     * @param filters    The list of filters.
      * @return A UserPaginationResponse object containing the retrieved records and pagination details.
      */
     @Override
-    public UserPaginationResponse getAll(int pageNo, int pageSize, String sortBy, String sortDir, List<Filter> filters) {
+    public UserPaginationResponse getAll(int pageNo, int pageSize, String sortBy, String sortDir,
+                                         String searchText, List<Filter> filters) {
         Sort sort = Sort.by(sortBy);
         sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? sort.ascending() : sort.descending();
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
         Specification<User> spec = Specifications.getSpecificationFromFilters(filters);
+        // Search by search text
+        if (searchText != null && !searchText.isEmpty()) {
+            spec = spec.and(UserSpecification.searchByNameOrEmail(searchText));
+        }
         Page<User> page = userRepository.findAll(spec, pageable);
         List<UserResponse> users = UserMapper.INSTANCE.toResponses(page.getContent());
         return UserPaginationResponse.builder()

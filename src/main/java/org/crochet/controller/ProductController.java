@@ -1,6 +1,7 @@
 package org.crochet.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -56,16 +57,23 @@ public class ProductController {
     @ApiResponse(responseCode = "400", description = "Invalid input")
     @PostMapping("/pagination")
     public ResponseEntity<ProductPaginationResponse> getProducts(
+            @Parameter(description = "Page number")
             @RequestParam(value = "pageNo", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER,
                     required = false) int pageNo,
+            @Parameter(description = "Page size")
             @RequestParam(value = "pageSize", defaultValue = AppConstant.DEFAULT_PAGE_SIZE,
                     required = false) int pageSize,
+            @Parameter(description = "Sort by field")
             @RequestParam(value = "sortBy", defaultValue = AppConstant.DEFAULT_SORT_BY, required = false) String sortBy,
+            @Parameter(description = "Sort direction")
             @RequestParam(value = "sortDir", defaultValue = AppConstant.DEFAULT_SORT_DIRECTION,
                     required = false) String sortDir,
+            @Parameter(description = "Search by name or description")
+            @RequestParam(value = "searchText", required = false) String searchText,
+            @Parameter(description = "Category ID")
             @RequestParam(value = "categoryId", required = false) UUID categoryId,
             @RequestBody(required = false) List<Filter> filters) {
-        var response = productService.getProducts(pageNo, pageSize, sortBy, sortDir, categoryId, filters);
+        var response = productService.getProducts(pageNo, pageSize, sortBy, sortDir, searchText, categoryId, filters);
         return ResponseEntity.ok(response);
     }
 

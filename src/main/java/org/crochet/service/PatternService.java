@@ -13,7 +13,7 @@ public interface PatternService {
     PatternResponse createOrUpdate(PatternRequest request);
 
     PatternPaginationResponse getPatterns(int pageNo, int pageSize, String sortBy, String sortDir,
-                                          UUID categoryId, List<Filter> filters);
+                                          String searchText, UUID categoryId, List<Filter> filters);
 
     List<PatternResponse> getLimitedPatterns();
 

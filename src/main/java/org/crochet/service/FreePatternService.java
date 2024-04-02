@@ -11,7 +11,8 @@ import java.util.UUID;
 public interface FreePatternService {
     FreePatternResponse createOrUpdate(FreePatternRequest request);
 
-    PaginatedFreePatternResponse getFreePatterns(int pageNo, int pageSize, String sortBy, String sortDir, UUID categoryId, List<Filter> filters);
+    PaginatedFreePatternResponse getFreePatterns(int pageNo, int pageSize, String sortBy, String sortDir,
+                                                 String searchText, UUID categoryId, List<Filter> filters);
 
     List<FreePatternResponse> getLimitedFreePatterns();
 

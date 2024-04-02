@@ -4,7 +4,6 @@ import org.crochet.constant.AppConstant;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.ImageMapper;
 import org.crochet.mapper.ProductMapper;
-import org.crochet.model.Image;
 import org.crochet.model.Product;
 import org.crochet.payload.request.ProductRequest;
 import org.crochet.payload.response.ProductPaginationResponse;
@@ -23,7 +22,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,22 +66,13 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductResponse createOrUpdate(ProductRequest request) {
         var category = categoryService.findById(request.getCategoryId());
-        var product = (request.getId() == null) ? new Product()
-                : findOne(request.getId());
-        product.setCategory(category);
-        product.setName(request.getName());
-        product.setPrice(request.getPrice());
-        product.setDescription(request.getDescription());
-        product.setCurrencyCode(request.getCurrencyCode());
-
-        if (!ObjectUtils.isEmpty(request.getImages())) {
-            List<Image> images = ImageMapper.INSTANCE.toEntities(request.getImages());
-            for (var image : images) {
-                image.setProduct(product);
-            }
-            product.setImages(images);
-        }
-
+        var product = (request.getId() != null) ? findOne(request.getId()) : new Product();
+        product.setCategory(category)
+                .setName(request.getName())
+                .setPrice(request.getPrice())
+                .setDescription(request.getDescription())
+                .setCurrencyCode(request.getCurrencyCode())
+                .setImages(ImageMapper.INSTANCE.toEntities(request.getImages()));
         product = productRepo.save(product);
         return ProductMapper.INSTANCE.toResponse(product);
     }
@@ -95,19 +84,23 @@ public class ProductServiceImpl implements ProductService {
      * @param pageSize   The number of products to include in each page.
      * @param sortBy     The attribute by which the products should be sorted.
      * @param sortDir    The sorting direction, either "ASC" (ascending) or "DESC" (descending).
+     * @param searchText The text used to filter products by name or description.
      * @param categoryId The unique identifiers of the categories used to filter products.
      * @param filters    The list of filters
      * @return A {@link ProductPaginationResponse} containing the paginated list of products.
      */
     @Override
     public ProductPaginationResponse getProducts(int pageNo, int pageSize, String sortBy, String sortDir,
-                                                 UUID categoryId, List<Filter> filters) {
+                                                 String searchText, UUID categoryId, List<Filter> filters) {
         // create Sort instance
         Sort sort = Sort.by(sortBy);
         sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? sort.ascending() : sort.descending();
         // create Pageable instance
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
         Specification<Product> spec = Specifications.getSpecificationFromFilters(filters);
+        if (searchText != null && !searchText.isEmpty()) {
+            spec = spec.and(ProductSpecifications.searchByNameOrDesc(searchText));
+        }
         if (categoryId != null) {
             spec = spec.and(ProductSpecifications.in(getProductsByCategory(categoryId)));
         }

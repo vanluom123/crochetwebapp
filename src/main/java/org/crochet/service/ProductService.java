@@ -11,7 +11,7 @@ import java.util.UUID;
 public interface ProductService {
     ProductResponse createOrUpdate(ProductRequest request);
 
-    ProductPaginationResponse getProducts(int pageNo, int pageSize, String sortBy, String sortDir, UUID categoryId, List<Filter> filters);
+    ProductPaginationResponse getProducts(int pageNo, int pageSize, String sortBy, String sortDir, String searchText, UUID categoryId, List<Filter> filters);
 
     List<ProductResponse> getLimitedProducts();
 

@@ -67,11 +67,13 @@ public class PatternController {
             @Parameter(description = "Sort direction (default: ASC)")
             @RequestParam(value = "sortDir", defaultValue = AppConstant.DEFAULT_SORT_DIRECTION,
                     required = false) String sortDir,
+            @Parameter(description = "Search by name or description")
+            @RequestParam(value = "searchText", required = false) String searchText,
             @Parameter(description = "Category ID")
             @RequestParam(value = "categoryId", required = false) UUID categoryId,
             @Parameter(description = "Filters")
             @RequestBody(required = false) List<Filter> filters) {
-        var response = patternService.getPatterns(pageNo, pageSize, sortBy, sortDir, categoryId, filters);
+        var response = patternService.getPatterns(pageNo, pageSize, sortBy, sortDir, searchText, categoryId, filters);
         return ResponseEntity.ok(response);
     }
 

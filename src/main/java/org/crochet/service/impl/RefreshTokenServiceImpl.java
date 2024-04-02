@@ -45,11 +45,10 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
                 .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_WITH_EMAIL_MESSAGE + username));
         LocalDateTime now = LocalDateTime.now();
         var expiryDate = now.plus(appProps.getAuth().getRefreshTokenExpirationMs(), ChronoUnit.MILLIS);
-        RefreshToken refreshToken = RefreshToken.builder()
-                .user(user)
-                .token(UUID.randomUUID().toString())
-                .expiresAt(expiryDate) // set expiry of refresh token to 10 minutes - you can configure it application.properties file
-                .build();
+        var refreshToken = new RefreshToken()
+                .setToken(UUID.randomUUID().toString())
+                .setExpiresAt(expiryDate) // set expiry of refresh token to 10 minutes - you can configure it application.properties file
+                .setUser(user);
         revokeRefreshToken(user);
         return refreshTokenRepo.save(refreshToken);
     }

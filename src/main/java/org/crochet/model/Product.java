@@ -1,19 +1,21 @@
 package org.crochet.model;
 
-import jakarta.persistence.CascadeType;
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.AttributeOverrides;
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.experimental.SuperBuilder;
+import lombok.experimental.Accessors;
 import org.crochet.enumerator.CurrencyCode;
 
 import java.util.List;
@@ -22,7 +24,7 @@ import java.util.List;
 @Setter
 @Entity
 @Table(name = "product")
-@SuperBuilder
+@Accessors(chain = true)
 @NoArgsConstructor
 public class Product extends BaseEntity {
     @Column(name = "name")
@@ -44,6 +46,12 @@ public class Product extends BaseEntity {
     @JoinColumn(name = "category_id", columnDefinition = "BINARY(16) NOT NULL")
     private Category category;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    @ElementCollection
+    @CollectionTable(name = "product_image",
+            joinColumns = @JoinColumn(name = "product_id", columnDefinition = "BINARY(16) NOT NULL"))
+    @AttributeOverrides({
+            @AttributeOverride(name = "fileName", column = @Column(name = "file_name")),
+            @AttributeOverride(name = "fileContent", column = @Column(name = "file_content"))
+    })
     private List<Image> images;
 }

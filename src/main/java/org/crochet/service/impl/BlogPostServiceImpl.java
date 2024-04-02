@@ -4,7 +4,6 @@ import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.BlogPostMapper;
 import org.crochet.mapper.FileMapper;
 import org.crochet.model.BlogPost;
-import org.crochet.model.File;
 import org.crochet.payload.request.BlogPostRequest;
 import org.crochet.payload.response.BlogPostPaginationResponse;
 import org.crochet.payload.response.BlogPostResponse;
@@ -19,7 +18,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ObjectUtils;
 
 import java.util.UUID;
 
@@ -50,21 +48,15 @@ public class BlogPostServiceImpl implements BlogPostService {
      * If the request does not contain an ID, it creates a new blog post.
      *
      * @param request The {@link BlogPostRequest} containing information for creating or updating the blog post.
-     * @return
+     * @return A {@link BlogPostResponse} containing detailed information about the created or updated blog post.
      */
     @Transactional
     @Override
     public BlogPostResponse createOrUpdatePost(BlogPostRequest request) {
         var blogPost = (request.getId() == null) ? new BlogPost() : findOne(request.getId());
-        blogPost.setTitle(request.getTitle());
-        blogPost.setContent(request.getContent());
-        if (!ObjectUtils.isEmpty(request.getFiles())) {
-            var files = FileMapper.INSTANCE.toEntities(request.getFiles());
-            for (File file : files) {
-                file.setBlogPost(blogPost);
-            }
-            blogPost.setFiles(files);
-        }
+        blogPost.setTitle(request.getTitle())
+                .setContent(request.getContent())
+                .setFiles(FileMapper.INSTANCE.toEntities(request.getFiles()));
         blogPost = blogPostRepo.save(blogPost);
         return BlogPostMapper.INSTANCE.toResponse(blogPost);
     }

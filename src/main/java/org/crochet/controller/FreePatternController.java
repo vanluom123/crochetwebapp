@@ -65,11 +65,13 @@ public class FreePatternController {
             @Parameter(description = "Sort direction (default: ASC)")
             @RequestParam(value = "sortDir", defaultValue = AppConstant.DEFAULT_SORT_DIRECTION,
                     required = false) String sortDir,
+            @Parameter(description = "Search by name, desc, or author")
+            @RequestParam(value = "searchText", required = false) String searchText,
             @Parameter(description = "Category ID")
             @RequestParam(value = "categoryId", required = false) UUID categoryId,
             @Parameter(description = "Filters")
             @RequestBody(required = false) List<Filter> filters) {
-        var response = freePatternService.getFreePatterns(pageNo, pageSize, sortBy, sortDir, categoryId, filters);
+        var response = freePatternService.getFreePatterns(pageNo, pageSize, sortBy, sortDir, searchText, categoryId, filters);
         return ResponseEntity.ok(response);
     }
 

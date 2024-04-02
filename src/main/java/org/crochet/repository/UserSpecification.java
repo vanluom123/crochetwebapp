@@ -4,21 +4,11 @@ import org.crochet.model.User;
 import org.springframework.data.jpa.domain.Specification;
 
 public class UserSpecification {
-    public static Specification<User> searchByUserName(String userName) {
+    public static Specification<User> searchByNameOrEmail(String text) {
         return (root, query, cb) -> {
-            return cb.like(root.get("name"), "%" + userName + "%");
-        };
-    }
-
-    public static Specification<User> searchByEmail(String email) {
-        return (root, query, cb) -> {
-            return cb.equal(root.get("email"), email);
-        };
-    }
-
-    public static Specification<User> searchByRole(String role) {
-        return (root, query, cb) -> {
-            return cb.equal(root.get("role"), role);
+            var nameLike = cb.like(root.get("name"), "%" + text + "%");
+            var emailLike = cb.like(root.get("email"), "%" + text + "%");
+            return cb.or(nameLike, emailLike);
         };
     }
 }

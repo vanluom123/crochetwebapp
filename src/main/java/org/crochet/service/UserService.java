@@ -14,10 +14,8 @@ import java.util.UUID;
 public interface UserService {
     User createUser(SignUpRequest signUpRequest);
 
-    UserPaginationResponse getAll(int pageNo,
-                                  int pageSize,
-                                  String sortBy,
-                                  String sortDir, List<Filter> filters);
+    UserPaginationResponse getAll(int pageNo, int pageSize, String sortBy, String sortDir,
+                                  String searchText, List<Filter> filters);
 
     @Transactional
     void updateUser(UserUpdateRequest request);

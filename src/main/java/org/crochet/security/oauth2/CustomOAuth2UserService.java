@@ -142,15 +142,14 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         String imageUrl = oAuth2User.getAttribute("picture");
 
         // Create a new user
-        User user = User.builder()
-                .role(RoleType.USER)
-                .provider(AuthProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId()))
-                .providerId(providerId)
-                .name(name)
-                .email(email)
-                .imageUrl(imageUrl)
-                .emailVerified(true)
-                .build();
+        User user = new User()
+                .setRole(RoleType.USER)
+                .setProvider(AuthProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId()))
+                .setProviderId(providerId)
+                .setName(name)
+                .setEmail(email)
+                .setImageUrl(imageUrl)
+                .setEmailVerified(true);
 
         // Save the new user in the repository
         return userRepository.save(user);

@@ -1,7 +1,11 @@
 package org.crochet.model;
 
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -13,7 +17,7 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.experimental.SuperBuilder;
+import lombok.experimental.Accessors;
 import org.crochet.enumerator.CurrencyCode;
 
 import java.util.List;
@@ -22,8 +26,8 @@ import java.util.List;
 @Setter
 @Entity
 @Table(name = "pattern")
-@SuperBuilder
 @NoArgsConstructor
+@Accessors(chain = true)
 public class Pattern extends BaseEntity {
     @Column(name = "name")
     private String name;
@@ -49,9 +53,21 @@ public class Pattern extends BaseEntity {
     @JoinColumn(name = "category_id", columnDefinition = "BINARY(16) NOT NULL")
     private Category category;
 
-    @OneToMany(mappedBy = "pattern", cascade = CascadeType.ALL)
+    @ElementCollection
+    @CollectionTable(name = "pattern_file",
+            joinColumns = @JoinColumn(name = "pattern_id", columnDefinition = "BINARY(16) NOT NULL"))
+    @AttributeOverrides({
+            @AttributeOverride(name = "fileName", column = @Column(name = "file_name")),
+            @AttributeOverride(name = "fileContent", column = @Column(name = "file_content"))
+    })
     private List<File> files;
 
-    @OneToMany(mappedBy = "pattern", cascade = CascadeType.ALL)
+    @ElementCollection
+    @CollectionTable(name = "pattern_image",
+            joinColumns = @JoinColumn(name = "pattern_id", columnDefinition = "BINARY(16) NOT NULL"))
+    @AttributeOverrides({
+            @AttributeOverride(name = "fileName", column = @Column(name = "file_name")),
+            @AttributeOverride(name = "fileContent", column = @Column(name = "file_content"))
+    })
     private List<Image> images;
 }

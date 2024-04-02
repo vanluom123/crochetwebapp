@@ -6,8 +6,6 @@ import org.crochet.mapper.FileMapper;
 import org.crochet.mapper.ImageMapper;
 import org.crochet.mapper.PatternMapper;
 import org.crochet.model.Category;
-import org.crochet.model.File;
-import org.crochet.model.Image;
 import org.crochet.model.Pattern;
 import org.crochet.model.User;
 import org.crochet.payload.request.PatternRequest;
@@ -28,7 +26,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -71,28 +68,13 @@ public class PatternServiceImpl implements PatternService {
         var category = categoryService.findById(request.getCategoryId());
         var pattern = (request.getId() == null) ? new Pattern()
                 : findOne(request.getId());
-        pattern.setCategory(category);
-        pattern.setName(request.getName());
-        pattern.setPrice(request.getPrice());
-        pattern.setDescription(request.getDescription());
-        pattern.setCurrencyCode(request.getCurrencyCode());
-
-        if (!ObjectUtils.isEmpty(request.getFiles())) {
-            List<File> files = FileMapper.INSTANCE.toEntities(request.getFiles());
-            for (var file : files) {
-                file.setPattern(pattern);
-            }
-            pattern.setFiles(files);
-        }
-
-        if (!ObjectUtils.isEmpty(request.getImages())) {
-            List<Image> images = ImageMapper.INSTANCE.toEntities(request.getImages());
-            for (var image : images) {
-                image.setPattern(pattern);
-            }
-            pattern.setImages(images);
-        }
-
+        pattern.setCategory(category)
+                .setName(request.getName())
+                .setPrice(request.getPrice())
+                .setDescription(request.getDescription())
+                .setCurrencyCode(request.getCurrencyCode())
+                .setFiles(FileMapper.INSTANCE.toEntities(request.getFiles()))
+                .setImages(ImageMapper.INSTANCE.toEntities(request.getImages()));
         pattern = patternRepo.save(pattern);
         return PatternMapper.INSTANCE.toResponse(pattern);
     }
@@ -104,16 +86,20 @@ public class PatternServiceImpl implements PatternService {
      * @param pageSize   The size of page
      * @param sortBy     Sort by
      * @param sortDir    Sort directory
+     * @param searchText Search text
      * @param categoryId Category id
      * @param filters    Filters
      * @return Pattern is paginated
      */
     @Override
     public PatternPaginationResponse getPatterns(int pageNo, int pageSize, String sortBy, String sortDir,
-                                                 UUID categoryId, List<Filter> filters) {
+                                                 String searchText, UUID categoryId, List<Filter> filters) {
         Sort sort = Sort.by(sortBy);
         sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? sort.ascending() : sort.descending();
         Specification<Pattern> spec = Specifications.getSpecificationFromFilters(filters);
+        if (searchText != null && !searchText.isEmpty()) {
+            spec = spec.and(PatternSpecifications.searchByNameOrDesc(searchText));
+        }
         if (categoryId != null) {
             spec = spec.and(PatternSpecifications.in(getPatternsByCategory(categoryId)));
         }

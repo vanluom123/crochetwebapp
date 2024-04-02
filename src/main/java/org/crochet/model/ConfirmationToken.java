@@ -11,7 +11,7 @@ import jakarta.persistence.TemporalType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.experimental.SuperBuilder;
+import lombok.experimental.Accessors;
 
 import java.time.LocalDateTime;
 
@@ -19,8 +19,8 @@ import java.time.LocalDateTime;
 @Setter
 @Entity
 @Table(name = "confirmation_token")
-@SuperBuilder
 @NoArgsConstructor
+@Accessors(chain = true)
 public class ConfirmationToken extends BaseEntity {
     @Column(name = "token",
             unique = true,

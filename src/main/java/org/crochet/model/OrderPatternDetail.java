@@ -13,18 +13,17 @@ import jakarta.persistence.TemporalType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.experimental.SuperBuilder;
+import lombok.experimental.Accessors;
 import org.crochet.enumerator.OrderStatus;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "order_pattern_detail")
-@SuperBuilder
 @NoArgsConstructor
+@Accessors(chain = true)
 public class OrderPatternDetail extends BaseEntity {
     @Column(name = "transaction_id", nullable = false, unique = true)
     private String transactionId;

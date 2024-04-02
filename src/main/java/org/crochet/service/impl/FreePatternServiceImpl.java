@@ -6,9 +6,7 @@ import org.crochet.mapper.FileMapper;
 import org.crochet.mapper.FreePatternMapper;
 import org.crochet.mapper.ImageMapper;
 import org.crochet.model.Category;
-import org.crochet.model.File;
 import org.crochet.model.FreePattern;
-import org.crochet.model.Image;
 import org.crochet.payload.request.FreePatternRequest;
 import org.crochet.payload.response.FreePatternResponse;
 import org.crochet.payload.response.PaginatedFreePatternResponse;
@@ -26,7 +24,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,29 +69,12 @@ public class FreePatternServiceImpl implements FreePatternService {
         var category = categoryService.findById(request.getCategoryId());
         FreePattern freePattern = (request.getId() == null) ? new FreePattern()
                 : findOne(request.getId());
-        freePattern.setCategory(category);
-        freePattern.setName(request.getName());
-        freePattern.setDescription(request.getDescription());
-        freePattern.setAuthor(request.getAuthor());
-
-        // Set files
-        if (!ObjectUtils.isEmpty(request.getFiles())) {
-            List<File> files = FileMapper.INSTANCE.toEntities(request.getFiles());
-            for (var file : files) {
-                file.setFreePattern(freePattern);
-            }
-            freePattern.setFiles(files);
-        }
-
-        // Set images
-        if (!ObjectUtils.isEmpty(request.getImages())) {
-            List<Image> images = ImageMapper.INSTANCE.toEntities(request.getImages());
-            for (var image : images) {
-                image.setFreePattern(freePattern);
-            }
-            freePattern.setImages(images);
-        }
-
+        freePattern.setCategory(category)
+                .setName(request.getName())
+                .setDescription(request.getDescription())
+                .setAuthor(request.getAuthor())
+                .setFiles(FileMapper.INSTANCE.toEntities(request.getFiles()))
+                .setImages(ImageMapper.INSTANCE.toEntities(request.getImages()));
         freePattern = freePatternRepo.save(freePattern);
         return FreePatternMapper.INSTANCE.toResponse(freePattern);
     }
@@ -106,19 +86,23 @@ public class FreePatternServiceImpl implements FreePatternService {
      * @param pageSize   The number of FreePatterns to include in each page.
      * @param sortBy     The attribute by which the FreePatterns should be sorted.
      * @param sortDir    The sorting direction, either "ASC" (ascending) or "DESC" (descending).
+     * @param searchText The text to search for in the FreePatterns.
      * @param categoryId The unique identifier of the category to filter FreePatterns by.
      * @param filters    The list of filters.
      * @return A {@link PaginatedFreePatternResponse} containing the paginated list of FreePatterns.
      */
     @Override
     public PaginatedFreePatternResponse getFreePatterns(int pageNo, int pageSize, String sortBy, String sortDir,
-                                                        UUID categoryId, List<Filter> filters) {
+                                                        String searchText, UUID categoryId, List<Filter> filters) {
         // create Sort instance
         Sort sort = Sort.by(sortBy);
         sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? sort.ascending() : sort.descending();
         // create Pageable instance
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
         Specification<FreePattern> spec = Specifications.getSpecificationFromFilters(filters);
+        if (searchText != null && !searchText.isEmpty()) {
+            spec = spec.and(FreePatternSpecifications.searchByNameDescOrAuthor(searchText));
+        }
         // add filter criteria
         if (categoryId != null) {
             spec = spec.and(FreePatternSpecifications.existIn(getAllFreePatterns(categoryId)));
