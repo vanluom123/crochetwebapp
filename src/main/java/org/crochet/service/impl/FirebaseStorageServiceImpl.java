@@ -81,4 +81,21 @@ public class FirebaseStorageServiceImpl implements FirebaseStorageService {
             return Optional.of(fileName);
         }
     }
+
+    @Override
+    public FileResponse updateFile(MultipartFile newFile, String existingFileName) {
+        // Delete the existing file
+        Blob blob = storageClient.bucket(BUCKET_NAME).get(existingFileName);
+        if (blob != null) {
+            blob.delete();
+            log.info("File {} has been deleted", existingFileName);
+        } else {
+            log.error("File {} does not exist", existingFileName);
+            throw new StorageException("File does not exist",
+                    msgCodeProps.getCode("FILE_NOT_FOUND_MESSAGE"));
+        }
+
+        // Upload the new file
+        return uploadFile(newFile);
+    }
 }

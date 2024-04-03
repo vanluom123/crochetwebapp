@@ -10,9 +10,9 @@ import java.util.List;
 
 @Getter
 @Setter
-@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-public class BlogPostPaginationResponse extends PaginationResponse {
-    private List<BlogPostResponse> contents;
+@SuperBuilder
+public class UserPaginationResponse extends PaginationResponse {
+    private List<UserResponse> contents;
 }

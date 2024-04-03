@@ -99,7 +99,7 @@ public class AuthServiceImpl implements AuthService {
         User user = userService.createUser(signUpRequest);
 
         // Create or update confirmation token
-        ConfirmationToken confirmationToken = confirmTokenService.createOrUpdateToken(user);
+        ConfirmationToken confirmationToken = confirmTokenService.createOrUpdate(user);
 
         // Build the base URI
         String baseUri = ServletUriComponentsBuilder.fromCurrentContextPath().toUriString();
@@ -128,7 +128,7 @@ public class AuthServiceImpl implements AuthService {
         User user = userService.getByEmail(email);
 
         // Create or update confirmation token
-        ConfirmationToken confirmationToken = confirmTokenService.createOrUpdateToken(user);
+        ConfirmationToken confirmationToken = confirmTokenService.createOrUpdate(user);
 
         // Build the base URI
         String baseUri = ServletUriComponentsBuilder.fromCurrentContextPath().toUriString();

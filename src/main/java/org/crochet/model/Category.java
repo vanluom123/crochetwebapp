@@ -10,7 +10,7 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.experimental.SuperBuilder;
+import lombok.experimental.Accessors;
 
 import java.util.List;
 
@@ -18,8 +18,8 @@ import java.util.List;
 @Setter
 @Entity
 @Table(name = "category")
-@SuperBuilder
 @NoArgsConstructor
+@Accessors(chain = true)
 public class Category extends BaseEntity {
     @Column(name = "name", nullable = false)
     private String name;

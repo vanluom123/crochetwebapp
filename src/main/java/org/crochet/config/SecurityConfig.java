@@ -1,6 +1,7 @@
 package org.crochet.config;
 
 import lombok.extern.slf4j.Slf4j;
+import org.crochet.properties.AuthorizeHttpRequestProperties;
 import org.crochet.security.CustomUserDetailsService;
 import org.crochet.security.RestAuthenticationEntryPoint;
 import org.crochet.security.TokenAuthenticationFilter;
@@ -34,20 +35,14 @@ import static org.springframework.security.config.Customizer.withDefaults;
         prePostEnabled = true
 )
 public class SecurityConfig {
-
     private final CustomUserDetailsService customUserDetailsService;
-
     private final CustomOAuth2UserService customOAuth2UserService;
-
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
-
     private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
-
     private final PasswordEncoder passwordEncoder;
-
     private final OAuth2CookieRepository oAuth2CookieRepository;
-
     private final TokenAuthenticationFilter tokenAuthenticationFilter;
+    private final AuthorizeHttpRequestProperties authorizeHttpRequestProps;
 
     public SecurityConfig(CustomUserDetailsService customUserDetailsService,
                           CustomOAuth2UserService customOAuth2UserService,
@@ -55,7 +50,8 @@ public class SecurityConfig {
                           OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler,
                           PasswordEncoder passwordEncoder,
                           OAuth2CookieRepository oAuth2CookieRepository,
-                          TokenAuthenticationFilter tokenAuthenticationFilter) {
+                          TokenAuthenticationFilter tokenAuthenticationFilter,
+                          AuthorizeHttpRequestProperties authorizeHttpRequestProps) {
         this.customUserDetailsService = customUserDetailsService;
         this.customOAuth2UserService = customOAuth2UserService;
         this.oAuth2AuthenticationSuccessHandler = oAuth2AuthenticationSuccessHandler;
@@ -63,8 +59,8 @@ public class SecurityConfig {
         this.passwordEncoder = passwordEncoder;
         this.oAuth2CookieRepository = oAuth2CookieRepository;
         this.tokenAuthenticationFilter = tokenAuthenticationFilter;
+        this.authorizeHttpRequestProps = authorizeHttpRequestProps;
     }
-
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
@@ -85,37 +81,9 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(
                         new RestAuthenticationEntryPoint()))
-                .authorizeHttpRequests(authReq -> authReq.requestMatchers("/",
-                                "/error",
-                                "/favicon.ico",
-                                "/*.png",
-                                "/*.gif",
-                                "/*.svg",
-                                "/*.jpg",
-                                "/*.html",
-                                "/*.css",
-                                "/*.js").permitAll()
-                        .requestMatchers("/auth/**", "/oauth2/**").permitAll()
-                        .requestMatchers("/blog/create",
-                                "/comment/create",
-                                "/free-pattern/create",
-                                "/pattern/create",
-                                "/category/create",
-                                "/category/update",
-                                "/category-pattern/create",
-                                "/category-pattern/update",
-                                "/category-free-pattern/create",
-                                "/category-free-pattern/update",
-                                "/firebase-storage/upload-file",
-                                "/product/create").authenticated()
-                        .requestMatchers(
-                                "/swagger-ui/**",
-                                "/swagger-ui.html",
-                                "webjars/**",
-                                "/v3/api-docs/**",
-                                "/v3/api-docs",
-                                "/swagger-resources",
-                                "/swagger-resources/**").permitAll()
+                .authorizeHttpRequests(authReq -> authReq
+                        .requestMatchers(authorizeHttpRequestProps.getPermitAll()).permitAll()
+                        .requestMatchers(authorizeHttpRequestProps.getAuthenticated()).authenticated()
                         .anyRequest().permitAll())
                 .oauth2Login(oauth -> oauth.authorizationEndpoint(authEndpointCustomizer ->
                                 authEndpointCustomizer

@@ -11,7 +11,7 @@ import java.util.UUID;
 @Data
 @Builder
 public class FreePatternRequest {
-    private String id;
+    private UUID id;
     @JsonProperty("category_id")
     private UUID categoryId;
     private String name;

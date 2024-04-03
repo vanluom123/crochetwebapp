@@ -15,6 +15,6 @@ public class ProductResponse {
     private double price;
     @JsonProperty("currency_code")
     private String currencyCode;
-    private List<FileResponse> files;
+    private List<FileResponse> images;
     private CategoryResponse category;
 }
