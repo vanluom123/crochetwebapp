@@ -18,11 +18,14 @@ import org.crochet.service.PayPalService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
-import static org.crochet.constant.MessageConstant.*;
+import static org.crochet.constant.MessageConstant.LOGIN_TO_ORDER_PATTERN_MESSAGE;
+import static org.crochet.constant.MessageConstant.ORDER_PATTERN_DETAIL_NOT_FOUND_FOR_TRANSACTION_ID_MESSAGE;
+import static org.crochet.constant.MessageConstant.PATTERN_NOT_FOUND_MESSAGE;
+import static org.crochet.constant.MessageConstant.PAYMENT_SUCCESS_MESSAGE;
+import static org.crochet.constant.MessageConstant.USER_NOT_FOUND_MESSAGE;
 
 @Service
 public class OrderPatternServiceImpl implements OrderPatternService {
@@ -71,21 +74,19 @@ public class OrderPatternServiceImpl implements OrderPatternService {
         var paymentOrder = payPalService.createPayment(pattern.getPrice());
 
         // Build a new order object using the fetched user
-        var order = Order.builder()
-                .user(user)
-                .build();
+        Order order = new Order()
+                .setUser(user);
         order = orderRepository.save(order);
 
         // Build a new order pattern detail object using the order, pattern, and payment order
         // Set the order date to the current instant
-        var orderPatternDetail = OrderPatternDetail.builder()
-                .order(order)
-                .pattern(pattern)
-                .transactionId(paymentOrder.getPayId())
-                .status(OrderStatus.valueOf(paymentOrder.getStatus()))
-                .orderDate(Date.from(Instant.now()))
-                .build();
-        orderPatternDetailRepository.save(orderPatternDetail);
+        OrderPatternDetail detail = new OrderPatternDetail()
+                .setOrder(order)
+                .setPattern(pattern)
+                .setTransactionId(paymentOrder.getPayId())
+                .setStatus(OrderStatus.valueOf(paymentOrder.getStatus()))
+                .setOrderDate(LocalDateTime.now());
+        orderPatternDetailRepository.save(detail);
 
         // Return the payment order
         return paymentOrder;

@@ -6,7 +6,7 @@ import org.crochet.model.User;
 import java.time.LocalDateTime;
 
 public interface ConfirmTokenService {
-    ConfirmationToken createOrUpdateToken(User user);
+    ConfirmationToken createOrUpdate(User user);
 
     void updateConfirmedAt(String token, LocalDateTime dateTime);
 

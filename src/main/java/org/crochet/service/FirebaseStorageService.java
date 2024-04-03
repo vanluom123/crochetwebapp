@@ -10,4 +10,6 @@ public interface FirebaseStorageService {
     List<FileResponse> uploadMultipleFiles(MultipartFile[] files);
 
     List<String> deleteMultipleFiles(List<String> fileNames);
+
+    FileResponse updateFile(MultipartFile newFile, String existingFileName);
 }

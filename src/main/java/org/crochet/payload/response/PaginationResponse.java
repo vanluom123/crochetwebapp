@@ -6,13 +6,17 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
-import java.util.List;
-
 @Getter
 @Setter
-@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-public class BlogPostPaginationResponse extends PaginationResponse {
-    private List<BlogPostResponse> contents;
+@SuperBuilder
+public class PaginationResponse {
+    private int pageNo;
+    private int pageSize;
+    private long totalElements;
+    private int totalPages;
+    private boolean last;
 }
+
+

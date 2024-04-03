@@ -4,22 +4,19 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.experimental.SuperBuilder;
-
-import java.time.LocalDateTime;
+import lombok.experimental.Accessors;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "comment")
-@SuperBuilder
 @NoArgsConstructor
+@Accessors(chain = true)
 public class Comment extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", nullable = false)
@@ -29,11 +26,6 @@ public class Comment extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Lob
-    @Column(name = "content", columnDefinition = "LONGBLOB", nullable = false)
+    @Column(name = "content", columnDefinition = "TEXT")
     private String content;
-
-    @Column(name = "created_date", nullable = false)
-    private LocalDateTime createdDate;
-
 }
