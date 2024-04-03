@@ -8,18 +8,18 @@ import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.experimental.SuperBuilder;
+import lombok.experimental.Accessors;
 
 import java.util.UUID;
 
 @Getter
 @Setter
-@SuperBuilder
 @MappedSuperclass
 @NoArgsConstructor
-public class BaseEntity {
+@Accessors(chain = true)
+public class BaseEntity extends AuditTable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false)
-    protected UUID id;
+    private UUID id;
 }

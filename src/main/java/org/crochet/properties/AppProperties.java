@@ -1,34 +1,26 @@
 package org.crochet.properties;
 
 import lombok.Getter;
+import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
+@Component
 @ConfigurationProperties(prefix = "app")
 public class AppProperties {
     private final Auth auth = new Auth();
     private final OAuth2 oauth2 = new OAuth2();
 
+    @Setter
     @Getter
     public static class Auth {
         private String tokenSecret;
         private long tokenExpirationMs;
         private long refreshTokenExpirationMs;
-
-        public void setTokenSecret(String tokenSecret) {
-            this.tokenSecret = tokenSecret;
-        }
-
-        public void setTokenExpirationMs(long tokenExpirationMs) {
-            this.tokenExpirationMs = tokenExpirationMs;
-        }
-
-        public void setRefreshTokenExpirationMs(long refreshTokenExpirationMs) {
-            this.refreshTokenExpirationMs = refreshTokenExpirationMs;
-        }
     }
 
     @Getter

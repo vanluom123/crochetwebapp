@@ -1,6 +1,5 @@
 package org.crochet.service.impl;
 
-import org.crochet.properties.MessageCodeProperties;
 import org.crochet.exception.IllegalArgumentException;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.CategoryMapper;
@@ -8,21 +7,27 @@ import org.crochet.model.Category;
 import org.crochet.payload.request.CategoryCreationRequest;
 import org.crochet.payload.request.CategoryUpdateRequest;
 import org.crochet.payload.response.CategoryResponse;
+import org.crochet.properties.MessageCodeProperties;
 import org.crochet.repository.CategoryRepo;
 import org.crochet.service.CategoryService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
-import static org.crochet.constant.MessageConstant.*;
+import static org.crochet.constant.MessageConstant.CATEGORY_NOT_FOUND_MESSAGE;
+import static org.crochet.constant.MessageConstant.EXISTS_AS_A_CHILD_MESSAGE;
+import static org.crochet.constant.MessageConstant.EXISTS_AS_A_PARENT_MESSAGE;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepo categoryRepo;
     private final MessageCodeProperties msgCodeProps;
 
-    public CategoryServiceImpl(CategoryRepo categoryRepo, MessageCodeProperties msgCodeProps) {
+    public CategoryServiceImpl(CategoryRepo categoryRepo,
+                               MessageCodeProperties msgCodeProps) {
         this.categoryRepo = categoryRepo;
         this.msgCodeProps = msgCodeProps;
     }
@@ -42,7 +47,7 @@ public class CategoryServiceImpl implements CategoryService {
         List<Category> parents = categoryRepo.findAllById(request.getParentIds());
 
         // Create child categories and add them to their respective parents
-        Set<Category> children = new HashSet<>();
+        List<Category> children = new ArrayList<>();
 
         if (parents.isEmpty()) {
             if (categoryRepo.existsByNameAndParentIsNotNull(name)) {
@@ -100,8 +105,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public List<CategoryResponse> getAllCategories() {
-        var categories = categoryRepo.findAll();
-        // get categories with no parent
+        var categories = categoryRepo.getCategories();
         var parentCategories = categories.stream()
                 .filter(category -> category.getParent() == null)
                 .toList();
@@ -116,7 +120,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Category findById(UUID id) {
-        return categoryRepo.findById(id)
+        return categoryRepo.getCategory(id)
                 .orElseThrow(() -> new ResourceNotFoundException(CATEGORY_NOT_FOUND_MESSAGE,
                         msgCodeProps.getCode("CATEGORY_NOT_FOUND_MESSAGE")));
     }

@@ -15,15 +15,19 @@ public interface PasswordResetTokenRepository extends JpaRepository<PasswordRese
 
     Optional<PasswordResetToken> findByToken(String token);
 
-    @Query("select p.user " +
-            "from PasswordResetToken p " +
-            "join fetch User u " +
-            "where p.token = ?1")
+    @Query("""
+            select p.user
+            from PasswordResetToken p
+            where p.token = ?1
+            """)
     Optional<User> getUserByToken(String token);
 
-    @Query("select p.user.email " +
-            "from PasswordResetToken p " +
-            "join fetch User u on p.user.id = u.id " +
-            "where p.token = ?1")
+
+    @Query("""
+            select u.email
+            from PasswordResetToken p
+            join User u on u.id = p.user.id
+            where p.token = ?1
+            """)
     Optional<String> findEmailByToken(String token);
 }

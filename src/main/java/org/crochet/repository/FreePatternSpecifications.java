@@ -4,18 +4,18 @@ import org.crochet.model.FreePattern;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
-import java.util.UUID;
 
 public class FreePatternSpecifications {
-    public static Specification<FreePattern> searchBy(String text) {
+    public static Specification<FreePattern> searchByNameDescOrAuthor(String searchText) {
         return (r, q, cb) -> {
-            var name = cb.like(r.get("name"), "%" + text + "%");
-            var desc = cb.like(r.get("description"), "%" + text + "%");
-            return cb.or(name, desc);
+            var nameLike = cb.like(r.get("searchText"), "%" + searchText + "%");
+            var descriptionLike = cb.like(r.get("description"), "%" + searchText + "%");
+            var authorLike = cb.like(r.get("author"), "%" + searchText + "%");
+            return cb.or(nameLike, descriptionLike, authorLike);
         };
     }
 
-    public static Specification<FreePattern> filterBy(List<UUID> categoryIds) {
-        return (r, q, cb) -> r.get("category").get("id").in(categoryIds);
+    public static Specification<FreePattern> existIn(List<FreePattern> patterns) {
+        return (r, q, cb) -> r.in(patterns);
     }
 }

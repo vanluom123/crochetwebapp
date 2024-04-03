@@ -1,12 +1,13 @@
 package org.crochet.service.impl;
 
-import org.crochet.properties.MessageCodeProperties;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.BlogPostMapper;
+import org.crochet.mapper.FileMapper;
 import org.crochet.model.BlogPost;
 import org.crochet.payload.request.BlogPostRequest;
 import org.crochet.payload.response.BlogPostPaginationResponse;
 import org.crochet.payload.response.BlogPostResponse;
+import org.crochet.properties.MessageCodeProperties;
 import org.crochet.repository.BlogPostRepository;
 import org.crochet.repository.BlogPostSpecifications;
 import org.crochet.service.BlogPostService;
@@ -18,7 +19,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.crochet.constant.MessageConstant.BLOG_NOT_FOUND_MESSAGE;
@@ -48,16 +48,15 @@ public class BlogPostServiceImpl implements BlogPostService {
      * If the request does not contain an ID, it creates a new blog post.
      *
      * @param request The {@link BlogPostRequest} containing information for creating or updating the blog post.
-     * @return
+     * @return A {@link BlogPostResponse} containing detailed information about the created or updated blog post.
      */
     @Transactional
     @Override
     public BlogPostResponse createOrUpdatePost(BlogPostRequest request) {
         var blogPost = (request.getId() == null) ? new BlogPost() : findOne(request.getId());
-        blogPost.setTitle(request.getTitle());
-        blogPost.setContent(request.getContent());
-        blogPost.setCreationDate(LocalDateTime.now());
-        blogPost.setFiles(request.getFiles());
+        blogPost.setTitle(request.getTitle())
+                .setContent(request.getContent())
+                .setFiles(FileMapper.INSTANCE.toEntities(request.getFiles()));
         blogPost = blogPostRepo.save(blogPost);
         return BlogPostMapper.INSTANCE.toResponse(blogPost);
     }
