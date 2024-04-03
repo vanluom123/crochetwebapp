@@ -1,6 +1,7 @@
 package org.crochet.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -9,11 +10,18 @@ import org.crochet.constant.AppConstant;
 import org.crochet.payload.request.ProductRequest;
 import org.crochet.payload.response.ProductPaginationResponse;
 import org.crochet.payload.response.ProductResponse;
+import org.crochet.repository.Filter;
 import org.crochet.service.ProductService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.UUID;
@@ -47,18 +55,25 @@ public class ProductController {
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = ProductPaginationResponse.class)))
     @ApiResponse(responseCode = "400", description = "Invalid input")
-    @GetMapping("/pagination")
+    @PostMapping("/pagination")
     public ResponseEntity<ProductPaginationResponse> getProducts(
+            @Parameter(description = "Page number")
             @RequestParam(value = "pageNo", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER,
                     required = false) int pageNo,
+            @Parameter(description = "Page size")
             @RequestParam(value = "pageSize", defaultValue = AppConstant.DEFAULT_PAGE_SIZE,
                     required = false) int pageSize,
+            @Parameter(description = "Sort by field")
             @RequestParam(value = "sortBy", defaultValue = AppConstant.DEFAULT_SORT_BY, required = false) String sortBy,
+            @Parameter(description = "Sort direction")
             @RequestParam(value = "sortDir", defaultValue = AppConstant.DEFAULT_SORT_DIRECTION,
                     required = false) String sortDir,
-            @RequestParam(value = "text", required = false) String text,
-            @RequestParam(value = "categoryIds", required = false) List<UUID> categoryIds) {
-        var response = productService.getProducts(pageNo, pageSize, sortBy, sortDir, text, categoryIds);
+            @Parameter(description = "Search by name or description")
+            @RequestParam(value = "searchText", required = false) String searchText,
+            @Parameter(description = "Category ID")
+            @RequestParam(value = "categoryId", required = false) UUID categoryId,
+            @RequestBody(required = false) List<Filter> filters) {
+        var response = productService.getProducts(pageNo, pageSize, sortBy, sortDir, searchText, categoryId, filters);
         return ResponseEntity.ok(response);
     }
 

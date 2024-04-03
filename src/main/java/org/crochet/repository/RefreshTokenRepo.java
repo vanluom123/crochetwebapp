@@ -14,11 +14,11 @@ import java.util.UUID;
 public interface RefreshTokenRepo extends JpaRepository<RefreshToken, UUID> {
     Optional<RefreshToken> findByToken(String token);
     @Query("""
-                select r
-                from RefreshToken r
-                where r.user = ?1
-                and r.expiryDate > current_timestamp
-                and r.revoked = false
+            select r
+            from RefreshToken r
+            where r.user = ?1
+            and r.expiresAt > current_timestamp
+            and r.revoked = false
             """)
     List<RefreshToken> findAllValidRefreshTokenByUser(User user);
 }

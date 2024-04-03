@@ -6,10 +6,12 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.experimental.SuperBuilder;
+import lombok.experimental.Accessors;
 
 import java.time.LocalDateTime;
 
@@ -17,16 +19,17 @@ import java.time.LocalDateTime;
 @Setter
 @Entity
 @Table(name = "password_reset_token")
-@SuperBuilder
 @NoArgsConstructor
+@Accessors(chain = true)
 public class PasswordResetToken extends BaseEntity {
-    @Column(name = "token", nullable = false)
+    @Column(name = "token",
+            unique = true,
+            updatable = false,
+            nullable = false)
     private String token;
 
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "expires_at", nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "expires_at")
     private LocalDateTime expiresAt;
 
     @ManyToOne(fetch = FetchType.LAZY)

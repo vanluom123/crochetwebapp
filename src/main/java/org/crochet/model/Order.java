@@ -10,7 +10,7 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.experimental.SuperBuilder;
+import lombok.experimental.Accessors;
 
 import java.util.Set;
 
@@ -18,8 +18,8 @@ import java.util.Set;
 @Setter
 @Entity
 @Table(name = "orders")
-@SuperBuilder
 @NoArgsConstructor
+@Accessors(chain = true)
 public class Order extends BaseEntity {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private Set<OrderPatternDetail> orderPatternDetails;
