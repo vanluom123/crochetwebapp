@@ -53,6 +53,12 @@ public class Pattern extends BaseEntity {
     @JoinColumn(name = "category_id", columnDefinition = "BINARY(16) NOT NULL")
     private Category category;
 
+    @Column(name = "is_home")
+    private boolean isHome;
+
+    @Column(name = "link")
+    private String link;
+
     @ElementCollection
     @CollectionTable(name = "pattern_file",
             joinColumns = @JoinColumn(name = "pattern_id", columnDefinition = "BINARY(16) NOT NULL"))

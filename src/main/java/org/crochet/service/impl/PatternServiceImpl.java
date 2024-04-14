@@ -12,13 +12,14 @@ import org.crochet.payload.request.PatternRequest;
 import org.crochet.payload.response.PatternPaginationResponse;
 import org.crochet.payload.response.PatternResponse;
 import org.crochet.properties.MessageCodeProperties;
+import org.crochet.repository.CustomCategoryRepo;
+import org.crochet.repository.CustomPatternRepo;
+import org.crochet.repository.CustomUserRepo;
 import org.crochet.repository.Filter;
 import org.crochet.repository.PatternRepository;
 import org.crochet.repository.PatternSpecifications;
 import org.crochet.repository.Specifications;
-import org.crochet.repository.UserRepository;
 import org.crochet.security.UserPrincipal;
-import org.crochet.service.CategoryService;
 import org.crochet.service.PatternService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -33,7 +34,6 @@ import java.util.List;
 import java.util.Queue;
 import java.util.UUID;
 
-import static org.crochet.constant.MessageConstant.PATTERN_NOT_FOUND_MESSAGE;
 import static org.crochet.constant.MessageConstant.USER_NOT_FOUND_MESSAGE;
 import static org.crochet.constant.MessageConstant.USER_NOT_PAYMENT_FOR_THIS_PATTERN_MESSAGE;
 
@@ -43,17 +43,20 @@ import static org.crochet.constant.MessageConstant.USER_NOT_PAYMENT_FOR_THIS_PAT
 @Service
 public class PatternServiceImpl implements PatternService {
     private final PatternRepository patternRepo;
-    private final UserRepository userRepo;
-    private final CategoryService categoryService;
+    private final CustomUserRepo customUserRepo;
+    private final CustomCategoryRepo customCategoryRepo;
+    private final CustomPatternRepo customPatternRepo;
     private final MessageCodeProperties msgCodeProps;
 
     public PatternServiceImpl(PatternRepository patternRepo,
-                              UserRepository userRepo,
-                              CategoryService categoryService,
+                              CustomUserRepo customUserRepo,
+                              CustomCategoryRepo customCategoryRepo,
+                              CustomPatternRepo customPatternRepo,
                               MessageCodeProperties msgCodeProps) {
         this.patternRepo = patternRepo;
-        this.userRepo = userRepo;
-        this.categoryService = categoryService;
+        this.customUserRepo = customUserRepo;
+        this.customCategoryRepo = customCategoryRepo;
+        this.customPatternRepo = customPatternRepo;
         this.msgCodeProps = msgCodeProps;
     }
 
@@ -65,14 +68,16 @@ public class PatternServiceImpl implements PatternService {
     @Transactional
     @Override
     public PatternResponse createOrUpdate(PatternRequest request) {
-        var category = categoryService.findById(request.getCategoryId());
+        var category = customCategoryRepo.findById(request.getCategoryId());
         var pattern = (request.getId() == null) ? new Pattern()
-                : findOne(request.getId());
+                : customPatternRepo.findById(request.getId());
         pattern.setCategory(category)
                 .setName(request.getName())
                 .setPrice(request.getPrice())
                 .setDescription(request.getDescription())
                 .setCurrencyCode(request.getCurrencyCode())
+                .setHome(request.isHome())
+                .setLink(request.getLink())
                 .setFiles(FileMapper.INSTANCE.toEntities(request.getFiles()))
                 .setImages(ImageMapper.INSTANCE.toEntities(request.getImages()));
         pattern = patternRepo.save(pattern);
@@ -120,7 +125,8 @@ public class PatternServiceImpl implements PatternService {
     public List<PatternResponse> getLimitedPatterns() {
         var patterns = patternRepo.findAll()
                 .stream()
-                .limit(AppConstant.PATTERN_SIZE)
+                .filter(Pattern::isHome)
+                .limit(AppConstant.PATTERN_LIMITED)
                 .toList();
         return PatternMapper.INSTANCE.toResponses(patterns);
     }
@@ -133,14 +139,12 @@ public class PatternServiceImpl implements PatternService {
      * @return PatternResponse
      */
     @Override
-    public PatternResponse getDetail(UserPrincipal principal, String id) {
+    public PatternResponse getDetail(UserPrincipal principal, UUID id) {
         if (principal == null) {
             throw new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE,
                     msgCodeProps.getCode("USER_NOT_FOUND_MESSAGE"));
         }
-        User user = userRepo.findById(principal.getId())
-                .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE,
-                        msgCodeProps.getCode("USER_NOT_FOUND_MESSAGE")));
+        User user = customUserRepo.findById(principal.getId());
         var pattern = findPatternByUserOrdered(user.getId(), id);
         return PatternMapper.INSTANCE.toResponse(pattern);
     }
@@ -149,7 +153,7 @@ public class PatternServiceImpl implements PatternService {
         Queue<Category> queue = new LinkedList<>();
         List<Pattern> patterns = new ArrayList<>();
 
-        Category rootCategory = categoryService.findById(categoryId);
+        Category rootCategory = customCategoryRepo.findById(categoryId);
         queue.add(rootCategory);
 
         while (!queue.isEmpty()) {
@@ -160,15 +164,8 @@ public class PatternServiceImpl implements PatternService {
         return patterns;
     }
 
-    private Pattern findOne(String id) {
-        return patternRepo.findById(UUID.fromString(id))
-                .orElseThrow(() -> new ResourceNotFoundException(PATTERN_NOT_FOUND_MESSAGE,
-                        msgCodeProps.getCode("PATTERN_NOT_FOUND_MESSAGE")));
-    }
-
-    private Pattern findPatternByUserOrdered(UUID userId, String patternId) {
-        return patternRepo.findPatternByUserOrdered(userId,
-                        UUID.fromString(patternId))
+    private Pattern findPatternByUserOrdered(UUID userId, UUID patternId) {
+        return patternRepo.findPatternByUserOrdered(userId,patternId)
                 .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_PAYMENT_FOR_THIS_PATTERN_MESSAGE,
                         msgCodeProps.getCode("USER_NOT_PAYMENT_FOR_THIS_PATTERN_MESSAGE")));
     }
@@ -177,5 +174,13 @@ public class PatternServiceImpl implements PatternService {
     @Override
     public void deletePattern(UUID id) {
         patternRepo.deleteById(id);
+    }
+
+    @Transactional
+    @Override
+    public void updateHomeStatus(UUID patternId, boolean isHome) {
+        if (patternId != null) {
+            patternRepo.updateHomeStatus(patternId, isHome);
+        }
     }
 }

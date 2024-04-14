@@ -18,6 +18,7 @@ public interface PatternMapper {
     PatternMapper INSTANCE = Mappers.getMapper(PatternMapper.class);
 
     @Mapping(target = "id", source = "id", qualifiedByName = "uuidToString")
+    @Mapping(target = "isHome", source = "home")
     PatternResponse toResponse(Pattern pattern);
 
     List<PatternResponse> toResponses(Collection<Pattern> patterns);

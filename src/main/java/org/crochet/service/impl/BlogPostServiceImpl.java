@@ -7,9 +7,9 @@ import org.crochet.model.BlogPost;
 import org.crochet.payload.request.BlogPostRequest;
 import org.crochet.payload.response.BlogPostPaginationResponse;
 import org.crochet.payload.response.BlogPostResponse;
-import org.crochet.properties.MessageCodeProperties;
 import org.crochet.repository.BlogPostRepository;
 import org.crochet.repository.BlogPostSpecifications;
+import org.crochet.repository.CustomBlogRepo;
 import org.crochet.service.BlogPostService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,25 +21,23 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
-import static org.crochet.constant.MessageConstant.BLOG_NOT_FOUND_MESSAGE;
-
 /**
  * BlogPostServiceImpl class
  */
 @Service
 public class BlogPostServiceImpl implements BlogPostService {
     private final BlogPostRepository blogPostRepo;
-    private final MessageCodeProperties msgCodeProps;
+    private final CustomBlogRepo customBlogRepo;
 
     /**
      * Constructs a new {@code BlogPostServiceImpl} with the specified BlogPost repository.
      *
      * @param blogPostRepo The repository for handling BlogPost-related operations.
-     * @param msgCodeProps The properties for retrieving message codes.
      */
-    public BlogPostServiceImpl(BlogPostRepository blogPostRepo, MessageCodeProperties msgCodeProps) {
+    public BlogPostServiceImpl(BlogPostRepository blogPostRepo,
+                               CustomBlogRepo customBlogRepo) {
         this.blogPostRepo = blogPostRepo;
-        this.msgCodeProps = msgCodeProps;
+        this.customBlogRepo = customBlogRepo;
     }
 
     /**
@@ -53,7 +51,7 @@ public class BlogPostServiceImpl implements BlogPostService {
     @Transactional
     @Override
     public BlogPostResponse createOrUpdatePost(BlogPostRequest request) {
-        var blogPost = (request.getId() == null) ? new BlogPost() : findOne(request.getId());
+        var blogPost = (request.getId() == null) ? new BlogPost() : customBlogRepo.findById(request.getId());
         blogPost.setTitle(request.getTitle())
                 .setContent(request.getContent())
                 .setFiles(FileMapper.INSTANCE.toEntities(request.getFiles()));
@@ -104,14 +102,8 @@ public class BlogPostServiceImpl implements BlogPostService {
      * @throws ResourceNotFoundException If the specified blog post ID does not correspond to an existing blog post.
      */
     @Override
-    public BlogPostResponse getDetail(String id) {
-        var blogPost = findOne(id);
+    public BlogPostResponse getDetail(UUID id) {
+        var blogPost = customBlogRepo.findById(id);
         return BlogPostMapper.INSTANCE.toResponse(blogPost);
-    }
-
-    private BlogPost findOne(String id) {
-        return blogPostRepo.findById(UUID.fromString(id))
-                .orElseThrow(() -> new ResourceNotFoundException(BLOG_NOT_FOUND_MESSAGE,
-                        msgCodeProps.getCode("BLOG_NOT_FOUND_MESSAGE")));
     }
 }

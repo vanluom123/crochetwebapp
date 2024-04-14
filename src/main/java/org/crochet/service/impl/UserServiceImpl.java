@@ -2,6 +2,7 @@ package org.crochet.service.impl;
 
 import org.crochet.constant.MessageConstant;
 import org.crochet.enumerator.AuthProvider;
+import org.crochet.enumerator.RoleType;
 import org.crochet.exception.BadRequestException;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.UserMapper;
@@ -61,7 +62,7 @@ public class UserServiceImpl implements UserService {
                 .setEmailVerified(false)
                 .setPassword(passwordEncoder.encode(signUpRequest.getPassword()))
                 .setProvider(AuthProvider.LOCAL)
-                .setRole(signUpRequest.getRole());
+                .setRole(RoleType.USER);
         // Save the user to the repository
         return userRepository.save(user);
     }

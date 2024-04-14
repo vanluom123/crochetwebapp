@@ -17,7 +17,9 @@ public interface PatternService {
 
     List<PatternResponse> getLimitedPatterns();
 
-    PatternResponse getDetail(UserPrincipal principal, String id);
+    PatternResponse getDetail(UserPrincipal principal, UUID id);
 
     void deletePattern(UUID id);
+
+    void updateHomeStatus(UUID patternId, boolean isHome);
 }

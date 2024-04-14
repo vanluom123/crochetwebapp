@@ -18,6 +18,7 @@ public interface ProductMapper {
     ProductMapper INSTANCE = Mappers.getMapper(ProductMapper.class);
 
     @Mapping(target = "id", source = "id", qualifiedByName = "uuidToString")
+    @Mapping(target = "isHome", source = "home")
     ProductResponse toResponse(Product product);
 
     List<ProductResponse> toResponses(Collection<Product> products);

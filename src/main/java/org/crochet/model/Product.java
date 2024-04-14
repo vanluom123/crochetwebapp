@@ -46,6 +46,12 @@ public class Product extends BaseEntity {
     @JoinColumn(name = "category_id", columnDefinition = "BINARY(16) NOT NULL")
     private Category category;
 
+    @Column(name = "is_home")
+    private boolean isHome;
+
+    @Column(name = "link")
+    private String link;
+
     @ElementCollection
     @CollectionTable(name = "product_image",
             joinColumns = @JoinColumn(name = "product_id", columnDefinition = "BINARY(16) NOT NULL"))

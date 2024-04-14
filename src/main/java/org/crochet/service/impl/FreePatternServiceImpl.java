@@ -1,7 +1,6 @@
 package org.crochet.service.impl;
 
 import org.crochet.constant.AppConstant;
-import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.FileMapper;
 import org.crochet.mapper.FreePatternMapper;
 import org.crochet.mapper.ImageMapper;
@@ -10,12 +9,12 @@ import org.crochet.model.FreePattern;
 import org.crochet.payload.request.FreePatternRequest;
 import org.crochet.payload.response.FreePatternResponse;
 import org.crochet.payload.response.PaginatedFreePatternResponse;
-import org.crochet.properties.MessageCodeProperties;
+import org.crochet.repository.CustomCategoryRepo;
+import org.crochet.repository.CustomFreePatternRepo;
 import org.crochet.repository.Filter;
 import org.crochet.repository.FreePatternRepository;
 import org.crochet.repository.FreePatternSpecifications;
 import org.crochet.repository.Specifications;
-import org.crochet.service.CategoryService;
 import org.crochet.service.FreePatternService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -29,30 +28,28 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.crochet.constant.MessageConstant.FREE_PATTERN_NOT_FOUND_MESSAGE;
-
 /**
  * FreePatternServiceImpl class
  */
 @Service
 public class FreePatternServiceImpl implements FreePatternService {
     private final FreePatternRepository freePatternRepo;
-    private final CategoryService categoryService;
-    private final MessageCodeProperties msgCodeProps;
+    private final CustomCategoryRepo customCategoryRepo;
+    private final CustomFreePatternRepo customFreePatternRepo;
 
     /**
      * Constructs a new {@code FreePatternServiceImpl} with the specified FreePattern repository.
      *
-     * @param freePatternRepo The repository for handling FreePattern-related operations.
-     * @param categoryService The service for handling Category-related operations.
-     * @param msgCodeProps    The properties for retrieving message codes.
+     * @param freePatternRepo       The repository for handling FreePattern-related operations.
+     * @param customCategoryRepo    The repository for handling CustomCategory-related operations.
+     * @param customFreePatternRepo The repository for handling CustomFreePattern-related operations.
      */
     public FreePatternServiceImpl(FreePatternRepository freePatternRepo,
-                                  CategoryService categoryService,
-                                  MessageCodeProperties msgCodeProps) {
+                                  CustomCategoryRepo customCategoryRepo,
+                                  CustomFreePatternRepo customFreePatternRepo) {
         this.freePatternRepo = freePatternRepo;
-        this.categoryService = categoryService;
-        this.msgCodeProps = msgCodeProps;
+        this.customCategoryRepo = customCategoryRepo;
+        this.customFreePatternRepo = customFreePatternRepo;
     }
 
     /**
@@ -66,13 +63,15 @@ public class FreePatternServiceImpl implements FreePatternService {
     @Transactional
     @Override
     public FreePatternResponse createOrUpdate(FreePatternRequest request) {
-        var category = categoryService.findById(request.getCategoryId());
+        var category = customCategoryRepo.findById(request.getCategoryId());
         FreePattern freePattern = (request.getId() == null) ? new FreePattern()
-                : findOne(request.getId());
+                : customFreePatternRepo.findById(request.getId());
         freePattern.setCategory(category)
                 .setName(request.getName())
                 .setDescription(request.getDescription())
                 .setAuthor(request.getAuthor())
+                .setHome(request.isHome())
+                .setLink(request.getLink())
                 .setFiles(FileMapper.INSTANCE.toEntities(request.getFiles()))
                 .setImages(ImageMapper.INSTANCE.toEntities(request.getImages()));
         freePattern = freePatternRepo.save(freePattern);
@@ -128,7 +127,7 @@ public class FreePatternServiceImpl implements FreePatternService {
      * @return A list of {@link FreePattern} objects containing information about the FreePatterns.
      */
     private List<FreePattern> getAllFreePatterns(UUID categoryId) {
-        Category category = categoryService.findById(categoryId);
+        Category category = customCategoryRepo.findById(categoryId);
         List<FreePattern> freePatterns = new ArrayList<>(category.getFreePatterns());
         for (Category subCategory : category.getChildren()) {
             freePatterns.addAll(getAllFreePatterns(subCategory.getId()));
@@ -146,7 +145,8 @@ public class FreePatternServiceImpl implements FreePatternService {
     public List<FreePatternResponse> getLimitedFreePatterns() {
         var freePatterns = freePatternRepo.findAll()
                 .stream()
-                .limit(AppConstant.FREE_PATTERN_SIZE)
+                .filter(FreePattern::isHome)
+                .limit(AppConstant.FREE_PATTERN_LIMITED)
                 .toList();
         return FreePatternMapper.INSTANCE.toResponses(freePatterns);
     }
@@ -159,27 +159,21 @@ public class FreePatternServiceImpl implements FreePatternService {
      */
     @Override
     public FreePatternResponse getDetail(UUID id) {
-        var freePattern = findOne(id);
+        var freePattern = customFreePatternRepo.findById(id);
         return FreePatternMapper.INSTANCE.toResponse(freePattern);
-    }
-
-    /**
-     * Retrieves a FreePattern entity by its unique identifier.
-     * If the FreePattern with the provided ID does not exist, it throws a {@link ResourceNotFoundException}.
-     *
-     * @param id The unique identifier of the FreePattern.
-     * @return The {@link FreePattern} entity with the corresponding ID.
-     * @throws ResourceNotFoundException if the FreePattern with the provided ID does not exist.
-     */
-    private FreePattern findOne(UUID id) {
-        return freePatternRepo.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(FREE_PATTERN_NOT_FOUND_MESSAGE,
-                        msgCodeProps.getCode("FREE_PATTERN_NOT_FOUND_MESSAGE")));
     }
 
     @Transactional
     @Override
     public void delete(UUID id) {
-        freePatternRepo.deleteById(id);
+        customFreePatternRepo.deleteById(id);
+    }
+
+    @Transactional
+    @Override
+    public void updateHomeStatus(UUID freePatternId, boolean isHome) {
+        if (freePatternId != null) {
+            freePatternRepo.updateHomeStatus(freePatternId, isHome);
+        }
     }
 }

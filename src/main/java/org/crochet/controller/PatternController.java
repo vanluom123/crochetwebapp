@@ -87,7 +87,7 @@ public class PatternController {
     public ResponseEntity<PatternResponse> getDetail(
             @CurrentUser UserPrincipal principal,
             @Parameter(description = "ID of the pattern to retrieve")
-            @RequestParam("id") String id) {
+            @RequestParam("id") UUID id) {
         return ResponseEntity.ok(patternService.getDetail(principal, id));
     }
 

@@ -319,3 +319,12 @@ ALTER TABLE pattern_image
 ALTER TABLE product_image
     ADD CONSTRAINT fk_product_image_on_product FOREIGN KEY (product_id) REFERENCES product (id);
 
+-- changeset admin:1713199141100-1
+ALTER TABLE free_pattern ADD is_home BIT(1) NULL, ADD link VARCHAR(255) NULL;
+
+-- changeset admin:1713199141100-2
+ALTER TABLE pattern ADD is_home BIT(1) NULL, ADD link VARCHAR(255) NULL;
+
+-- changeset admin:1713199141100-3
+ALTER TABLE product ADD is_home BIT(1) NULL, ADD link VARCHAR(255) NULL;
+
