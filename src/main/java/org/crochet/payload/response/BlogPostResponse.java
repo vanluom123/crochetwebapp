@@ -15,5 +15,5 @@ public class BlogPostResponse {
     private String content;
     private List<FileResponse> files;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime creationDate;
+    private LocalDateTime createdDate;
 }

@@ -14,12 +14,16 @@ import org.crochet.service.BlogPostService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/blog")
@@ -60,8 +64,28 @@ public class BlogController {
             @RequestParam(value = "sortDir", defaultValue = AppConstant.DEFAULT_SORT_DIRECTION,
                     required = false) String sortDir,
             @Parameter(description = "Search text")
-            @RequestParam(value = "text", required = false) String text) {
-        var response = blogPostService.getBlogs(pageNo, pageSize, sortBy, sortDir, text);
+            @RequestParam(value = "searchText", required = false) String searchText) {
+        var response = blogPostService.getBlogs(pageNo, pageSize, sortBy, sortDir, searchText);
         return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Get details of a blog post")
+    @ApiResponse(responseCode = "200", description = "Details of a blog post",
+            content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = BlogPostResponse.class)))
+    @GetMapping("/detail")
+    public ResponseEntity<BlogPostResponse> getDetail(@RequestParam UUID id) {
+        var response = blogPostService.getDetail(id);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Delete a blog post")
+    @ApiResponse(responseCode = "204", description = "Blog post deleted successfully")
+    @DeleteMapping("/delete")
+    @PreAuthorize("hasRole('ADMIN')")
+    @SecurityRequirement(name = "BearerAuth")
+    public ResponseEntity<Void> deletePost(@RequestParam UUID id) {
+        blogPostService.deletePost(id);
+        return ResponseEntity.noContent().build();
     }
 }
