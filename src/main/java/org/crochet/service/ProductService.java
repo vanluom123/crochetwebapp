@@ -18,6 +18,4 @@ public interface ProductService {
     ProductResponse getDetail(UUID id);
 
     void delete(UUID id);
-
-    void updateHomeStatus(UUID id, boolean isHome);
 }

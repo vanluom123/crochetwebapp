@@ -150,12 +150,4 @@ public class ProductServiceImpl implements ProductService {
     public void delete(UUID id) {
         customProductRepo.deleteById(id);
     }
-
-    @Transactional
-    @Override
-    public void updateHomeStatus(UUID id, boolean isHome) {
-        if (id != null) {
-            productRepo.updateHomeStatus(id, isHome);
-        }
-    }
 }

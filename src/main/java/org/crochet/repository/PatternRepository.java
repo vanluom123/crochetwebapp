@@ -3,10 +3,8 @@ package org.crochet.repository;
 import org.crochet.model.Pattern;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -21,13 +19,4 @@ public interface PatternRepository extends JpaRepository<Pattern, UUID>, JpaSpec
             where u.id = ?1 and p.id = ?2 and opd.status = 'COMPLETED'
             """)
     Optional<Pattern> findPatternByUserOrdered(UUID userId, UUID patternId);
-
-    @Transactional
-    @Modifying
-    @Query("""
-                update Pattern p
-                set p.isHome = ?2
-                where p.id = ?1
-            """)
-    void updateHomeStatus(UUID patternId, boolean isHomePattern);
 }

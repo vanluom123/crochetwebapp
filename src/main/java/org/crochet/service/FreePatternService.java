@@ -19,6 +19,4 @@ public interface FreePatternService {
     FreePatternResponse getDetail(UUID id);
 
     void delete(UUID id);
-
-    void updateHomeStatus(UUID freePatternId, boolean isHome);
 }

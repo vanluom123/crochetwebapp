@@ -168,12 +168,4 @@ public class FreePatternServiceImpl implements FreePatternService {
     public void delete(UUID id) {
         customFreePatternRepo.deleteById(id);
     }
-
-    @Transactional
-    @Override
-    public void updateHomeStatus(UUID freePatternId, boolean isHome) {
-        if (freePatternId != null) {
-            freePatternRepo.updateHomeStatus(freePatternId, isHome);
-        }
-    }
 }

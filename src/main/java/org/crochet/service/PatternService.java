@@ -20,6 +20,4 @@ public interface PatternService {
     PatternResponse getDetail(UserPrincipal principal, UUID id);
 
     void deletePattern(UUID id);
-
-    void updateHomeStatus(UUID patternId, boolean isHome);
 }

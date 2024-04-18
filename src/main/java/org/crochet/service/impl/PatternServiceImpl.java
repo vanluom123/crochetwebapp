@@ -175,12 +175,4 @@ public class PatternServiceImpl implements PatternService {
     public void deletePattern(UUID id) {
         patternRepo.deleteById(id);
     }
-
-    @Transactional
-    @Override
-    public void updateHomeStatus(UUID patternId, boolean isHome) {
-        if (patternId != null) {
-            patternRepo.updateHomeStatus(patternId, isHome);
-        }
-    }
 }
