@@ -11,7 +11,6 @@ import org.crochet.model.User;
 import org.crochet.payload.request.PatternRequest;
 import org.crochet.payload.response.PatternPaginationResponse;
 import org.crochet.payload.response.PatternResponse;
-import org.crochet.properties.MessageCodeProperties;
 import org.crochet.repository.CustomCategoryRepo;
 import org.crochet.repository.CustomPatternRepo;
 import org.crochet.repository.CustomUserRepo;
@@ -34,6 +33,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.UUID;
 
+import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
 import static org.crochet.constant.MessageConstant.USER_NOT_FOUND_MESSAGE;
 import static org.crochet.constant.MessageConstant.USER_NOT_PAYMENT_FOR_THIS_PATTERN_MESSAGE;
 
@@ -46,18 +46,15 @@ public class PatternServiceImpl implements PatternService {
     private final CustomUserRepo customUserRepo;
     private final CustomCategoryRepo customCategoryRepo;
     private final CustomPatternRepo customPatternRepo;
-    private final MessageCodeProperties msgCodeProps;
 
     public PatternServiceImpl(PatternRepository patternRepo,
                               CustomUserRepo customUserRepo,
                               CustomCategoryRepo customCategoryRepo,
-                              CustomPatternRepo customPatternRepo,
-                              MessageCodeProperties msgCodeProps) {
+                              CustomPatternRepo customPatternRepo) {
         this.patternRepo = patternRepo;
         this.customUserRepo = customUserRepo;
         this.customCategoryRepo = customCategoryRepo;
         this.customPatternRepo = customPatternRepo;
-        this.msgCodeProps = msgCodeProps;
     }
 
     /**
@@ -141,8 +138,7 @@ public class PatternServiceImpl implements PatternService {
     @Override
     public PatternResponse getDetail(UserPrincipal principal, UUID id) {
         if (principal == null) {
-            throw new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE,
-                    msgCodeProps.getCode("USER_NOT_FOUND_MESSAGE"));
+            throw new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE, MAP_CODE.get(USER_NOT_FOUND_MESSAGE));
         }
         User user = customUserRepo.findById(principal.getId());
         var pattern = findPatternByUserOrdered(user.getId(), id);
@@ -165,9 +161,9 @@ public class PatternServiceImpl implements PatternService {
     }
 
     private Pattern findPatternByUserOrdered(UUID userId, UUID patternId) {
-        return patternRepo.findPatternByUserOrdered(userId,patternId)
+        return patternRepo.findPatternByUserOrdered(userId, patternId)
                 .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_PAYMENT_FOR_THIS_PATTERN_MESSAGE,
-                        msgCodeProps.getCode("USER_NOT_PAYMENT_FOR_THIS_PATTERN_MESSAGE")));
+                        MAP_CODE.get(USER_NOT_PAYMENT_FOR_THIS_PATTERN_MESSAGE)));
     }
 
     @Transactional

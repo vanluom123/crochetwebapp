@@ -3,7 +3,6 @@ package org.crochet.service.impl;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
-import org.crochet.properties.MessageCodeProperties;
 import org.crochet.exception.IllegalStateException;
 import org.crochet.service.EmailSender;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -13,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
 
+import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
 import static org.crochet.constant.MessageConstant.FAILED_TO_SEND_EMAIL_MESSAGE;
 
 /**
@@ -22,17 +22,14 @@ import static org.crochet.constant.MessageConstant.FAILED_TO_SEND_EMAIL_MESSAGE;
 @Slf4j
 public class EmailService implements EmailSender {
     private final JavaMailSender javaMailSender;
-    private final MessageCodeProperties msgCodeProps;
 
     /**
      * Constructor
      *
      * @param javaMailSender JavaMailSender
-     * @param msgCodeProps   MessageCodeProperties
      */
-    public EmailService(JavaMailSender javaMailSender, MessageCodeProperties msgCodeProps) {
+    public EmailService(JavaMailSender javaMailSender) {
         this.javaMailSender = javaMailSender;
-        this.msgCodeProps = msgCodeProps;
     }
 
     /**
@@ -57,8 +54,7 @@ public class EmailService implements EmailSender {
             javaMailSender.send(mimeMessage);
         } catch (MessagingException e) {
             log.error(FAILED_TO_SEND_EMAIL_MESSAGE, e);
-            throw new IllegalStateException(FAILED_TO_SEND_EMAIL_MESSAGE,
-                    msgCodeProps.getCode("FAILED_TO_SEND_EMAIL_MESSAGE"));
+            throw new IllegalStateException(FAILED_TO_SEND_EMAIL_MESSAGE, MAP_CODE.get(FAILED_TO_SEND_EMAIL_MESSAGE));
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }

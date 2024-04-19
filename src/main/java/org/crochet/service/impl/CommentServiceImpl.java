@@ -6,7 +6,6 @@ import org.crochet.model.Comment;
 import org.crochet.model.User;
 import org.crochet.payload.request.CommentRequest;
 import org.crochet.payload.response.CommentResponse;
-import org.crochet.properties.MessageCodeProperties;
 import org.crochet.repository.CommentRepository;
 import org.crochet.repository.CustomBlogRepo;
 import org.crochet.repository.CustomCommentRepo;
@@ -18,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
+import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
 import static org.crochet.constant.MessageConstant.USER_NOT_FOUND_MESSAGE;
 
 /**
@@ -29,23 +29,23 @@ public class CommentServiceImpl implements CommentService {
     private final CustomCommentRepo customCommentRepo;
     private final CustomUserRepo customUserRepo;
     private final CustomBlogRepo customBlogRepo;
-    private final MessageCodeProperties msgCodeProps;
 
     /**
      * Constructs a new {@code CommentServiceImpl} with the specified repositories.
      *
-     * @param msgCodeProps The properties for message codes.
+     * @param commentRepo  The repository for handling comments.
+     * @param customCommentRepo The custom repository for handling comments.
+     * @param customUserRepo The custom repository for handling users.
+     * @param customBlogRepo The custom repository for handling blog posts.
      */
     public CommentServiceImpl(CommentRepository commentRepo,
                               CustomCommentRepo customCommentRepo,
                               CustomUserRepo customUserRepo,
-                              CustomBlogRepo customBlogRepo,
-                              MessageCodeProperties msgCodeProps) {
+                              CustomBlogRepo customBlogRepo) {
         this.commentRepo = commentRepo;
         this.customCommentRepo = customCommentRepo;
         this.customUserRepo = customUserRepo;
         this.customBlogRepo = customBlogRepo;
-        this.msgCodeProps = msgCodeProps;
     }
 
     /**
@@ -62,8 +62,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public CommentResponse createOrUpdate(UserPrincipal principal, CommentRequest request) {
         if (principal == null) {
-            throw new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE,
-                    msgCodeProps.getCode("USER_NOT_FOUND_MESSAGE"));
+            throw new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE, MAP_CODE.get(USER_NOT_FOUND_MESSAGE));
         }
         User user = customUserRepo.findById(principal.getId());
 
