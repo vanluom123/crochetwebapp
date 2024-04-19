@@ -11,7 +11,6 @@ import org.crochet.payload.request.SignUpRequest;
 import org.crochet.payload.request.UserUpdateRequest;
 import org.crochet.payload.response.UserPaginationResponse;
 import org.crochet.payload.response.UserResponse;
-import org.crochet.properties.MessageCodeProperties;
 import org.crochet.repository.Filter;
 import org.crochet.repository.Specifications;
 import org.crochet.repository.UserRepository;
@@ -29,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.UUID;
 
+import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
 import static org.crochet.constant.MessageConstant.INCORRECT_PASSWORD_MESSAGE;
 import static org.crochet.constant.MessageConstant.USER_NOT_FOUND_WITH_EMAIL_MESSAGE;
 import static org.crochet.constant.MessageConstant.USER_NOT_FOUND_WITH_ID_MESSAGE;
@@ -37,14 +37,11 @@ import static org.crochet.constant.MessageConstant.USER_NOT_FOUND_WITH_ID_MESSAG
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final MessageCodeProperties msgCodeProps;
 
     public UserServiceImpl(UserRepository userRepository,
-                           PasswordEncoder passwordEncoder,
-                           MessageCodeProperties msgCodeProps) {
+                           PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.msgCodeProps = msgCodeProps;
     }
 
     @Override
@@ -52,7 +49,7 @@ public class UserServiceImpl implements UserService {
         // Check if the email address is already in use
         if (isValidEmail(signUpRequest.getEmail())) {
             throw new BadRequestException(MessageConstant.EMAIL_ADDRESS_ALREADY_IN_USE_MESSAGE,
-                    msgCodeProps.getCode("EMAIL_ADDRESS_ALREADY_IN_USE_MESSAGE"));
+                    MAP_CODE.get(MessageConstant.EMAIL_ADDRESS_ALREADY_IN_USE_MESSAGE));
         }
 
         // Creating user's account
@@ -106,7 +103,7 @@ public class UserServiceImpl implements UserService {
     public void updateUser(UserUpdateRequest request) {
         User user = userRepository.findById(request.getId())
                 .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_WITH_ID_MESSAGE + request.getId(),
-                        msgCodeProps.getCode("USER_NOT_FOUND_WITH_ID_MESSAGE")));
+                        MAP_CODE.get(USER_NOT_FOUND_WITH_ID_MESSAGE)));
         if (request.getName() != null) {
             user.setName(request.getName());
         }
@@ -126,21 +123,21 @@ public class UserServiceImpl implements UserService {
     public User getByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_WITH_EMAIL_MESSAGE + email,
-                        msgCodeProps.getCode("USER_NOT_FOUND_WITH_EMAIL_MESSAGE")));
+                        MAP_CODE.get(USER_NOT_FOUND_WITH_EMAIL_MESSAGE)));
     }
 
     @Override
     public User getById(UUID id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_WITH_ID_MESSAGE + id,
-                        msgCodeProps.getCode("USER_NOT_FOUND_WITH_ID_MESSAGE")));
+                        MAP_CODE.get(USER_NOT_FOUND_WITH_ID_MESSAGE)));
     }
 
     @Override
     public UserResponse getDetail(UUID id) {
         return userRepository.getDetail(id)
                 .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_WITH_ID_MESSAGE + id,
-                        msgCodeProps.getCode("USER_NOT_FOUND_WITH_ID_MESSAGE")));
+                        MAP_CODE.get(USER_NOT_FOUND_WITH_ID_MESSAGE)));
     }
 
     @Override
@@ -159,7 +156,7 @@ public class UserServiceImpl implements UserService {
         var isMatch = passwordEncoder.matches(password, user.getPassword());
         if (!isMatch) {
             throw new BadRequestException(INCORRECT_PASSWORD_MESSAGE,
-                    msgCodeProps.getCode("INCORRECT_PASSWORD_MESSAGE"));
+                    MAP_CODE.get(INCORRECT_PASSWORD_MESSAGE));
         }
         return user;
     }

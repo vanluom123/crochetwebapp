@@ -7,7 +7,6 @@ import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.model.Order;
 import org.crochet.model.OrderPatternDetail;
 import org.crochet.model.User;
-import org.crochet.properties.MessageCodeProperties;
 import org.crochet.repository.OrderPatternDetailRepository;
 import org.crochet.repository.OrderRepository;
 import org.crochet.repository.PatternRepository;
@@ -21,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
 import static org.crochet.constant.MessageConstant.LOGIN_TO_ORDER_PATTERN_MESSAGE;
 import static org.crochet.constant.MessageConstant.ORDER_PATTERN_DETAIL_NOT_FOUND_FOR_TRANSACTION_ID_MESSAGE;
 import static org.crochet.constant.MessageConstant.PATTERN_NOT_FOUND_MESSAGE;
@@ -34,20 +34,17 @@ public class OrderPatternServiceImpl implements OrderPatternService {
     private final PatternRepository patternRepository;
     private final OrderRepository orderRepository;
     private final OrderPatternDetailRepository orderPatternDetailRepository;
-    private final MessageCodeProperties msgCodeProps;
 
     public OrderPatternServiceImpl(PayPalService payPalService,
                                    UserRepository userRepository,
                                    PatternRepository patternRepository,
                                    OrderRepository orderRepository,
-                                   OrderPatternDetailRepository orderPatternDetailRepository,
-                                   MessageCodeProperties msgCodeProps) {
+                                   OrderPatternDetailRepository orderPatternDetailRepository) {
         this.payPalService = payPalService;
         this.userRepository = userRepository;
         this.patternRepository = patternRepository;
         this.orderRepository = orderRepository;
         this.orderPatternDetailRepository = orderPatternDetailRepository;
-        this.msgCodeProps = msgCodeProps;
     }
 
     @Transactional
@@ -55,20 +52,20 @@ public class OrderPatternServiceImpl implements OrderPatternService {
     public PaymentOrder createPayment(UserPrincipal principal, String patternId) {
         if (principal == null) {
             throw new ResourceNotFoundException(LOGIN_TO_ORDER_PATTERN_MESSAGE,
-                    msgCodeProps.getCode("LOGIN_TO_ORDER_PATTERN_MESSAGE"));
+                    MAP_CODE.get(LOGIN_TO_ORDER_PATTERN_MESSAGE));
         }
 
         // Fetch the user from the database using the ID from the UserPrincipal
         // If the user is not found, throw a ResourceNotFoundException
         User user = userRepository.findById(principal.getId())
                 .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE,
-                        msgCodeProps.getCode("USER_NOT_FOUND_MESSAGE")));
+                        MAP_CODE.get(USER_NOT_FOUND_MESSAGE)));
 
         // Fetch the pattern from the database using the provided pattern ID
         // If the pattern is not found, throw a ResourceNotFoundException
         var pattern = patternRepository.findById(UUID.fromString(patternId))
                 .orElseThrow(() -> new ResourceNotFoundException(PATTERN_NOT_FOUND_MESSAGE,
-                        msgCodeProps.getCode("PATTERN_NOT_FOUND_MESSAGE")));
+                        MAP_CODE.get(PATTERN_NOT_FOUND_MESSAGE)));
 
         // Create a payment order using the price of the pattern
         var paymentOrder = payPalService.createPayment(pattern.getPrice());
@@ -97,8 +94,10 @@ public class OrderPatternServiceImpl implements OrderPatternService {
     public String completePayment(String transactionId) {
         var completeOrder = payPalService.completePayment(transactionId);
         var orderPatternDetail = orderPatternDetailRepository.findByTransactionId(transactionId)
-                .orElseThrow(() -> new DecoratedRuntimeException(ORDER_PATTERN_DETAIL_NOT_FOUND_FOR_TRANSACTION_ID_MESSAGE + transactionId,
-                        msgCodeProps.getCode("ORDER_PATTERN_DETAIL_NOT_FOUND_FOR_TRANSACTION_ID_MESSAGE")));
+                .orElseThrow(() ->
+                        new DecoratedRuntimeException(ORDER_PATTERN_DETAIL_NOT_FOUND_FOR_TRANSACTION_ID_MESSAGE + transactionId,
+                                MAP_CODE.get(ORDER_PATTERN_DETAIL_NOT_FOUND_FOR_TRANSACTION_ID_MESSAGE))
+                );
         orderPatternDetail.setStatus(OrderStatus.valueOf(completeOrder.getStatus()));
         orderPatternDetailRepository.save(orderPatternDetail);
         return PAYMENT_SUCCESS_MESSAGE;
