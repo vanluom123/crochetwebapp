@@ -43,6 +43,9 @@ public class FreePattern extends BaseEntity {
     @Column(name = "link")
     private String link;
 
+    @Column(name = "is_banner")
+    private boolean isBanner;
+
     @ElementCollection
     @CollectionTable(name = "free_pattern_file",
             joinColumns = @JoinColumn(name = "free_pattern_id", columnDefinition = "BINARY(16) NOT NULL"))

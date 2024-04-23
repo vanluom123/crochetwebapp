@@ -70,6 +70,7 @@ public class ProductServiceImpl implements ProductService {
                 .setCurrencyCode(request.getCurrencyCode())
                 .setHome(request.isHome())
                 .setLink(request.getLink())
+                .setBanner(request.isBanner())
                 .setImages(ImageMapper.INSTANCE.toEntities(request.getImages()));
         product = productRepo.save(product);
         return ProductMapper.INSTANCE.toResponse(product);

@@ -59,6 +59,9 @@ public class Pattern extends BaseEntity {
     @Column(name = "link")
     private String link;
 
+    @Column(name = "is_banner")
+    private boolean isBanner;
+
     @ElementCollection
     @CollectionTable(name = "pattern_file",
             joinColumns = @JoinColumn(name = "pattern_id", columnDefinition = "BINARY(16) NOT NULL"))

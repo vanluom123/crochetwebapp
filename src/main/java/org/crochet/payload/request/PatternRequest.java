@@ -12,7 +12,7 @@ import java.util.UUID;
 
 @Data
 @Builder
-@JsonPropertyOrder({"id", "category_id", "name", "description", "price", "currency_code", "is_home", "link", "images", "files"})
+@JsonPropertyOrder({"id", "category_id", "name", "description", "price", "currency_code", "is_home", "link", "isBanner", "images", "files"})
 public class PatternRequest {
     private UUID id;
     @JsonProperty("category_id")
@@ -25,6 +25,7 @@ public class PatternRequest {
     @JsonProperty("is_home")
     private boolean isHome;
     private String link;
+    private boolean isBanner;
     private List<FileResponse> images;
     private List<FileResponse> files;
 }

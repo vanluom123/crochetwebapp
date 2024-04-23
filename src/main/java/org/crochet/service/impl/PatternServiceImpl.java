@@ -75,6 +75,7 @@ public class PatternServiceImpl implements PatternService {
                 .setCurrencyCode(request.getCurrencyCode())
                 .setHome(request.isHome())
                 .setLink(request.getLink())
+                .setBanner(request.isBanner())
                 .setFiles(FileMapper.INSTANCE.toEntities(request.getFiles()))
                 .setImages(ImageMapper.INSTANCE.toEntities(request.getImages()));
         pattern = patternRepo.save(pattern);

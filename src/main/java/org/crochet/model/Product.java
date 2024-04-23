@@ -52,6 +52,12 @@ public class Product extends BaseEntity {
     @Column(name = "link")
     private String link;
 
+    @Column(name = "is_banner")
+    private boolean isBanner;
+
+    @Column(name = "is_covered_background")
+    private boolean isCoveredBackground;
+
     @ElementCollection
     @CollectionTable(name = "product_image",
             joinColumns = @JoinColumn(name = "product_id", columnDefinition = "BINARY(16) NOT NULL"))

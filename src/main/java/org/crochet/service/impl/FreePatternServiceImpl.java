@@ -72,6 +72,7 @@ public class FreePatternServiceImpl implements FreePatternService {
                 .setAuthor(request.getAuthor())
                 .setHome(request.isHome())
                 .setLink(request.getLink())
+                .setBanner(request.isBanner())
                 .setFiles(FileMapper.INSTANCE.toEntities(request.getFiles()))
                 .setImages(ImageMapper.INSTANCE.toEntities(request.getImages()));
         freePattern = freePatternRepo.save(freePattern);
