@@ -1,24 +1,19 @@
 package org.crochet.service.impl;
 
 import org.crochet.constant.AppConstant;
-import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.FileMapper;
-import org.crochet.mapper.ImageMapper;
 import org.crochet.mapper.PatternMapper;
 import org.crochet.model.Category;
 import org.crochet.model.Pattern;
-import org.crochet.model.User;
 import org.crochet.payload.request.PatternRequest;
 import org.crochet.payload.response.PatternPaginationResponse;
 import org.crochet.payload.response.PatternResponse;
 import org.crochet.repository.CustomCategoryRepo;
 import org.crochet.repository.CustomPatternRepo;
-import org.crochet.repository.CustomUserRepo;
 import org.crochet.repository.Filter;
 import org.crochet.repository.PatternRepository;
 import org.crochet.repository.PatternSpecifications;
 import org.crochet.repository.Specifications;
-import org.crochet.security.UserPrincipal;
 import org.crochet.service.PatternService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -33,26 +28,19 @@ import java.util.List;
 import java.util.Queue;
 import java.util.UUID;
 
-import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
-import static org.crochet.constant.MessageConstant.USER_NOT_FOUND_MESSAGE;
-import static org.crochet.constant.MessageConstant.USER_NOT_PAYMENT_FOR_THIS_PATTERN_MESSAGE;
-
 /**
  * PatternServiceImpl class
  */
 @Service
 public class PatternServiceImpl implements PatternService {
     private final PatternRepository patternRepo;
-    private final CustomUserRepo customUserRepo;
     private final CustomCategoryRepo customCategoryRepo;
     private final CustomPatternRepo customPatternRepo;
 
     public PatternServiceImpl(PatternRepository patternRepo,
-                              CustomUserRepo customUserRepo,
                               CustomCategoryRepo customCategoryRepo,
                               CustomPatternRepo customPatternRepo) {
         this.patternRepo = patternRepo;
-        this.customUserRepo = customUserRepo;
         this.customCategoryRepo = customCategoryRepo;
         this.customPatternRepo = customPatternRepo;
     }
@@ -68,16 +56,15 @@ public class PatternServiceImpl implements PatternService {
         var category = customCategoryRepo.findById(request.getCategoryId());
         var pattern = (request.getId() == null) ? new Pattern()
                 : customPatternRepo.findById(request.getId());
-        pattern.setCategory(category)
-                .setName(request.getName())
-                .setPrice(request.getPrice())
-                .setDescription(request.getDescription())
-                .setCurrencyCode(request.getCurrencyCode())
-                .setHome(request.isHome())
-                .setLink(request.getLink())
-                .setBanner(request.isBanner())
-                .setFiles(FileMapper.INSTANCE.toEntities(request.getFiles()))
-                .setImages(ImageMapper.INSTANCE.toEntities(request.getImages()));
+        pattern.setCategory(category);
+        pattern.setName(request.getName());
+        pattern.setPrice(request.getPrice());
+        pattern.setDescription(request.getDescription());
+        pattern.setCurrencyCode(request.getCurrencyCode());
+        pattern.setHome(request.isHome());
+        pattern.setLink(request.getLink());
+        pattern.setFiles(FileMapper.INSTANCE.toEntities(request.getFiles()));
+        pattern.setImages(FileMapper.INSTANCE.toEntities(request.getImages()));
         pattern = patternRepo.save(pattern);
         return PatternMapper.INSTANCE.toResponse(pattern);
     }
@@ -132,17 +119,12 @@ public class PatternServiceImpl implements PatternService {
     /**
      * Get pattern detail
      *
-     * @param principal UserPrincipal
-     * @param id        Pattern id
+     * @param id Pattern id
      * @return PatternResponse
      */
     @Override
-    public PatternResponse getDetail(UserPrincipal principal, UUID id) {
-        if (principal == null) {
-            throw new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE, MAP_CODE.get(USER_NOT_FOUND_MESSAGE));
-        }
-        User user = customUserRepo.findById(principal.getId());
-        var pattern = findPatternByUserOrdered(user.getId(), id);
+    public PatternResponse getDetail(UUID id) {
+        var pattern = customPatternRepo.findById(id);
         return PatternMapper.INSTANCE.toResponse(pattern);
     }
 
@@ -159,12 +141,6 @@ public class PatternServiceImpl implements PatternService {
             queue.addAll(currentCategory.getChildren());
         }
         return patterns;
-    }
-
-    private Pattern findPatternByUserOrdered(UUID userId, UUID patternId) {
-        return patternRepo.findPatternByUserOrdered(userId, patternId)
-                .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_PAYMENT_FOR_THIS_PATTERN_MESSAGE,
-                        MAP_CODE.get(USER_NOT_PAYMENT_FOR_THIS_PATTERN_MESSAGE)));
     }
 
     @Transactional

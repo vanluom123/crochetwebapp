@@ -33,10 +33,10 @@ public class CommentServiceImpl implements CommentService {
     /**
      * Constructs a new {@code CommentServiceImpl} with the specified repositories.
      *
-     * @param commentRepo  The repository for handling comments.
+     * @param commentRepo       The repository for handling comments.
      * @param customCommentRepo The custom repository for handling comments.
-     * @param customUserRepo The custom repository for handling users.
-     * @param customBlogRepo The custom repository for handling blog posts.
+     * @param customUserRepo    The custom repository for handling users.
+     * @param customBlogRepo    The custom repository for handling blog posts.
      */
     public CommentServiceImpl(CommentRepository commentRepo,
                               CustomCommentRepo customCommentRepo,
@@ -71,14 +71,15 @@ public class CommentServiceImpl implements CommentService {
         var id = request.getId();
         Comment comment;
         if (id == null) {
-            comment = new Comment();
-            comment.setBlogPost(blog)
-                    .setUser(user);
+            comment = Comment.builder()
+                    .blogPost(blog)
+                    .user(user)
+                    .build();
         } else {
             comment = customCommentRepo.findById(id);
         }
-        comment.setContent(request.getContent())
-                .setCreatedDate(LocalDateTime.now());
+        comment.setContent(request.getContent());
+        comment.setCreatedDate(LocalDateTime.now());
         comment = commentRepo.save(comment);
         return CommentMapper.INSTANCE.toResponse(comment);
     }

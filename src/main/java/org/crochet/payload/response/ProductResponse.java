@@ -9,7 +9,7 @@ import java.util.List;
 
 @Data
 @Builder
-@JsonPropertyOrder({"id", "name", "description", "price", "currency_code", "is_home", "isBanner", "isCoveredBackground", "link", "images", "category"})
+@JsonPropertyOrder({"id", "name", "description", "price", "currency_code", "is_home", "link", "images", "category"})
 public class ProductResponse {
     private String id;
     private String name;
@@ -20,8 +20,6 @@ public class ProductResponse {
     @JsonProperty("is_home")
     private boolean isHome;
     private String link;
-    private boolean isBanner;
-    private boolean isCoveredBackground;
     private List<FileResponse> images;
     private CategoryResponse category;
 }

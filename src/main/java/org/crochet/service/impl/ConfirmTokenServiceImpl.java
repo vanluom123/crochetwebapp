@@ -31,10 +31,11 @@ public class ConfirmTokenServiceImpl implements ConfirmTokenService {
         if (confirmationToken == null) {
             // Create a new token
             String token = UUID.randomUUID().toString();
-            confirmationToken = new ConfirmationToken()
-                    .setToken(token)
-                    .setExpiresAt(expirationTime)
-                    .setUser(user);
+            confirmationToken = ConfirmationToken.builder()
+                    .token(token)
+                    .expiresAt(expirationTime)
+                    .user(user)
+                    .build();
         } else {
             // Update the existing token
             confirmationToken.setExpiresAt(expirationTime);

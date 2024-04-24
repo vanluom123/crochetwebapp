@@ -1,7 +1,7 @@
 package org.crochet.service.impl;
 
 import org.crochet.constant.AppConstant;
-import org.crochet.mapper.ImageMapper;
+import org.crochet.mapper.FileMapper;
 import org.crochet.mapper.ProductMapper;
 import org.crochet.model.Product;
 import org.crochet.payload.request.ProductRequest;
@@ -62,18 +62,46 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductResponse createOrUpdate(ProductRequest request) {
         var category = customCategoryRepo.findById(request.getCategoryId());
-        var product = (request.getId() != null) ? customProductRepo.findById(request.getId()) : new Product();
-        product.setCategory(category)
-                .setName(request.getName())
-                .setPrice(request.getPrice())
-                .setDescription(request.getDescription())
-                .setCurrencyCode(request.getCurrencyCode())
-                .setHome(request.isHome())
-                .setLink(request.getLink())
-                .setBanner(request.isBanner())
-                .setImages(ImageMapper.INSTANCE.toEntities(request.getImages()));
+        Product product;
+        if (request.getId() == null) {
+            product = Product.builder()
+                    .category(category)
+                    .name(request.getName())
+                    .price(request.getPrice())
+                    .description(request.getDescription())
+                    .currencyCode(request.getCurrencyCode())
+                    .isHome(request.isHome())
+                    .link(request.getLink())
+                    .images(FileMapper.INSTANCE.toEntities(request.getImages()))
+                    .build();
+        } else {
+            product = customProductRepo.findById(request.getId());
+            product = ProductMapper.INSTANCE.update(request, product);
+        }
         product = productRepo.save(product);
         return ProductMapper.INSTANCE.toResponse(product);
+    }
+
+    @Transactional
+    @Override
+    public List<ProductResponse> batchInsert(List<ProductRequest> requests) {
+        List<Product> products = new ArrayList<>();
+        for (ProductRequest request : requests) {
+            var category = customCategoryRepo.findById(request.getCategoryId());
+            Product product = Product.builder()
+                    .category(category)
+                    .name(request.getName())
+                    .price(request.getPrice())
+                    .description(request.getDescription())
+                    .currencyCode(request.getCurrencyCode())
+                    .isHome(request.isHome())
+                    .link(request.getLink())
+                    .images(FileMapper.INSTANCE.toEntities(request.getImages()))
+                    .build();
+            products.add(product);
+        }
+        products = productRepo.saveAll(products);
+        return ProductMapper.INSTANCE.toResponses(products);
     }
 
     /**

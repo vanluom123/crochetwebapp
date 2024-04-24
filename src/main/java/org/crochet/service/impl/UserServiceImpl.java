@@ -53,13 +53,13 @@ public class UserServiceImpl implements UserService {
         }
 
         // Creating user's account
-        User user = new User()
-                .setName(signUpRequest.getName())
-                .setEmail(signUpRequest.getEmail())
-                .setEmailVerified(false)
-                .setPassword(passwordEncoder.encode(signUpRequest.getPassword()))
-                .setProvider(AuthProvider.LOCAL)
-                .setRole(RoleType.USER);
+        User user = User.builder()
+                .email(signUpRequest.getEmail())
+                .emailVerified(false)
+                .password(passwordEncoder.encode(signUpRequest.getPassword()))
+                .provider(AuthProvider.LOCAL)
+                .role(RoleType.USER)
+                .build();
         // Save the user to the repository
         return userRepository.save(user);
     }

@@ -21,12 +21,13 @@ public class AdminConfig {
             // Check if admin user exists
             if (userRepository.findByEmail(adminEmail).isEmpty()) {
                 // Create admin user
-                User admin = new User()
-                        .setEmail(adminEmail)
-                        .setEmailVerified(true)
-                        .setPassword(encodedPassword)
-                        .setName("Admin")
-                        .setRole(RoleType.ADMIN);
+                User admin = User.builder()
+                        .email(adminEmail)
+                        .emailVerified(true)
+                        .password(encodedPassword)
+                        .name("Admin")
+                        .role(RoleType.ADMIN)
+                        .build();
                 userRepository.save(admin);
             }
         };

@@ -3,7 +3,6 @@ package org.crochet.service.impl;
 import org.crochet.constant.AppConstant;
 import org.crochet.mapper.FileMapper;
 import org.crochet.mapper.FreePatternMapper;
-import org.crochet.mapper.ImageMapper;
 import org.crochet.model.Category;
 import org.crochet.model.FreePattern;
 import org.crochet.payload.request.FreePatternRequest;
@@ -66,15 +65,14 @@ public class FreePatternServiceImpl implements FreePatternService {
         var category = customCategoryRepo.findById(request.getCategoryId());
         FreePattern freePattern = (request.getId() == null) ? new FreePattern()
                 : customFreePatternRepo.findById(request.getId());
-        freePattern.setCategory(category)
-                .setName(request.getName())
-                .setDescription(request.getDescription())
-                .setAuthor(request.getAuthor())
-                .setHome(request.isHome())
-                .setLink(request.getLink())
-                .setBanner(request.isBanner())
-                .setFiles(FileMapper.INSTANCE.toEntities(request.getFiles()))
-                .setImages(ImageMapper.INSTANCE.toEntities(request.getImages()));
+        freePattern.setCategory(category);
+        freePattern.setName(request.getName());
+        freePattern.setDescription(request.getDescription());
+        freePattern.setAuthor(request.getAuthor());
+        freePattern.setHome(request.isHome());
+        freePattern.setLink(request.getLink());
+        freePattern.setFiles(FileMapper.INSTANCE.toEntities(request.getFiles()));
+        freePattern.setImages(FileMapper.INSTANCE.toEntities(request.getImages()));
         freePattern = freePatternRepo.save(freePattern);
         return FreePatternMapper.INSTANCE.toResponse(freePattern);
     }

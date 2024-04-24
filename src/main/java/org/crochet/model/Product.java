@@ -12,10 +12,11 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 import org.crochet.enumerator.CurrencyCode;
 
 import java.util.List;
@@ -24,8 +25,9 @@ import java.util.List;
 @Setter
 @Entity
 @Table(name = "product")
-@Accessors(chain = true)
+@SuperBuilder
 @NoArgsConstructor
+@AllArgsConstructor
 public class Product extends BaseEntity {
     @Column(name = "name")
     private String name;
@@ -52,18 +54,12 @@ public class Product extends BaseEntity {
     @Column(name = "link")
     private String link;
 
-    @Column(name = "is_banner")
-    private boolean isBanner;
-
-    @Column(name = "is_covered_background")
-    private boolean isCoveredBackground;
-
     @ElementCollection
     @CollectionTable(name = "product_image",
             joinColumns = @JoinColumn(name = "product_id", columnDefinition = "BINARY(16) NOT NULL"))
     @AttributeOverrides({
             @AttributeOverride(name = "fileName", column = @Column(name = "file_name")),
-            @AttributeOverride(name = "fileContent", column = @Column(name = "file_content"))
+            @AttributeOverride(name = "fileContent", column = @Column(name = "file_content", columnDefinition = "TEXT"))
     })
-    private List<Image> images;
+    private List<File> images;
 }

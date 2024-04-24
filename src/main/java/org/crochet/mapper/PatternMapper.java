@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE,
-        uses = {FileMapper.class, ImageMapper.class})
+        uses = {FileMapper.class})
 public interface PatternMapper {
     PatternMapper INSTANCE = Mappers.getMapper(PatternMapper.class);
 

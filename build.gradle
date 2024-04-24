@@ -67,7 +67,7 @@ dependencies {
 liquibase {
     activities {
         main {
-            changelogFile 'src/main/resources/db/changelog/db.changelog-master.yaml'
+            changelogFile 'src/main/resources/db/changelog/gradle/db.changelog-master.yaml'
             url 'jdbc:mysql://localhost:3306/testDB'
             username 'root'
             password 'root'

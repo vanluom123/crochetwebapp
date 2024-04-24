@@ -52,9 +52,9 @@ public class BlogPostServiceImpl implements BlogPostService {
     @Override
     public BlogPostResponse createOrUpdatePost(BlogPostRequest request) {
         var blogPost = (request.getId() == null) ? new BlogPost() : customBlogRepo.findById(request.getId());
-        blogPost.setTitle(request.getTitle())
-                .setContent(request.getContent())
-                .setFiles(FileMapper.INSTANCE.toEntities(request.getFiles()));
+        blogPost.setTitle(request.getTitle());
+        blogPost.setContent(request.getContent());
+        blogPost.setFiles(FileMapper.INSTANCE.toEntities(request.getFiles()));
         blogPost = blogPostRepo.save(blogPost);
         return BlogPostMapper.INSTANCE.toResponse(blogPost);
     }

@@ -31,10 +31,11 @@ public class PasswordResetTokenServiceImpl implements PasswordResetTokenService 
         if (passwordResetToken == null) {
             // Create a new token
             String token = UUID.randomUUID().toString();
-            passwordResetToken = new PasswordResetToken()
-                    .setToken(token)
-                    .setExpiresAt(expirationTime)
-                    .setUser(user);
+            passwordResetToken = PasswordResetToken.builder()
+                    .token(token)
+                    .expiresAt(expirationTime)
+                    .user(user)
+                    .build();
         } else {
             passwordResetToken.setExpiresAt(expirationTime);
         }

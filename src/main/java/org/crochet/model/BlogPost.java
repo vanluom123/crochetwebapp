@@ -9,10 +9,11 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 
@@ -20,8 +21,9 @@ import java.util.List;
 @Setter
 @Entity
 @Table(name = "blog_post")
+@SuperBuilder
 @NoArgsConstructor
-@Accessors(chain = true)
+@AllArgsConstructor
 public class BlogPost extends BaseEntity {
     @Column(name = "title", nullable = false)
     private String title;
