@@ -54,6 +54,7 @@ public class UserServiceImpl implements UserService {
 
         // Creating user's account
         User user = User.builder()
+                .name(signUpRequest.getName())
                 .email(signUpRequest.getEmail())
                 .emailVerified(false)
                 .password(passwordEncoder.encode(signUpRequest.getPassword()))

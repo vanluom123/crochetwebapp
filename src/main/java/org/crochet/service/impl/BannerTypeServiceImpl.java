@@ -1,6 +1,6 @@
 package org.crochet.service.impl;
 
-import lombok.RequiredArgsConstructor;
+import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.BannerTypeMapper;
 import org.crochet.model.BannerType;
 import org.crochet.payload.request.BannerTypeRequest;
@@ -14,9 +14,12 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 public class BannerTypeServiceImpl implements BannerTypeService {
-    private final BannerTypeRepo bannerTypeRepo;
+    final BannerTypeRepo bannerTypeRepo;
+
+    public BannerTypeServiceImpl(BannerTypeRepo bannerTypeRepo) {
+        this.bannerTypeRepo = bannerTypeRepo;
+    }
 
     @Transactional
     @Override
@@ -27,7 +30,7 @@ public class BannerTypeServiceImpl implements BannerTypeService {
             bannerType.setName(request.getName());
         } else {
             bannerType = bannerTypeRepo.findById(request.getId())
-                    .orElseThrow(() -> new RuntimeException("Banner type not found"));
+                    .orElseThrow(() -> new ResourceNotFoundException("Banner type not found"));
             bannerType.setName(request.getName());
         }
         bannerType = bannerTypeRepo.save(bannerType);

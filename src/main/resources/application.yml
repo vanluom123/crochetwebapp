@@ -63,6 +63,8 @@ authorize:
       - "/firebase-storage/upload-file"
       - "/product/create"
       - "/users/**"
+      - "/banner/batchInsertOrUpdate"
+      - "/bannerType/**"
     permit-all:
       - "/"
       - "/auth/**"

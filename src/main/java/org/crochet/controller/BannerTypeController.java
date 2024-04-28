@@ -1,10 +1,11 @@
 package org.crochet.controller;
 
-import lombok.RequiredArgsConstructor;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.crochet.payload.request.BannerTypeRequest;
 import org.crochet.payload.response.BannerTypeResponse;
 import org.crochet.service.BannerTypeService;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,9 +21,14 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/bannerType")
-@RequiredArgsConstructor
+@PreAuthorize("hasRole('ADMIN')")
+@SecurityRequirement(name = "bearerAuth")
 public class BannerTypeController {
-    private final BannerTypeService bannerTypeService;
+    final BannerTypeService bannerTypeService;
+
+    public BannerTypeController(BannerTypeService bannerTypeService) {
+        this.bannerTypeService = bannerTypeService;
+    }
 
     @ResponseBody
     @ResponseStatus(HttpStatus.CREATED)
