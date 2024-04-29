@@ -5,10 +5,15 @@ plugins {
     id 'org.liquibase.gradle' version '2.2.1'
 }
 
+apply from: 'version.gradle'
+
 group = 'org'
-version = '0.0.1-SNAPSHOT'
+version = loadVersion().getVersion()
 description = 'crochet'
-sourceCompatibility = '17'
+
+java {
+    sourceCompatibility = '17'
+}
 
 configurations {
     compileOnly {
