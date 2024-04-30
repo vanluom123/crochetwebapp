@@ -23,6 +23,7 @@ public class BannerResponse {
     private String fileName;
     private String fileContent;
     private boolean active;
+    private String textColor;
     private BannerTypeResponse bannerType;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdDate;

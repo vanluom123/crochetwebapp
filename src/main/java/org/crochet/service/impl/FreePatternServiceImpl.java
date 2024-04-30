@@ -62,17 +62,24 @@ public class FreePatternServiceImpl implements FreePatternService {
     @Transactional
     @Override
     public FreePatternResponse createOrUpdate(FreePatternRequest request) {
-        var category = customCategoryRepo.findById(request.getCategoryId());
-        FreePattern freePattern = (request.getId() == null) ? new FreePattern()
-                : customFreePatternRepo.findById(request.getId());
-        freePattern.setCategory(category);
-        freePattern.setName(request.getName());
-        freePattern.setDescription(request.getDescription());
-        freePattern.setAuthor(request.getAuthor());
-        freePattern.setHome(request.isHome());
-        freePattern.setLink(request.getLink());
-        freePattern.setFiles(FileMapper.INSTANCE.toEntities(request.getFiles()));
-        freePattern.setImages(FileMapper.INSTANCE.toEntities(request.getImages()));
+        FreePattern freePattern;
+        if (request.getId() == null) {
+            var category = customCategoryRepo.findById(request.getCategoryId());
+            freePattern = FreePattern.builder()
+                    .category(category)
+                    .name(request.getName())
+                    .description(request.getDescription())
+                    .author(request.getAuthor())
+                    .isHome(request.isHome())
+                    .link(request.getLink())
+                    .content(request.getContent())
+                    .files(FileMapper.INSTANCE.toEntities(request.getFiles()))
+                    .images(FileMapper.INSTANCE.toEntities(request.getImages()))
+                    .build();
+        } else {
+            freePattern = customFreePatternRepo.findById(request.getId());
+            freePattern = FreePatternMapper.INSTANCE.partialUpdate(request, freePattern);
+        }
         freePattern = freePatternRepo.save(freePattern);
         return FreePatternMapper.INSTANCE.toResponse(freePattern);
     }

@@ -1,6 +1,7 @@
 package org.crochet.mapper;
 
 import org.crochet.model.Pattern;
+import org.crochet.payload.request.PatternRequest;
 import org.crochet.payload.response.PatternResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -14,7 +15,7 @@ import java.util.UUID;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE,
         uses = {FileMapper.class})
-public interface PatternMapper {
+public interface PatternMapper extends PartialUpdate<Pattern, PatternRequest> {
     PatternMapper INSTANCE = Mappers.getMapper(PatternMapper.class);
 
     @Mapping(target = "id", source = "id", qualifiedByName = "uuidToString")

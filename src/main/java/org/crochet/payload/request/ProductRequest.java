@@ -12,7 +12,7 @@ import java.util.UUID;
 
 @Data
 @Builder
-@JsonPropertyOrder({"id", "category_id", "name", "description", "price", "currency_code", "is_home", "link", "images"})
+@JsonPropertyOrder({"id", "category_id", "name", "description", "price", "currency_code", "is_home", "link", "content", "images", "files"})
 public class ProductRequest {
     private UUID id;
     @JsonProperty("category_id")
@@ -25,5 +25,6 @@ public class ProductRequest {
     @JsonProperty("is_home")
     private boolean isHome;
     private String link;
+    private String content;
     private List<FileResponse> images;
 }

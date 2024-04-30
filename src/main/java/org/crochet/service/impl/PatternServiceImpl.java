@@ -53,18 +53,25 @@ public class PatternServiceImpl implements PatternService {
     @Transactional
     @Override
     public PatternResponse createOrUpdate(PatternRequest request) {
-        var category = customCategoryRepo.findById(request.getCategoryId());
-        var pattern = (request.getId() == null) ? new Pattern()
-                : customPatternRepo.findById(request.getId());
-        pattern.setCategory(category);
-        pattern.setName(request.getName());
-        pattern.setPrice(request.getPrice());
-        pattern.setDescription(request.getDescription());
-        pattern.setCurrencyCode(request.getCurrencyCode());
-        pattern.setHome(request.isHome());
-        pattern.setLink(request.getLink());
-        pattern.setFiles(FileMapper.INSTANCE.toEntities(request.getFiles()));
-        pattern.setImages(FileMapper.INSTANCE.toEntities(request.getImages()));
+        Pattern pattern;
+        if (request.getId() == null) {
+            var category = customCategoryRepo.findById(request.getCategoryId());
+            pattern = Pattern.builder()
+                    .category(category)
+                    .name(request.getName())
+                    .price(request.getPrice())
+                    .description(request.getDescription())
+                    .currencyCode(request.getCurrencyCode())
+                    .isHome(request.isHome())
+                    .link(request.getLink())
+                    .content(request.getContent())
+                    .files(FileMapper.INSTANCE.toEntities(request.getFiles()))
+                    .images(FileMapper.INSTANCE.toEntities(request.getImages()))
+                    .build();
+        } else {
+            pattern = customPatternRepo.findById(request.getId());
+            pattern = PatternMapper.INSTANCE.partialUpdate(request, pattern);
+        }
         pattern = patternRepo.save(pattern);
         return PatternMapper.INSTANCE.toResponse(pattern);
     }

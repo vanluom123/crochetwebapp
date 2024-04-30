@@ -9,7 +9,7 @@ import java.util.List;
 
 @Data
 @Builder
-@JsonPropertyOrder({"id", "name", "description", "author", "is_home", "link", "images", "files", "category"})
+@JsonPropertyOrder({"id", "name", "description", "author", "is_home", "link", "content", "images", "files", "category"})
 public class FreePatternResponse {
     private String id;
     private String name;
@@ -18,6 +18,7 @@ public class FreePatternResponse {
     @JsonProperty("is_home")
     private boolean isHome;
     private String link;
+    private String content;
     private List<FileResponse> images;
     private List<FileResponse> files;
     private CategoryResponse category;

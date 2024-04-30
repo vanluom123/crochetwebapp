@@ -22,4 +22,5 @@ public class BannerRequest {
     private String fileName;
     private String fileContent;
     private boolean active;
+    private String textColor;
 }

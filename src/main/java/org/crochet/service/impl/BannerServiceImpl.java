@@ -40,6 +40,7 @@ public class BannerServiceImpl implements BannerService {
                         .content(request.getContent())
                         .url(request.getUrl())
                         .active(request.isActive())
+                        .textColor(request.getTextColor())
                         .fileName(request.getFileName())
                         .fileContent(request.getFileContent())
                         .bannerType(bannerType)

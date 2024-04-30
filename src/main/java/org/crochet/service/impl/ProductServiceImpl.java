@@ -72,6 +72,7 @@ public class ProductServiceImpl implements ProductService {
                     .currencyCode(request.getCurrencyCode())
                     .isHome(request.isHome())
                     .link(request.getLink())
+                    .content(request.getContent())
                     .images(FileMapper.INSTANCE.toEntities(request.getImages()))
                     .build();
         } else {

@@ -38,6 +38,9 @@ public class Banner extends BaseEntity {
     @Column(name = "file_content")
     private String fileContent;
 
+    @Column(name = "text_color")
+    private String textColor;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "banner_type_id", columnDefinition = "BINARY(16) NOT NULL")
     private BannerType bannerType;
