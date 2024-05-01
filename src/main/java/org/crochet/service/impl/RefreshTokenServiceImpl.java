@@ -1,6 +1,5 @@
 package org.crochet.service.impl;
 
-import org.crochet.properties.MessageCodeProperties;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.exception.TokenException;
 import org.crochet.model.RefreshToken;
@@ -17,6 +16,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
 import static org.crochet.constant.MessageConstant.REFRESH_TOKEN_IS_EXPIRED_MESSAGE;
 import static org.crochet.constant.MessageConstant.REFRESH_TOKEN_NOT_FOUND_MESSAGE;
 import static org.crochet.constant.MessageConstant.USER_NOT_FOUND_WITH_EMAIL_MESSAGE;
@@ -26,16 +26,13 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     private final RefreshTokenRepo refreshTokenRepo;
     private final UserRepository userRepository;
     private final AppProperties appProps;
-    private final MessageCodeProperties msgCodeProps;
 
     public RefreshTokenServiceImpl(RefreshTokenRepo refreshTokenRepo,
                                    UserRepository userRepository,
-                                   AppProperties appProps,
-                                   MessageCodeProperties msgCodeProps) {
+                                   AppProperties appProps) {
         this.refreshTokenRepo = refreshTokenRepo;
         this.userRepository = userRepository;
         this.appProps = appProps;
-        this.msgCodeProps = msgCodeProps;
     }
 
     @Transactional
@@ -45,10 +42,11 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
                 .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_WITH_EMAIL_MESSAGE + username));
         LocalDateTime now = LocalDateTime.now();
         var expiryDate = now.plus(appProps.getAuth().getRefreshTokenExpirationMs(), ChronoUnit.MILLIS);
-        var refreshToken = new RefreshToken()
-                .setToken(UUID.randomUUID().toString())
-                .setExpiresAt(expiryDate) // set expiry of refresh token to 10 minutes - you can configure it application.properties file
-                .setUser(user);
+        var refreshToken = RefreshToken.builder()
+                .token(UUID.randomUUID().toString())
+                .expiresAt(expiryDate)
+                .user(user)
+                .build();
         revokeRefreshToken(user);
         return refreshTokenRepo.save(refreshToken);
     }
@@ -63,7 +61,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         if (token.getExpiresAt().isBefore(LocalDateTime.now())) {
             refreshTokenRepo.delete(token);
             throw new TokenException(token.getToken() + REFRESH_TOKEN_IS_EXPIRED_MESSAGE,
-                    msgCodeProps.getCode("REFRESH_TOKEN_IS_EXPIRED_MESSAGE"));
+                    MAP_CODE.get(REFRESH_TOKEN_IS_EXPIRED_MESSAGE));
         }
         return token;
     }
@@ -72,7 +70,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     public void revokeByToken(String token) {
         var refreshToken = findByToken(token)
                 .orElseThrow(() -> new ResourceNotFoundException(REFRESH_TOKEN_NOT_FOUND_MESSAGE + token,
-                        msgCodeProps.getCode("REFRESH_TOKEN_NOT_FOUND_MESSAGE")));
+                        MAP_CODE.get(REFRESH_TOKEN_NOT_FOUND_MESSAGE)));
         refreshToken.setRevoked(true);
         refreshTokenRepo.save(refreshToken);
     }

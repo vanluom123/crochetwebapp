@@ -7,9 +7,9 @@ import org.crochet.model.BlogPost;
 import org.crochet.payload.request.BlogPostRequest;
 import org.crochet.payload.response.BlogPostPaginationResponse;
 import org.crochet.payload.response.BlogPostResponse;
-import org.crochet.properties.MessageCodeProperties;
 import org.crochet.repository.BlogPostRepository;
 import org.crochet.repository.BlogPostSpecifications;
+import org.crochet.repository.CustomBlogRepo;
 import org.crochet.service.BlogPostService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,25 +21,23 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
-import static org.crochet.constant.MessageConstant.BLOG_NOT_FOUND_MESSAGE;
-
 /**
  * BlogPostServiceImpl class
  */
 @Service
 public class BlogPostServiceImpl implements BlogPostService {
     private final BlogPostRepository blogPostRepo;
-    private final MessageCodeProperties msgCodeProps;
+    private final CustomBlogRepo customBlogRepo;
 
     /**
      * Constructs a new {@code BlogPostServiceImpl} with the specified BlogPost repository.
      *
      * @param blogPostRepo The repository for handling BlogPost-related operations.
-     * @param msgCodeProps The properties for retrieving message codes.
      */
-    public BlogPostServiceImpl(BlogPostRepository blogPostRepo, MessageCodeProperties msgCodeProps) {
+    public BlogPostServiceImpl(BlogPostRepository blogPostRepo,
+                               CustomBlogRepo customBlogRepo) {
         this.blogPostRepo = blogPostRepo;
-        this.msgCodeProps = msgCodeProps;
+        this.customBlogRepo = customBlogRepo;
     }
 
     /**
@@ -53,10 +51,19 @@ public class BlogPostServiceImpl implements BlogPostService {
     @Transactional
     @Override
     public BlogPostResponse createOrUpdatePost(BlogPostRequest request) {
-        var blogPost = (request.getId() == null) ? new BlogPost() : findOne(request.getId());
-        blogPost.setTitle(request.getTitle())
-                .setContent(request.getContent())
-                .setFiles(FileMapper.INSTANCE.toEntities(request.getFiles()));
+        BlogPost blogPost;
+        if (request.getId() == null) {
+            blogPost = BlogPost.builder()
+                    .title(request.getTitle())
+                    .content(request.getContent())
+                    .home(request.isHome())
+                    .files(FileMapper.INSTANCE.toEntities(request.getFiles()))
+                    .avatars(FileMapper.INSTANCE.toEntities(request.getAvatars()))
+                    .build();
+        } else {
+            blogPost = customBlogRepo.findById(request.getId());
+            blogPost = BlogPostMapper.INSTANCE.partialUpdate(request, blogPost);
+        }
         blogPost = blogPostRepo.save(blogPost);
         return BlogPostMapper.INSTANCE.toResponse(blogPost);
     }
@@ -64,23 +71,23 @@ public class BlogPostServiceImpl implements BlogPostService {
     /**
      * Retrieves a paginated list of blog posts based on the provided parameters.
      *
-     * @param pageNo   The page number to retrieve (0-indexed).
-     * @param pageSize The number of blog posts to include in each page.
-     * @param sortBy   The attribute by which the blog posts should be sorted.
-     * @param sortDir  The sorting direction, either "ASC" (ascending) or "DESC" (descending).
-     * @param text     The search text used to filter blog posts by title or content.
+     * @param pageNo     The page number to retrieve (0-indexed).
+     * @param pageSize   The number of blog posts to include in each page.
+     * @param sortBy     The attribute by which the blog posts should be sorted.
+     * @param sortDir    The sorting direction, either "ASC" (ascending) or "DESC" (descending).
+     * @param searchText The search searchText used to filter blog posts by title or content.
      * @return A {@link BlogPostPaginationResponse} containing the paginated list of blog posts.
      */
     @Override
-    public BlogPostPaginationResponse getBlogs(int pageNo, int pageSize, String sortBy, String sortDir, String text) {
+    public BlogPostPaginationResponse getBlogs(int pageNo, int pageSize, String sortBy, String sortDir, String searchText) {
         // create Sort instance
         Sort sort = Sort.by(sortBy);
         sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? sort.ascending() : sort.descending();
         // create Pageable instance
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
         Specification<BlogPost> spec = Specification.where(null);
-        if (text != null && !text.isEmpty()) {
-            spec = spec.and(BlogPostSpecifications.searchBy(text));
+        if (searchText != null && !searchText.isEmpty()) {
+            spec = spec.and(BlogPostSpecifications.searchBy(searchText));
         }
 
         Page<BlogPost> menuPage = blogPostRepo.findAll(spec, pageable);
@@ -104,14 +111,21 @@ public class BlogPostServiceImpl implements BlogPostService {
      * @throws ResourceNotFoundException If the specified blog post ID does not correspond to an existing blog post.
      */
     @Override
-    public BlogPostResponse getDetail(String id) {
-        var blogPost = findOne(id);
+    public BlogPostResponse getDetail(UUID id) {
+        var blogPost = customBlogRepo.findById(id);
         return BlogPostMapper.INSTANCE.toResponse(blogPost);
     }
 
-    private BlogPost findOne(String id) {
-        return blogPostRepo.findById(UUID.fromString(id))
-                .orElseThrow(() -> new ResourceNotFoundException(BLOG_NOT_FOUND_MESSAGE,
-                        msgCodeProps.getCode("BLOG_NOT_FOUND_MESSAGE")));
+    /**
+     * Deletes the blog post identified by the given ID.
+     *
+     * @param id The unique identifier of the blog post to delete.
+     * @throws ResourceNotFoundException If the specified blog post ID does not correspond to an existing blog post.
+     */
+    @Transactional
+    @Override
+    public void deletePost(UUID id) {
+        var blogPost = customBlogRepo.findById(id);
+        blogPostRepo.delete(blogPost);
     }
 }

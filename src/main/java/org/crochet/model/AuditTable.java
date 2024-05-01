@@ -5,10 +5,11 @@ import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -20,10 +21,11 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@SuperBuilder
 @EntityListeners(AuditingEntityListener.class)
 @MappedSuperclass
 @NoArgsConstructor
-@Accessors(chain = true)
+@AllArgsConstructor
 public abstract class AuditTable {
     @CreatedBy
     private String createdBy;
