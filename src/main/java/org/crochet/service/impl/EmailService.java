@@ -4,6 +4,7 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.crochet.exception.IllegalStateException;
+import org.crochet.payload.request.EmailRequest;
 import org.crochet.service.EmailSender;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -57,6 +58,23 @@ public class EmailService implements EmailSender {
             throw new IllegalStateException(FAILED_TO_SEND_EMAIL_MESSAGE, MAP_CODE.get(FAILED_TO_SEND_EMAIL_MESSAGE));
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    @Async
+    public void send(EmailRequest emailRequest) {
+        try {
+            MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
+            helper.setText(emailRequest.getContent(), true);
+            helper.setTo("dothithamphuong@gmail.com");
+            helper.setSubject(emailRequest.getSubject());
+            helper.setFrom(emailRequest.getFrom());
+            javaMailSender.send(mimeMessage);
+        } catch (MessagingException e) {
+            log.error(FAILED_TO_SEND_EMAIL_MESSAGE, e);
+            throw new IllegalStateException(FAILED_TO_SEND_EMAIL_MESSAGE, MAP_CODE.get(FAILED_TO_SEND_EMAIL_MESSAGE));
         }
     }
 }
