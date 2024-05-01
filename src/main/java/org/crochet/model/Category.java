@@ -7,10 +7,11 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 
@@ -18,8 +19,9 @@ import java.util.List;
 @Setter
 @Entity
 @Table(name = "category")
+@SuperBuilder
+@AllArgsConstructor
 @NoArgsConstructor
-@Accessors(chain = true)
 public class Category extends BaseEntity {
     @Column(name = "name", nullable = false)
     private String name;

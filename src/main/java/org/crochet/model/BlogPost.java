@@ -9,10 +9,11 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 
@@ -20,14 +21,18 @@ import java.util.List;
 @Setter
 @Entity
 @Table(name = "blog_post")
+@SuperBuilder
 @NoArgsConstructor
-@Accessors(chain = true)
+@AllArgsConstructor
 public class BlogPost extends BaseEntity {
     @Column(name = "title", nullable = false)
     private String title;
 
     @Column(name = "content", columnDefinition = "TEXT")
     private String content;
+
+    @Column(name = "home", columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private boolean home;
 
     @OneToMany(mappedBy = "blogPost")
     private List<Comment> comments;
@@ -40,4 +45,13 @@ public class BlogPost extends BaseEntity {
             @AttributeOverride(name = "fileContent", column = @Column(name = "file_content"))
     })
     private List<File> files;
+
+    @ElementCollection
+    @CollectionTable(name = "blog_post_avatar",
+            joinColumns = @JoinColumn(name = "blog_post_id", columnDefinition = "BINARY(16) NOT NULL"))
+    @AttributeOverrides({
+            @AttributeOverride(name = "fileName", column = @Column(name = "file_name")),
+            @AttributeOverride(name = "fileContent", column = @Column(name = "file_content"))
+    })
+    private List<File> avatars;
 }

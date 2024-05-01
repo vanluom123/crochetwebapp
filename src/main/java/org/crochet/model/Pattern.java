@@ -2,7 +2,6 @@ package org.crochet.model;
 
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.AttributeOverrides;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -12,12 +11,12 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 import org.crochet.enumerator.CurrencyCode;
 
 import java.util.List;
@@ -26,8 +25,9 @@ import java.util.List;
 @Setter
 @Entity
 @Table(name = "pattern")
+@SuperBuilder
 @NoArgsConstructor
-@Accessors(chain = true)
+@AllArgsConstructor
 public class Pattern extends BaseEntity {
     @Column(name = "name")
     private String name;
@@ -46,19 +46,25 @@ public class Pattern extends BaseEntity {
             nullable = false)
     private CurrencyCode currencyCode;
 
-    @OneToMany(mappedBy = "pattern", cascade = CascadeType.ALL)
-    private List<OrderPatternDetail> orderPatternDetails;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", columnDefinition = "BINARY(16) NOT NULL")
     private Category category;
+
+    @Column(name = "is_home")
+    private boolean isHome;
+
+    @Column(name = "link")
+    private String link;
+
+    @Column(name = "content", columnDefinition = "TEXT")
+    private String content;
 
     @ElementCollection
     @CollectionTable(name = "pattern_file",
             joinColumns = @JoinColumn(name = "pattern_id", columnDefinition = "BINARY(16) NOT NULL"))
     @AttributeOverrides({
             @AttributeOverride(name = "fileName", column = @Column(name = "file_name")),
-            @AttributeOverride(name = "fileContent", column = @Column(name = "file_content"))
+            @AttributeOverride(name = "fileContent", column = @Column(name = "file_content", columnDefinition = "TEXT"))
     })
     private List<File> files;
 
@@ -69,5 +75,5 @@ public class Pattern extends BaseEntity {
             @AttributeOverride(name = "fileName", column = @Column(name = "file_name")),
             @AttributeOverride(name = "fileContent", column = @Column(name = "file_content"))
     })
-    private List<Image> images;
+    private List<File> images;
 }

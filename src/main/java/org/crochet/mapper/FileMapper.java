@@ -17,4 +17,5 @@ public interface FileMapper {
     List<File> toEntities(Collection<FileResponse> fileResponses);
 
     FileResponse toResponse(File file);
+    List<FileResponse> toResponses(Collection<File> files);
 }

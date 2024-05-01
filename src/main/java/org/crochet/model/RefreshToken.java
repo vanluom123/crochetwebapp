@@ -12,7 +12,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 
@@ -20,9 +20,9 @@ import java.time.LocalDateTime;
 @Setter
 @Entity
 @Table(name = "refresh_token")
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-@Accessors(chain = true)
 public class RefreshToken extends BaseEntity {
     @Column(name = "token",
             unique = true,
