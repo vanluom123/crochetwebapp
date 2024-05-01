@@ -31,7 +31,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-mail'
-    implementation 'org.springframework.security:spring-security-oauth2-client:6.2.0'
+    implementation 'org.springframework.security:spring-security-oauth2-client:6.2.4'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0'
     implementation 'jakarta.validation:jakarta.validation-api:3.0.2'
@@ -39,7 +39,7 @@ dependencies {
     implementation 'com.mysql:mysql-connector-j:8.3.0'
     implementation 'org.liquibase:liquibase-core:4.23.0'
     implementation 'com.h2database:h2:2.2.220'
-    implementation 'org.postgresql:postgresql:42.2.27'
+    implementation 'org.postgresql:postgresql:42.7.3'
 
     implementation 'com.paypal.sdk:checkout-sdk:2.0.0'
 
@@ -67,6 +67,7 @@ dependencies {
     liquibaseRuntime 'org.liquibase:liquibase-groovy-dsl:3.0.3'
     liquibaseRuntime 'info.picocli:picocli:4.7.4'
     liquibaseRuntime 'com.mysql:mysql-connector-j:8.3.0'
+    liquibaseRuntime 'org.postgresql:postgresql:42.7.3'
 }
 
 liquibase {
