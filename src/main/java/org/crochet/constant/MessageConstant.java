@@ -45,4 +45,12 @@ public class MessageConstant {
     public static final String REFRESH_TOKEN_NOT_FOUND_MESSAGE = "Refresh token not found: ";
     public static final String EXISTS_AS_A_PARENT_MESSAGE = "A category with the same name already exists as a parent.";
     public static final String EXISTS_AS_A_CHILD_MESSAGE = "A category with the same name already exists as a child.";
+    public static final String CANNOT_UPLOAD_FILE_MESSAGE = "Cannot upload image to Firebase Cloud Storage";
+    public static final String FILE_DOES_NOT_EXIST = "File does not exist";
+    public static final String UNAUTHORIZED = "Unauthorized";
+    public static final String FORBIDDEN = "Forbidden";
+    public static final String DATA_INTEGRITY_VIOLATION = "Data integrity violation";
+
+    private MessageConstant() {
+    }
 }

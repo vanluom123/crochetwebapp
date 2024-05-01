@@ -5,10 +5,15 @@ plugins {
     id 'org.liquibase.gradle' version '2.2.1'
 }
 
+apply from: 'version.gradle'
+
 group = 'org'
-version = '0.0.1-SNAPSHOT'
+version = loadVersion().getVersion()
 description = 'crochet'
-sourceCompatibility = '17'
+
+java {
+    sourceCompatibility = '17'
+}
 
 configurations {
     compileOnly {
@@ -67,7 +72,7 @@ dependencies {
 liquibase {
     activities {
         main {
-            changelogFile 'src/main/resources/db/changelog/db.changelog-master.yaml'
+            changelogFile 'src/main/resources/db/changelog/gradle/db.changelog-master.yaml'
             url 'jdbc:mysql://localhost:3306/testDB'
             username 'root'
             password 'root'

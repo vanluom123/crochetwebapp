@@ -1,6 +1,5 @@
 package org.crochet.service.impl;
 
-import org.crochet.properties.MessageCodeProperties;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.model.PasswordResetToken;
 import org.crochet.model.User;
@@ -11,18 +10,16 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
 import static org.crochet.constant.MessageConstant.PASSWORD_RESET_TOKEN_NOT_FOUND_MESSAGE;
 import static org.crochet.constant.MessageConstant.USER_NOT_FOUND_WITH_TOKEN_MESSAGE;
 
 @Service
 public class PasswordResetTokenServiceImpl implements PasswordResetTokenService {
     private final PasswordResetTokenRepository passwordResetTokenRepository;
-    private final MessageCodeProperties msgCodeProps;
 
-    public PasswordResetTokenServiceImpl(PasswordResetTokenRepository passwordResetTokenRepository,
-                                         MessageCodeProperties msgCodeProps) {
+    public PasswordResetTokenServiceImpl(PasswordResetTokenRepository passwordResetTokenRepository) {
         this.passwordResetTokenRepository = passwordResetTokenRepository;
-        this.msgCodeProps = msgCodeProps;
     }
 
     @Override
@@ -34,10 +31,11 @@ public class PasswordResetTokenServiceImpl implements PasswordResetTokenService 
         if (passwordResetToken == null) {
             // Create a new token
             String token = UUID.randomUUID().toString();
-            passwordResetToken = new PasswordResetToken()
-                    .setToken(token)
-                    .setExpiresAt(expirationTime)
-                    .setUser(user);
+            passwordResetToken = PasswordResetToken.builder()
+                    .token(token)
+                    .expiresAt(expirationTime)
+                    .user(user)
+                    .build();
         } else {
             passwordResetToken.setExpiresAt(expirationTime);
         }
@@ -47,8 +45,10 @@ public class PasswordResetTokenServiceImpl implements PasswordResetTokenService 
     @Override
     public String getEmailByToken(String token) {
         return passwordResetTokenRepository.findEmailByToken(token)
-                .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_WITH_TOKEN_MESSAGE + token,
-                        msgCodeProps.getCode("USER_NOT_FOUND_WITH_TOKEN_MESSAGE")));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(USER_NOT_FOUND_WITH_TOKEN_MESSAGE + token,
+                                MAP_CODE.get(USER_NOT_FOUND_WITH_TOKEN_MESSAGE))
+                );
     }
 
     @Override
@@ -59,7 +59,9 @@ public class PasswordResetTokenServiceImpl implements PasswordResetTokenService 
     @Override
     public PasswordResetToken getPasswordResetToken(String token) {
         return passwordResetTokenRepository.findByToken(token)
-                .orElseThrow(() -> new ResourceNotFoundException(PASSWORD_RESET_TOKEN_NOT_FOUND_MESSAGE,
-                        msgCodeProps.getCode("PASSWORD_RESET_TOKEN_NOT_FOUND_MESSAGE")));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(PASSWORD_RESET_TOKEN_NOT_FOUND_MESSAGE,
+                                MAP_CODE.get(PASSWORD_RESET_TOKEN_NOT_FOUND_MESSAGE))
+                );
     }
 }

@@ -11,6 +11,8 @@ import java.util.UUID;
 public interface ProductService {
     ProductResponse createOrUpdate(ProductRequest request);
 
+    List<ProductResponse> batchInsert(List<ProductRequest> requests);
+
     ProductPaginationResponse getProducts(int pageNo, int pageSize, String sortBy, String sortDir, String searchText, UUID categoryId, List<Filter> filters);
 
     List<ProductResponse> getLimitedProducts();

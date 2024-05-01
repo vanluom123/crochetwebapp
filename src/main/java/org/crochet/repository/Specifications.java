@@ -2,10 +2,12 @@ package org.crochet.repository;
 
 import org.crochet.model.BaseEntity;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.crochet.enumerator.QueryOperator.OPERATORS;
 import static org.springframework.data.jpa.domain.Specification.where;
 
 public class Specifications {
@@ -15,6 +17,17 @@ public class Specifications {
             return spec;
         }
         for (Filter input : filters) {
+            if (input.getField() == null || input.getField().isEmpty()) {
+                continue;
+            }
+            if (input.getOperator() == null || !OPERATORS.contains(input.getOperator())) {
+                continue;
+            }
+            if (input.getValue() == null || input.getValue().isEmpty()) {
+                if (ObjectUtils.isEmpty(input.getValues())) {
+                    continue;
+                }
+            }
             spec = spec.and(createSpecification(input));
         }
         return spec;

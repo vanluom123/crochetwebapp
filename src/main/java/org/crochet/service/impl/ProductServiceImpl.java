@@ -1,19 +1,18 @@
 package org.crochet.service.impl;
 
 import org.crochet.constant.AppConstant;
-import org.crochet.exception.ResourceNotFoundException;
-import org.crochet.mapper.ImageMapper;
+import org.crochet.mapper.FileMapper;
 import org.crochet.mapper.ProductMapper;
 import org.crochet.model.Product;
 import org.crochet.payload.request.ProductRequest;
 import org.crochet.payload.response.ProductPaginationResponse;
 import org.crochet.payload.response.ProductResponse;
-import org.crochet.properties.MessageCodeProperties;
+import org.crochet.repository.CustomCategoryRepo;
+import org.crochet.repository.CustomProductRepo;
 import org.crochet.repository.Filter;
 import org.crochet.repository.ProductRepository;
 import org.crochet.repository.ProductSpecifications;
 import org.crochet.repository.Specifications;
-import org.crochet.service.CategoryService;
 import org.crochet.service.ProductService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -27,30 +26,27 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.crochet.constant.MessageConstant.PRODUCT_NOT_FOUND_MESSAGE;
-
 /**
  * ProductServiceImpl class
  */
 @Service
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepo;
-    private final CategoryService categoryService;
-    private final MessageCodeProperties msgCodeProps;
+    private final CustomProductRepo customProductRepo;
+    private final CustomCategoryRepo customCategoryRepo;
 
     /**
      * Constructor
      *
-     * @param productRepo     The {@link ProductRepository} instance.
-     * @param categoryService The {@link CategoryService} instance.
-     * @param msgCodeProps    The {@link MessageCodeProperties} instance.
+     * @param productRepo       The {@link ProductRepository} instance.
+     * @param customProductRepo The {@link CustomProductRepo} instance.
      */
     public ProductServiceImpl(ProductRepository productRepo,
-                              CategoryService categoryService,
-                              MessageCodeProperties msgCodeProps) {
+                              CustomProductRepo customProductRepo,
+                              CustomCategoryRepo customCategoryRepo) {
         this.productRepo = productRepo;
-        this.categoryService = categoryService;
-        this.msgCodeProps = msgCodeProps;
+        this.customProductRepo = customProductRepo;
+        this.customCategoryRepo = customCategoryRepo;
     }
 
     /**
@@ -65,16 +61,48 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     @Override
     public ProductResponse createOrUpdate(ProductRequest request) {
-        var category = categoryService.findById(request.getCategoryId());
-        var product = (request.getId() != null) ? findOne(request.getId()) : new Product();
-        product.setCategory(category)
-                .setName(request.getName())
-                .setPrice(request.getPrice())
-                .setDescription(request.getDescription())
-                .setCurrencyCode(request.getCurrencyCode())
-                .setImages(ImageMapper.INSTANCE.toEntities(request.getImages()));
+        var category = customCategoryRepo.findById(request.getCategoryId());
+        Product product;
+        if (request.getId() == null) {
+            product = Product.builder()
+                    .category(category)
+                    .name(request.getName())
+                    .price(request.getPrice())
+                    .description(request.getDescription())
+                    .currencyCode(request.getCurrencyCode())
+                    .isHome(request.isHome())
+                    .link(request.getLink())
+                    .content(request.getContent())
+                    .images(FileMapper.INSTANCE.toEntities(request.getImages()))
+                    .build();
+        } else {
+            product = customProductRepo.findById(request.getId());
+            product = ProductMapper.INSTANCE.update(request, product);
+        }
         product = productRepo.save(product);
         return ProductMapper.INSTANCE.toResponse(product);
+    }
+
+    @Transactional
+    @Override
+    public List<ProductResponse> batchInsert(List<ProductRequest> requests) {
+        List<Product> products = new ArrayList<>();
+        for (ProductRequest request : requests) {
+            var category = customCategoryRepo.findById(request.getCategoryId());
+            Product product = Product.builder()
+                    .category(category)
+                    .name(request.getName())
+                    .price(request.getPrice())
+                    .description(request.getDescription())
+                    .currencyCode(request.getCurrencyCode())
+                    .isHome(request.isHome())
+                    .link(request.getLink())
+                    .images(FileMapper.INSTANCE.toEntities(request.getImages()))
+                    .build();
+            products.add(product);
+        }
+        products = productRepo.saveAll(products);
+        return ProductMapper.INSTANCE.toResponses(products);
     }
 
     /**
@@ -117,7 +145,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     private List<Product> getProductsByCategory(UUID categoryId) {
-        var category = categoryService.findById(categoryId);
+        var category = customCategoryRepo.findById(categoryId);
         List<Product> products = new ArrayList<>(category.getProducts());
         for (var subCategory : category.getChildren()) {
             products.addAll(getProductsByCategory(subCategory.getId()));
@@ -129,7 +157,8 @@ public class ProductServiceImpl implements ProductService {
     public List<ProductResponse> getLimitedProducts() {
         var products = productRepo.findAll()
                 .stream()
-                .limit(AppConstant.PRODUCT_SIZE)
+                .filter(Product::isHome)
+                .limit(AppConstant.PRODUCT_LIMITED)
                 .toList();
         return ProductMapper.INSTANCE.toResponses(products);
     }
@@ -142,19 +171,13 @@ public class ProductServiceImpl implements ProductService {
      */
     @Override
     public ProductResponse getDetail(UUID id) {
-        var product = findOne(id);
+        var product = customProductRepo.findById(id);
         return ProductMapper.INSTANCE.toResponse(product);
-    }
-
-    private Product findOne(UUID id) {
-        return productRepo.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(PRODUCT_NOT_FOUND_MESSAGE,
-                        msgCodeProps.getCode("PRODUCT_NOT_FOUND_MESSAGE")));
     }
 
     @Transactional
     @Override
     public void delete(UUID id) {
-        productRepo.deleteById(id);
+        customProductRepo.deleteById(id);
     }
 }
