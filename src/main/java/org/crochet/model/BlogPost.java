@@ -31,6 +31,9 @@ public class BlogPost extends BaseEntity {
     @Column(name = "content", columnDefinition = "TEXT")
     private String content;
 
+    @Column(name = "home", columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private boolean home;
+
     @OneToMany(mappedBy = "blogPost")
     private List<Comment> comments;
 
@@ -42,4 +45,13 @@ public class BlogPost extends BaseEntity {
             @AttributeOverride(name = "fileContent", column = @Column(name = "file_content"))
     })
     private List<File> files;
+
+    @ElementCollection
+    @CollectionTable(name = "blog_post_avatar",
+            joinColumns = @JoinColumn(name = "blog_post_id", columnDefinition = "BINARY(16) NOT NULL"))
+    @AttributeOverrides({
+            @AttributeOverride(name = "fileName", column = @Column(name = "file_name")),
+            @AttributeOverride(name = "fileContent", column = @Column(name = "file_content"))
+    })
+    private List<File> avatars;
 }

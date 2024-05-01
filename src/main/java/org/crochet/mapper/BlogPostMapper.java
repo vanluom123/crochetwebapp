@@ -1,6 +1,7 @@
 package org.crochet.mapper;
 
 import org.crochet.model.BlogPost;
+import org.crochet.payload.request.BlogPostRequest;
 import org.crochet.payload.response.BlogPostResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -13,8 +14,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
-public interface BlogPostMapper {
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE,
+        uses = {FileMapper.class})
+public interface BlogPostMapper extends PartialUpdate<BlogPost, BlogPostRequest> {
     BlogPostMapper INSTANCE = Mappers.getMapper(BlogPostMapper.class);
 
     @Mapping(target = "id", source = "id", qualifiedByName = "uuidToString")

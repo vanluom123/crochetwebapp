@@ -51,10 +51,19 @@ public class BlogPostServiceImpl implements BlogPostService {
     @Transactional
     @Override
     public BlogPostResponse createOrUpdatePost(BlogPostRequest request) {
-        var blogPost = (request.getId() == null) ? new BlogPost() : customBlogRepo.findById(request.getId());
-        blogPost.setTitle(request.getTitle());
-        blogPost.setContent(request.getContent());
-        blogPost.setFiles(FileMapper.INSTANCE.toEntities(request.getFiles()));
+        BlogPost blogPost;
+        if (request.getId() == null) {
+            blogPost = BlogPost.builder()
+                    .title(request.getTitle())
+                    .content(request.getContent())
+                    .home(request.isHome())
+                    .files(FileMapper.INSTANCE.toEntities(request.getFiles()))
+                    .avatars(FileMapper.INSTANCE.toEntities(request.getAvatars()))
+                    .build();
+        } else {
+            blogPost = customBlogRepo.findById(request.getId());
+            blogPost = BlogPostMapper.INSTANCE.partialUpdate(request, blogPost);
+        }
         blogPost = blogPostRepo.save(blogPost);
         return BlogPostMapper.INSTANCE.toResponse(blogPost);
     }
@@ -62,11 +71,11 @@ public class BlogPostServiceImpl implements BlogPostService {
     /**
      * Retrieves a paginated list of blog posts based on the provided parameters.
      *
-     * @param pageNo   The page number to retrieve (0-indexed).
-     * @param pageSize The number of blog posts to include in each page.
-     * @param sortBy   The attribute by which the blog posts should be sorted.
-     * @param sortDir  The sorting direction, either "ASC" (ascending) or "DESC" (descending).
-     * @param searchText     The search searchText used to filter blog posts by title or content.
+     * @param pageNo     The page number to retrieve (0-indexed).
+     * @param pageSize   The number of blog posts to include in each page.
+     * @param sortBy     The attribute by which the blog posts should be sorted.
+     * @param sortDir    The sorting direction, either "ASC" (ascending) or "DESC" (descending).
+     * @param searchText The search searchText used to filter blog posts by title or content.
      * @return A {@link BlogPostPaginationResponse} containing the paginated list of blog posts.
      */
     @Override
