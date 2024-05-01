@@ -1,14 +1,14 @@
 spring:
   profiles:
-    active: local
+    active: ${env:local}
 
   security:
     oauth2:
       client:
         registration:
           google:
-            clientId: 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
-            clientSecret: 782330301173-u95n2p5pc6obg6nim17bq7m4kmm861tt.apps.googleusercontent.com
+            clientId: ${GOOGLE_CLIENT_SECRET}
+            clientSecret: ${GOOGLE_CLIENT_ID}
             redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
             scope:
               - email
@@ -16,8 +16,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: phanvanluom97bd@gmail.com
-    password: bnptvnwccmxgwuxq
+    username: ${EMAIL}
+    password: ${APP_PASSWORD}
     properties:
       mail:
         smtp:
@@ -31,7 +31,7 @@ spring:
 
 app:
   auth:
-    tokenSecret: 37e2a786c5dc962fac3cfcf5c72b592339abbd7433148e8ed2dd0fc13f1d7402a53de020cb3b0b75f534b9937e191943f3feff64c88af6fbb3eb9e47dccadfa2
+    tokenSecret: ${TOKEN_SECRET}
     tokenExpirationMs: 900000 # 15 minutes
     refresh-token-expiration-ms: 86400000 # 1 day
   cors:
