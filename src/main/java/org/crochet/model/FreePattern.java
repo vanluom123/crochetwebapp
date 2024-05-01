@@ -10,10 +10,11 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 
@@ -21,8 +22,9 @@ import java.util.List;
 @Setter
 @Entity
 @Table(name = "free_pattern")
+@SuperBuilder
 @NoArgsConstructor
-@Accessors(chain = true)
+@AllArgsConstructor
 public class FreePattern extends BaseEntity {
     @Column(name = "name")
     private String name;
@@ -37,12 +39,21 @@ public class FreePattern extends BaseEntity {
     @JoinColumn(name = "category_id", columnDefinition = "BINARY(16) NOT NULL")
     private Category category;
 
+    @Column(name = "is_home")
+    private boolean isHome;
+
+    @Column(name = "link")
+    private String link;
+
+    @Column(name = "content", columnDefinition = "TEXT")
+    private String content;
+
     @ElementCollection
     @CollectionTable(name = "free_pattern_file",
             joinColumns = @JoinColumn(name = "free_pattern_id", columnDefinition = "BINARY(16) NOT NULL"))
     @AttributeOverrides({
             @AttributeOverride(name = "fileName", column = @Column(name = "file_name")),
-            @AttributeOverride(name = "fileContent", column = @Column(name = "file_content"))
+            @AttributeOverride(name = "fileContent", column = @Column(name = "file_content", columnDefinition = "TEXT"))
 
     })
     private List<File> files;
@@ -52,8 +63,8 @@ public class FreePattern extends BaseEntity {
             joinColumns = @JoinColumn(name = "free_pattern_id", columnDefinition = "BINARY(16) NOT NULL"))
     @AttributeOverrides({
             @AttributeOverride(name = "fileName", column = @Column(name = "file_name")),
-            @AttributeOverride(name = "fileContent", column = @Column(name = "file_content"))
+            @AttributeOverride(name = "fileContent", column = @Column(name = "file_content", columnDefinition = "TEXT"))
 
     })
-    private List<Image> images;
+    private List<File> images;
 }

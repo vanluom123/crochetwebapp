@@ -3,7 +3,7 @@ package org.crochet.service.impl;
 import com.google.cloud.storage.Blob;
 import com.google.firebase.cloud.StorageClient;
 import lombok.extern.slf4j.Slf4j;
-import org.crochet.properties.MessageCodeProperties;
+import org.crochet.constant.MessageConstant;
 import org.crochet.exception.StorageException;
 import org.crochet.payload.response.FileResponse;
 import org.crochet.service.FirebaseStorageService;
@@ -16,17 +16,16 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
+
 @Slf4j
 @Service
 public class FirebaseStorageServiceImpl implements FirebaseStorageService {
     private static final String BUCKET_NAME = "littlecrochet.appspot.com";
-    public static final String CANNOT_UPLOAD_FILE_MESSAGE = "Cannot upload image to Firebase Cloud Storage";
     private final StorageClient storageClient;
-    private final MessageCodeProperties msgCodeProps;
 
-    public FirebaseStorageServiceImpl(StorageClient storageClient, MessageCodeProperties msgCodeProps) {
+    public FirebaseStorageServiceImpl(StorageClient storageClient) {
         this.storageClient = storageClient;
-        this.msgCodeProps = msgCodeProps;
     }
 
     public FileResponse uploadFile(MultipartFile imageFile) {
@@ -39,9 +38,8 @@ public class FirebaseStorageServiceImpl implements FirebaseStorageService {
             blob = storageClient.bucket(BUCKET_NAME)
                     .create(fileName, imageFile.getInputStream(), imageFile.getContentType());
         } catch (IOException e) {
-            log.error(CANNOT_UPLOAD_FILE_MESSAGE);
-            throw new StorageException(CANNOT_UPLOAD_FILE_MESSAGE,
-                    msgCodeProps.getCode("CANNOT_UPLOAD_FILE_MESSAGE"));
+            log.error(MessageConstant.CANNOT_UPLOAD_FILE_MESSAGE);
+            throw new StorageException(MessageConstant.CANNOT_UPLOAD_FILE_MESSAGE, MAP_CODE.get(MessageConstant.CANNOT_UPLOAD_FILE_MESSAGE));
         }
 
         log.info("image name: {}", blob.getName());
@@ -56,7 +54,7 @@ public class FirebaseStorageServiceImpl implements FirebaseStorageService {
     public List<FileResponse> uploadMultipleFiles(MultipartFile[] files) {
         List<FileResponse> fileNames;
         fileNames = Stream.of(files)
-                .map(this::uploadFile)
+                .map(this::tryUploadFile)
                 .toList();
         return fileNames;
     }
@@ -83,16 +81,13 @@ public class FirebaseStorageServiceImpl implements FirebaseStorageService {
     }
 
     @Override
-    public FileResponse updateFile(MultipartFile newFile, String existingFileName) {
-        // Delete the existing file
-        Blob blob = storageClient.bucket(BUCKET_NAME).get(existingFileName);
+    public FileResponse tryUploadFile(MultipartFile newFile) {
+        String fileName = "images/" + newFile.getOriginalFilename();
+        Blob blob = storageClient.bucket(BUCKET_NAME).get(fileName);
         if (blob != null) {
+            // Delete the existing file
             blob.delete();
-            log.info("File {} has been deleted", existingFileName);
-        } else {
-            log.error("File {} does not exist", existingFileName);
-            throw new StorageException("File does not exist",
-                    msgCodeProps.getCode("FILE_NOT_FOUND_MESSAGE"));
+            log.info("Deleted {}", fileName);
         }
 
         // Upload the new file

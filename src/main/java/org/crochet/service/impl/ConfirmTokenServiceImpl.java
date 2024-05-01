@@ -1,6 +1,5 @@
 package org.crochet.service.impl;
 
-import org.crochet.properties.MessageCodeProperties;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.model.ConfirmationToken;
 import org.crochet.model.User;
@@ -11,17 +10,15 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
 import static org.crochet.constant.MessageConstant.CONFIRM_TOKEN_NOT_FOUND_MESSAGE;
 
 @Service
 public class ConfirmTokenServiceImpl implements ConfirmTokenService {
     private final ConfirmationTokenRepository confirmationTokenRepository;
-    private final MessageCodeProperties msgCodeProps;
 
-    public ConfirmTokenServiceImpl(ConfirmationTokenRepository confirmationTokenRepository,
-                                   MessageCodeProperties msgCodeProps) {
+    public ConfirmTokenServiceImpl(ConfirmationTokenRepository confirmationTokenRepository) {
         this.confirmationTokenRepository = confirmationTokenRepository;
-        this.msgCodeProps = msgCodeProps;
     }
 
     @Override
@@ -34,10 +31,11 @@ public class ConfirmTokenServiceImpl implements ConfirmTokenService {
         if (confirmationToken == null) {
             // Create a new token
             String token = UUID.randomUUID().toString();
-            confirmationToken = new ConfirmationToken()
-                    .setToken(token)
-                    .setExpiresAt(expirationTime)
-                    .setUser(user);
+            confirmationToken = ConfirmationToken.builder()
+                    .token(token)
+                    .expiresAt(expirationTime)
+                    .user(user)
+                    .build();
         } else {
             // Update the existing token
             confirmationToken.setExpiresAt(expirationTime);
@@ -52,8 +50,11 @@ public class ConfirmTokenServiceImpl implements ConfirmTokenService {
 
     @Override
     public ConfirmationToken getToken(String token) {
-        return confirmationTokenRepository.findByToken(token)
-                .orElseThrow(() -> new ResourceNotFoundException(CONFIRM_TOKEN_NOT_FOUND_MESSAGE,
-                        msgCodeProps.getCode("CONFIRM_TOKEN_NOT_FOUND_MESSAGE")));
+        return confirmationTokenRepository
+                .findByToken(token)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(CONFIRM_TOKEN_NOT_FOUND_MESSAGE,
+                                MAP_CODE.get(CONFIRM_TOKEN_NOT_FOUND_MESSAGE))
+                );
     }
 }

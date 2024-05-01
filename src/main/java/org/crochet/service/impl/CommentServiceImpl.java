@@ -6,19 +6,19 @@ import org.crochet.model.Comment;
 import org.crochet.model.User;
 import org.crochet.payload.request.CommentRequest;
 import org.crochet.payload.response.CommentResponse;
-import org.crochet.properties.MessageCodeProperties;
-import org.crochet.repository.BlogPostRepository;
 import org.crochet.repository.CommentRepository;
-import org.crochet.repository.UserRepository;
+import org.crochet.repository.CustomBlogRepo;
+import org.crochet.repository.CustomCommentRepo;
+import org.crochet.repository.CustomUserRepo;
 import org.crochet.security.UserPrincipal;
 import org.crochet.service.CommentService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
-import static org.crochet.constant.MessageConstant.*;
+import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
+import static org.crochet.constant.MessageConstant.USER_NOT_FOUND_MESSAGE;
 
 /**
  * CommentServiceImpl class
@@ -26,26 +26,26 @@ import static org.crochet.constant.MessageConstant.*;
 @Service
 public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepo;
-    private final UserRepository userRepo;
-    private final BlogPostRepository blogPostRepo;
-    private final MessageCodeProperties msgCodeProps;
+    private final CustomCommentRepo customCommentRepo;
+    private final CustomUserRepo customUserRepo;
+    private final CustomBlogRepo customBlogRepo;
 
     /**
      * Constructs a new {@code CommentServiceImpl} with the specified repositories.
      *
-     * @param commentRepo  The repository for handling comments.
-     * @param userRepo     The repository for handling users.
-     * @param blogPostRepo The repository for handling blog posts.
-     * @param msgCodeProps The properties for message codes.
+     * @param commentRepo       The repository for handling comments.
+     * @param customCommentRepo The custom repository for handling comments.
+     * @param customUserRepo    The custom repository for handling users.
+     * @param customBlogRepo    The custom repository for handling blog posts.
      */
     public CommentServiceImpl(CommentRepository commentRepo,
-                              UserRepository userRepo,
-                              BlogPostRepository blogPostRepo,
-                              MessageCodeProperties msgCodeProps) {
+                              CustomCommentRepo customCommentRepo,
+                              CustomUserRepo customUserRepo,
+                              CustomBlogRepo customBlogRepo) {
         this.commentRepo = commentRepo;
-        this.userRepo = userRepo;
-        this.blogPostRepo = blogPostRepo;
-        this.msgCodeProps = msgCodeProps;
+        this.customCommentRepo = customCommentRepo;
+        this.customUserRepo = customUserRepo;
+        this.customBlogRepo = customBlogRepo;
     }
 
     /**
@@ -62,42 +62,25 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public CommentResponse createOrUpdate(UserPrincipal principal, CommentRequest request) {
         if (principal == null) {
-            throw new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE,
-                    msgCodeProps.getCode("USER_NOT_FOUND_MESSAGE"));
+            throw new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE, MAP_CODE.get(USER_NOT_FOUND_MESSAGE));
         }
-        User user = userRepo.findById(principal.getId())
-                .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE,
-                        msgCodeProps.getCode("USER_NOT_FOUND_MESSAGE")));
+        User user = customUserRepo.findById(principal.getId());
 
-        var blog = blogPostRepo.findById(UUID.fromString(request.getBlogPostId()))
-                .orElseThrow(() -> new ResourceNotFoundException(BLOG_NOT_FOUND_MESSAGE,
-                        msgCodeProps.getCode("BLOG_NOT_FOUND_MESSAGE")));
+        var blog = customBlogRepo.findById(request.getBlogPostId());
 
         var id = request.getId();
         Comment comment;
         if (id == null) {
-            comment = new Comment();
-            comment.setBlogPost(blog);
-            comment.setUser(user);
+            comment = Comment.builder()
+                    .blogPost(blog)
+                    .user(user)
+                    .build();
         } else {
-            comment = findOne(id);
+            comment = customCommentRepo.findById(id);
         }
         comment.setContent(request.getContent());
         comment.setCreatedDate(LocalDateTime.now());
         comment = commentRepo.save(comment);
         return CommentMapper.INSTANCE.toResponse(comment);
-    }
-
-    /**
-     * Finds a comment by its ID.
-     *
-     * @param id The ID of the comment to find.
-     * @return The comment with the specified ID.
-     * @throws ResourceNotFoundException If the comment with the specified ID is not found.
-     */
-    private Comment findOne(String id) {
-        return commentRepo.findById(UUID.fromString(id))
-                .orElseThrow(() -> new ResourceNotFoundException(COMMENT_NOT_FOUND_MESSAGE,
-                        msgCodeProps.getCode("COMMENT_NOT_FOUND_MESSAGE")));
     }
 }

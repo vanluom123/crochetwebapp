@@ -6,6 +6,7 @@ import org.crochet.client.paypal.PaymentOrder;
 
 public interface PayPalService {
     PaymentOrder createPayment(double fee);
+
     CompleteOrder completePayment(String token);
 
     Refund refundPayment(String captureId, double refundAmount);
