@@ -19,7 +19,9 @@ import org.crochet.service.EmailSender;
 import org.crochet.service.JwtTokenService;
 import org.crochet.service.PasswordResetTokenService;
 import org.crochet.service.RefreshTokenService;
+import org.crochet.service.TokenBlacklistService;
 import org.crochet.service.UserService;
+import org.crochet.util.TokenUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -59,14 +61,28 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenService refreshTokenService;
     private final JwtTokenService jwtTokenService;
+    private final TokenBlacklistService tokenBlacklistService;
 
+    /**
+     * Constructor
+     *
+     * @param confirmTokenService       ConfirmTokenService
+     * @param passwordResetTokenService PasswordResetTokenService
+     * @param userService               UserService
+     * @param emailSender               EmailSender
+     * @param passwordEncoder           PasswordEncoder
+     * @param refreshTokenService       RefreshTokenService
+     * @param jwtTokenService           JwtTokenService
+     * @param tokenBlacklistService     TokenBlacklistService
+     */
     public AuthServiceImpl(ConfirmTokenService confirmTokenService,
                            PasswordResetTokenService passwordResetTokenService,
                            UserService userService,
                            EmailSender emailSender,
                            PasswordEncoder passwordEncoder,
                            RefreshTokenService refreshTokenService,
-                           JwtTokenService jwtTokenService) {
+                           JwtTokenService jwtTokenService,
+                           TokenBlacklistService tokenBlacklistService) {
         this.confirmTokenService = confirmTokenService;
         this.passwordResetTokenService = passwordResetTokenService;
         this.userService = userService;
@@ -74,6 +90,7 @@ public class AuthServiceImpl implements AuthService {
         this.passwordEncoder = passwordEncoder;
         this.refreshTokenService = refreshTokenService;
         this.jwtTokenService = jwtTokenService;
+        this.tokenBlacklistService = tokenBlacklistService;
     }
 
     /**
@@ -363,9 +380,9 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void logout(HttpServletRequest request) {
-        var token = request.getHeader("refresh_token");
+        var token = TokenUtils.getJwtFromAuthorizationHeader(request);
         if (hasText(token)) {
-            refreshTokenService.revokeByToken(token);
+            tokenBlacklistService.addTokenToBlacklist(token);
             SecurityContextHolder.clearContext();
         }
     }
