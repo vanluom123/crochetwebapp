@@ -1,0 +1,234 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1714749913294-1
+      author: admin (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addUniqueConstraint:
+            columnNames: name
+            constraintName: uc_banner_type_name
+            tableName: banner_type
+  - changeSet:
+      id: 1714749913294-2
+      author: admin (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addUniqueConstraint:
+            columnNames: name
+            constraintName: uc_category_name
+            tableName: category
+  - changeSet:
+      id: 1714749913294-3
+      author: admin (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addUniqueConstraint:
+            columnNames: token
+            constraintName: uc_confirmation_token_token
+            tableName: confirmation_token
+  - changeSet:
+      id: 1714749913294-4
+      author: admin (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addUniqueConstraint:
+            columnNames: token
+            constraintName: uc_password_reset_token_token
+            tableName: password_reset_token
+  - changeSet:
+      id: 1714749913294-5
+      author: admin (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addUniqueConstraint:
+            columnNames: token
+            constraintName: uc_refresh_token_token
+            tableName: refresh_token
+  - changeSet:
+      id: 1714749913294-6
+      author: admin (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: banner_type_id
+            baseTableName: banner
+            constraintName: FK_BANNER_ON_BANNER_TYPE
+            referencedColumnNames: id
+            referencedTableName: banner_type
+  - changeSet:
+      id: 1714749913294-7
+      author: admin (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: parent_id
+            baseTableName: category
+            constraintName: FK_CATEGORY_ON_PARENT
+            referencedColumnNames: id
+            referencedTableName: category
+  - changeSet:
+      id: 1714749913294-8
+      author: admin (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: post_id
+            baseTableName: comment
+            constraintName: FK_COMMENT_ON_POST
+            referencedColumnNames: id
+            referencedTableName: blog_post
+  - changeSet:
+      id: 1714749913294-9
+      author: admin (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: comment
+            constraintName: FK_COMMENT_ON_USER
+            referencedColumnNames: id
+            referencedTableName: users
+  - changeSet:
+      id: 1714749913294-10
+      author: admin (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: confirmation_token
+            constraintName: FK_CONFIRMATION_TOKEN_ON_USER
+            referencedColumnNames: id
+            referencedTableName: users
+  - changeSet:
+      id: 1714749913294-11
+      author: admin (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: category_id
+            baseTableName: free_pattern
+            constraintName: FK_FREE_PATTERN_ON_CATEGORY
+            referencedColumnNames: id
+            referencedTableName: category
+  - changeSet:
+      id: 1714749913294-12
+      author: admin (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: password_reset_token
+            constraintName: FK_PASSWORD_RESET_TOKEN_ON_USER
+            referencedColumnNames: id
+            referencedTableName: users
+  - changeSet:
+      id: 1714749913294-13
+      author: admin (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: category_id
+            baseTableName: pattern
+            constraintName: FK_PATTERN_ON_CATEGORY
+            referencedColumnNames: id
+            referencedTableName: category
+  - changeSet:
+      id: 1714749913294-14
+      author: admin (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: category_id
+            baseTableName: product
+            constraintName: FK_PRODUCT_ON_CATEGORY
+            referencedColumnNames: id
+            referencedTableName: category
+  - changeSet:
+      id: 1714749913294-15
+      author: admin (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: refresh_token
+            constraintName: FK_REFRESH_TOKEN_ON_USER
+            referencedColumnNames: id
+            referencedTableName: users
+  - changeSet:
+      id: 1714749913294-16
+      author: admin (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: blog_post_id
+            baseTableName: blog_post_avatar
+            constraintName: fk_blog_post_avatar_on_blog_post
+            referencedColumnNames: id
+            referencedTableName: blog_post
+  - changeSet:
+      id: 1714749913294-17
+      author: admin (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: blog_post_id
+            baseTableName: blog_post_file
+            constraintName: fk_blog_post_file_on_blog_post
+            referencedColumnNames: id
+            referencedTableName: blog_post
+  - changeSet:
+      id: 1714749913294-18
+      author: admin (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: free_pattern_id
+            baseTableName: free_pattern_file
+            constraintName: fk_free_pattern_file_on_free_pattern
+            referencedColumnNames: id
+            referencedTableName: free_pattern
+  - changeSet:
+      id: 1714749913294-19
+      author: admin (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: free_pattern_id
+            baseTableName: free_pattern_image
+            constraintName: fk_free_pattern_image_on_free_pattern
+            referencedColumnNames: id
+            referencedTableName: free_pattern
+  - changeSet:
+      id: 1714749913294-20
+      author: admin (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: pattern_id
+            baseTableName: pattern_file
+            constraintName: fk_pattern_file_on_pattern
+            referencedColumnNames: id
+            referencedTableName: pattern
+  - changeSet:
+      id: 1714749913294-21
+      author: admin (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: pattern_id
+            baseTableName: pattern_image
+            constraintName: fk_pattern_image_on_pattern
+            referencedColumnNames: id
+            referencedTableName: pattern
+  - changeSet:
+      id: 1714749913294-22
+      author: admin (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: product_id
+            baseTableName: product_image
+            constraintName: fk_product_image_on_product
+            referencedColumnNames: id
+            referencedTableName: product
+
