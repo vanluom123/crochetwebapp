@@ -7,9 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
-public interface CategoryRepo extends JpaRepository<Category, UUID> {
+public interface CategoryRepo extends JpaRepository<Category, String> {
     @Query("select c from Category c where c.name = ?1")
     Optional<Category> findByName(String name);
 
@@ -26,5 +25,5 @@ public interface CategoryRepo extends JpaRepository<Category, UUID> {
     List<Category> getCategories();
 
     @Query("SELECT c FROM Category c LEFT JOIN FETCH c.children WHERE c.id = :id")
-    Optional<Category> getCategory(UUID id);
+    Optional<Category> getCategory(String id);
 }

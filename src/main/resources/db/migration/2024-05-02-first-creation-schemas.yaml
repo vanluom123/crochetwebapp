@@ -1,0 +1,752 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1714721943064-1
+      author: admin (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_banner
+                  name: id
+                  type: VARCHAR(255)
+              - column:
+                  name: created_by
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: created_date
+                  type: DATETIME
+              - column:
+                  name: last_modified_by
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: last_modified_date
+                  type: DATETIME
+              - column:
+                  name: title
+                  type: VARCHAR(255)
+              - column:
+                  name: content
+                  type: text
+              - column:
+                  name: url
+                  type: VARCHAR(255)
+              - column:
+                  defaultValueBoolean: false
+                  name: active
+                  type: boolean
+              - column:
+                  name: file_name
+                  type: VARCHAR(255)
+              - column:
+                  name: file_content
+                  type: VARCHAR(255)
+              - column:
+                  name: text_color
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: banner_type_id
+                  type: VARCHAR(255)
+            tableName: banner
+  - changeSet:
+      id: 1714721943064-2
+      author: admin (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_banner_type
+                  name: id
+                  type: VARCHAR(255)
+              - column:
+                  name: created_by
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: created_date
+                  type: DATETIME
+              - column:
+                  name: last_modified_by
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: last_modified_date
+                  type: DATETIME
+              - column:
+                  constraints:
+                    nullable: false
+                  name: name
+                  type: VARCHAR(255)
+            tableName: banner_type
+  - changeSet:
+      id: 1714721943064-3
+      author: admin (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_blog_post
+                  name: id
+                  type: VARCHAR(255)
+              - column:
+                  name: created_by
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: created_date
+                  type: DATETIME
+              - column:
+                  name: last_modified_by
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: last_modified_date
+                  type: DATETIME
+              - column:
+                  constraints:
+                    nullable: false
+                  name: title
+                  type: VARCHAR(255)
+              - column:
+                  name: content
+                  type: TEXT
+              - column:
+                  defaultValueBoolean: false
+                  name: home
+                  type: BOOLEAN
+            tableName: blog_post
+  - changeSet:
+      id: 1714721943064-4
+      author: admin (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                  name: blog_post_id
+                  type: VARCHAR(255)
+              - column:
+                  name: file_name
+                  type: VARCHAR(255)
+              - column:
+                  name: file_content
+                  type: VARCHAR(255)
+            tableName: blog_post_avatar
+  - changeSet:
+      id: 1714721943064-5
+      author: admin (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                  name: blog_post_id
+                  type: VARCHAR(255)
+              - column:
+                  name: file_name
+                  type: VARCHAR(255)
+              - column:
+                  name: file_content
+                  type: VARCHAR(255)
+            tableName: blog_post_file
+  - changeSet:
+      id: 1714721943064-6
+      author: admin (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_category
+                  name: id
+                  type: VARCHAR(255)
+              - column:
+                  name: created_by
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: created_date
+                  type: DATETIME
+              - column:
+                  name: last_modified_by
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: last_modified_date
+                  type: DATETIME
+              - column:
+                  constraints:
+                    nullable: false
+                  name: name
+                  type: VARCHAR(255)
+              - column:
+                  name: parent_id
+                  type: VARCHAR(255)
+            tableName: category
+  - changeSet:
+      id: 1714721943064-7
+      author: admin (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_comment
+                  name: id
+                  type: VARCHAR(255)
+              - column:
+                  name: created_by
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: created_date
+                  type: DATETIME
+              - column:
+                  name: last_modified_by
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: last_modified_date
+                  type: DATETIME
+              - column:
+                  constraints:
+                    nullable: false
+                  name: post_id
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: user_id
+                  type: VARCHAR(255)
+              - column:
+                  name: content
+                  type: TEXT
+            tableName: comment
+  - changeSet:
+      id: 1714721943064-8
+      author: admin (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_confirmation_token
+                  name: id
+                  type: VARCHAR(255)
+              - column:
+                  name: created_by
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: created_date
+                  type: DATETIME
+              - column:
+                  name: last_modified_by
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: last_modified_date
+                  type: DATETIME
+              - column:
+                  constraints:
+                    nullable: false
+                  name: token
+                  type: VARCHAR(255)
+              - column:
+                  name: expires_at
+                  type: DATETIME
+              - column:
+                  name: confirmed_at
+                  type: DATETIME
+              - column:
+                  constraints:
+                    nullable: false
+                  name: user_id
+                  type: VARCHAR(255)
+            tableName: confirmation_token
+  - changeSet:
+      id: 1714721943064-9
+      author: admin (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_free_pattern
+                  name: id
+                  type: VARCHAR(255)
+              - column:
+                  name: created_by
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: created_date
+                  type: DATETIME
+              - column:
+                  name: last_modified_by
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: last_modified_date
+                  type: DATETIME
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+              - column:
+                  name: description
+                  type: TEXT
+              - column:
+                  name: author
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: category_id
+                  type: VARCHAR(255)
+              - column:
+                  name: is_home
+                  type: BOOLEAN
+              - column:
+                  name: link
+                  type: VARCHAR(255)
+              - column:
+                  name: content
+                  type: TEXT
+            tableName: free_pattern
+  - changeSet:
+      id: 1714721943064-10
+      author: admin (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                  name: free_pattern_id
+                  type: VARCHAR(255)
+              - column:
+                  name: file_name
+                  type: VARCHAR(255)
+              - column:
+                  name: file_content
+                  type: VARCHAR(255)
+            tableName: free_pattern_file
+  - changeSet:
+      id: 1714721943064-11
+      author: admin (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                  name: free_pattern_id
+                  type: VARCHAR(255)
+              - column:
+                  name: file_name
+                  type: VARCHAR(255)
+              - column:
+                  name: file_content
+                  type: VARCHAR(255)
+            tableName: free_pattern_image
+  - changeSet:
+      id: 1714721943064-12
+      author: admin (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_password_reset_token
+                  name: id
+                  type: VARCHAR(255)
+              - column:
+                  name: created_by
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: created_date
+                  type: DATETIME
+              - column:
+                  name: last_modified_by
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: last_modified_date
+                  type: DATETIME
+              - column:
+                  constraints:
+                    nullable: false
+                  name: token
+                  type: VARCHAR(255)
+              - column:
+                  name: expires_at
+                  type: DATETIME
+              - column:
+                  constraints:
+                    nullable: false
+                  name: user_id
+                  type: VARCHAR(255)
+            tableName: password_reset_token
+  - changeSet:
+      id: 1714721943064-13
+      author: admin (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_pattern
+                  name: id
+                  type: VARCHAR(255)
+              - column:
+                  name: created_by
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: created_date
+                  type: DATETIME
+              - column:
+                  name: last_modified_by
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: last_modified_date
+                  type: DATETIME
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+              - column:
+                  name: description
+                  type: TEXT
+              - column:
+                  constraints:
+                    nullable: false
+                  defaultValueNumeric: 0.0
+                  name: price
+                  type: DOUBLE
+              - column:
+                  constraints:
+                    nullable: false
+                  defaultValue: USD
+                  name: currency_code
+                  type: VARCHAR(20)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: category_id
+                  type: VARCHAR(255)
+              - column:
+                  name: is_home
+                  type: BOOLEAN
+              - column:
+                  name: link
+                  type: VARCHAR(255)
+              - column:
+                  name: content
+                  type: TEXT
+            tableName: pattern
+  - changeSet:
+      id: 1714721943064-14
+      author: admin (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                  name: pattern_id
+                  type: VARCHAR(255)
+              - column:
+                  name: file_name
+                  type: VARCHAR(255)
+              - column:
+                  name: file_content
+                  type: VARCHAR(255)
+            tableName: pattern_file
+  - changeSet:
+      id: 1714721943064-15
+      author: admin (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                  name: pattern_id
+                  type: VARCHAR(255)
+              - column:
+                  name: file_name
+                  type: VARCHAR(255)
+              - column:
+                  name: file_content
+                  type: VARCHAR(255)
+            tableName: pattern_image
+  - changeSet:
+      id: 1714721943064-16
+      author: admin (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_product
+                  name: id
+                  type: VARCHAR(255)
+              - column:
+                  name: created_by
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: created_date
+                  type: DATETIME
+              - column:
+                  name: last_modified_by
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: last_modified_date
+                  type: DATETIME
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+              - column:
+                  name: description
+                  type: TEXT
+              - column:
+                  constraints:
+                    nullable: false
+                  defaultValueNumeric: 0.0
+                  name: price
+                  type: DOUBLE
+              - column:
+                  constraints:
+                    nullable: false
+                  defaultValue: USD
+                  name: currency_code
+                  type: VARCHAR(20)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: category_id
+                  type: VARCHAR(255)
+              - column:
+                  name: is_home
+                  type: BOOLEAN
+              - column:
+                  name: link
+                  type: VARCHAR(255)
+              - column:
+                  name: content
+                  type: TEXT
+            tableName: product
+  - changeSet:
+      id: 1714721943064-17
+      author: admin (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                  name: product_id
+                  type: VARCHAR(255)
+              - column:
+                  name: file_name
+                  type: VARCHAR(255)
+              - column:
+                  name: file_content
+                  type: VARCHAR(255)
+            tableName: product_image
+  - changeSet:
+      id: 1714721943064-18
+      author: admin (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_refresh_token
+                  name: id
+                  type: VARCHAR(255)
+              - column:
+                  name: created_by
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: created_date
+                  type: DATETIME
+              - column:
+                  name: last_modified_by
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: last_modified_date
+                  type: DATETIME
+              - column:
+                  constraints:
+                    nullable: false
+                  name: token
+                  type: VARCHAR(255)
+              - column:
+                  name: expires_at
+                  type: DATETIME
+              - column:
+                  defaultValueBoolean: false
+                  name: revoked
+                  type: BOOLEAN
+              - column:
+                  constraints:
+                    nullable: false
+                  name: user_id
+                  type: VARCHAR(255)
+            tableName: refresh_token
+  - changeSet:
+      id: 1714721943064-19
+      author: admin (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_users
+                  name: id
+                  type: VARCHAR(255)
+              - column:
+                  name: created_by
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: created_date
+                  type: DATETIME
+              - column:
+                  name: last_modified_by
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: last_modified_date
+                  type: DATETIME
+              - column:
+                  constraints:
+                    nullable: false
+                  name: name
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: email
+                  type: VARCHAR(255)
+              - column:
+                  name: image_url
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  defaultValueBoolean: false
+                  name: email_verified
+                  type: BOOLEAN
+              - column:
+                  constraints:
+                    nullable: false
+                  name: password
+                  type: VARCHAR(255)
+              - column:
+                  defaultValue: LOCAL
+                  name: provider
+                  type: VARCHAR(25)
+              - column:
+                  name: provider_id
+                  type: VARCHAR(255)
+              - column:
+                  name: verification_code
+                  type: VARCHAR(255)
+              - column:
+                  defaultValue: USER
+                  name: roles
+                  type: VARCHAR(10)
+            tableName: users
+  - changeSet:
+      id: 1714721943064-20
+      author: admin (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addUniqueConstraint:
+            columnNames: email
+            constraintName: uc_74165e195b2f7b25de690d14a
+            tableName: users
+

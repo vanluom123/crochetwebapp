@@ -58,7 +58,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     @Override
     public RefreshToken verifyExpiration(RefreshToken token) {
-        if (token.getExpiresAt().isBefore(LocalDateTime.now())) {
+        if (token.getExpiresAt().isBefore(LocalDateTime.now()) || token.isRevoked()) {
             refreshTokenRepo.delete(token);
             throw new TokenException(token.getToken() + REFRESH_TOKEN_IS_EXPIRED_MESSAGE,
                     MAP_CODE.get(REFRESH_TOKEN_IS_EXPIRED_MESSAGE));

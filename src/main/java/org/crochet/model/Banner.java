@@ -42,6 +42,6 @@ public class Banner extends BaseEntity {
     private String textColor;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "banner_type_id", columnDefinition = "BINARY(16) NOT NULL")
+    @JoinColumn(name = "banner_type_id", referencedColumnName = "id", nullable = false)
     private BannerType bannerType;
 }

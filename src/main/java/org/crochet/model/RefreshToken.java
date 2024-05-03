@@ -38,6 +38,6 @@ public class RefreshToken extends BaseEntity {
     public boolean revoked;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", columnDefinition = "BINARY(16) NOT NULL")
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private User user;
 }

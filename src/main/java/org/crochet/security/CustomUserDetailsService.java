@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * CustomUserDetailsService class
@@ -46,7 +45,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         // Retrieve the user by email from the UserRepository
         User user = userRepository.findByEmail(email)
-                .filter(User::getEmailVerified)
+                .filter(User::isEmailVerified)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
 
         // Create a list of GrantedAuthority with a single authority ROLE_USER
@@ -74,8 +73,8 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Transactional
     public UserDetails loadUserById(String id) {
         // Retrieve the user by ID from the UserRepository
-        User user = userRepository.findById(UUID.fromString(id))
-                .filter(User::getEmailVerified)
+        User user = userRepository.findById(id)
+                .filter(User::isEmailVerified)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("User with %s not found", id)));
 
         // Create a list of GrantedAuthority with a single authority ROLE_USER

@@ -23,6 +23,19 @@ jobs:
         id: docker_build
         with:
           builder: ${{ steps.buildx.outputs.name }}
+          build-args: |
+            EMAIL=${{ secrets.EMAIL }}
+            DB_HOST=${{ secrets.DB_HOST }}
+            DB_PORT=${{ secrets.DB_PORT }}
+            DB_NAME=${{ secrets.DB_NAME }}
+            DB_USERNAME=${{ secrets.DB_USERNAME }}
+            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+            GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+            GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
+            TOKEN_SECRET=${{ secrets.TOKEN_SECRET }}
+            APP_PASSWORD=${{ secrets.APP_PASSWORD }}
+            PAYPAL_CLIENT_ID=${{ secrets.PAYPAL_CLIENT_ID }}
+            PAYPAL_CLIENT_SECRET=${{ secrets.PAYPAL_CLIENT_SECRET }}
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/crochet:latest
       - name: Verify

@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -16,7 +15,7 @@ import java.util.UUID;
 @Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class BannerResponse {
-    private UUID id;
+    private String id;
     private String title;
     private String content;
     private String url;

@@ -45,7 +45,7 @@ public class Product extends BaseEntity {
     private CurrencyCode currencyCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", columnDefinition = "BINARY(16) NOT NULL")
+    @JoinColumn(name = "category_id", referencedColumnName = "id", nullable = false)
     private Category category;
 
     @Column(name = "is_home")
@@ -59,7 +59,7 @@ public class Product extends BaseEntity {
 
     @ElementCollection
     @CollectionTable(name = "product_image",
-            joinColumns = @JoinColumn(name = "product_id", columnDefinition = "BINARY(16) NOT NULL"))
+            joinColumns = @JoinColumn(name = "product_id", referencedColumnName = "id", nullable = false))
     @AttributeOverrides({
             @AttributeOverride(name = "fileName", column = @Column(name = "file_name")),
             @AttributeOverride(name = "fileContent", column = @Column(name = "file_content", columnDefinition = "TEXT"))

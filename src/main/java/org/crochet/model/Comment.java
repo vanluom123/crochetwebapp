@@ -21,11 +21,11 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 public class Comment extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id", nullable = false)
+    @JoinColumn(name = "post_id", referencedColumnName = "id", nullable = false)
     private BlogPost blogPost;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private User user;
 
     @Column(name = "content", columnDefinition = "TEXT")
