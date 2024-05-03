@@ -9,14 +9,13 @@ import lombok.Setter;
 import org.crochet.enumerator.RoleType;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 public class UserResponse {
-    private UUID id;
+    private String id;
     private String name;
     @Email
     private String email;

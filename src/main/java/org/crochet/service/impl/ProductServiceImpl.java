@@ -21,10 +21,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * ProductServiceImpl class
@@ -61,9 +61,9 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     @Override
     public ProductResponse createOrUpdate(ProductRequest request) {
-        var category = customCategoryRepo.findById(request.getCategoryId());
         Product product;
-        if (request.getId() == null) {
+        if (!StringUtils.hasText(request.getId())) {
+            var category = customCategoryRepo.findById(request.getCategoryId());
             product = Product.builder()
                     .category(category)
                     .name(request.getName())
@@ -119,17 +119,17 @@ public class ProductServiceImpl implements ProductService {
      */
     @Override
     public ProductPaginationResponse getProducts(int pageNo, int pageSize, String sortBy, String sortDir,
-                                                 String searchText, UUID categoryId, List<Filter> filters) {
+                                                 String searchText, String categoryId, List<Filter> filters) {
         // create Sort instance
         Sort sort = Sort.by(sortBy);
         sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? sort.ascending() : sort.descending();
         // create Pageable instance
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
         Specification<Product> spec = Specifications.getSpecificationFromFilters(filters);
-        if (searchText != null && !searchText.isEmpty()) {
+        if (StringUtils.hasText(searchText)) {
             spec = spec.and(ProductSpecifications.searchByNameOrDesc(searchText));
         }
-        if (categoryId != null) {
+        if (StringUtils.hasText(categoryId)) {
             spec = spec.and(ProductSpecifications.in(getProductsByCategory(categoryId)));
         }
         Page<Product> menuPage = productRepo.findAll(spec, pageable);
@@ -144,7 +144,7 @@ public class ProductServiceImpl implements ProductService {
                 .build();
     }
 
-    private List<Product> getProductsByCategory(UUID categoryId) {
+    private List<Product> getProductsByCategory(String categoryId) {
         var category = customCategoryRepo.findById(categoryId);
         List<Product> products = new ArrayList<>(category.getProducts());
         for (var subCategory : category.getChildren()) {
@@ -170,14 +170,14 @@ public class ProductServiceImpl implements ProductService {
      * @return A {@link ProductResponse} containing detailed information about the product.
      */
     @Override
-    public ProductResponse getDetail(UUID id) {
+    public ProductResponse getDetail(String id) {
         var product = customProductRepo.findById(id);
         return ProductMapper.INSTANCE.toResponse(product);
     }
 
     @Transactional
     @Override
-    public void delete(UUID id) {
+    public void delete(String id) {
         customProductRepo.deleteById(id);
     }
 }

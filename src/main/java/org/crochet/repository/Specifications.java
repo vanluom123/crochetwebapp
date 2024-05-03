@@ -1,6 +1,6 @@
 package org.crochet.repository;
 
-import org.crochet.model.BaseEntity;
+import org.crochet.model.AuditTable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.ObjectUtils;
 
@@ -11,7 +11,7 @@ import static org.crochet.enumerator.QueryOperator.OPERATORS;
 import static org.springframework.data.jpa.domain.Specification.where;
 
 public class Specifications {
-    public static <T extends BaseEntity> Specification<T> getSpecificationFromFilters(List<Filter> filters) {
+    public static <T extends AuditTable> Specification<T> getSpecificationFromFilters(List<Filter> filters) {
         Specification<T> spec = where(null);
         if (filters == null || filters.isEmpty()) {
             return spec;
@@ -33,7 +33,7 @@ public class Specifications {
         return spec;
     }
 
-    private static <T extends BaseEntity> Specification<T> createSpecification(Filter input) {
+    private static <T extends AuditTable> Specification<T> createSpecification(Filter input) {
         return switch (input.getOperator()) {
             case EQUALS -> (root, query, criteriaBuilder) ->
                     criteriaBuilder.equal(root.get(input.getField()),

@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/pattern")
@@ -68,7 +67,7 @@ public class PatternController {
             @Parameter(description = "Search by name or description")
             @RequestParam(value = "searchText", required = false) String searchText,
             @Parameter(description = "Category ID")
-            @RequestParam(value = "categoryId", required = false) UUID categoryId,
+            @RequestParam(value = "categoryId", required = false) String categoryId,
             @Parameter(description = "Filters")
             @RequestBody(required = false) List<Filter> filters) {
         var response = patternService.getPatterns(pageNo, pageSize, sortBy, sortDir, searchText, categoryId, filters);
@@ -82,7 +81,7 @@ public class PatternController {
     @GetMapping("/detail")
     public ResponseEntity<PatternResponse> getDetail(
             @Parameter(description = "ID of the pattern to retrieve")
-            @RequestParam("id") UUID id) {
+            @RequestParam("id") String id) {
         return ResponseEntity.ok(patternService.getDetail(id));
     }
 
@@ -98,7 +97,7 @@ public class PatternController {
     @SecurityRequirement(name = "BearerAuth")
     public ResponseEntity<String> deletePattern(
             @Parameter(description = "ID of the pattern to delete")
-            @RequestParam("id") UUID id) {
+            @RequestParam("id") String id) {
         patternService.deletePattern(id);
         return ResponseEntity.ok("Pattern deleted successfully");
     }

@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
 import static org.crochet.constant.MessageConstant.CATEGORY_NOT_FOUND_MESSAGE;
@@ -105,13 +104,13 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public CategoryResponse getById(UUID id) {
+    public CategoryResponse getById(String id) {
         var category = findById(id);
         return CategoryMapper.INSTANCE.toResponse(category);
     }
 
     @Override
-    public Category findById(UUID id) {
+    public Category findById(String id) {
         return categoryRepo
                 .getCategory(id)
                 .orElseThrow(() ->
@@ -121,7 +120,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Transactional
     @Override
-    public void delete(UUID id) {
+    public void delete(String id) {
         var category = findById(id);
         categoryRepo.delete(category);
     }

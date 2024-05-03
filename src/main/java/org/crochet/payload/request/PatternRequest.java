@@ -8,15 +8,14 @@ import org.crochet.enumerator.CurrencyCode;
 import org.crochet.payload.response.FileResponse;
 
 import java.util.List;
-import java.util.UUID;
 
 @Data
 @Builder
 @JsonPropertyOrder({"id", "category_id", "name", "description", "price", "currency_code", "is_home", "link", "content", "images", "files"})
 public class PatternRequest {
-    private UUID id;
+    private String id;
     @JsonProperty("category_id")
-    private UUID categoryId;
+    private String categoryId;
     private String name;
     private String description;
     private double price;

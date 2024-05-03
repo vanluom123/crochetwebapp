@@ -6,16 +6,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.UUID;
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 public class BannerRequest {
-    private UUID id;
+    private String id;
     @NotNull(message = "Banner type id is required")
-    private UUID bannerTypeId;
+    private String bannerTypeId;
     private String title;
     private String content;
     private String url;

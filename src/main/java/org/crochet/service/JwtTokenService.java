@@ -27,6 +27,5 @@ public interface JwtTokenService {
     @Deprecated
     String getUserIdFromToken(String token);
 
-    @Deprecated
     boolean validateToken(String authToken);
 }

@@ -1,12 +1,11 @@
 package org.crochet.config;
 
+import com.paypal.core.PayPalEnvironment;
+import com.paypal.core.PayPalHttpClient;
 import org.crochet.properties.PayPalProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-
-import com.paypal.core.PayPalEnvironment;
-import com.paypal.core.PayPalHttpClient;
 
 @Configuration
 public class PayPalConfig {

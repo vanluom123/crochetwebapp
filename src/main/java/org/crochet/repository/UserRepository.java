@@ -10,10 +10,9 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
-import java.util.UUID;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, UUID>, JpaSpecificationExecutor<User> {
+public interface UserRepository extends JpaRepository<User, String>, JpaSpecificationExecutor<User> {
 
     Optional<User> findByEmail(String email);
 
@@ -47,5 +46,5 @@ public interface UserRepository extends JpaRepository<User, UUID>, JpaSpecificat
             from User u
             where u.id = ?1
             """)
-    Optional<UserResponse> getDetail(UUID id);
+    Optional<UserResponse> getDetail(String id);
 }

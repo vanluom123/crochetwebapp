@@ -21,12 +21,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import java.util.UUID;
 
 /**
  * PatternServiceImpl class
@@ -54,7 +54,7 @@ public class PatternServiceImpl implements PatternService {
     @Override
     public PatternResponse createOrUpdate(PatternRequest request) {
         Pattern pattern;
-        if (request.getId() == null) {
+        if (!StringUtils.hasText(request.getId())) {
             var category = customCategoryRepo.findById(request.getCategoryId());
             pattern = Pattern.builder()
                     .category(category)
@@ -90,14 +90,14 @@ public class PatternServiceImpl implements PatternService {
      */
     @Override
     public PatternPaginationResponse getPatterns(int pageNo, int pageSize, String sortBy, String sortDir,
-                                                 String searchText, UUID categoryId, List<Filter> filters) {
+                                                 String searchText, String categoryId, List<Filter> filters) {
         Sort sort = Sort.by(sortBy);
         sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? sort.ascending() : sort.descending();
         Specification<Pattern> spec = Specifications.getSpecificationFromFilters(filters);
-        if (searchText != null && !searchText.isEmpty()) {
+        if (StringUtils.hasText(searchText)) {
             spec = spec.and(PatternSpecifications.searchByNameOrDesc(searchText));
         }
-        if (categoryId != null) {
+        if (StringUtils.hasText(categoryId)) {
             spec = spec.and(PatternSpecifications.in(getPatternsByCategory(categoryId)));
         }
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
@@ -130,12 +130,12 @@ public class PatternServiceImpl implements PatternService {
      * @return PatternResponse
      */
     @Override
-    public PatternResponse getDetail(UUID id) {
+    public PatternResponse getDetail(String id) {
         var pattern = customPatternRepo.findById(id);
         return PatternMapper.INSTANCE.toResponse(pattern);
     }
 
-    private List<Pattern> getPatternsByCategory(UUID categoryId) {
+    private List<Pattern> getPatternsByCategory(String categoryId) {
         Queue<Category> queue = new LinkedList<>();
         List<Pattern> patterns = new ArrayList<>();
 
@@ -152,7 +152,7 @@ public class PatternServiceImpl implements PatternService {
 
     @Transactional
     @Override
-    public void deletePattern(UUID id) {
+    public void deletePattern(String id) {
         patternRepo.deleteById(id);
     }
 }
