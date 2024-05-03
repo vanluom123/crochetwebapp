@@ -25,6 +25,12 @@ public class TokenUtils {
         return null;
     }
 
+    /**
+     * Retrieves the JWT (JSON Web Token) from the "jwtToken" cookie of an HTTP request.
+     *
+     * @param request The HttpServletRequest representing the HTTP request.
+     * @return The extracted JWT, or null if it is not found.
+     */
     public static String extractJwtTokenFromCookie(HttpServletRequest request) {
         return CookieUtils.getCookie(request, "jwtToken")
                 .map(Cookie::getValue)
