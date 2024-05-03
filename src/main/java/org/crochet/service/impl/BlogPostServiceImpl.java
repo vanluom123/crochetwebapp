@@ -18,8 +18,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.UUID;
+import org.springframework.util.StringUtils;
 
 /**
  * BlogPostServiceImpl class
@@ -52,7 +51,7 @@ public class BlogPostServiceImpl implements BlogPostService {
     @Override
     public BlogPostResponse createOrUpdatePost(BlogPostRequest request) {
         BlogPost blogPost;
-        if (request.getId() == null) {
+        if (!StringUtils.hasText(request.getId())) {
             blogPost = BlogPost.builder()
                     .title(request.getTitle())
                     .content(request.getContent())
@@ -86,7 +85,7 @@ public class BlogPostServiceImpl implements BlogPostService {
         // create Pageable instance
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
         Specification<BlogPost> spec = Specification.where(null);
-        if (searchText != null && !searchText.isEmpty()) {
+        if (StringUtils.hasText(searchText)) {
             spec = spec.and(BlogPostSpecifications.searchBy(searchText));
         }
 
@@ -111,7 +110,7 @@ public class BlogPostServiceImpl implements BlogPostService {
      * @throws ResourceNotFoundException If the specified blog post ID does not correspond to an existing blog post.
      */
     @Override
-    public BlogPostResponse getDetail(UUID id) {
+    public BlogPostResponse getDetail(String id) {
         var blogPost = customBlogRepo.findById(id);
         return BlogPostMapper.INSTANCE.toResponse(blogPost);
     }
@@ -124,7 +123,7 @@ public class BlogPostServiceImpl implements BlogPostService {
      */
     @Transactional
     @Override
-    public void deletePost(UUID id) {
+    public void deletePost(String id) {
         var blogPost = customBlogRepo.findById(id);
         blogPostRepo.delete(blogPost);
     }

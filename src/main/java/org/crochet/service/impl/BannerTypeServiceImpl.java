@@ -9,9 +9,9 @@ import org.crochet.repository.BannerTypeRepo;
 import org.crochet.service.BannerTypeService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class BannerTypeServiceImpl implements BannerTypeService {
@@ -25,7 +25,7 @@ public class BannerTypeServiceImpl implements BannerTypeService {
     @Override
     public BannerTypeResponse createOrUpdate(BannerTypeRequest request) {
         BannerType bannerType;
-        if (request.getId() == null) {
+        if (!StringUtils.hasText(request.getId())) {
             bannerType = new BannerType();
             bannerType.setName(request.getName());
         } else {
@@ -39,7 +39,7 @@ public class BannerTypeServiceImpl implements BannerTypeService {
 
     @Transactional
     @Override
-    public void delete(UUID id) {
+    public void delete(String id) {
         bannerTypeRepo.deleteById(id);
     }
 
@@ -49,7 +49,7 @@ public class BannerTypeServiceImpl implements BannerTypeService {
     }
 
     @Override
-    public BannerTypeResponse getById(UUID id) {
+    public BannerTypeResponse getById(String id) {
         var banner = bannerTypeRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Banner type not found"));
         return BannerTypeMapper.INSTANCE.toResponse(banner);

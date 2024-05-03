@@ -6,17 +6,16 @@ import org.crochet.payload.response.PaginatedFreePatternResponse;
 import org.crochet.repository.Filter;
 
 import java.util.List;
-import java.util.UUID;
 
 public interface FreePatternService {
     FreePatternResponse createOrUpdate(FreePatternRequest request);
 
     PaginatedFreePatternResponse getFreePatterns(int pageNo, int pageSize, String sortBy, String sortDir,
-                                                 String searchText, UUID categoryId, List<Filter> filters);
+                                                 String searchText, String categoryId, List<Filter> filters);
 
     List<FreePatternResponse> getLimitedFreePatterns();
 
-    FreePatternResponse getDetail(UUID id);
+    FreePatternResponse getDetail(String id);
 
-    void delete(UUID id);
+    void delete(String id);
 }

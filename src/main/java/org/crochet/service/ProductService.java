@@ -6,18 +6,17 @@ import org.crochet.payload.response.ProductResponse;
 import org.crochet.repository.Filter;
 
 import java.util.List;
-import java.util.UUID;
 
 public interface ProductService {
     ProductResponse createOrUpdate(ProductRequest request);
 
     List<ProductResponse> batchInsert(List<ProductRequest> requests);
 
-    ProductPaginationResponse getProducts(int pageNo, int pageSize, String sortBy, String sortDir, String searchText, UUID categoryId, List<Filter> filters);
+    ProductPaginationResponse getProducts(int pageNo, int pageSize, String sortBy, String sortDir, String searchText, String categoryId, List<Filter> filters);
 
     List<ProductResponse> getLimitedProducts();
 
-    ProductResponse getDetail(UUID id);
+    ProductResponse getDetail(String id);
 
-    void delete(UUID id);
+    void delete(String id);
 }

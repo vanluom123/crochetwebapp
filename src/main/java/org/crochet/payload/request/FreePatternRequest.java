@@ -7,15 +7,14 @@ import lombok.Data;
 import org.crochet.payload.response.FileResponse;
 
 import java.util.List;
-import java.util.UUID;
 
 @Data
 @Builder
 @JsonPropertyOrder({"id", "category_id", "name", "description", "author", "is_home", "link", "content", "images", "files"})
 public class FreePatternRequest {
-    private UUID id;
+    private String id;
     @JsonProperty("category_id")
-    private UUID categoryId;
+    private String categoryId;
     private String name;
     private String description;
     private String author;

@@ -10,7 +10,6 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * UserPrincipal class
@@ -20,7 +19,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserPrincipal implements OAuth2User, UserDetails {
-    private UUID id;
+    private String id;
     private String email;
     private String password;
     private Collection<? extends GrantedAuthority> authorities;

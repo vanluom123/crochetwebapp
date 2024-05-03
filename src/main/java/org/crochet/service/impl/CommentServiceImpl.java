@@ -14,6 +14,7 @@ import org.crochet.security.UserPrincipal;
 import org.crochet.service.CommentService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 
@@ -70,7 +71,7 @@ public class CommentServiceImpl implements CommentService {
 
         var id = request.getId();
         Comment comment;
-        if (id == null) {
+        if (!StringUtils.hasText(id)) {
             comment = Comment.builder()
                     .blogPost(blog)
                     .user(user)

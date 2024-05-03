@@ -42,7 +42,7 @@ public class User extends BaseEntity {
     private String imageUrl;
 
     @Column(name = "email_verified", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
-    private Boolean emailVerified;
+    private boolean emailVerified;
 
     @JsonIgnore
     @Column(name = "password", nullable = false)

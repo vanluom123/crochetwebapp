@@ -87,7 +87,7 @@ public class AuthServiceImpl implements AuthService {
         // Check email and password
         var user = userService.checkLogin(loginRequest.getEmail(), loginRequest.getPassword());
         // Check email verified
-        if (!user.getEmailVerified()) {
+        if (!user.isEmailVerified()) {
             throw new EmailVerificationException(EMAIL_NOT_VERIFIED_MESSAGE, MAP_CODE.get(EMAIL_NOT_VERIFIED_MESSAGE));
         }
         // Create refresh token
