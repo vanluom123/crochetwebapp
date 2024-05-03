@@ -26,7 +26,7 @@ ext.loadVersion = { ->
 
     def versionPropertiesFile = file('version.properties')
 
-    if(!versionPropertiesFile.exists()) {
+    if (!versionPropertiesFile.exists()) {
         throw new Exception('No version.properties file found')
     }
 
@@ -42,28 +42,54 @@ ext.loadVersion = { ->
 
 }
 
-task majorVersionUpdate(group: 'versioning', description: 'Bump to next major version') {
-    doFirst {
+tasks.register('majorVersionUpdate') {
+    group = 'versioning'
+    description = 'Bump to next major version'
+
+    dependsOn(minorVersionUpdate)
+
+    doLast {
         def versionFile = file('version.properties')
         ant.propertyfile(file: versionFile) {
-            entry(key: 'major', type: 'int', operation: '+', value: 1)
-            entry(key: 'minor', type: 'int', operation: '=', value: 0)
-            entry(key: 'patch', type: 'int', operation: '=', value: 0)
+            if (versionFile.canRead()) {
+                def versionProperties = new Properties()
+                versionProperties.load(new FileInputStream(versionFile))
+                def minor = versionProperties.minor.toInteger()
+                if (minor >= 20) {
+                    println "Minor version is greater than 20, bumping major version"
+                    entry(key: 'major', type: 'int', operation: '+', value: 1)
+                    entry(key: 'minor', type: 'int', operation: '=', value: 0)
+                    entry(key: 'patch', type: 'int', operation: '=', value: 0)
+                }
+            }
         }
     }
 }
+tasks.register('minorVersionUpdate') {
+    group = 'versioning'
+    description = 'Bump to next minor version'
 
-task minorVersionUpdate(group: 'versioning', description: 'Bump to next minor version') {
-    doFirst {
+    dependsOn(patchVersionUpdate)
+
+    doLast {
         def versionFile = file('version.properties')
         ant.propertyfile(file: versionFile) {
-            entry(key: 'minor', type: 'int', operation: '+', value: 1)
-            entry(key: 'patch', type: 'int', operation: '=', value: 0)
+            if (versionFile.canRead()) {
+                def versionProperties = new Properties()
+                versionProperties.load(new FileInputStream(versionFile))
+                def patch = versionProperties.patch.toInteger()
+                if (patch >= 20) {
+                    println "Patch version is greater than 20, bumping minor version"
+                    entry(key: 'minor', type: 'int', operation: '+', value: 1)
+                    entry(key: 'patch', type: 'int', operation: '=', value: 0)
+                }
+            }
         }
     }
 }
-
-task patchVersionUpdate(group: 'versioning', description: 'Bump to next patch version') {
+tasks.register('patchVersionUpdate') {
+    group = 'versioning'
+    description = 'Bump to next patch version'
     doFirst {
         def versionFile = file('version.properties')
         ant.propertyfile(file: versionFile) {
@@ -71,8 +97,9 @@ task patchVersionUpdate(group: 'versioning', description: 'Bump to next patch ve
         }
     }
 }
-
-task releaseVersion(group: 'versioning', description: 'Make the version a release') {
+tasks.register('releaseVersion') {
+    group = 'versioning'
+    description = 'Make the version a release'
     doFirst {
         def versionFile = file('version.properties')
         ant.propertyfile(file: versionFile) {
@@ -80,8 +107,9 @@ task releaseVersion(group: 'versioning', description: 'Make the version a releas
         }
     }
 }
-
-task preReleaseVersion(group: 'versioning', description: 'Make the version a pre release') {
+tasks.register('preReleaseVersion') {
+    group = 'versioning'
+    description = 'Make the version a pre release'
     doFirst {
         def versionFile = file('version.properties')
         ant.propertyfile(file: versionFile) {

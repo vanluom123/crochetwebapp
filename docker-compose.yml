@@ -1,27 +1,8 @@
 version: '3'
 services:
-  # Spring Boot application
   web:
     image: phanvanluom97bd/crochet:latest
     ports:
       - "8080:8080"
-    depends_on:
-      - mysql
-    environment:
-      ENV: local
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/testDB?autoReconnect=true&useSSL=false
-      APP_PASSWORD: ${APP_PASSWORD}
-      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
-      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
-      TOKEN_SECRET: ${TOKEN_SECRET}
-      PAYPAL_CLIENT_ID: ${PAYPAL_CLIENT_ID}
-      PAYPAL_CLIENT_SECRET: ${PAYPAL_CLIENT_SECRET}
-
-  # MySQL database
-  mysql:
-    image: mysql:5.7
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: testDB
-    ports:
-      - "3307:3306"
+    env_file:
+      - .env

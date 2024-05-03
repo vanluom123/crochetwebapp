@@ -22,10 +22,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * FreePatternServiceImpl class
@@ -63,7 +63,7 @@ public class FreePatternServiceImpl implements FreePatternService {
     @Override
     public FreePatternResponse createOrUpdate(FreePatternRequest request) {
         FreePattern freePattern;
-        if (request.getId() == null) {
+        if (!StringUtils.hasText(request.getId())) {
             var category = customCategoryRepo.findById(request.getCategoryId());
             freePattern = FreePattern.builder()
                     .category(category)
@@ -98,18 +98,18 @@ public class FreePatternServiceImpl implements FreePatternService {
      */
     @Override
     public PaginatedFreePatternResponse getFreePatterns(int pageNo, int pageSize, String sortBy, String sortDir,
-                                                        String searchText, UUID categoryId, List<Filter> filters) {
+                                                        String searchText, String categoryId, List<Filter> filters) {
         // create Sort instance
         Sort sort = Sort.by(sortBy);
         sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? sort.ascending() : sort.descending();
         // create Pageable instance
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
         Specification<FreePattern> spec = Specifications.getSpecificationFromFilters(filters);
-        if (searchText != null && !searchText.isEmpty()) {
+        if (StringUtils.hasText(searchText)) {
             spec = spec.and(FreePatternSpecifications.searchByNameDescOrAuthor(searchText));
         }
         // add filter criteria
-        if (categoryId != null) {
+        if (StringUtils.hasText(categoryId)) {
             spec = spec.and(FreePatternSpecifications.existIn(getAllFreePatterns(categoryId)));
         }
         // retrieve FreePatterns
@@ -132,7 +132,7 @@ public class FreePatternServiceImpl implements FreePatternService {
      * @param categoryId The unique identifier of the category.
      * @return A list of {@link FreePattern} objects containing information about the FreePatterns.
      */
-    private List<FreePattern> getAllFreePatterns(UUID categoryId) {
+    private List<FreePattern> getAllFreePatterns(String categoryId) {
         Category category = customCategoryRepo.findById(categoryId);
         List<FreePattern> freePatterns = new ArrayList<>(category.getFreePatterns());
         for (Category subCategory : category.getChildren()) {
@@ -164,14 +164,14 @@ public class FreePatternServiceImpl implements FreePatternService {
      * @return A {@link FreePatternResponse} containing detailed information about the FreePattern.
      */
     @Override
-    public FreePatternResponse getDetail(UUID id) {
+    public FreePatternResponse getDetail(String id) {
         var freePattern = customFreePatternRepo.findById(id);
         return FreePatternMapper.INSTANCE.toResponse(freePattern);
     }
 
     @Transactional
     @Override
-    public void delete(UUID id) {
+    public void delete(String id) {
         customFreePatternRepo.deleteById(id);
     }
 }

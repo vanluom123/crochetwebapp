@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/free-pattern")
@@ -68,7 +67,7 @@ public class FreePatternController {
             @Parameter(description = "Search by name, desc, or author")
             @RequestParam(value = "searchText", required = false) String searchText,
             @Parameter(description = "Category ID")
-            @RequestParam(value = "categoryId", required = false) UUID categoryId,
+            @RequestParam(value = "categoryId", required = false) String categoryId,
             @Parameter(description = "Filters")
             @RequestBody(required = false) List<Filter> filters) {
         var response = freePatternService.getFreePatterns(pageNo, pageSize, sortBy, sortDir, searchText, categoryId, filters);
@@ -82,7 +81,7 @@ public class FreePatternController {
     @GetMapping("/detail")
     public ResponseEntity<FreePatternResponse> getDetail(
             @Parameter(description = "ID of the pattern to retrieve")
-            @RequestParam("id") UUID id) {
+            @RequestParam("id") String id) {
         return ResponseEntity.ok(freePatternService.getDetail(id));
     }
 
@@ -98,7 +97,7 @@ public class FreePatternController {
     @SecurityRequirement(name = "BearerAuth")
     public ResponseEntity<String> delete(
             @Parameter(description = "ID of the pattern to delete")
-            @RequestParam("id") UUID id) {
+            @RequestParam("id") String id) {
         freePatternService.delete(id);
         return ResponseEntity.ok("Pattern deleted successfully");
     }

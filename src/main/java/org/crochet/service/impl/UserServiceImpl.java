@@ -24,9 +24,9 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
-import java.util.UUID;
 
 import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
 import static org.crochet.constant.MessageConstant.INCORRECT_PASSWORD_MESSAGE;
@@ -84,7 +84,7 @@ public class UserServiceImpl implements UserService {
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
         Specification<User> spec = Specifications.getSpecificationFromFilters(filters);
         // Search by search text
-        if (searchText != null && !searchText.isEmpty()) {
+        if (StringUtils.hasText(searchText)) {
             spec = spec.and(UserSpecification.searchByNameOrEmail(searchText));
         }
         Page<User> page = userRepository.findAll(spec, pageable);
@@ -116,7 +116,7 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public void deleteUser(UUID id) {
+    public void deleteUser(String id) {
         userRepository.deleteById(id);
     }
 
@@ -128,14 +128,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getById(UUID id) {
+    public User getById(String id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_WITH_ID_MESSAGE + id,
                         MAP_CODE.get(USER_NOT_FOUND_WITH_ID_MESSAGE)));
     }
 
     @Override
-    public UserResponse getDetail(UUID id) {
+    public UserResponse getDetail(String id) {
         return userRepository.getDetail(id)
                 .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_WITH_ID_MESSAGE + id,
                         MAP_CODE.get(USER_NOT_FOUND_WITH_ID_MESSAGE)));

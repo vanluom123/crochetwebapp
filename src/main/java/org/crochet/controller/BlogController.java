@@ -22,8 +22,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.UUID;
-
 @RestController
 @RequestMapping("/blog")
 public class BlogController {
@@ -73,7 +71,7 @@ public class BlogController {
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = BlogPostResponse.class)))
     @GetMapping("/detail")
-    public ResponseEntity<BlogPostResponse> getDetail(@RequestParam UUID id) {
+    public ResponseEntity<BlogPostResponse> getDetail(@RequestParam String id) {
         var response = blogPostService.getDetail(id);
         return ResponseEntity.ok(response);
     }
@@ -83,7 +81,7 @@ public class BlogController {
     @DeleteMapping("/delete")
     @PreAuthorize("hasRole('ADMIN')")
     @SecurityRequirement(name = "BearerAuth")
-    public ResponseEntity<Void> deletePost(@RequestParam UUID id) {
+    public ResponseEntity<Void> deletePost(@RequestParam String id) {
         blogPostService.deletePost(id);
         return ResponseEntity.noContent().build();
     }

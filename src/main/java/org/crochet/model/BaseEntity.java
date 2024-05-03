@@ -11,8 +11,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
-import java.util.UUID;
-
 @Getter
 @Setter
 @SuperBuilder
@@ -22,6 +20,6 @@ import java.util.UUID;
 public class BaseEntity extends AuditTable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id", nullable = false)
-    private UUID id;
+    @Column(name = "id", nullable = false, updatable = false, unique = true)
+    private String id;
 }
