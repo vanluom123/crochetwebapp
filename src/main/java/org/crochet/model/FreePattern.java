@@ -36,7 +36,7 @@ public class FreePattern extends BaseEntity {
     private String author;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", columnDefinition = "BINARY(16) NOT NULL")
+    @JoinColumn(name = "category_id", referencedColumnName = "id", nullable = false)
     private Category category;
 
     @Column(name = "is_home")
@@ -50,7 +50,7 @@ public class FreePattern extends BaseEntity {
 
     @ElementCollection
     @CollectionTable(name = "free_pattern_file",
-            joinColumns = @JoinColumn(name = "free_pattern_id", columnDefinition = "BINARY(16) NOT NULL"))
+            joinColumns = @JoinColumn(name = "free_pattern_id", referencedColumnName = "id", nullable = false))
     @AttributeOverrides({
             @AttributeOverride(name = "fileName", column = @Column(name = "file_name")),
             @AttributeOverride(name = "fileContent", column = @Column(name = "file_content", columnDefinition = "TEXT"))
@@ -60,7 +60,7 @@ public class FreePattern extends BaseEntity {
 
     @ElementCollection
     @CollectionTable(name = "free_pattern_image",
-            joinColumns = @JoinColumn(name = "free_pattern_id", columnDefinition = "BINARY(16) NOT NULL"))
+            joinColumns = @JoinColumn(name = "free_pattern_id", referencedColumnName = "id", nullable = false))
     @AttributeOverrides({
             @AttributeOverride(name = "fileName", column = @Column(name = "file_name")),
             @AttributeOverride(name = "fileContent", column = @Column(name = "file_content", columnDefinition = "TEXT"))

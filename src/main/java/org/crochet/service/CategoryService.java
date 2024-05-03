@@ -7,7 +7,6 @@ import org.crochet.payload.response.CategoryResponse;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.UUID;
 
 public interface CategoryService {
     @Transactional
@@ -17,9 +16,9 @@ public interface CategoryService {
 
     List<CategoryResponse> getAllCategories();
 
-    CategoryResponse getById(UUID id);
+    CategoryResponse getById(String id);
 
-    Category findById(UUID id);
+    Category findById(String id);
 
-    void delete(UUID id);
+    void delete(String id);
 }

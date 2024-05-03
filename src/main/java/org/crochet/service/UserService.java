@@ -9,7 +9,6 @@ import org.crochet.repository.Filter;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.UUID;
 
 public interface UserService {
     User createUser(SignUpRequest signUpRequest);
@@ -21,13 +20,13 @@ public interface UserService {
     void updateUser(UserUpdateRequest request);
 
     @Transactional
-    void deleteUser(UUID id);
+    void deleteUser(String id);
 
     User getByEmail(String email);
 
-    User getById(UUID id);
+    User getById(String id);
 
-    UserResponse getDetail(UUID id);
+    UserResponse getDetail(String id);
 
     void updatePassword(String password, String email);
 

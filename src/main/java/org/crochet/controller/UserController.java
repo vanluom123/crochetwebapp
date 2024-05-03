@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/users")
@@ -70,13 +69,13 @@ public class UserController {
 
     @GetMapping("/detail")
     public ResponseEntity<UserResponse> getDetail(@Parameter(description = "User ID")
-                                                  @RequestParam UUID id) {
+                                                  @RequestParam String id) {
         var user = userService.getDetail(id);
         return ResponseEntity.ok(user);
     }
 
     @DeleteMapping("/delete")
-    public void deleteUser(UUID id) {
+    public void deleteUser(@RequestParam String id) {
         userService.deleteUser(id);
     }
 }

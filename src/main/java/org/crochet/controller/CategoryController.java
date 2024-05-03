@@ -15,10 +15,16 @@ import org.crochet.service.CategoryService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/category")
@@ -84,7 +90,7 @@ public class CategoryController {
     @ApiResponse(responseCode = "200", description = "Get category by id",
             content = {@Content(mediaType = "application/json", schema = @Schema(implementation = CategoryResponse.class))})
     @GetMapping("/getById")
-    public ResponseEntity<CategoryResponse> getById(UUID id) {
+    public ResponseEntity<CategoryResponse> getById(@RequestParam String id) {
         var response = categoryService.getById(id);
         return ResponseEntity.ok(response);
     }
@@ -97,7 +103,7 @@ public class CategoryController {
     @DeleteMapping("/delete")
     @PreAuthorize("hasRole('ADMIN')")
     @SecurityRequirement(name = "BearerAuth")
-    public ResponseEntity<String> delete(UUID id) {
+    public ResponseEntity<String> delete(@RequestParam String id) {
         categoryService.delete(id);
         return ResponseEntity.ok("Category deleted");
     }

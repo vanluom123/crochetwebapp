@@ -63,7 +63,7 @@ public class JwtTokenServiceImpl implements JwtTokenService {
 
         // Build and sign the JWT token
         return Jwts.builder()
-                .setSubject(userPrincipal.getId().toString()) // Set the subject of the token as the user ID
+                .setSubject(userPrincipal.getId()) // Set the subject of the token as the user ID
                 .setIssuedAt(new Date()) // Set the issued date as the current date
                 .setExpiration(expiryDate) // Set the token expiration date
                 .signWith(getKey(), SignatureAlgorithm.HS512) // Sign the token using the key and algorithm
@@ -173,7 +173,6 @@ public class JwtTokenServiceImpl implements JwtTokenService {
      * @param authToken The JWT token to validate.
      * @return true if the token is valid, false otherwise.
      */
-    @Deprecated
     @Override
     public boolean validateToken(String authToken) {
         try {

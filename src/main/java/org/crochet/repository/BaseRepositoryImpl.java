@@ -5,8 +5,6 @@ import jakarta.persistence.PersistenceContext;
 import org.crochet.exception.ResourceNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
-
 public abstract class BaseRepositoryImpl<T> implements BaseRepository<T> {
     @PersistenceContext
     protected EntityManager em;
@@ -28,7 +26,7 @@ public abstract class BaseRepositoryImpl<T> implements BaseRepository<T> {
         return em.merge(entity);
     }
 
-    public T findById(UUID id) {
+    public T findById(String id) {
         T entity = em.find(type, id);
         if (entity == null) {
             throw new ResourceNotFoundException(type.getSimpleName() + " not found");
@@ -37,7 +35,7 @@ public abstract class BaseRepositoryImpl<T> implements BaseRepository<T> {
     }
 
     @Transactional
-    public void deleteById(UUID id) {
+    public void deleteById(String id) {
         T entity = findById(id);
         if (entity != null) {
             delete(entity);

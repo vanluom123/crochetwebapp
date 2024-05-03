@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/bannerType")
@@ -39,7 +38,7 @@ public class BannerTypeController {
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/delete/{id}")
-    public void delete(@PathVariable UUID id) {
+    public void delete(@PathVariable String id) {
         bannerTypeService.delete(id);
     }
 
@@ -53,7 +52,7 @@ public class BannerTypeController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     @GetMapping("/getById/{id}")
-    public BannerTypeResponse getById(@PathVariable UUID id) {
+    public BannerTypeResponse getById(@PathVariable String id) {
         return bannerTypeService.getById(id);
     }
 }

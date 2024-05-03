@@ -10,6 +10,7 @@ import org.crochet.repository.BannerTypeRepo;
 import org.crochet.service.BannerService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +33,7 @@ public class BannerServiceImpl implements BannerService {
 
         for (BannerRequest request : requests) {
             Banner banner;
-            if (request.getId() == null) {
+            if (!StringUtils.hasText(request.getId())) {
                 var bannerType = bannerTypeRepo.findById(request.getBannerTypeId())
                         .orElseThrow(() -> new ResourceNotFoundException("Banner type not found"));
                 banner = Banner.builder()

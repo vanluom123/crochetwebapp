@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/product")
@@ -80,7 +79,7 @@ public class ProductController {
             @Parameter(description = "Search by name or description")
             @RequestParam(value = "searchText", required = false) String searchText,
             @Parameter(description = "Category ID")
-            @RequestParam(value = "categoryId", required = false) UUID categoryId,
+            @RequestParam(value = "categoryId", required = false) String categoryId,
             @RequestBody(required = false) List<Filter> filters) {
         var response = productService.getProducts(pageNo, pageSize, sortBy, sortDir, searchText, categoryId, filters);
         return ResponseEntity.ok(response);
@@ -93,7 +92,7 @@ public class ProductController {
                     schema = @Schema(implementation = ProductResponse.class)))
     @ApiResponse(responseCode = "404", description = "Product not found")
     @GetMapping("/detail")
-    public ResponseEntity<ProductResponse> getProductDetail(@RequestParam("id") UUID id) {
+    public ResponseEntity<ProductResponse> getProductDetail(@RequestParam("id") String id) {
         return ResponseEntity.ok(productService.getDetail(id));
     }
 
@@ -103,7 +102,7 @@ public class ProductController {
     @DeleteMapping("/delete")
     @PreAuthorize("hasRole('ADMIN')")
     @SecurityRequirement(name = "BearerAuth")
-    public ResponseEntity<String> deleteProduct(@RequestParam("id") UUID id) {
+    public ResponseEntity<String> deleteProduct(@RequestParam("id") String id) {
         productService.delete(id);
         return ResponseEntity.ok("Product deleted successfully");
     }

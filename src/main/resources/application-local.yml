@@ -11,12 +11,7 @@ spring:
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
   liquibase:
-    change-log: classpath:db/changelog/liquibase/db.changelog-master.yaml
-    enabled: ${LIQUIBASE_ENABLED:false}
-    user: root
-    password: root
-    url: jdbc:mysql://localhost:3306/testDB
-    drop-first: ${DROP_ENABLED:false}
+    enabled: false
 
 paypal:
   username: ${PAYPAL_CLIENT_ID}
