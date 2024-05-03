@@ -12,6 +12,7 @@ import io.jsonwebtoken.security.SecurityException;
 import org.crochet.properties.AppProperties;
 import org.crochet.security.UserPrincipal;
 import org.crochet.service.JwtTokenService;
+import org.crochet.service.TokenBlacklistService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -32,14 +33,18 @@ public class JwtTokenServiceImpl implements JwtTokenService {
     private static final Logger logger = LoggerFactory.getLogger(JwtTokenServiceImpl.class);
 
     private final AppProperties appProperties;
+    private final TokenBlacklistService tokenBlacklistService;
 
     /**
-     * Constructs a TokenProvider with the provided AppProperties dependency.
+     * Constructor
      *
-     * @param appProperties The AppProperties dependency.
+     * @param appProperties         AppProperties
+     * @param tokenBlacklistService TokenBlacklistService
      */
-    public JwtTokenServiceImpl(AppProperties appProperties) {
+    public JwtTokenServiceImpl(AppProperties appProperties,
+                               TokenBlacklistService tokenBlacklistService) {
         this.appProperties = appProperties;
+        this.tokenBlacklistService = tokenBlacklistService;
     }
 
 
@@ -181,6 +186,13 @@ public class JwtTokenServiceImpl implements JwtTokenService {
                     .setSigningKey(getKey())
                     .build()
                     .parseClaimsJws(authToken);
+
+            // Check if the token is blacklisted
+            if (tokenBlacklistService.isTokenBlacklisted(authToken)) {
+                logger.error("Token is existed in blacklist");
+                return false;
+            }
+
             // If no exception is thrown during parsing and validation, the token is considered valid
             return true;
         } catch (SecurityException ex) {

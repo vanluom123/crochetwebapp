@@ -1,3 +1,7 @@
 databaseChangeLog:
   - include:
       file: src/main/resources/db/migration/2024-05-02-first-creation-schemas.yaml
+  - include:
+      file: src/main/resources/db/migration/2024-05-03-add-constraint.yaml
+  - include:
+      file: src/main/resources/db/migration/2024-05-03-add-token-blacklist.yaml
