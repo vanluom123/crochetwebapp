@@ -83,13 +83,7 @@ liquibase {
 }
 
 jar {
-    manifest {
-        archiveFileName = "${project.name}-${project.version}.jar"
-        attributes(
-                'Class-Path': configurations.runtimeClasspath.files.collect { it.getName() }.join(' '),
-                'Main-Class': 'org.crochet.CrochetApplication'
-        )
-    }
+    enabled = false
 }
 
 test {
