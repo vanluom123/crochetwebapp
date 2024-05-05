@@ -6,10 +6,11 @@ import org.springframework.data.jpa.domain.Specification;
 import java.util.List;
 
 public class ProductSpecifications {
-    public static Specification<Product> searchByNameOrDesc(String name) {
+    public static Specification<Product> searchByNameOrDesc(String searchText) {
         return (root, query, cb) -> {
-            var nameLike = cb.like(root.get("name"), "%" + name + "%");
-            var descriptionLike = cb.like(root.get("description"), "%" + name + "%");
+            String lowerCase = searchText.toLowerCase();
+            var nameLike = cb.like(cb.lower(root.get("name")), "%" + lowerCase + "%");
+            var descriptionLike = cb.like(cb.lower(root.get("description")), "%" + lowerCase + "%");
             return cb.or(nameLike, descriptionLike);
         };
     }
