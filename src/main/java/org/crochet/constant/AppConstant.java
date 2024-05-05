@@ -6,7 +6,7 @@ public class AppConstant {
     public static final String DEFAULT_SORT_BY = "id";
     public static final String DEFAULT_SORT_DIRECTION = "asc";
     public static final String DEFAULT_SORT_BY_ORD = "orderTime";
-    public static final String DATE_PATTERN = "dd-MM-yyyy HH:mm:ss";
+    public static final String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
     public static final int PRODUCT_LIMITED = 12;
     public static final int PATTERN_LIMITED = 12;
     public static final int FREE_PATTERN_LIMITED = 12;
