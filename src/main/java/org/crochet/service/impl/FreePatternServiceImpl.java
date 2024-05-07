@@ -8,12 +8,7 @@ import org.crochet.model.FreePattern;
 import org.crochet.payload.request.FreePatternRequest;
 import org.crochet.payload.response.FreePatternResponse;
 import org.crochet.payload.response.PaginatedFreePatternResponse;
-import org.crochet.repository.CustomCategoryRepo;
-import org.crochet.repository.CustomFreePatternRepo;
-import org.crochet.repository.Filter;
-import org.crochet.repository.FreePatternRepository;
-import org.crochet.repository.FreePatternSpecifications;
-import org.crochet.repository.Specifications;
+import org.crochet.repository.*;
 import org.crochet.service.FreePatternService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +21,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * FreePatternServiceImpl class
@@ -79,6 +75,10 @@ public class FreePatternServiceImpl implements FreePatternService {
         } else {
             freePattern = customFreePatternRepo.findById(request.getId());
             freePattern = FreePatternMapper.INSTANCE.partialUpdate(request, freePattern);
+            if (!Objects.equals(freePattern.getCategory().getId(), request.getCategoryId())) {
+                var category = customCategoryRepo.findById(request.getCategoryId());
+                freePattern.setCategory(category);
+            }
         }
         freePattern = freePatternRepo.save(freePattern);
         return FreePatternMapper.INSTANCE.toResponse(freePattern);
