@@ -26,6 +26,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * FreePatternServiceImpl class
@@ -79,6 +80,10 @@ public class FreePatternServiceImpl implements FreePatternService {
         } else {
             freePattern = customFreePatternRepo.findById(request.getId());
             freePattern = FreePatternMapper.INSTANCE.partialUpdate(request, freePattern);
+            if (!Objects.equals(freePattern.getCategory().getId(), request.getCategoryId())) {
+                var category = customCategoryRepo.findById(request.getCategoryId());
+                freePattern.setCategory(category);
+            }
         }
         freePattern = freePatternRepo.save(freePattern);
         return FreePatternMapper.INSTANCE.toResponse(freePattern);
