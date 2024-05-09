@@ -15,6 +15,8 @@ import org.crochet.repository.PatternRepository;
 import org.crochet.repository.PatternSpecifications;
 import org.crochet.repository.Specifications;
 import org.crochet.service.PatternService;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -114,6 +116,7 @@ public class PatternServiceImpl implements PatternService {
     }
 
     @Override
+    @Cacheable(value = "patternCache")
     public List<PatternResponse> getLimitedPatterns() {
         var patterns = patternRepo.findAll()
                 .stream()
@@ -130,6 +133,7 @@ public class PatternServiceImpl implements PatternService {
      * @return PatternResponse
      */
     @Override
+    @Cacheable(value = "patternCache", key = "#id")
     public PatternResponse getDetail(String id) {
         var pattern = customPatternRepo.findById(id);
         return PatternMapper.INSTANCE.toResponse(pattern);
@@ -152,6 +156,7 @@ public class PatternServiceImpl implements PatternService {
 
     @Transactional
     @Override
+    @CacheEvict(value = "patternCache", allEntries = true)
     public void deletePattern(String id) {
         patternRepo.deleteById(id);
     }

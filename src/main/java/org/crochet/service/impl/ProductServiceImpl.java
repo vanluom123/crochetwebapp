@@ -14,6 +14,8 @@ import org.crochet.repository.ProductRepository;
 import org.crochet.repository.ProductSpecifications;
 import org.crochet.repository.Specifications;
 import org.crochet.service.ProductService;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -154,6 +156,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Cacheable(value = "productCache")
     public List<ProductResponse> getLimitedProducts() {
         var products = productRepo.findAll()
                 .stream()
@@ -170,6 +173,7 @@ public class ProductServiceImpl implements ProductService {
      * @return A {@link ProductResponse} containing detailed information about the product.
      */
     @Override
+    @Cacheable(value = "productCache", key = "#id")
     public ProductResponse getDetail(String id) {
         var product = customProductRepo.findById(id);
         return ProductMapper.INSTANCE.toResponse(product);
@@ -177,6 +181,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Transactional
     @Override
+    @CacheEvict(value = "productCache", allEntries = true)
     public void delete(String id) {
         customProductRepo.deleteById(id);
     }

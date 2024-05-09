@@ -11,6 +11,8 @@ import org.crochet.repository.BlogPostRepository;
 import org.crochet.repository.BlogPostSpecifications;
 import org.crochet.repository.CustomBlogRepo;
 import org.crochet.service.BlogPostService;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -110,6 +112,7 @@ public class BlogPostServiceImpl implements BlogPostService {
      * @throws ResourceNotFoundException If the specified blog post ID does not correspond to an existing blog post.
      */
     @Override
+    @Cacheable(value = "blogPostCache", key = "#id")
     public BlogPostResponse getDetail(String id) {
         var blogPost = customBlogRepo.findById(id);
         return BlogPostMapper.INSTANCE.toResponse(blogPost);
@@ -123,6 +126,7 @@ public class BlogPostServiceImpl implements BlogPostService {
      */
     @Transactional
     @Override
+    @CacheEvict(value = "blogPostCache", allEntries = true)
     public void deletePost(String id) {
         var blogPost = customBlogRepo.findById(id);
         blogPostRepo.delete(blogPost);

@@ -15,6 +15,8 @@ import org.crochet.repository.FreePatternRepository;
 import org.crochet.repository.FreePatternSpecifications;
 import org.crochet.repository.Specifications;
 import org.crochet.service.FreePatternService;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -153,6 +155,7 @@ public class FreePatternServiceImpl implements FreePatternService {
      * @return A list of {@link FreePatternResponse} objects containing information about the FreePatterns.
      */
     @Override
+    @Cacheable(value = "freePatternCache")
     public List<FreePatternResponse> getLimitedFreePatterns() {
         var freePatterns = freePatternRepo.findAll()
                 .stream()
@@ -169,6 +172,7 @@ public class FreePatternServiceImpl implements FreePatternService {
      * @return A {@link FreePatternResponse} containing detailed information about the FreePattern.
      */
     @Override
+    @Cacheable(value = "freePatternCache", key = "#id")
     public FreePatternResponse getDetail(String id) {
         var freePattern = customFreePatternRepo.findById(id);
         return FreePatternMapper.INSTANCE.toResponse(freePattern);
@@ -176,6 +180,7 @@ public class FreePatternServiceImpl implements FreePatternService {
 
     @Transactional
     @Override
+    @CacheEvict(value = "freePatternCache", allEntries = true)
     public void delete(String id) {
         customFreePatternRepo.deleteById(id);
     }
