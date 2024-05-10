@@ -19,6 +19,6 @@ paypal:
 
 redis:
   host: ${REDIS_HOST}
-  port: 16395
+  port: ${REDIS_PORT}
   username: default
   password: ${REDIS_PASSWORD}
