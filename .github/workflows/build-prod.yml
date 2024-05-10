@@ -38,6 +38,8 @@ jobs:
           APP_PASSWORD: ${{ secrets.APP_PASSWORD }}
           PAYPAL_CLIENT_ID: ${{ secrets.PAYPAL_CLIENT_ID }}
           PAYPAL_CLIENT_SECRET: ${{ secrets.PAYPAL_CLIENT_SECRET }}
+          REDIS_HOST: ${{ secrets.REDIS_HOST }}
+          REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
         run: |
           chmod +x gradlew
           ./gradlew releaseVersion

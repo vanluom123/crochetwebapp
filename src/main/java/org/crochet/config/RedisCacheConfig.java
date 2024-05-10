@@ -22,8 +22,6 @@ import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-import java.io.Serializable;
-
 @Configuration
 public class RedisCacheConfig {
 
@@ -33,7 +31,8 @@ public class RedisCacheConfig {
         return new RedisCacheProperties();
     }
 
-    public ObjectMapper objectMapper(){
+    @Bean
+    public ObjectMapper objectMapper() {
         return JsonMapper
                 .builder()
                 .addModule(new JavaTimeModule())
@@ -49,12 +48,12 @@ public class RedisCacheConfig {
     }
 
     @Bean
-    public RedisTemplate<String, Serializable> redisCacheTemplate() {
-        RedisTemplate<String, Serializable> template = new RedisTemplate<>();
+    public RedisTemplate<String, Object> redisCacheTemplate() {
+        RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(jedisConnectionFactory());
 
         StringRedisSerializer keySerializer = new StringRedisSerializer();
-        RedisSerializer<Object> valueSerializer = RedisSerializer.json();
+        RedisSerializer<Object> valueSerializer = new GenericJackson2JsonRedisSerializer();
 
         template.setKeySerializer(keySerializer);
         template.setValueSerializer(valueSerializer);
