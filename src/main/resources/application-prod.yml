@@ -16,3 +16,9 @@ spring:
 paypal:
   username: ${PAYPAL_CLIENT_ID}
   password: ${PAYPAL_CLIENT_SECRET}
+
+redis:
+  host: ${REDIS_HOST}
+  port: ${REDIS_PORT}
+  username: default
+  password: ${REDIS_PASSWORD}
