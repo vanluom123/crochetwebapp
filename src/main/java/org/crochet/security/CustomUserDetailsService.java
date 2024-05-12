@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 /**
  * CustomUserDetailsService class
@@ -56,7 +55,6 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .email(user.getEmail())
                 .password(user.getPassword())
                 .authorities(authorities)
-                .attributes(Map.of("name", email))
                 .build();
 
         return userDetails;
