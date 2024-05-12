@@ -1,0 +1,18 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1715532806837-5
+      author: admin (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableName: blog_post_avatar
+            constraintName: fk_blog_post_avatar_on_blog_post
+  - changeSet:
+      id: 1715532806837-6
+      author: admin (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - dropTable:
+            cascadeConstraints: true
+            tableName: blog_post_avatar
+

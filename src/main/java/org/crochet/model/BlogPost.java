@@ -45,13 +45,4 @@ public class BlogPost extends BaseEntity {
             @AttributeOverride(name = "fileContent", column = @Column(name = "file_content"))
     })
     private List<File> files;
-
-    @ElementCollection
-    @CollectionTable(name = "blog_post_avatar",
-            joinColumns = @JoinColumn(name = "blog_post_id", referencedColumnName = "id", nullable = false))
-    @AttributeOverrides({
-            @AttributeOverride(name = "fileName", column = @Column(name = "file_name")),
-            @AttributeOverride(name = "fileContent", column = @Column(name = "file_content"))
-    })
-    private List<File> avatars;
 }

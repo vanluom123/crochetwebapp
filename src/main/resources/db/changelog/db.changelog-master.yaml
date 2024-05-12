@@ -5,3 +5,5 @@ databaseChangeLog:
       file: src/main/resources/db/migration/2024-05-03-add-constraint.yaml
   - include:
       file: src/main/resources/db/migration/2024-05-03-add-token-blacklist.yaml
+  - include:
+      file: src/main/resources/db/migration/2024-05-12-remove-avatar-column-in-blog-table.yaml
