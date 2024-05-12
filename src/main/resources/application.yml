@@ -34,11 +34,6 @@ app:
     tokenSecret: ${TOKEN_SECRET}
     tokenExpirationMs: 900000 # 15 minutes
     refresh-token-expiration-ms: 86400000 # 1 day
-  cors:
-    allowedOrigins:
-      - http://localhost:3000
-      - https://tieuphuongcrochet.com
-      - https://tieuphuongcrochet.github.io
   oauth2:
     # After successfully authenticating with the OAuth2 Provider,
     # we'll be generating an auth token for the user and sending the token to the
