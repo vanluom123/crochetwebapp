@@ -20,7 +20,6 @@ public class BlogPostResponse implements Serializable {
     private String content;
     private boolean home;
     private List<FileResponse> files;
-    private List<FileResponse> avatars;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdDate;
 }

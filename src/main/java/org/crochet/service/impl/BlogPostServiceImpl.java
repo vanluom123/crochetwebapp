@@ -57,7 +57,6 @@ public class BlogPostServiceImpl implements BlogPostService {
                     .content(request.getContent())
                     .home(request.isHome())
                     .files(FileMapper.INSTANCE.toEntities(request.getFiles()))
-                    .avatars(FileMapper.INSTANCE.toEntities(request.getAvatars()))
                     .build();
         } else {
             blogPost = customBlogRepo.findById(request.getId());

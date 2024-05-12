@@ -16,5 +16,4 @@ public class BlogPostRequest {
     private String content;
     private boolean home;
     private List<FileResponse> files;
-    private List<FileResponse> avatars;
 }
