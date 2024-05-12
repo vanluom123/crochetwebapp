@@ -1,14 +1,8 @@
 package org.crochet.properties;
 
-import lombok.Getter;
-import lombok.Setter;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
+import lombok.Data;
 
-@Getter
-@Setter
-@Component
-@ConfigurationProperties(prefix = "authorize.http-request")
+@Data
 public class AuthorizeHttpRequestProperties {
     private String[] permitAll;
     private String[] authenticated;

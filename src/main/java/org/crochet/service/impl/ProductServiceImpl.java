@@ -83,28 +83,6 @@ public class ProductServiceImpl implements ProductService {
         return ProductMapper.INSTANCE.toResponse(product);
     }
 
-    @Transactional
-    @Override
-    public List<ProductResponse> batchInsert(List<ProductRequest> requests) {
-        List<Product> products = new ArrayList<>();
-        for (ProductRequest request : requests) {
-            var category = customCategoryRepo.findById(request.getCategoryId());
-            Product product = Product.builder()
-                    .category(category)
-                    .name(request.getName())
-                    .price(request.getPrice())
-                    .description(request.getDescription())
-                    .currencyCode(request.getCurrencyCode())
-                    .isHome(request.isHome())
-                    .link(request.getLink())
-                    .images(FileMapper.INSTANCE.toEntities(request.getImages()))
-                    .build();
-            products.add(product);
-        }
-        products = productRepo.saveAll(products);
-        return ProductMapper.INSTANCE.toResponses(products);
-    }
-
     /**
      * Retrieves a paginated list of products based on the provided parameters.
      *

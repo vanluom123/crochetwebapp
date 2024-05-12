@@ -9,6 +9,7 @@ import org.crochet.security.oauth2.CustomOAuth2UserService;
 import org.crochet.security.oauth2.OAuth2AuthenticationFailureHandler;
 import org.crochet.security.oauth2.OAuth2AuthenticationSuccessHandler;
 import org.crochet.security.oauth2.OAuth2CookieRepository;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -42,7 +43,6 @@ public class SecurityConfig {
     private final PasswordEncoder passwordEncoder;
     private final OAuth2CookieRepository oAuth2CookieRepository;
     private final TokenAuthenticationFilter tokenAuthenticationFilter;
-    private final AuthorizeHttpRequestProperties authorizeHttpRequestProps;
 
     public SecurityConfig(CustomUserDetailsService customUserDetailsService,
                           CustomOAuth2UserService customOAuth2UserService,
@@ -50,8 +50,7 @@ public class SecurityConfig {
                           OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler,
                           PasswordEncoder passwordEncoder,
                           OAuth2CookieRepository oAuth2CookieRepository,
-                          TokenAuthenticationFilter tokenAuthenticationFilter,
-                          AuthorizeHttpRequestProperties authorizeHttpRequestProps) {
+                          TokenAuthenticationFilter tokenAuthenticationFilter) {
         this.customUserDetailsService = customUserDetailsService;
         this.customOAuth2UserService = customOAuth2UserService;
         this.oAuth2AuthenticationSuccessHandler = oAuth2AuthenticationSuccessHandler;
@@ -59,7 +58,12 @@ public class SecurityConfig {
         this.passwordEncoder = passwordEncoder;
         this.oAuth2CookieRepository = oAuth2CookieRepository;
         this.tokenAuthenticationFilter = tokenAuthenticationFilter;
-        this.authorizeHttpRequestProps = authorizeHttpRequestProps;
+    }
+
+    @Bean
+    @ConfigurationProperties(prefix = "authorize.http-request")
+    public AuthorizeHttpRequestProperties authorizeHttpRequestProperties() {
+        return new AuthorizeHttpRequestProperties();
     }
 
     @Bean
@@ -82,8 +86,8 @@ public class SecurityConfig {
                 .exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(
                         new RestAuthenticationEntryPoint()))
                 .authorizeHttpRequests(authReq -> authReq
-                        .requestMatchers(authorizeHttpRequestProps.getPermitAll()).permitAll()
-                        .requestMatchers(authorizeHttpRequestProps.getAuthenticated()).authenticated()
+                        .requestMatchers(authorizeHttpRequestProperties().getPermitAll()).permitAll()
+                        .requestMatchers(authorizeHttpRequestProperties().getAuthenticated()).authenticated()
                         .anyRequest().permitAll())
                 .oauth2Login(oauth -> oauth.authorizationEndpoint(authEndpointCustomizer ->
                                 authEndpointCustomizer
