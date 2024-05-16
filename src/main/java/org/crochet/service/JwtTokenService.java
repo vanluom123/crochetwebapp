@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.function.Function;
 
 public interface JwtTokenService {
-    @Deprecated
     String createToken(Authentication auth);
 
     String extractUsername(String token);

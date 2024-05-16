@@ -11,4 +11,8 @@ public interface FirebaseStorageService {
     List<String> deleteMultipleFiles(List<String> fileNames);
 
     FileResponse tryUploadFile(MultipartFile newFile);
+
+    List<String> getAllFilesInStorage();
+
+    List<String> getAllFilesInStorage(String folderName);
 }
