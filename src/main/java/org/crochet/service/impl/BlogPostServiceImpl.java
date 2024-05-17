@@ -20,6 +20,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.util.List;
+
+import static org.crochet.constant.AppConstant.BLOG_LIMITED;
+
 /**
  * BlogPostServiceImpl class
  */
@@ -57,7 +61,6 @@ public class BlogPostServiceImpl implements BlogPostService {
                     .content(request.getContent())
                     .home(request.isHome())
                     .files(FileMapper.INSTANCE.toEntities(request.getFiles()))
-                    .avatars(FileMapper.INSTANCE.toEntities(request.getAvatars()))
                     .build();
         } else {
             blogPost = customBlogRepo.findById(request.getId());
@@ -113,6 +116,21 @@ public class BlogPostServiceImpl implements BlogPostService {
     public BlogPostResponse getDetail(String id) {
         var blogPost = customBlogRepo.findById(id);
         return BlogPostMapper.INSTANCE.toResponse(blogPost);
+    }
+
+    /**
+     * Retrieves a list of blog posts limited by the constant BLOG_LIMITED.
+     *
+     * @return A list of {@link BlogPostResponse} containing limited blog posts.
+     */
+    @Override
+    public List<BlogPostResponse> getLimitedBlogPosts() {
+        var blogPosts = blogPostRepo.findAll()
+                .stream()
+                .filter(BlogPost::isHome)
+                .limit(BLOG_LIMITED)
+                .toList();
+        return BlogPostMapper.INSTANCE.toResponses(blogPosts);
     }
 
     /**

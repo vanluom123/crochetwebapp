@@ -20,6 +20,7 @@ public interface BlogPostMapper extends PartialUpdate<BlogPost, BlogPostRequest>
     BlogPostMapper INSTANCE = Mappers.getMapper(BlogPostMapper.class);
 
     @Mapping(target = "id", source = "id", qualifiedByName = "uuidToString")
+    @Mapping(target = "isHome", source = "home")
     BlogPostResponse toResponse(BlogPost blogPost);
 
     @Named("uuidToString")
