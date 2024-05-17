@@ -10,6 +10,7 @@ public class AppConstant {
     public static final int PRODUCT_LIMITED = 12;
     public static final int PATTERN_LIMITED = 12;
     public static final int FREE_PATTERN_LIMITED = 12;
+    public static final int BLOG_LIMITED = 12;
     public static final long MAX_AGE_SECS = 3600;
     public static final int READ_TIMEOUT_SECONDS = 10;
     public static final int WRITE_TIMEOUT_SECONDS = 10;

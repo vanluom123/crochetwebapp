@@ -54,7 +54,6 @@ public class JwtTokenServiceImpl implements JwtTokenService {
      * @param auth The Authentication object representing the authenticated user.
      * @return The created JWT token.
      */
-    @Deprecated
     @Override
     public String createToken(Authentication auth) {
         // Get the UserPrincipal from the Authentication object
@@ -68,35 +67,69 @@ public class JwtTokenServiceImpl implements JwtTokenService {
 
         // Build and sign the JWT token
         return Jwts.builder()
-                .setSubject(userPrincipal.getId()) // Set the subject of the token as the user ID
+                .setSubject(userPrincipal.getUsername()) // Set the subject of the token as the user ID
                 .setIssuedAt(new Date()) // Set the issued date as the current date
                 .setExpiration(expiryDate) // Set the token expiration date
                 .signWith(getKey(), SignatureAlgorithm.HS512) // Sign the token using the key and algorithm
                 .compact(); // Compact the token into its final string representation
     }
 
+    /**
+     * Extracts the username from the provided token.
+     *
+     * @param token The token from which to extract the username.
+     * @return The username extracted from the token.
+     */
     @Override
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
+    /**
+     * Extracts a claim from the provided token using the specified claims resolver function.
+     *
+     * @param token         The token from which to extract the claim.
+     * @param claimsResolver The claims resolver function to use.
+     * @param <T>           The type of the claim to extract.
+     * @return The extracted claim.
+     */
     @Override
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
 
+    /**
+     * Validates the provided token against the specified UserDetails object.
+     *
+     * @param token       The token to validate.
+     * @param userDetails The UserDetails object to validate against.
+     * @return true if the token is valid for the user, false otherwise.
+     */
     @Override
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
     }
 
+    /**
+     * Generates a JWT token for the specified username.
+     *
+     * @param username The username for which to generate the token.
+     * @return The generated JWT token.
+     */
     @Override
     public String generateToken(String username) {
         return generateToken(new HashMap<>(), username);
     }
 
+    /**
+     * Generates a JWT token for the specified username with the specified extra claims.
+     *
+     * @param extraClaims The extra claims to include in the token.
+     * @param username    The username for which to generate the token.
+     * @return The generated JWT token.
+     */
     @Override
     public String generateToken(
             Map<String, Object> extraClaims,
@@ -105,6 +138,14 @@ public class JwtTokenServiceImpl implements JwtTokenService {
         return buildToken(extraClaims, username, appProperties.getAuth().getTokenExpirationMs());
     }
 
+    /**
+     * Builds a JWT token with the specified extra claims, username, and expiration time.
+     *
+     * @param extraClaims The extra claims to include in the token.
+     * @param username    The username for which to generate the token.
+     * @param expiration  The expiration time for the token.
+     * @return The generated JWT token.
+     */
     private String buildToken(
             Map<String, Object> extraClaims,
             String username,
@@ -120,14 +161,32 @@ public class JwtTokenServiceImpl implements JwtTokenService {
                 .compact();
     }
 
+    /**
+     * Checks if the provided token is expired.
+     *
+     * @param token The token to check.
+     * @return true if the token is expired, false otherwise.
+     */
     private boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
 
+    /**
+     * Extracts the expiration date from the provided token.
+     *
+     * @param token The token from which to extract the expiration date.
+     * @return The expiration date extracted from the token.
+     */
     private Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
 
+    /**
+     * Extracts all claims from the provided token.
+     *
+     * @param token The token from which to extract the claims.
+     * @return The claims extracted from the token.
+     */
     private Claims extractAllClaims(String token) {
         return Jwts
                 .parserBuilder()

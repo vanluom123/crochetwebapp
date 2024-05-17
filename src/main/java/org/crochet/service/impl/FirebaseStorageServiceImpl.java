@@ -1,6 +1,8 @@
 package org.crochet.service.impl;
 
 import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.Bucket;
+import com.google.cloud.storage.Storage;
 import com.google.firebase.cloud.StorageClient;
 import lombok.extern.slf4j.Slf4j;
 import org.crochet.constant.MessageConstant;
@@ -11,10 +13,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
 
@@ -23,14 +28,27 @@ import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
 public class FirebaseStorageServiceImpl implements FirebaseStorageService {
     private static final String BUCKET_NAME = "littlecrochet.appspot.com";
     private final StorageClient storageClient;
+    private final String env;
 
+    /**
+     * Constructor
+     *
+     * @param storageClient The Firebase Cloud Storage client
+     */
     public FirebaseStorageServiceImpl(StorageClient storageClient) {
         this.storageClient = storageClient;
+        env = System.getenv("env");
     }
 
+    /**
+     * Upload a file to Firebase Cloud Storage
+     *
+     * @param imageFile The file to be uploaded
+     * @return The file name and download URL
+     */
     public FileResponse uploadFile(MultipartFile imageFile) {
         // Define the path and filename in Firebase Cloud Storage
-        String fileName = "images/" + imageFile.getOriginalFilename();
+        String fileName = env + "/" + imageFile.getOriginalFilename();
 
         // Upload the image to Firebase Cloud Storage
         Blob blob;
@@ -44,12 +62,18 @@ public class FirebaseStorageServiceImpl implements FirebaseStorageService {
 
         log.info("image name: {}", blob.getName());
 
-        String blobName = blob.getName().replaceFirst("images/", "");
-        String fileContent = "https://firebasestorage.googleapis.com/v0/b/" + BUCKET_NAME + "/o/images%2F" + blobName + "?alt=media";
-
+        var encodeName = URLEncoder.encode(blob.getName(), StandardCharsets.UTF_8);
+        String downloadUrl = "https://firebasestorage.googleapis.com/v0/b/%s/o/%s?alt=media";
+        var fileContent = String.format(downloadUrl, BUCKET_NAME, encodeName);
         return new FileResponse(fileName, fileContent);
     }
 
+    /**
+     * Upload multiple files to Firebase Cloud Storage
+     *
+     * @param files The list of files to be uploaded
+     * @return The list of file names
+     */
     @Override
     public List<FileResponse> uploadMultipleFiles(MultipartFile[] files) {
         List<FileResponse> fileNames;
@@ -59,6 +83,12 @@ public class FirebaseStorageServiceImpl implements FirebaseStorageService {
         return fileNames;
     }
 
+    /**
+     * Delete a file from Firebase Cloud Storage
+     *
+     * @param fileNames The name of the file to be deleted
+     * @return The name of the deleted file
+     */
     @Override
     public List<String> deleteMultipleFiles(List<String> fileNames) {
         return fileNames.stream()
@@ -68,6 +98,12 @@ public class FirebaseStorageServiceImpl implements FirebaseStorageService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Try to delete a file from Firebase Cloud Storage
+     *
+     * @param fileName The name of the file to be deleted
+     * @return The name of the deleted file
+     */
     private Optional<String> tryDeleteFile(String fileName) {
         Blob blob = storageClient.bucket(BUCKET_NAME).get(fileName);
         if (blob != null) {
@@ -80,9 +116,15 @@ public class FirebaseStorageServiceImpl implements FirebaseStorageService {
         }
     }
 
+    /**
+     * Try to upload a file to Firebase Cloud Storage
+     *
+     * @param newFile The file to be uploaded
+     * @return The file name and download URL
+     */
     @Override
     public FileResponse tryUploadFile(MultipartFile newFile) {
-        String fileName = "images/" + newFile.getOriginalFilename();
+        String fileName = env + "/" + newFile.getOriginalFilename();
         Blob blob = storageClient.bucket(BUCKET_NAME).get(fileName);
         if (blob != null) {
             // Delete the existing file
@@ -92,5 +134,32 @@ public class FirebaseStorageServiceImpl implements FirebaseStorageService {
 
         // Upload the new file
         return uploadFile(newFile);
+    }
+
+    /**
+     * Get all files in Firebase Cloud Storage
+     *
+     * @return The list of file names
+     */
+    @Override
+    public List<String> getAllFilesInStorage() {
+        Bucket bucket = storageClient.bucket(BUCKET_NAME);
+        return StreamSupport.stream(bucket.list().iterateAll().spliterator(), false)
+                .map(Blob::getName)
+                .toList();
+    }
+
+    /**
+     * Get all files in a specific folder in Firebase Cloud Storage
+     *
+     * @param folderName The name of the folder
+     * @return The list of file names
+     */
+    @Override
+    public List<String> getAllFilesInStorage(String folderName) {
+        Bucket bucket = storageClient.bucket(BUCKET_NAME);
+        return StreamSupport.stream(bucket.list(Storage.BlobListOption.prefix(folderName + "/")).iterateAll().spliterator(), false)
+                .map(Blob::getName)
+                .toList();
     }
 }

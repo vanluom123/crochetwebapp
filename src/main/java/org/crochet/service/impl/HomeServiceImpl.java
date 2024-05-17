@@ -3,6 +3,7 @@ package org.crochet.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.crochet.payload.response.HomeResponse;
 import org.crochet.service.BannerService;
+import org.crochet.service.BlogPostService;
 import org.crochet.service.FreePatternService;
 import org.crochet.service.HomeService;
 import org.crochet.service.PatternService;
@@ -17,6 +18,7 @@ public class HomeServiceImpl implements HomeService {
     private final PatternService patternService;
     private final FreePatternService freePatternService;
     private final BannerService bannerService;
+    private final BlogPostService blogService;
 
     @Override
     @Cacheable(value = "gethomes")
@@ -25,11 +27,13 @@ public class HomeServiceImpl implements HomeService {
         var patterns = patternService.getLimitedPatterns();
         var freePatterns = freePatternService.getLimitedFreePatterns();
         var banners = bannerService.getAll();
+        var blogs = blogService.getLimitedBlogPosts();
         return HomeResponse.builder()
                 .products(prods)
                 .patterns(patterns)
                 .freePatterns(freePatterns)
                 .banners(banners)
+                .blogs(blogs)
                 .build();
     }
 }
