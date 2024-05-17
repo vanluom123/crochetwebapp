@@ -1,5 +1,6 @@
 package org.crochet.payload.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,6 +15,7 @@ public class BlogPostRequest {
     private String id;
     private String title;
     private String content;
-    private boolean home;
+    @JsonProperty("is_home")
+    private boolean isHome;
     private List<FileResponse> files;
 }
