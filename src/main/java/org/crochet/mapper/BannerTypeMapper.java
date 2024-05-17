@@ -8,8 +8,10 @@ import org.mapstruct.MappingConstants;
 import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE,
-        componentModel = MappingConstants.ComponentModel.SPRING)
+@Mapper(
+        unmappedTargetPolicy = ReportingPolicy.IGNORE,
+        componentModel = MappingConstants.ComponentModel.SPRING
+)
 public interface BannerTypeMapper extends AbstractMapper<BannerType, BannerTypeResponse>,
         PartialUpdate<BannerType, BannerTypeRequest> {
     BannerTypeMapper INSTANCE = Mappers.getMapper(BannerTypeMapper.class);

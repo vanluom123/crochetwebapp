@@ -3,13 +3,17 @@ package org.crochet.mapper;
 import org.crochet.model.File;
 import org.crochet.payload.response.FileResponse;
 import org.mapstruct.Mapper;
+import org.mapstruct.MappingConstants;
 import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 
 import java.util.Collection;
 import java.util.List;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(
+        unmappedTargetPolicy = ReportingPolicy.IGNORE,
+        componentModel = MappingConstants.ComponentModel.SPRING
+)
 public interface FileMapper {
     FileMapper INSTANCE = Mappers.getMapper(FileMapper.class);
 
