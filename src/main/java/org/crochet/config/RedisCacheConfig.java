@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+import org.springframework.data.redis.connection.jedis.JedisClientConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
@@ -85,6 +86,12 @@ public class RedisCacheConfig {
         conf.setPort(redisCacheProperties().getPort());
         conf.setUsername(redisCacheProperties().getUsername());
         conf.setPassword(redisCacheProperties().getPassword());
-        return new JedisConnectionFactory(conf);
+        var jedisClientConfBuilder = JedisClientConfiguration.builder();
+        if (redisCacheProperties().isSsl()) {
+            jedisClientConfBuilder.useSsl();
+        }
+        jedisClientConfBuilder.usePooling();
+        JedisClientConfiguration jedisClientConf = jedisClientConfBuilder.build();
+        return new JedisConnectionFactory(conf, jedisClientConf);
     }
 }
