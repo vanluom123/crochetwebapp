@@ -7,6 +7,7 @@ import org.crochet.service.BlogCategoryService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,16 +38,16 @@ public class BlogCategoryController {
         return blogCategoryService.updateBlogCategory(request);
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping("/delete/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteBlogCategory(String id) {
+    public void deleteBlogCategory(@PathVariable String id) {
         blogCategoryService.deleteBlogCategory(id);
     }
 
-    @GetMapping("/detail")
+    @GetMapping("/detail/{id}")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public BlogCategoryResponse getDetail(String id) {
+    public BlogCategoryResponse getDetail(@PathVariable String id) {
         return blogCategoryService.getBlogCategory(id);
     }
 

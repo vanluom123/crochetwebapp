@@ -2,6 +2,7 @@ package org.crochet.repository;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.model.BaseEntity;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,7 +34,11 @@ public class BaseRepositoryImpl<T extends BaseEntity, ID extends Serializable> i
 
     @Override
     public T findById(ID id) {
-        return em.find(entityClass, id);
+        var entity = em.find(entityClass, id);
+        if (entity == null) {
+            throw new ResourceNotFoundException(entityClass.getSimpleName() + " not found");
+        }
+        return entity;
     }
 
     @Transactional
