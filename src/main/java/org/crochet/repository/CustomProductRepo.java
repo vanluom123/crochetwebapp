@@ -4,8 +4,5 @@ import org.crochet.model.Product;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class CustomProductRepo extends BaseRepositoryImpl<Product> {
-    public CustomProductRepo() {
-        super(Product.class);
-    }
+public class CustomProductRepo extends BaseRepositoryImpl<Product, String> {
 }
