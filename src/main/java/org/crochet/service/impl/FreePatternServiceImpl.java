@@ -1,5 +1,6 @@
 package org.crochet.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import org.crochet.constant.AppConstant;
 import org.crochet.mapper.FileMapper;
 import org.crochet.mapper.FreePatternMapper;
@@ -15,6 +16,7 @@ import org.crochet.repository.FreePatternRepository;
 import org.crochet.repository.FreePatternSpecifications;
 import org.crochet.repository.Specifications;
 import org.crochet.service.FreePatternService;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -31,6 +33,7 @@ import java.util.Objects;
 /**
  * FreePatternServiceImpl class
  */
+@Slf4j
 @Service
 public class FreePatternServiceImpl implements FreePatternService {
     private final FreePatternRepository freePatternRepo;
@@ -152,8 +155,10 @@ public class FreePatternServiceImpl implements FreePatternService {
      *
      * @return A list of {@link FreePatternResponse} objects containing information about the FreePatterns.
      */
+    @Cacheable(value = "limitedfreepatterns")
     @Override
     public List<FreePatternResponse> getLimitedFreePatterns() {
+        log.info("Fetching limited free patterns");
         var freePatterns = freePatternRepo.findAll()
                 .stream()
                 .filter(FreePattern::isHome)

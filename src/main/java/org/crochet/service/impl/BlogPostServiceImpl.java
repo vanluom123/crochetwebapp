@@ -1,5 +1,6 @@
 package org.crochet.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.BlogPostMapper;
 import org.crochet.mapper.FileMapper;
@@ -11,6 +12,7 @@ import org.crochet.repository.BlogPostRepository;
 import org.crochet.repository.BlogPostSpecifications;
 import org.crochet.repository.CustomBlogRepo;
 import org.crochet.service.BlogPostService;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -27,6 +29,7 @@ import static org.crochet.constant.AppConstant.BLOG_LIMITED;
 /**
  * BlogPostServiceImpl class
  */
+@Slf4j
 @Service
 public class BlogPostServiceImpl implements BlogPostService {
     private final BlogPostRepository blogPostRepo;
@@ -123,8 +126,10 @@ public class BlogPostServiceImpl implements BlogPostService {
      *
      * @return A list of {@link BlogPostResponse} containing limited blog posts.
      */
+    @Cacheable(value = "limitedblogs")
     @Override
     public List<BlogPostResponse> getLimitedBlogPosts() {
+        log.info("Fetching limited blog posts");
         var blogPosts = blogPostRepo.findAll()
                 .stream()
                 .filter(BlogPost::isHome)

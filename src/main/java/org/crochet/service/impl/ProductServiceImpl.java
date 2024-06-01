@@ -1,5 +1,6 @@
 package org.crochet.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import org.crochet.constant.AppConstant;
 import org.crochet.mapper.FileMapper;
 import org.crochet.mapper.ProductMapper;
@@ -14,6 +15,7 @@ import org.crochet.repository.ProductRepository;
 import org.crochet.repository.ProductSpecifications;
 import org.crochet.repository.Specifications;
 import org.crochet.service.ProductService;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +31,7 @@ import java.util.List;
 /**
  * ProductServiceImpl class
  */
+@Slf4j
 @Service
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepo;
@@ -131,8 +134,10 @@ public class ProductServiceImpl implements ProductService {
         return products;
     }
 
+    @Cacheable(value = "limitedproducts")
     @Override
     public List<ProductResponse> getLimitedProducts() {
+        log.info("Fetching limited products");
         var products = productRepo.findAll()
                 .stream()
                 .filter(Product::isHome)

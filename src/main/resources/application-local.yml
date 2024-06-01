@@ -6,8 +6,6 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
         format_sql: true
     generate-ddl: true
-    hibernate:
-      ddl-auto: create-drop
   datasource:
     url: jdbc:mysql://localhost:3306/testDB
     username: root

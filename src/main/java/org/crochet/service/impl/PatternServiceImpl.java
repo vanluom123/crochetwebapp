@@ -1,5 +1,6 @@
 package org.crochet.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import org.crochet.constant.AppConstant;
 import org.crochet.mapper.FileMapper;
 import org.crochet.mapper.PatternMapper;
@@ -15,6 +16,7 @@ import org.crochet.repository.PatternRepository;
 import org.crochet.repository.PatternSpecifications;
 import org.crochet.repository.Specifications;
 import org.crochet.service.PatternService;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -31,6 +33,7 @@ import java.util.Queue;
 /**
  * PatternServiceImpl class
  */
+@Slf4j
 @Service
 public class PatternServiceImpl implements PatternService {
     private final PatternRepository patternRepo;
@@ -113,8 +116,10 @@ public class PatternServiceImpl implements PatternService {
                 .build();
     }
 
+    @Cacheable(value = "limitedpatterns")
     @Override
     public List<PatternResponse> getLimitedPatterns() {
+        log.info("Fetching limited patterns");
         var patterns = patternRepo.findAll()
                 .stream()
                 .filter(Pattern::isHome)
