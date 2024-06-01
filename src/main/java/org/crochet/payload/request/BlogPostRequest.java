@@ -13,6 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 public class BlogPostRequest {
     private String id;
+    private String blogCategoryId;
     private String title;
     private String content;
     @JsonProperty("is_home")

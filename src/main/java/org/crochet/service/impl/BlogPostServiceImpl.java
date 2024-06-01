@@ -10,6 +10,7 @@ import org.crochet.payload.response.BlogPostPaginationResponse;
 import org.crochet.payload.response.BlogPostResponse;
 import org.crochet.repository.BlogPostRepository;
 import org.crochet.repository.BlogPostSpecifications;
+import org.crochet.repository.CustomBlogCategoryRepo;
 import org.crochet.repository.CustomBlogRepo;
 import org.crochet.service.BlogPostService;
 import org.springframework.cache.annotation.Cacheable;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
+import java.util.Objects;
 
 import static org.crochet.constant.AppConstant.BLOG_LIMITED;
 
@@ -34,16 +36,21 @@ import static org.crochet.constant.AppConstant.BLOG_LIMITED;
 public class BlogPostServiceImpl implements BlogPostService {
     private final BlogPostRepository blogPostRepo;
     private final CustomBlogRepo customBlogRepo;
+    private final CustomBlogCategoryRepo customBlogCategoryRepo;
 
     /**
      * Constructs a new {@code BlogPostServiceImpl} with the specified BlogPost repository.
      *
-     * @param blogPostRepo The repository for handling BlogPost-related operations.
+     * @param blogPostRepo           The repository for handling BlogPost-related operations.
+     * @param customBlogRepo         The repository for handling custom BlogPost-related operations.
+     * @param customBlogCategoryRepo The repository for handling custom BlogCategory-related operations.
      */
     public BlogPostServiceImpl(BlogPostRepository blogPostRepo,
-                               CustomBlogRepo customBlogRepo) {
+                               CustomBlogRepo customBlogRepo,
+                               CustomBlogCategoryRepo customBlogCategoryRepo) {
         this.blogPostRepo = blogPostRepo;
         this.customBlogRepo = customBlogRepo;
+        this.customBlogCategoryRepo = customBlogCategoryRepo;
     }
 
     /**
@@ -59,7 +66,9 @@ public class BlogPostServiceImpl implements BlogPostService {
     public BlogPostResponse createOrUpdatePost(BlogPostRequest request) {
         BlogPost blogPost;
         if (!StringUtils.hasText(request.getId())) {
+            var blogCategory = customBlogCategoryRepo.findById(request.getBlogCategoryId());
             blogPost = BlogPost.builder()
+                    .blogCategory(blogCategory)
                     .title(request.getTitle())
                     .content(request.getContent())
                     .home(request.isHome())
@@ -68,6 +77,10 @@ public class BlogPostServiceImpl implements BlogPostService {
         } else {
             blogPost = customBlogRepo.findById(request.getId());
             blogPost = BlogPostMapper.INSTANCE.partialUpdate(request, blogPost);
+            if (!Objects.equals(blogPost.getBlogCategory().getId(), request.getBlogCategoryId())) {
+                var blogCategory = customBlogCategoryRepo.findById(request.getBlogCategoryId());
+                blogPost.setBlogCategory(blogCategory);
+            }
         }
         blogPost = blogPostRepo.save(blogPost);
         return BlogPostMapper.INSTANCE.toResponse(blogPost);

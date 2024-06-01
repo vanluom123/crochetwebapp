@@ -4,8 +4,5 @@ import org.crochet.model.FreePattern;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class CustomFreePatternRepo extends BaseRepositoryImpl<FreePattern> {
-    public CustomFreePatternRepo() {
-        super(FreePattern.class);
-    }
+public class CustomFreePatternRepo extends BaseRepositoryImpl<FreePattern, String> {
 }
