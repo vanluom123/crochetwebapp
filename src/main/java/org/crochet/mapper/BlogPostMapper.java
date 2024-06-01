@@ -14,8 +14,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE,
-        uses = {FileMapper.class})
+@Mapper(
+        unmappedTargetPolicy = ReportingPolicy.IGNORE,
+        uses = {FileMapper.class}
+)
 public interface BlogPostMapper extends PartialUpdate<BlogPost, BlogPostRequest> {
     BlogPostMapper INSTANCE = Mappers.getMapper(BlogPostMapper.class);
 

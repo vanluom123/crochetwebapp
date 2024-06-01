@@ -8,7 +8,6 @@ import org.crochet.service.FreePatternService;
 import org.crochet.service.HomeService;
 import org.crochet.service.PatternService;
 import org.crochet.service.ProductService;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -21,7 +20,6 @@ public class HomeServiceImpl implements HomeService {
     private final BlogPostService blogService;
 
     @Override
-    @Cacheable(value = "gethomes")
     public HomeResponse getHomes() {
         var prods = productService.getLimitedProducts();
         var patterns = patternService.getLimitedPatterns();
