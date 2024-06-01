@@ -3,39 +3,47 @@ package org.crochet.repository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.crochet.exception.ResourceNotFoundException;
+import org.crochet.model.BaseEntity;
 import org.springframework.transaction.annotation.Transactional;
 
-public abstract class BaseRepositoryImpl<T> implements BaseRepository<T> {
+import java.io.Serializable;
+import java.lang.reflect.ParameterizedType;
+
+public class BaseRepositoryImpl<T extends BaseEntity, ID extends Serializable> implements BaseRepository<T, ID> {
     @PersistenceContext
-    protected EntityManager em;
+    private EntityManager em;
 
-    private final Class<T> type;
+    private final Class<T> entityClass;
 
-    public BaseRepositoryImpl(Class<T> type) {
-        this.type = type;
+    public BaseRepositoryImpl() {
+        this.entityClass = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
     }
 
     @Transactional
+    @Override
     public T save(T entity) {
         em.persist(entity);
         return entity;
     }
 
     @Transactional
+    @Override
     public T update(T entity) {
         return em.merge(entity);
     }
 
-    public T findById(String id) {
-        T entity = em.find(type, id);
+    @Override
+    public T findById(ID id) {
+        var entity = em.find(entityClass, id);
         if (entity == null) {
-            throw new ResourceNotFoundException(type.getSimpleName() + " not found");
+            throw new ResourceNotFoundException(entityClass.getSimpleName() + " not found");
         }
         return entity;
     }
 
     @Transactional
-    public void deleteById(String id) {
+    @Override
+    public void deleteById(ID id) {
         T entity = findById(id);
         if (entity != null) {
             delete(entity);
@@ -43,6 +51,7 @@ public abstract class BaseRepositoryImpl<T> implements BaseRepository<T> {
     }
 
     @Transactional
+    @Override
     public void delete(T entity) {
         em.remove(entity);
     }

@@ -1,0 +1,69 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1715988199957-5
+      author: admin (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_blog_category
+                  name: id
+                  type: VARCHAR(255)
+              - column:
+                  name: created_by
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: created_date
+                  type: DATETIME
+              - column:
+                  name: last_modified_by
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: last_modified_date
+                  type: DATETIME
+              - column:
+                  constraints:
+                    nullable: false
+                  name: name
+                  type: VARCHAR(255)
+            tableName: blog_category
+  - changeSet:
+      id: 1715988199957-6
+      author: admin (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  name: blog_category_id
+                  type: VARCHAR(255)
+            tableName: blog_post
+  - changeSet:
+      id: 1715988199957-7
+      author: admin (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addUniqueConstraint:
+            columnNames: name
+            constraintName: uc_blog_category_name
+            tableName: blog_category
+  - changeSet:
+      id: 1715988199957-8
+      author: admin (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: blog_category_id
+            baseTableName: blog_post
+            constraintName: FK_BLOG_POST_ON_BLOG_CATEGORY
+            referencedColumnNames: id
+            referencedTableName: blog_category
+

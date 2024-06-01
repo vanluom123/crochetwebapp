@@ -8,4 +8,9 @@ public class RedisCacheProperties {
     private int port;
     private String username;
     private String password;
+    private boolean isSsl;
+
+    public boolean isSsl() {
+        return username != null && password != null && isSsl;
+    }
 }

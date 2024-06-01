@@ -9,7 +9,9 @@ import org.mapstruct.factory.Mappers;
 import java.util.Collection;
 import java.util.List;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(
+        unmappedTargetPolicy = ReportingPolicy.IGNORE
+)
 public interface FileMapper {
     FileMapper INSTANCE = Mappers.getMapper(FileMapper.class);
 

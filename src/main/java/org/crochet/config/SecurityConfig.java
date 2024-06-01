@@ -83,7 +83,6 @@ public class SecurityConfig {
                 .exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(
                         new RestAuthenticationEntryPoint()))
                 .authorizeHttpRequests(authReq -> authReq
-                        .requestMatchers(authorizeHttpRequestProperties().getPermitAll()).permitAll()
                         .requestMatchers(authorizeHttpRequestProperties().getAuthenticated()).authenticated()
                         .anyRequest().permitAll())
                 .oauth2Login(oauth -> oauth.authorizationEndpoint(authEndpointCustomizer ->
