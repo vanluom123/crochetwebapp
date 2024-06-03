@@ -15,7 +15,9 @@ import org.crochet.repository.ProductRepository;
 import org.crochet.repository.ProductSpecifications;
 import org.crochet.repository.Specifications;
 import org.crochet.service.ProductService;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -63,6 +65,12 @@ public class ProductServiceImpl implements ProductService {
      */
     @Transactional
     @Override
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "limitedproducts", allEntries = true),
+                    @CacheEvict(value = "products", allEntries = true)
+            }
+    )
     public ProductResponse createOrUpdate(ProductRequest request) {
         Product product;
         if (!StringUtils.hasText(request.getId())) {
@@ -99,8 +107,10 @@ public class ProductServiceImpl implements ProductService {
      * @return A {@link ProductPaginationResponse} containing the paginated list of products.
      */
     @Override
+    @Cacheable(value = "products", key = "T(java.util.Objects).hash(#pageNo, #pageSize, #sortBy, #sortDir, #searchText, #categoryId, #filters)")
     public ProductPaginationResponse getProducts(int pageNo, int pageSize, String sortBy, String sortDir,
                                                  String searchText, String categoryId, List<Filter> filters) {
+        log.info("Fetching products");
         // create Sort instance
         Sort sort = Sort.by(sortBy);
         sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? sort.ascending() : sort.descending();
@@ -108,10 +118,10 @@ public class ProductServiceImpl implements ProductService {
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
         Specification<Product> spec = Specifications.getSpecificationFromFilters(filters);
         if (StringUtils.hasText(searchText)) {
-            spec = spec.and(ProductSpecifications.searchByNameOrDesc(searchText));
+            spec = spec.or(ProductSpecifications.searchByNameOrDesc(searchText));
         }
         if (StringUtils.hasText(categoryId)) {
-            spec = spec.and(ProductSpecifications.in(getProductsByCategory(categoryId)));
+            spec = spec.or(ProductSpecifications.in(getProductsByCategory(categoryId)));
         }
         Page<Product> menuPage = productRepo.findAll(spec, pageable);
         List<ProductResponse> contents = ProductMapper.INSTANCE.toResponses(menuPage.getContent());
@@ -160,6 +170,12 @@ public class ProductServiceImpl implements ProductService {
 
     @Transactional
     @Override
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "limitedproducts", allEntries = true),
+                    @CacheEvict(value = "products", allEntries = true)
+            }
+    )
     public void delete(String id) {
         customProductRepo.deleteById(id);
     }
