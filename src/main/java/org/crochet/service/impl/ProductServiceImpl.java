@@ -113,10 +113,10 @@ public class ProductServiceImpl implements ProductService {
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
         Specification<Product> spec = Specifications.getSpecificationFromFilters(filters);
         if (StringUtils.hasText(searchText)) {
-            spec = spec.and(ProductSpecifications.searchByNameOrDesc(searchText));
+            spec = spec.or(ProductSpecifications.searchByNameOrDesc(searchText));
         }
         if (StringUtils.hasText(categoryId)) {
-            spec = spec.and(ProductSpecifications.in(getProductsByCategory(categoryId)));
+            spec = spec.or(ProductSpecifications.in(getProductsByCategory(categoryId)));
         }
         Page<Product> menuPage = productRepo.findAll(spec, pageable);
         List<ProductResponse> contents = ProductMapper.INSTANCE.toResponses(menuPage.getContent());
