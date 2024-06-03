@@ -1,7 +1,13 @@
 name: Docker deployment
 
 on:
-  workflow_dispatch:
+  workflow_run:
+    workflows: [ "Build on Development" ]
+    types:
+      - completed
+  push:
+    branches:
+      - 'release'
 
 jobs:
   docker:
