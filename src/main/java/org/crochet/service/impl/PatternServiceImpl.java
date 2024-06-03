@@ -103,10 +103,10 @@ public class PatternServiceImpl implements PatternService {
         sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? sort.ascending() : sort.descending();
         Specification<Pattern> spec = Specifications.getSpecificationFromFilters(filters);
         if (StringUtils.hasText(searchText)) {
-            spec = spec.and(PatternSpecifications.searchByNameOrDesc(searchText));
+            spec = spec.or(PatternSpecifications.searchByNameOrDesc(searchText));
         }
         if (StringUtils.hasText(categoryId)) {
-            spec = spec.and(PatternSpecifications.in(getPatternsByCategory(categoryId)));
+            spec = spec.or(PatternSpecifications.in(getPatternsByCategory(categoryId)));
         }
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
         var page = patternRepo.findAll(spec, pageable);

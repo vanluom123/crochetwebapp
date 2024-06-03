@@ -119,11 +119,11 @@ public class FreePatternServiceImpl implements FreePatternService {
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
         Specification<FreePattern> spec = Specifications.getSpecificationFromFilters(filters);
         if (StringUtils.hasText(searchText)) {
-            spec = spec.and(FreePatternSpecifications.searchByNameDescOrAuthor(searchText));
+            spec = spec.or(FreePatternSpecifications.searchByNameDescOrAuthor(searchText));
         }
         // add filter criteria
         if (StringUtils.hasText(categoryId)) {
-            spec = spec.and(FreePatternSpecifications.existIn(getAllFreePatterns(categoryId)));
+            spec = spec.or(FreePatternSpecifications.existIn(getAllFreePatterns(categoryId)));
         }
         // retrieve FreePatterns
         Page<FreePattern> page = freePatternRepo.findAll(spec, pageable);

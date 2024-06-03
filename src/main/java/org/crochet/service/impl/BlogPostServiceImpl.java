@@ -110,7 +110,7 @@ public class BlogPostServiceImpl implements BlogPostService {
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
         Specification<BlogPost> spec = Specification.where(null);
         if (StringUtils.hasText(searchText)) {
-            spec = spec.and(BlogPostSpecifications.searchBy(searchText));
+            spec = spec.or(BlogPostSpecifications.searchBy(searchText));
         }
 
         Page<BlogPost> menuPage = blogPostRepo.findAll(spec, pageable);
