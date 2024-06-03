@@ -15,7 +15,9 @@ import org.crochet.repository.ProductRepository;
 import org.crochet.repository.ProductSpecifications;
 import org.crochet.repository.Specifications;
 import org.crochet.service.ProductService;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -63,6 +65,9 @@ public class ProductServiceImpl implements ProductService {
      */
     @Transactional
     @Override
+    @Caching(
+            evict = {@CacheEvict(value = "limitedproducts", allEntries = true)}
+    )
     public ProductResponse createOrUpdate(ProductRequest request) {
         Product product;
         if (!StringUtils.hasText(request.getId())) {
@@ -160,6 +165,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Transactional
     @Override
+    @CacheEvict(value = "limitedproducts", allEntries = true)
     public void delete(String id) {
         customProductRepo.deleteById(id);
     }

@@ -16,7 +16,9 @@ import org.crochet.repository.FreePatternRepository;
 import org.crochet.repository.FreePatternSpecifications;
 import org.crochet.repository.Specifications;
 import org.crochet.service.FreePatternService;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -65,6 +67,9 @@ public class FreePatternServiceImpl implements FreePatternService {
      */
     @Transactional
     @Override
+    @Caching(
+            evict = {@CacheEvict(value = "limitedfreepatterns", allEntries = true)}
+    )
     public FreePatternResponse createOrUpdate(FreePatternRequest request) {
         FreePattern freePattern;
         if (!StringUtils.hasText(request.getId())) {
@@ -181,6 +186,7 @@ public class FreePatternServiceImpl implements FreePatternService {
 
     @Transactional
     @Override
+    @CacheEvict(value = "limitedfreepatterns", allEntries = true)
     public void delete(String id) {
         customFreePatternRepo.deleteById(id);
     }
