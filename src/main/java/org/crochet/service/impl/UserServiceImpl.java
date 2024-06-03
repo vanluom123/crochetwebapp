@@ -85,7 +85,7 @@ public class UserServiceImpl implements UserService {
         Specification<User> spec = Specifications.getSpecificationFromFilters(filters);
         // Search by search text
         if (StringUtils.hasText(searchText)) {
-            spec = spec.and(UserSpecification.searchByNameOrEmail(searchText));
+            spec = spec.or(UserSpecification.searchByNameOrEmail(searchText));
         }
         Page<User> page = userRepository.findAll(spec, pageable);
         List<UserResponse> users = UserMapper.INSTANCE.toResponses(page.getContent());

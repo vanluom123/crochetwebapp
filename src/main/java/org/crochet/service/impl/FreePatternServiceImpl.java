@@ -16,7 +16,9 @@ import org.crochet.repository.FreePatternRepository;
 import org.crochet.repository.FreePatternSpecifications;
 import org.crochet.repository.Specifications;
 import org.crochet.service.FreePatternService;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -65,6 +67,12 @@ public class FreePatternServiceImpl implements FreePatternService {
      */
     @Transactional
     @Override
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "limitedfreepatterns", allEntries = true),
+                    @CacheEvict(value = "freepatterns", allEntries = true)
+            }
+    )
     public FreePatternResponse createOrUpdate(FreePatternRequest request) {
         FreePattern freePattern;
         if (!StringUtils.hasText(request.getId())) {
@@ -105,8 +113,10 @@ public class FreePatternServiceImpl implements FreePatternService {
      * @return A {@link PaginatedFreePatternResponse} containing the paginated list of FreePatterns.
      */
     @Override
+    @Cacheable(value = "freepatterns", key = "T(java.util.Objects).hash(#pageNo, #pageSize, #sortBy, #sortDir, #searchText, #categoryId, #filters)")
     public PaginatedFreePatternResponse getFreePatterns(int pageNo, int pageSize, String sortBy, String sortDir,
                                                         String searchText, String categoryId, List<Filter> filters) {
+        log.info("Fetching free patterns");
         // create Sort instance
         Sort sort = Sort.by(sortBy);
         sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? sort.ascending() : sort.descending();
@@ -114,11 +124,11 @@ public class FreePatternServiceImpl implements FreePatternService {
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
         Specification<FreePattern> spec = Specifications.getSpecificationFromFilters(filters);
         if (StringUtils.hasText(searchText)) {
-            spec = spec.and(FreePatternSpecifications.searchByNameDescOrAuthor(searchText));
+            spec = spec.or(FreePatternSpecifications.searchByNameDescOrAuthor(searchText));
         }
         // add filter criteria
         if (StringUtils.hasText(categoryId)) {
-            spec = spec.and(FreePatternSpecifications.existIn(getAllFreePatterns(categoryId)));
+            spec = spec.or(FreePatternSpecifications.existIn(getAllFreePatterns(categoryId)));
         }
         // retrieve FreePatterns
         Page<FreePattern> page = freePatternRepo.findAll(spec, pageable);
@@ -181,6 +191,12 @@ public class FreePatternServiceImpl implements FreePatternService {
 
     @Transactional
     @Override
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "limitedfreepatterns", allEntries = true),
+                    @CacheEvict(value = "freepatterns", allEntries = true)
+            }
+    )
     public void delete(String id) {
         customFreePatternRepo.deleteById(id);
     }

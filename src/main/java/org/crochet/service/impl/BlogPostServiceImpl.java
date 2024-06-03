@@ -13,7 +13,9 @@ import org.crochet.repository.BlogPostSpecifications;
 import org.crochet.repository.CustomBlogCategoryRepo;
 import org.crochet.repository.CustomBlogRepo;
 import org.crochet.service.BlogPostService;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -63,6 +65,12 @@ public class BlogPostServiceImpl implements BlogPostService {
      */
     @Transactional
     @Override
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "limitedblogs", allEntries = true),
+                    @CacheEvict(value = "blogs", allEntries = true)
+            }
+    )
     public BlogPostResponse createOrUpdatePost(BlogPostRequest request) {
         BlogPost blogPost;
         if (!StringUtils.hasText(request.getId())) {
@@ -97,7 +105,9 @@ public class BlogPostServiceImpl implements BlogPostService {
      * @return A {@link BlogPostPaginationResponse} containing the paginated list of blog posts.
      */
     @Override
+    @Cacheable(value = "blogs", key = "T(java.util.Objects).hash(#pageNo, #pageSize, #sortBy, #sortDir, #searchText)")
     public BlogPostPaginationResponse getBlogs(int pageNo, int pageSize, String sortBy, String sortDir, String searchText) {
+        log.info("Fetching blog posts");
         // create Sort instance
         Sort sort = Sort.by(sortBy);
         sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? sort.ascending() : sort.descending();
@@ -105,7 +115,7 @@ public class BlogPostServiceImpl implements BlogPostService {
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
         Specification<BlogPost> spec = Specification.where(null);
         if (StringUtils.hasText(searchText)) {
-            spec = spec.and(BlogPostSpecifications.searchBy(searchText));
+            spec = spec.or(BlogPostSpecifications.searchBy(searchText));
         }
 
         Page<BlogPost> menuPage = blogPostRepo.findAll(spec, pageable);
@@ -159,6 +169,12 @@ public class BlogPostServiceImpl implements BlogPostService {
      */
     @Transactional
     @Override
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "limitedblogs", allEntries = true),
+                    @CacheEvict(value = "blogs", allEntries = true)
+            }
+    )
     public void deletePost(String id) {
         var blogPost = customBlogRepo.findById(id);
         blogPostRepo.delete(blogPost);
