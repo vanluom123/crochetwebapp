@@ -58,7 +58,10 @@ public class PatternServiceImpl implements PatternService {
     @Transactional
     @Override
     @Caching(
-            evict = {@CacheEvict(value = "limitedpatterns", allEntries = true)}
+            evict = {
+                    @CacheEvict(value = "limitedpatterns", allEntries = true),
+                    @CacheEvict(value = "patterns", allEntries = true)
+            }
     )
     public PatternResponse createOrUpdate(PatternRequest request) {
         Pattern pattern;
@@ -97,8 +100,10 @@ public class PatternServiceImpl implements PatternService {
      * @return Pattern is paginated
      */
     @Override
+    @Cacheable(value = "patterns", key = "T(java.util.Objects).hash(#pageNo, #pageSize, #sortBy, #sortDir, #searchText, #categoryId, #filters)")
     public PatternPaginationResponse getPatterns(int pageNo, int pageSize, String sortBy, String sortDir,
                                                  String searchText, String categoryId, List<Filter> filters) {
+        log.info("Fetching patterns");
         Sort sort = Sort.by(sortBy);
         sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? sort.ascending() : sort.descending();
         Specification<Pattern> spec = Specifications.getSpecificationFromFilters(filters);
@@ -162,7 +167,12 @@ public class PatternServiceImpl implements PatternService {
 
     @Transactional
     @Override
-    @CacheEvict(value = "limitedpatterns", allEntries = true)
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "limitedpatterns", allEntries = true),
+                    @CacheEvict(value = "patterns", allEntries = true)
+            }
+    )
     public void deletePattern(String id) {
         patternRepo.deleteById(id);
     }

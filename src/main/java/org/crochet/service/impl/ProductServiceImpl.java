@@ -66,7 +66,10 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     @Override
     @Caching(
-            evict = {@CacheEvict(value = "limitedproducts", allEntries = true)}
+            evict = {
+                    @CacheEvict(value = "limitedproducts", allEntries = true),
+                    @CacheEvict(value = "products", allEntries = true)
+            }
     )
     public ProductResponse createOrUpdate(ProductRequest request) {
         Product product;
@@ -104,8 +107,10 @@ public class ProductServiceImpl implements ProductService {
      * @return A {@link ProductPaginationResponse} containing the paginated list of products.
      */
     @Override
+    @Cacheable(value = "products", key = "T(java.util.Objects).hash(#pageNo, #pageSize, #sortBy, #sortDir, #searchText, #categoryId, #filters)")
     public ProductPaginationResponse getProducts(int pageNo, int pageSize, String sortBy, String sortDir,
                                                  String searchText, String categoryId, List<Filter> filters) {
+        log.info("Fetching products");
         // create Sort instance
         Sort sort = Sort.by(sortBy);
         sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? sort.ascending() : sort.descending();
@@ -165,7 +170,12 @@ public class ProductServiceImpl implements ProductService {
 
     @Transactional
     @Override
-    @CacheEvict(value = "limitedproducts", allEntries = true)
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "limitedproducts", allEntries = true),
+                    @CacheEvict(value = "products", allEntries = true)
+            }
+    )
     public void delete(String id) {
         customProductRepo.deleteById(id);
     }
