@@ -16,7 +16,9 @@ import org.crochet.repository.PatternRepository;
 import org.crochet.repository.PatternSpecifications;
 import org.crochet.repository.Specifications;
 import org.crochet.service.PatternService;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -55,6 +57,9 @@ public class PatternServiceImpl implements PatternService {
      */
     @Transactional
     @Override
+    @Caching(
+            evict = {@CacheEvict(value = "limitedpatterns", allEntries = true)}
+    )
     public PatternResponse createOrUpdate(PatternRequest request) {
         Pattern pattern;
         if (!StringUtils.hasText(request.getId())) {
@@ -157,6 +162,7 @@ public class PatternServiceImpl implements PatternService {
 
     @Transactional
     @Override
+    @CacheEvict(value = "limitedpatterns", allEntries = true)
     public void deletePattern(String id) {
         patternRepo.deleteById(id);
     }

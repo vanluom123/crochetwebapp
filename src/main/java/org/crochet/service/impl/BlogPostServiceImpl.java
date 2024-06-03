@@ -13,7 +13,9 @@ import org.crochet.repository.BlogPostSpecifications;
 import org.crochet.repository.CustomBlogCategoryRepo;
 import org.crochet.repository.CustomBlogRepo;
 import org.crochet.service.BlogPostService;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -63,6 +65,9 @@ public class BlogPostServiceImpl implements BlogPostService {
      */
     @Transactional
     @Override
+    @Caching(
+            evict = {@CacheEvict(value = "limitedblogs", allEntries = true)}
+    )
     public BlogPostResponse createOrUpdatePost(BlogPostRequest request) {
         BlogPost blogPost;
         if (!StringUtils.hasText(request.getId())) {
@@ -159,6 +164,7 @@ public class BlogPostServiceImpl implements BlogPostService {
      */
     @Transactional
     @Override
+    @CacheEvict(value = "limitedblogs", allEntries = true)
     public void deletePost(String id) {
         var blogPost = customBlogRepo.findById(id);
         blogPostRepo.delete(blogPost);
