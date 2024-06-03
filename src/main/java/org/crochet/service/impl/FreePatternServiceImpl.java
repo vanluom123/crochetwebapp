@@ -68,7 +68,10 @@ public class FreePatternServiceImpl implements FreePatternService {
     @Transactional
     @Override
     @Caching(
-            evict = {@CacheEvict(value = "limitedfreepatterns", allEntries = true)}
+            evict = {
+                    @CacheEvict(value = "limitedfreepatterns", allEntries = true),
+                    @CacheEvict(value = "freepatterns", allEntries = true)
+            }
     )
     public FreePatternResponse createOrUpdate(FreePatternRequest request) {
         FreePattern freePattern;
@@ -110,8 +113,10 @@ public class FreePatternServiceImpl implements FreePatternService {
      * @return A {@link PaginatedFreePatternResponse} containing the paginated list of FreePatterns.
      */
     @Override
+    @Cacheable(value = "freepatterns", key = "T(java.util.Objects).hash(#pageNo, #pageSize, #sortBy, #sortDir, #searchText, #categoryId, #filters)")
     public PaginatedFreePatternResponse getFreePatterns(int pageNo, int pageSize, String sortBy, String sortDir,
                                                         String searchText, String categoryId, List<Filter> filters) {
+        log.info("Fetching free patterns");
         // create Sort instance
         Sort sort = Sort.by(sortBy);
         sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? sort.ascending() : sort.descending();
@@ -186,7 +191,12 @@ public class FreePatternServiceImpl implements FreePatternService {
 
     @Transactional
     @Override
-    @CacheEvict(value = "limitedfreepatterns", allEntries = true)
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "limitedfreepatterns", allEntries = true),
+                    @CacheEvict(value = "freepatterns", allEntries = true)
+            }
+    )
     public void delete(String id) {
         customFreePatternRepo.deleteById(id);
     }
