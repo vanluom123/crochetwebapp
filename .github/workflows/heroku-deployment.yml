@@ -1,10 +1,6 @@
 name: Heroku Deployment
 
 on:
-  workflow_run:
-    workflows: [ "Build on Production" ]
-    types:
-      - completed
   push:
     branches:
       - 'master'
