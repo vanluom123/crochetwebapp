@@ -21,7 +21,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/bannerType")
 @PreAuthorize("hasRole('ADMIN')")
-@SecurityRequirement(name = "bearerAuth")
+@SecurityRequirement(name = "BearerAuth")
 public class BannerTypeController {
     final BannerTypeService bannerTypeService;
 

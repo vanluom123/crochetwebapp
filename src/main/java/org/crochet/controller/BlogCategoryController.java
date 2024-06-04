@@ -1,10 +1,12 @@
 package org.crochet.controller;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.crochet.payload.request.BlogCategoryRequest;
 import org.crochet.payload.response.BlogCategoryResponse;
 import org.crochet.service.BlogCategoryService;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,6 +29,8 @@ public class BlogCategoryController {
     @PostMapping("/create")
     @ResponseBody
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('ADMIN')")
+    @SecurityRequirement(name = "BearerAuth")
     public BlogCategoryResponse createBlogCategory(@RequestBody BlogCategoryRequest request) {
         return blogCategoryService.createBlogCategory(request);
     }
@@ -34,12 +38,16 @@ public class BlogCategoryController {
     @PutMapping("/update")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasRole('ADMIN')")
+    @SecurityRequirement(name = "BearerAuth")
     public BlogCategoryResponse updateBlogCategory(@RequestBody BlogCategoryRequest request) {
         return blogCategoryService.updateBlogCategory(request);
     }
 
     @DeleteMapping("/delete/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ADMIN')")
+    @SecurityRequirement(name = "BearerAuth")
     public void deleteBlogCategory(@PathVariable String id) {
         blogCategoryService.deleteBlogCategory(id);
     }

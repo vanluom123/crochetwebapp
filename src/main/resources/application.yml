@@ -69,3 +69,6 @@ authorize:
       - "/users/**"
       - "/banner/batchInsertOrUpdate"
       - "/bannerType/**"
+      - "/blog-categories/create"
+      - "/blog-categories/update"
+      - "/blog-categories/delete/**"
