@@ -48,7 +48,7 @@ app:
     allowed-origins:
       - http://localhost:3000
       - https://tieuphuongcrochet.com
-      - https://fonts.googleapis.com
+      - https://fonts.googleapis.com/css?family=Rubik|HelveticaNeue|Helvetica+Neue|Playfair+Display
 
 authorize:
   http-request:
