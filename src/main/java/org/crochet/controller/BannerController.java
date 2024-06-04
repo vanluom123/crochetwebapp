@@ -29,7 +29,7 @@ public class BannerController {
     @ResponseBody
     @PostMapping("/batchInsertOrUpdate")
     @PreAuthorize("hasRole('ADMIN')")
-    @SecurityRequirement(name = "bearerAuth")
+    @SecurityRequirement(name = "BearerAuth")
     public List<BannerResponse> batchInsertOrUpdate(@RequestBody List<BannerRequest> requests) {
         return bannerService.batchInsertOrUpdate(requests);
     }
