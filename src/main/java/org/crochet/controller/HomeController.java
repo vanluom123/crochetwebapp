@@ -23,7 +23,7 @@ public class HomeController {
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = HomeResponse.class)))
     @GetMapping
     public ResponseEntity<HomeResponse> getHomes() {
-        var response = homeService.getHomes();
+        var response = homeService.getHomesAsync().join();
         return ResponseEntity.ok(response);
     }
 }
