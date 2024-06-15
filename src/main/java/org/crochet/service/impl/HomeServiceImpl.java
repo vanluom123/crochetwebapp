@@ -12,8 +12,6 @@ import org.crochet.service.ProductService;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 @Slf4j
 @Service
@@ -27,15 +25,13 @@ public class HomeServiceImpl implements HomeService {
 
     @Override
     public HomeResponse getHomes() {
-        ExecutorService executor = Executors.newFixedThreadPool(5);
+        var prodFuture = CompletableFuture.supplyAsync(productService::getLimitedProducts);
+        var patternFuture = CompletableFuture.supplyAsync(patternService::getLimitedPatterns);
+        var freePatternFuture = CompletableFuture.supplyAsync(freePatternService::getLimitedFreePatterns);
+        var bannerFuture = CompletableFuture.supplyAsync(bannerService::getAll);
+        var blogFuture = CompletableFuture.supplyAsync(blogService::getLimitedBlogPosts);
 
-        var prodFuture = CompletableFuture.supplyAsync(productService::getLimitedProducts, executor);
-        var patternFuture = CompletableFuture.supplyAsync(patternService::getLimitedPatterns, executor);
-        var freePatternFuture = CompletableFuture.supplyAsync(freePatternService::getLimitedFreePatterns, executor);
-        var bannerFuture = CompletableFuture.supplyAsync(bannerService::getAll, executor);
-        var blogFuture = CompletableFuture.supplyAsync(blogService::getLimitedBlogPosts, executor);
-
-        CompletableFuture<Void> allFutures = CompletableFuture.allOf(prodFuture, patternFuture, freePatternFuture, bannerFuture, blogFuture);
+        var allFutures = CompletableFuture.allOf(prodFuture, patternFuture, freePatternFuture, bannerFuture, blogFuture);
 
         return allFutures.thenApply(v -> HomeResponse.builder()
                         .products(prodFuture.join())
