@@ -18,4 +18,7 @@ public class AppConstant {
     public static final int MAX_ATTEMPTS = 3;
     public static final int BACKOFF_DURATION_SECONDS = 2;
     public static final int TIMEOUT_SECONDS = 10;
+    public static final int CORE_POOL_SIZE = 10;
+    public static final int MAX_POOL_SIZE = 50;
+    public static final int QUEUE_CAPACITY = 100;
 }
