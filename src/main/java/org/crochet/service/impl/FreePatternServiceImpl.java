@@ -169,11 +169,7 @@ public class FreePatternServiceImpl implements FreePatternService {
     @Override
     public List<FreePatternResponse> getLimitedFreePatterns() {
         log.info("Fetching limited free patterns");
-        var freePatterns = freePatternRepo.findAll()
-                .stream()
-                .filter(FreePattern::isHome)
-                .limit(AppConstant.FREE_PATTERN_LIMITED)
-                .toList();
+        var freePatterns = freePatternRepo.findLimitedNumFreePatternByCreatedDateDesc(AppConstant.FREE_PATTERN_LIMITED);
         return FreePatternMapper.INSTANCE.toResponses(freePatterns);
     }
 
