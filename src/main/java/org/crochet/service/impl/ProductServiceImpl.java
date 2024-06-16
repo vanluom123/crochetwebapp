@@ -148,11 +148,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<ProductResponse> getLimitedProducts() {
         log.info("Fetching limited products");
-        var products = productRepo.findAll()
-                .stream()
-                .filter(Product::isHome)
-                .limit(AppConstant.PRODUCT_LIMITED)
-                .toList();
+        var products = productRepo.findLimitedNumProductByCreatedDateDesc(AppConstant.PRODUCT_LIMITED);
         return ProductMapper.INSTANCE.toResponses(products);
     }
 
