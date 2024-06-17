@@ -130,11 +130,7 @@ public class PatternServiceImpl implements PatternService {
     @Override
     public List<PatternResponse> getLimitedPatterns() {
         log.info("Fetching limited patterns");
-        var patterns = patternRepo.findAll()
-                .stream()
-                .filter(Pattern::isHome)
-                .limit(AppConstant.PATTERN_LIMITED)
-                .toList();
+        var patterns = patternRepo.findLimitedNumPatternByCreatedDateDesc(AppConstant.PATTERN_LIMITED);
         return PatternMapper.INSTANCE.toResponses(patterns);
     }
 

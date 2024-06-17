@@ -2,6 +2,7 @@ package org.crochet.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.crochet.constant.AppConstant;
 import org.crochet.payload.response.HomeResponse;
 import org.crochet.service.BannerService;
 import org.crochet.service.BlogPostService;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 
 @Slf4j
 @Service
@@ -24,15 +26,32 @@ public class HomeServiceImpl implements HomeService {
     private final FreePatternService freePatternService;
     private final BannerService bannerService;
     private final BlogPostService blogService;
+    private final Executor crochetTaskExecutor;
 
-    @Async("taskExecutor")
+    @Override
+    public HomeResponse getHomes() {
+        var products = productService.getLimitedProducts();
+        var patterns = patternService.getLimitedPatterns();
+        var freePatterns = freePatternService.getLimitedFreePatterns();
+        var banners = bannerService.getAll();
+        var blogs = blogService.getLimitedBlogPosts();
+        return HomeResponse.builder()
+                .products(products)
+                .patterns(patterns)
+                .freePatterns(freePatterns)
+                .banners(banners)
+                .blogs(blogs)
+                .build();
+    }
+
+    @Async(AppConstant.CROCHET_TASK_EXECUTOR)
     @Override
     public CompletableFuture<HomeResponse> getHomesAsync() {
-        var prodFuture = CompletableFuture.supplyAsync(productService::getLimitedProducts);
-        var patternFuture = CompletableFuture.supplyAsync(patternService::getLimitedPatterns);
-        var freePatternFuture = CompletableFuture.supplyAsync(freePatternService::getLimitedFreePatterns);
-        var bannerFuture = CompletableFuture.supplyAsync(bannerService::getAll);
-        var blogFuture = CompletableFuture.supplyAsync(blogService::getLimitedBlogPosts);
+        var prodFuture = CompletableFuture.supplyAsync(productService::getLimitedProducts, crochetTaskExecutor);
+        var patternFuture = CompletableFuture.supplyAsync(patternService::getLimitedPatterns, crochetTaskExecutor);
+        var freePatternFuture = CompletableFuture.supplyAsync(freePatternService::getLimitedFreePatterns, crochetTaskExecutor);
+        var bannerFuture = CompletableFuture.supplyAsync(bannerService::getAll, crochetTaskExecutor);
+        var blogFuture = CompletableFuture.supplyAsync(blogService::getLimitedBlogPosts, crochetTaskExecutor);
 
         return CompletableFuture.allOf(prodFuture, patternFuture, freePatternFuture, bannerFuture, blogFuture)
                 .thenApply(v -> HomeResponse.builder()

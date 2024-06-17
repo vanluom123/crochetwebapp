@@ -74,10 +74,7 @@ public class BannerServiceImpl implements BannerService {
     @Override
     public List<BannerResponse> getAll() {
         log.info("Fetching all active banners");
-        List<Banner> banners = bannerRepo.findAll()
-                .stream()
-                .filter(Banner::isActive)
-                .toList();
+        List<Banner> banners = bannerRepo.findActiveBanners();
         return BannerMapper.INSTANCE.toResponses(banners);
     }
 }

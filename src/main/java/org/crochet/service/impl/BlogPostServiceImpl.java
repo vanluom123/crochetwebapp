@@ -153,11 +153,7 @@ public class BlogPostServiceImpl implements BlogPostService {
     @Override
     public List<BlogPostResponse> getLimitedBlogPosts() {
         log.info("Fetching limited blog posts");
-        var blogPosts = blogPostRepo.findAll()
-                .stream()
-                .filter(BlogPost::isHome)
-                .limit(BLOG_LIMITED)
-                .toList();
+        var blogPosts = blogPostRepo.findLimitedNumPostsByCreatedDateDesc(BLOG_LIMITED);
         return BlogPostMapper.INSTANCE.toResponses(blogPosts);
     }
 
