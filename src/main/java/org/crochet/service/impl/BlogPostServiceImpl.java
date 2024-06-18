@@ -22,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
@@ -149,6 +150,7 @@ public class BlogPostServiceImpl implements BlogPostService {
      *
      * @return A list of {@link BlogPostResponse} containing limited blog posts.
      */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Cacheable(value = "limitedblogs")
     @Override
     public List<BlogPostResponse> getLimitedBlogPosts() {
