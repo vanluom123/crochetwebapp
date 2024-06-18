@@ -24,6 +24,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
@@ -144,6 +145,7 @@ public class ProductServiceImpl implements ProductService {
         return products;
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Cacheable(value = "limitedproducts")
     @Override
     public List<ProductResponse> getLimitedProducts() {

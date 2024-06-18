@@ -13,6 +13,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
@@ -70,6 +71,7 @@ public class BannerServiceImpl implements BannerService {
         return banners.stream().map(BannerMapper.INSTANCE::toResponse).toList();
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Cacheable(value = "activebanners")
     @Override
     public List<BannerResponse> getAll() {
