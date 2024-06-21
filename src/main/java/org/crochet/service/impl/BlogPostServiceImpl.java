@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.BlogPostMapper;
 import org.crochet.mapper.FileMapper;
+import org.crochet.model.BlogCategory;
 import org.crochet.model.BlogPost;
 import org.crochet.payload.request.BlogPostRequest;
 import org.crochet.payload.response.BlogPostPaginationResponse;
@@ -75,7 +76,7 @@ public class BlogPostServiceImpl implements BlogPostService {
     public BlogPostResponse createOrUpdatePost(BlogPostRequest request) {
         BlogPost blogPost;
         if (!StringUtils.hasText(request.getId())) {
-            var blogCategory = customBlogCategoryRepo.findById(request.getBlogCategoryId());
+            BlogCategory blogCategory = customBlogCategoryRepo.findById(request.getBlogCategoryId());
             blogPost = BlogPost.builder()
                     .blogCategory(blogCategory)
                     .title(request.getTitle())
@@ -107,7 +108,8 @@ public class BlogPostServiceImpl implements BlogPostService {
      */
     @Override
     @Cacheable(value = "blogs", key = "T(java.util.Objects).hash(#pageNo, #pageSize, #sortBy, #sortDir, #searchText)")
-    public BlogPostPaginationResponse getBlogs(int pageNo, int pageSize, String sortBy, String sortDir, String searchText) {
+    public BlogPostPaginationResponse getBlogs(int pageNo, int pageSize, String sortBy, String sortDir,
+                                               String searchText) {
         log.info("Fetching blog posts");
         // create Sort instance
         Sort sort = Sort.by(sortBy);
