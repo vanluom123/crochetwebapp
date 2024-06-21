@@ -17,4 +17,12 @@ public interface FreePatternRepository extends JpaRepository<FreePattern, String
                     limit ?1
             """)
     List<FreePattern> findLimitedNumFreePatternByCreatedDateDesc(int limited);
+
+    @Query("""
+                select fp
+                from FreePattern fp
+                join fetch fp.category c
+                where c.id = ?1
+            """)
+    List<FreePattern> findFreePatternByCategory(String categoryId);
 }

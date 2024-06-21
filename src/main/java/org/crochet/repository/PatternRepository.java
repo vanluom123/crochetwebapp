@@ -18,4 +18,12 @@ public interface PatternRepository extends JpaRepository<Pattern, String>, JpaSp
             LIMIT ?1
             """)
     List<Pattern> findLimitedNumPatternByCreatedDateDesc(int limited);
+
+    @Query("""
+            select p
+            from Pattern p
+            join fetch p.category c
+            where c.id = ?1
+            """)
+    List<Pattern> findPatternByCategory(String categoryId);
 }
