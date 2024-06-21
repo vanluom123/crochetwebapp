@@ -13,7 +13,6 @@ import java.util.List;
 public class AppProperties {
     private final Auth auth = new Auth();
     private final OAuth2 oauth2 = new OAuth2();
-    private final Cors cors = new Cors();
 
     @Setter
     @Getter
@@ -27,11 +26,5 @@ public class AppProperties {
     @Setter
     public static final class OAuth2 {
         private List<String> authorizedRedirectUris;
-    }
-
-    @Getter
-    @Setter
-    public static final class Cors {
-        private List<String> allowedOrigins;
     }
 }
