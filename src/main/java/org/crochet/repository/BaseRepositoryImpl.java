@@ -34,6 +34,9 @@ public class BaseRepositoryImpl<T extends BaseEntity, ID extends Serializable> i
 
     @Override
     public T findById(ID id) {
+        if (id == null) {
+            return null;
+        }
         var entity = em.find(entityClass, id);
         if (entity == null) {
             throw new ResourceNotFoundException(entityClass.getSimpleName() + " not found");

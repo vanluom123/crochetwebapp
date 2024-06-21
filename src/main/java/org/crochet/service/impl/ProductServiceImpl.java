@@ -28,7 +28,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -138,7 +137,7 @@ public class ProductServiceImpl implements ProductService {
 
     private List<Product> getProductsByCategory(String categoryId) {
         var category = customCategoryRepo.findById(categoryId);
-        List<Product> products = new ArrayList<>(category.getProducts());
+        List<Product> products = productRepo.findProductByCategory(categoryId);
         for (var subCategory : category.getChildren()) {
             products.addAll(getProductsByCategory(subCategory.getId()));
         }

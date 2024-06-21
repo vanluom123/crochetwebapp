@@ -12,8 +12,6 @@ import org.crochet.service.PatternService;
 import org.crochet.service.ProductService;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
@@ -29,22 +27,6 @@ public class HomeServiceImpl implements HomeService {
     private final BannerService bannerService;
     private final BlogPostService blogService;
     private final Executor crochetTaskExecutor;
-
-    @Override
-    public HomeResponse getHomes() {
-        var products = productService.getLimitedProducts();
-        var patterns = patternService.getLimitedPatterns();
-        var freePatterns = freePatternService.getLimitedFreePatterns();
-        var banners = bannerService.getAll();
-        var blogs = blogService.getLimitedBlogPosts();
-        return HomeResponse.builder()
-                .products(products)
-                .patterns(patterns)
-                .freePatterns(freePatterns)
-                .banners(banners)
-                .blogs(blogs)
-                .build();
-    }
 
     @Async(AppConstant.CROCHET_TASK_EXECUTOR)
     @Override
