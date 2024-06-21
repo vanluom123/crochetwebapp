@@ -29,7 +29,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -153,7 +152,7 @@ public class FreePatternServiceImpl implements FreePatternService {
      */
     private List<FreePattern> getAllFreePatterns(String categoryId) {
         Category category = customCategoryRepo.findById(categoryId);
-        List<FreePattern> freePatterns = new ArrayList<>(category.getFreePatterns());
+        List<FreePattern> freePatterns = freePatternRepo.findFreePatternByCategory(categoryId);
         for (Category subCategory : category.getChildren()) {
             freePatterns.addAll(getAllFreePatterns(subCategory.getId()));
         }

@@ -18,4 +18,12 @@ public interface ProductRepository extends JpaRepository<Product, String>, JpaSp
                 limit ?1
             """)
     List<Product> findLimitedNumProductByCreatedDateDesc(int limited);
+
+    @Query("""
+            select prod
+            from Product prod
+            join fetch prod.category c
+            where c.id = ?1
+            """)
+    List<Product> findProductByCategory(String categoryId);
 }

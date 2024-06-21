@@ -157,7 +157,7 @@ public class PatternServiceImpl implements PatternService {
 
         while (!queue.isEmpty()) {
             Category currentCategory = queue.poll();
-            patterns.addAll(currentCategory.getPatterns());
+            patterns.addAll(patternRepo.findPatternByCategory(currentCategory.getId()));
             queue.addAll(currentCategory.getChildren());
         }
         return patterns;
