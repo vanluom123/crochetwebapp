@@ -42,13 +42,10 @@ app:
     authorizedRedirectUris:
       - http://localhost:3000/oauth2/redirect
       - https://tieuphuongcrochet.com/oauth2/redirect
+      - https://littlecrochet.web.app/oauth2/redirect
+      - https://littlecrochet.firebaseapp.com/oauth2/redirect
       - crochetandroidapp://oauth2/redirect
       - crochetiosapp://oauth2/redirect
-  cors:
-    allowed-origins:
-      - http://localhost:3000
-      - https://tieuphuongcrochet.com
-      - https://fonts.googleapis.com/css?family=Rubik|HelveticaNeue|Helvetica+Neue|Playfair+Display
 
 authorize:
   http-request:
