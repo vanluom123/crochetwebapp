@@ -17,6 +17,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -48,7 +49,8 @@ public class FirebaseStorageServiceImpl implements FirebaseStorageService {
      */
     public FileResponse uploadFile(MultipartFile imageFile) {
         // Define the path and filename in Firebase Cloud Storage
-        String fileName = env + "/" + imageFile.getOriginalFilename();
+        String fileName = UUID.randomUUID().toString().concat(this.getExtension(imageFile.getOriginalFilename()));
+        fileName = env + "/" + fileName;
 
         // Upload the image to Firebase Cloud Storage
         Blob blob;
@@ -161,5 +163,9 @@ public class FirebaseStorageServiceImpl implements FirebaseStorageService {
         return StreamSupport.stream(bucket.list(Storage.BlobListOption.prefix(folderName + "/")).iterateAll().spliterator(), false)
                 .map(Blob::getName)
                 .toList();
+    }
+
+    private String getExtension(String fileName) {
+        return fileName.substring(fileName.lastIndexOf("."));
     }
 }
