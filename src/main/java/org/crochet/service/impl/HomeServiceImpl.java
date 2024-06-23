@@ -28,6 +28,11 @@ public class HomeServiceImpl implements HomeService {
     private final BlogPostService blogService;
     private final Executor crochetTaskExecutor;
 
+    /**
+     * Fetches all the required data for the home page asynchronously.
+     *
+     * @return a CompletableFuture of HomeResponse
+     */
     @Async(AppConstant.CROCHET_TASK_EXECUTOR)
     @Override
     public CompletableFuture<HomeResponse> getHomesAsync() {
@@ -48,6 +53,12 @@ public class HomeServiceImpl implements HomeService {
                 .exceptionally(this::handleException);
     }
 
+    /**
+     * Handles the exception occurred while fetching home data.
+     *
+     * @param ex the exception occurred
+     * @return a default HomeResponse
+     */
     private HomeResponse handleException(Throwable ex) {
         // Log the exception and return a default value
         log.error("Error occurred while fetching home data: ", ex);

@@ -19,7 +19,7 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.crochet.enumerator.CurrencyCode;
 
-import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -66,7 +66,7 @@ public class Pattern extends BaseEntity {
             @AttributeOverride(name = "fileName", column = @Column(name = "file_name")),
             @AttributeOverride(name = "fileContent", column = @Column(name = "file_content", columnDefinition = "TEXT"))
     })
-    private List<File> files;
+    private Set<File> files;
 
     @ElementCollection
     @CollectionTable(name = "pattern_image",
@@ -75,5 +75,5 @@ public class Pattern extends BaseEntity {
             @AttributeOverride(name = "fileName", column = @Column(name = "file_name")),
             @AttributeOverride(name = "fileContent", column = @Column(name = "file_content"))
     })
-    private List<File> images;
+    private Set<File> images;
 }

@@ -1,5 +1,6 @@
 package org.crochet.repository;
 
+import jakarta.persistence.criteria.JoinType;
 import org.crochet.model.Product;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -17,5 +18,15 @@ public class ProductSpecifications {
 
     public static Specification<Product> in(List<Product> products) {
         return (root, query, cb) -> root.in(products);
+    }
+
+    public static Specification<Product> getAll() {
+        return (r, q, cb) -> {
+            if (Long.class != q.getResultType()) {
+                r.fetch("images", JoinType.LEFT);
+            }
+            q.distinct(true);
+            return cb.conjunction();
+        };
     }
 }

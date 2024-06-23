@@ -1,5 +1,6 @@
 package org.crochet.service;
 
+import org.crochet.model.BlogCategory;
 import org.crochet.payload.request.BlogCategoryRequest;
 import org.crochet.payload.response.BlogCategoryResponse;
 

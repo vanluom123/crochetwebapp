@@ -82,7 +82,7 @@ public class UserServiceImpl implements UserService {
         Sort sort = Sort.by(sortBy);
         sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? sort.ascending() : sort.descending();
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
-        Specification<User> spec = Specifications.getSpecificationFromFilters(filters);
+        Specification<User> spec = Specifications.getSpecFromFilters(filters);
         // Search by search text
         if (StringUtils.hasText(searchText)) {
             spec = spec.or(UserSpecification.searchByNameOrEmail(searchText));

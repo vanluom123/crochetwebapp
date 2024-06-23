@@ -1,6 +1,6 @@
 package org.crochet.repository;
 
-import org.crochet.model.AuditTable;
+import org.crochet.model.BaseEntity;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.crochet.constant.AppConstant.DATE_PATTERN;
@@ -17,29 +18,23 @@ import static org.springframework.data.jpa.domain.Specification.where;
 
 public class Specifications {
 
-    public static <T extends AuditTable> Specification<T> getSpecificationFromFilters(List<Filter> filters) {
+    public static <T extends BaseEntity> Specification<T> getSpecFromFilters(List<Filter> filters) {
         Specification<T> spec = where(null);
         if (ObjectUtils.isEmpty(filters)) {
             return spec;
         }
+        filters = filters.stream()
+                .filter(filter -> StringUtils.hasText(filter.getField()))
+                .filter(filter -> filter.getOperator() != null && OPERATORS.contains(filter.getOperator()))
+                .filter(filter -> StringUtils.hasText(filter.getValue()) || !ObjectUtils.isEmpty(filter.getValues()))
+                .toList();
         for (Filter input : filters) {
-            if (!StringUtils.hasText(input.getField())) {
-                continue;
-            }
-            if (input.getOperator() == null || !OPERATORS.contains(input.getOperator())) {
-                continue;
-            }
-            if (!StringUtils.hasText(input.getValue())) {
-                if (ObjectUtils.isEmpty(input.getValues())) {
-                    continue;
-                }
-            }
-            spec = spec.or(createSpecification(input));
+            spec = spec.or(createSpec(input));
         }
         return spec;
     }
 
-    private static <T extends AuditTable> Specification<T> createSpecification(Filter input) {
+    private static <T extends BaseEntity> Specification<T> createSpec(Filter input) {
         return switch (input.getOperator()) {
             case EQUALS -> (root, query, criteriaBuilder) ->
                     criteriaBuilder.equal(root.get(input.getField()),
@@ -79,7 +74,7 @@ public class Specifications {
         };
     }
 
-    private static Object castToRequiredType(Class fieldType, String value) {
+    private static Object castToRequiredType(Class<?> fieldType, String value) {
         try {
             if (fieldType.isAssignableFrom(Double.class)) {
                 return Double.valueOf(value);
@@ -96,7 +91,10 @@ public class Specifications {
             } else if (fieldType.isAssignableFrom(Boolean.class)) {
                 return Boolean.valueOf(value);
             } else if (Enum.class.isAssignableFrom(fieldType)) {
-                return Enum.valueOf(fieldType, value);
+                return Arrays.stream(fieldType.getEnumConstants())
+                        .filter(e -> ((Enum<?>) e).name().equals(value))
+                        .findFirst()
+                        .orElseThrow(() -> new IllegalArgumentException("Invalid enum value provided"));
             } else if (fieldType.isAssignableFrom(String.class)) {
                 return value;
             } else if (fieldType.isAssignableFrom(LocalDate.class)) {
@@ -112,11 +110,10 @@ public class Specifications {
         }
     }
 
-    private static Object castToRequiredType(Class fieldType, List<String> value) {
-        List lists = new ArrayList();
-        for (String s : value) {
-            lists.add(castToRequiredType(fieldType, s));
-        }
-        return lists;
+    private static Object castToRequiredType(Class<?> fieldType, List<String> values) {
+        var objects = values.stream()
+                .map(value -> castToRequiredType(fieldType, value))
+                .toList();
+        return new ArrayList<>(objects);
     }
 }
