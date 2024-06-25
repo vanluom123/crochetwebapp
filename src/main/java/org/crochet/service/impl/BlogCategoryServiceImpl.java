@@ -30,7 +30,7 @@ public class BlogCategoryServiceImpl implements BlogCategoryService {
     @Transactional
     @Override
     public BlogCategoryResponse updateBlogCategory(BlogCategoryRequest request) {
-        BlogCategory blogCategory = getBlogCategoryById(request.getId());
+        BlogCategory blogCategory = getById(request.getId());
         blogCategory.setName(request.getName());
         blogCategory = blogCategoryRepo.save(blogCategory);
         return BlogCategoryMapper.INSTANCE.toResponse(blogCategory);
@@ -38,7 +38,7 @@ public class BlogCategoryServiceImpl implements BlogCategoryService {
 
     @Override
     public BlogCategoryResponse getBlogCategory(String id) {
-        BlogCategory blogCategory = getBlogCategoryById(id);
+        BlogCategory blogCategory = getById(id);
         return BlogCategoryMapper.INSTANCE.toResponse(blogCategory);
     }
 
@@ -51,12 +51,13 @@ public class BlogCategoryServiceImpl implements BlogCategoryService {
     @Transactional
     @Override
     public void deleteBlogCategory(String id) {
-        BlogCategory blogCategory = getBlogCategoryById(id);
+        BlogCategory blogCategory = getById(id);
         blogCategoryRepo.delete(blogCategory);
     }
 
-    private BlogCategory getBlogCategoryById(String id) {
-        return blogCategoryRepo.findById(id)
-                        .orElseThrow(() -> new ResourceNotFoundException("Blog category not found."));
+    BlogCategory getById(String id) {
+        return blogCategoryRepo.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("Blog category not found.")
+        );
     }
 }

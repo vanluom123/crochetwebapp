@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.crochet.constant.AppConstant;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -25,8 +26,8 @@ public class BannerResponse implements Serializable {
     private boolean active;
     private String textColor;
     private BannerTypeResponse bannerType;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = AppConstant.DATE_PATTERN)
     private LocalDateTime createdDate;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = AppConstant.DATE_PATTERN)
     private LocalDateTime lastModifiedDate;
 }

@@ -1,5 +1,6 @@
 package org.crochet.service.impl;
 
+import lombok.RequiredArgsConstructor;
 import org.crochet.exception.IllegalArgumentException;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.CategoryMapper;
@@ -21,13 +22,16 @@ import static org.crochet.constant.MessageConstant.EXISTS_AS_A_CHILD_MESSAGE;
 import static org.crochet.constant.MessageConstant.EXISTS_AS_A_PARENT_MESSAGE;
 
 @Service
+@RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
-    private final CategoryRepo categoryRepo;
+    final CategoryRepo categoryRepo;
 
-    public CategoryServiceImpl(CategoryRepo categoryRepo) {
-        this.categoryRepo = categoryRepo;
-    }
-
+    /**
+     * Create a new category or multiple categories
+     *
+     * @param request the request object containing the parent IDs and category name
+     * @return a list of CategoryResponse objects
+     */
     @Transactional
     @Override
     public List<CategoryResponse> create(CategoryCreationRequest request) {
@@ -78,6 +82,12 @@ public class CategoryServiceImpl implements CategoryService {
         return CategoryMapper.INSTANCE.toResponses(children);
     }
 
+    /**
+     * Update a category
+     *
+     * @param request the request object containing the category ID and new name
+     * @return a CategoryResponse object
+     */
     @Transactional
     @Override
     public CategoryResponse update(CategoryUpdateRequest request) {
@@ -94,6 +104,11 @@ public class CategoryServiceImpl implements CategoryService {
         return CategoryMapper.INSTANCE.toResponse(category);
     }
 
+    /**
+     * Get all categories
+     *
+     * @return a list of CategoryResponse objects
+     */
     @Override
     public List<CategoryResponse> getAllCategories() {
         var categories = categoryRepo.getCategories();
@@ -103,21 +118,38 @@ public class CategoryServiceImpl implements CategoryService {
         return CategoryMapper.INSTANCE.toResponses(parentCategories);
     }
 
+    /**
+     * Get a category by ID
+     *
+     * @param id the category ID
+     * @return a CategoryResponse object
+     */
     @Override
     public CategoryResponse getById(String id) {
         var category = findById(id);
         return CategoryMapper.INSTANCE.toResponse(category);
     }
 
-    @Override
-    public Category findById(String id) {
+    /**
+     * Get all child categories of a parent category
+     *
+     * @param id the parent category ID
+     * @return a list of CategoryResponse objects
+     */
+    Category findById(String id) {
         return categoryRepo
                 .getCategory(id)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException(CATEGORY_NOT_FOUND_MESSAGE, MAP_CODE.get(CATEGORY_NOT_FOUND_MESSAGE))
+                        new ResourceNotFoundException(CATEGORY_NOT_FOUND_MESSAGE,
+                                MAP_CODE.get(CATEGORY_NOT_FOUND_MESSAGE))
                 );
     }
 
+    /**
+     * Delete a category
+     *
+     * @param id the category ID
+     */
     @Transactional
     @Override
     public void delete(String id) {
