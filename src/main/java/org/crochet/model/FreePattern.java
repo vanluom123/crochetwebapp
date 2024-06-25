@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
-import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -56,7 +56,7 @@ public class FreePattern extends BaseEntity {
             @AttributeOverride(name = "fileContent", column = @Column(name = "file_content", columnDefinition = "TEXT"))
 
     })
-    private List<File> files;
+    private Set<File> files;
 
     @ElementCollection
     @CollectionTable(name = "free_pattern_image",
@@ -66,5 +66,5 @@ public class FreePattern extends BaseEntity {
             @AttributeOverride(name = "fileContent", column = @Column(name = "file_content", columnDefinition = "TEXT"))
 
     })
-    private List<File> images;
+    private Set<File> images;
 }

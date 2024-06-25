@@ -1,5 +1,6 @@
 package org.crochet.service.impl;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.crochet.constant.AppConstant;
 import org.crochet.mapper.FileMapper;
@@ -8,8 +9,7 @@ import org.crochet.model.Product;
 import org.crochet.payload.request.ProductRequest;
 import org.crochet.payload.response.ProductPaginationResponse;
 import org.crochet.payload.response.ProductResponse;
-import org.crochet.repository.CustomCategoryRepo;
-import org.crochet.repository.CustomProductRepo;
+import org.crochet.repository.CategoryRepo;
 import org.crochet.repository.Filter;
 import org.crochet.repository.ProductRepository;
 import org.crochet.repository.ProductSpecifications;
@@ -35,24 +35,10 @@ import java.util.List;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
-    private final ProductRepository productRepo;
-    private final CustomProductRepo customProductRepo;
-    private final CustomCategoryRepo customCategoryRepo;
-
-    /**
-     * Constructor
-     *
-     * @param productRepo       The {@link ProductRepository} instance.
-     * @param customProductRepo The {@link CustomProductRepo} instance.
-     */
-    public ProductServiceImpl(ProductRepository productRepo,
-                              CustomProductRepo customProductRepo,
-                              CustomCategoryRepo customCategoryRepo) {
-        this.productRepo = productRepo;
-        this.customProductRepo = customProductRepo;
-        this.customCategoryRepo = customCategoryRepo;
-    }
+    final ProductRepository productRepo;
+    final CategoryRepo categoryRepo;
 
     /**
      * Creates a new product or updates an existing one based on the provided {@link ProductRequest}.
@@ -74,7 +60,9 @@ public class ProductServiceImpl implements ProductService {
     public ProductResponse createOrUpdate(ProductRequest request) {
         Product product;
         if (!StringUtils.hasText(request.getId())) {
-            var category = customCategoryRepo.findById(request.getCategoryId());
+            var category = categoryRepo.findById(request.getCategoryId()).orElseThrow(
+                    () -> new IllegalArgumentException("Category not found")
+            );
             product = Product.builder()
                     .category(category)
                     .name(request.getName())
@@ -87,7 +75,9 @@ public class ProductServiceImpl implements ProductService {
                     .images(FileMapper.INSTANCE.toEntities(request.getImages()))
                     .build();
         } else {
-            product = customProductRepo.findById(request.getId());
+            product = productRepo.findById(request.getId()).orElseThrow(
+                    () -> new IllegalArgumentException("Product not found")
+            );
             product = ProductMapper.INSTANCE.update(request, product);
         }
         product = productRepo.save(product);
@@ -107,23 +97,29 @@ public class ProductServiceImpl implements ProductService {
      * @return A {@link ProductPaginationResponse} containing the paginated list of products.
      */
     @Override
-    @Cacheable(value = "products", key = "T(java.util.Objects).hash(#pageNo, #pageSize, #sortBy, #sortDir, #searchText, #categoryId, #filters)")
+    @Cacheable(value = "products",
+            key = "T(java.util.Objects).hash(#pageNo, #pageSize, #sortBy, #sortDir, #searchText, #categoryId, #filters)")
     public ProductPaginationResponse getProducts(int pageNo, int pageSize, String sortBy, String sortDir,
                                                  String searchText, String categoryId, List<Filter> filters) {
         log.info("Fetching products");
-        // create Sort instance
         Sort sort = Sort.by(sortBy);
         sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? sort.ascending() : sort.descending();
-        // create Pageable instance
+
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
-        Specification<Product> spec = Specifications.getSpecificationFromFilters(filters);
+
+        Specification<Product> spec = Specifications.getSpecFromFilters(filters);
+
         if (StringUtils.hasText(searchText)) {
             spec = spec.or(ProductSpecifications.searchByNameOrDesc(searchText));
         }
         if (StringUtils.hasText(categoryId)) {
             spec = spec.or(ProductSpecifications.in(getProductsByCategory(categoryId)));
         }
+
+        spec = spec.and(ProductSpecifications.getAll());
+
         Page<Product> menuPage = productRepo.findAll(spec, pageable);
+
         List<ProductResponse> contents = ProductMapper.INSTANCE.toResponses(menuPage.getContent());
         return ProductPaginationResponse.builder()
                 .contents(contents)
@@ -135,15 +131,26 @@ public class ProductServiceImpl implements ProductService {
                 .build();
     }
 
+    /**
+     * Get all products by category
+     *
+     * @param categoryId The unique identifier of the category.
+     * @return A list of {@link Product} containing products.
+     */
     private List<Product> getProductsByCategory(String categoryId) {
-        var category = customCategoryRepo.findById(categoryId);
         List<Product> products = productRepo.findProductByCategory(categoryId);
-        for (var subCategory : category.getChildren()) {
-            products.addAll(getProductsByCategory(subCategory.getId()));
+        var categoryIds = categoryRepo.findChildrenIds(categoryId);
+        for (var subCategoryId : categoryIds) {
+            products.addAll(getProductsByCategory(subCategoryId));
         }
         return products;
     }
 
+    /**
+     * Retrieves a list of products that are marked as limited.
+     *
+     * @return A list of {@link ProductResponse} containing limited products.
+     */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Cacheable(value = "limitedproducts")
     @Override
@@ -161,10 +168,17 @@ public class ProductServiceImpl implements ProductService {
      */
     @Override
     public ProductResponse getDetail(String id) {
-        var product = customProductRepo.findById(id);
+        var product = productRepo.getDetail(id).orElseThrow(
+                () -> new IllegalArgumentException("Product not found")
+        );
         return ProductMapper.INSTANCE.toResponse(product);
     }
 
+    /**
+     * Deletes the product with the specified ID.
+     *
+     * @param id The unique identifier of the product to delete.
+     */
     @Transactional
     @Override
     @Caching(
@@ -174,6 +188,6 @@ public class ProductServiceImpl implements ProductService {
             }
     )
     public void delete(String id) {
-        customProductRepo.deleteById(id);
+        productRepo.deleteById(id);
     }
 }

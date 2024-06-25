@@ -7,22 +7,35 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface FreePatternRepository extends JpaRepository<FreePattern, String>, JpaSpecificationExecutor<FreePattern> {
     @Query("""
-                    select f from FreePattern f
-                    where f.isHome = true
-                    order by f.createdDate desc
-                    limit ?1
+            select f
+            from FreePattern f
+            left join fetch f.files
+            left join fetch f.images
+            where f.isHome = true
+            order by f.createdDate desc
+            limit ?1
             """)
     List<FreePattern> findLimitedNumFreePatternByCreatedDateDesc(int limited);
 
     @Query("""
-                select fp
-                from FreePattern fp
-                join fetch fp.category c
-                where c.id = ?1
+            select fp
+            from FreePattern fp
+            join fetch fp.category c
+            where c.id = ?1
             """)
     List<FreePattern> findFreePatternByCategory(String categoryId);
+
+    @Query("""
+            select f
+            from FreePattern f
+            left join fetch f.files
+            left join fetch f.images
+            where f.id = ?1
+            """)
+    Optional<FreePattern> getDetail(String id);
 }
