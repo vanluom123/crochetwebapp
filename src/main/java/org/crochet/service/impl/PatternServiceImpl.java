@@ -1,16 +1,16 @@
 package org.crochet.service.impl;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.crochet.constant.AppConstant;
+import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.FileMapper;
 import org.crochet.mapper.PatternMapper;
-import org.crochet.model.Category;
 import org.crochet.model.Pattern;
 import org.crochet.payload.request.PatternRequest;
 import org.crochet.payload.response.PatternPaginationResponse;
 import org.crochet.payload.response.PatternResponse;
-import org.crochet.repository.CustomCategoryRepo;
-import org.crochet.repository.CustomPatternRepo;
+import org.crochet.repository.CategoryRepo;
 import org.crochet.repository.Filter;
 import org.crochet.repository.PatternRepository;
 import org.crochet.repository.PatternSpecifications;
@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -38,18 +39,10 @@ import java.util.Queue;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class PatternServiceImpl implements PatternService {
-    private final PatternRepository patternRepo;
-    private final CustomCategoryRepo customCategoryRepo;
-    private final CustomPatternRepo customPatternRepo;
-
-    public PatternServiceImpl(PatternRepository patternRepo,
-                              CustomCategoryRepo customCategoryRepo,
-                              CustomPatternRepo customPatternRepo) {
-        this.patternRepo = patternRepo;
-        this.customCategoryRepo = customCategoryRepo;
-        this.customPatternRepo = customPatternRepo;
-    }
+    final PatternRepository patternRepo;
+    final CategoryRepo categoryRepo;
 
     /**
      * Create or update pattern
@@ -67,7 +60,9 @@ public class PatternServiceImpl implements PatternService {
     public PatternResponse createOrUpdate(PatternRequest request) {
         Pattern pattern;
         if (!StringUtils.hasText(request.getId())) {
-            var category = customCategoryRepo.findById(request.getCategoryId());
+            var category = categoryRepo.findById(request.getCategoryId()).orElseThrow(
+                    () -> new ResourceNotFoundException("Category not found")
+            );
             pattern = Pattern.builder()
                     .category(category)
                     .name(request.getName())
@@ -77,11 +72,13 @@ public class PatternServiceImpl implements PatternService {
                     .isHome(request.isHome())
                     .link(request.getLink())
                     .content(request.getContent())
-                    .files(FileMapper.INSTANCE.toEntities(request.getFiles()))
-                    .images(FileMapper.INSTANCE.toEntities(request.getImages()))
+                    .files(new HashSet<>(FileMapper.INSTANCE.toEntities(request.getFiles())))
+                    .images(new HashSet<>(FileMapper.INSTANCE.toEntities(request.getImages())))
                     .build();
         } else {
-            pattern = customPatternRepo.findById(request.getId());
+            pattern = patternRepo.findById(request.getId()).orElseThrow(
+                    () -> new ResourceNotFoundException("Pattern not found")
+            );
             pattern = PatternMapper.INSTANCE.partialUpdate(request, pattern);
         }
         pattern = patternRepo.save(pattern);
@@ -107,15 +104,21 @@ public class PatternServiceImpl implements PatternService {
         log.info("Fetching patterns");
         Sort sort = Sort.by(sortBy);
         sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? sort.ascending() : sort.descending();
-        Specification<Pattern> spec = Specifications.getSpecificationFromFilters(filters);
+
+        Specification<Pattern> spec = Specifications.getSpecFromFilters(filters);
+
         if (StringUtils.hasText(searchText)) {
             spec = spec.or(PatternSpecifications.searchByNameOrDesc(searchText));
         }
         if (StringUtils.hasText(categoryId)) {
             spec = spec.or(PatternSpecifications.in(getPatternsByCategory(categoryId)));
         }
+
+        spec = spec.and(PatternSpecifications.getAll());
+
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
         var page = patternRepo.findAll(spec, pageable);
+
         List<PatternResponse> responses = PatternMapper.INSTANCE.toResponses(page.getContent());
         return PatternPaginationResponse.builder()
                 .contents(responses)
@@ -144,25 +147,37 @@ public class PatternServiceImpl implements PatternService {
      */
     @Override
     public PatternResponse getDetail(String id) {
-        var pattern = customPatternRepo.findById(id);
+        var pattern = patternRepo.getDetail(id).orElseThrow(
+                () -> new ResourceNotFoundException("Pattern not found")
+        );
         return PatternMapper.INSTANCE.toResponse(pattern);
     }
 
+    /**
+     * Get patterns by category
+     *
+     * @param categoryId Category id
+     * @return List of patterns
+     */
     private List<Pattern> getPatternsByCategory(String categoryId) {
-        Queue<Category> queue = new LinkedList<>();
+        Queue<String> queue = new LinkedList<>();
         List<Pattern> patterns = new ArrayList<>();
 
-        Category rootCategory = customCategoryRepo.findById(categoryId);
-        queue.add(rootCategory);
+        queue.add(categoryId);
 
         while (!queue.isEmpty()) {
-            Category currentCategory = queue.poll();
-            patterns.addAll(patternRepo.findPatternByCategory(currentCategory.getId()));
-            queue.addAll(currentCategory.getChildren());
+            var childId = queue.poll();
+            patterns.addAll(patternRepo.findPatternByCategory(childId));
+            queue.addAll(categoryRepo.findChildrenIds(childId));
         }
         return patterns;
     }
 
+    /**
+     * Delete pattern
+     *
+     * @param id Pattern id
+     */
     @Transactional
     @Override
     @Caching(

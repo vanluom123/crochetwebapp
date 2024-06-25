@@ -7,12 +7,15 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface PatternRepository extends JpaRepository<Pattern, String>, JpaSpecificationExecutor<Pattern> {
     @Query("""
             SELECT p
             FROM Pattern p
+            LEFT JOIN FETCH p.files
+            LEFT JOIN FETCH p.images
             WHERE p.isHome = true
             ORDER BY p.createdDate DESC
             LIMIT ?1
@@ -26,4 +29,13 @@ public interface PatternRepository extends JpaRepository<Pattern, String>, JpaSp
             where c.id = ?1
             """)
     List<Pattern> findPatternByCategory(String categoryId);
+
+    @Query("""
+            SELECT p
+            FROM Pattern p
+            LEFT JOIN FETCH p.files
+            LEFT JOIN FETCH p.images
+            WHERE p.id = ?1
+            """)
+    Optional<Pattern> getDetail(String id);
 }

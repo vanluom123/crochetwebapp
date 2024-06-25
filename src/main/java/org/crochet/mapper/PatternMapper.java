@@ -13,7 +13,7 @@ import java.util.List;
 
 @Mapper(
         unmappedTargetPolicy = ReportingPolicy.IGNORE,
-        uses = {FileMapper.class, CategoryMapper.class}
+        uses = {FileMapper.class}
 )
 public interface PatternMapper extends PartialUpdate<Pattern, PatternRequest> {
     PatternMapper INSTANCE = Mappers.getMapper(PatternMapper.class);

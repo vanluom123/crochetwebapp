@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.crochet.constant.AppConstant;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -22,6 +23,6 @@ public class BlogPostResponse implements Serializable {
     @JsonProperty("is_home")
     private boolean isHome;
     private List<FileResponse> files;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = AppConstant.DATE_PATTERN)
     private LocalDateTime createdDate;
 }
