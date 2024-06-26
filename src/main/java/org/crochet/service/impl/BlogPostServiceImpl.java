@@ -61,9 +61,7 @@ public class BlogPostServiceImpl implements BlogPostService {
         BlogPost blogPost;
         if (!StringUtils.hasText(request.getId())) {
             BlogCategory blogCategory = blogCategoryRepo.findById(request.getBlogCategoryId())
-                    .orElseThrow(
-                            () -> new ResourceNotFoundException("Blog category not found")
-                    );
+                    .orElse(null);
             blogPost = BlogPost.builder()
                     .blogCategory(blogCategory)
                     .title(request.getTitle())
