@@ -18,9 +18,9 @@ public interface ProductRepository extends JpaRepository<Product, String>, JpaSp
             left join fetch p.images
             where p.isHome = true
             order by p.createdDate desc
-            limit ?1
+            limit 12
             """)
-    List<Product> findLimitedNumProductByCreatedDateDesc(int limited);
+    List<Product> findLimitedNumProductByCreatedDateDesc();
 
     @Query("""
             select prod

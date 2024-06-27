@@ -18,9 +18,9 @@ public interface PatternRepository extends JpaRepository<Pattern, String>, JpaSp
             LEFT JOIN FETCH p.images
             WHERE p.isHome = true
             ORDER BY p.createdDate DESC
-            LIMIT ?1
+            LIMIT 12
             """)
-    List<Pattern> findLimitedNumPatternByCreatedDateDesc(int limited);
+    List<Pattern> findLimitedNumPatternByCreatedDateDesc();
 
     @Query("""
             select p
