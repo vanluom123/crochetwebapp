@@ -29,8 +29,6 @@ import org.springframework.util.StringUtils;
 
 import java.util.List;
 
-import static org.crochet.constant.AppConstant.BLOG_LIMITED;
-
 /**
  * BlogPostServiceImpl class
  */
@@ -148,7 +146,7 @@ public class BlogPostServiceImpl implements BlogPostService {
     @Override
     public List<BlogPostResponse> getLimitedBlogPosts() {
         log.info("Fetching limited blog posts");
-        var blogPosts = blogPostRepo.findLimitedNumPostsByCreatedDateDesc(BLOG_LIMITED);
+        var blogPosts = blogPostRepo.findLimitedNumPostsByCreatedDateDesc();
         return BlogPostMapper.INSTANCE.toResponses(blogPosts);
     }
 

@@ -18,9 +18,9 @@ public interface FreePatternRepository extends JpaRepository<FreePattern, String
             left join fetch f.images
             where f.isHome = true
             order by f.createdDate desc
-            limit ?1
+            limit 12
             """)
-    List<FreePattern> findLimitedNumFreePatternByCreatedDateDesc(int limited);
+    List<FreePattern> findLimitedNumFreePatternByCreatedDateDesc();
 
     @Query("""
             select fp

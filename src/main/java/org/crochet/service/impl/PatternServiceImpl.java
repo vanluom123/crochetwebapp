@@ -2,7 +2,6 @@ package org.crochet.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.crochet.constant.AppConstant;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.FileMapper;
 import org.crochet.mapper.PatternMapper;
@@ -135,7 +134,7 @@ public class PatternServiceImpl implements PatternService {
     @Override
     public List<PatternResponse> getLimitedPatterns() {
         log.info("Fetching limited patterns");
-        var patterns = patternRepo.findLimitedNumPatternByCreatedDateDesc(AppConstant.PATTERN_LIMITED);
+        var patterns = patternRepo.findLimitedNumPatternByCreatedDateDesc();
         return PatternMapper.INSTANCE.toResponses(patterns);
     }
 

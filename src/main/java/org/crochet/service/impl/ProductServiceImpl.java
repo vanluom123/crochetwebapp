@@ -2,7 +2,6 @@ package org.crochet.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.crochet.constant.AppConstant;
 import org.crochet.mapper.FileMapper;
 import org.crochet.mapper.ProductMapper;
 import org.crochet.model.Product;
@@ -156,7 +155,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<ProductResponse> getLimitedProducts() {
         log.info("Fetching limited products");
-        var products = productRepo.findLimitedNumProductByCreatedDateDesc(AppConstant.PRODUCT_LIMITED);
+        var products = productRepo.findLimitedNumProductByCreatedDateDesc();
         return ProductMapper.INSTANCE.toResponses(products);
     }
 
