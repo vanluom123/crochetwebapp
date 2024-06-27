@@ -17,9 +17,9 @@ public interface BlogPostRepository extends JpaRepository<BlogPost, String>, Jpa
             left join fetch p.files
             where p.home = true
             order by p.createdDate desc
-            limit ?1
+            limit 12
             """)
-    List<BlogPost> findLimitedNumPostsByCreatedDateDesc(int limited);
+    List<BlogPost> findLimitedNumPostsByCreatedDateDesc();
 
     @Query("""
             select p

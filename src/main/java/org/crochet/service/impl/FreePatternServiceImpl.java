@@ -2,7 +2,6 @@ package org.crochet.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.crochet.constant.AppConstant;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.FileMapper;
 import org.crochet.mapper.FreePatternMapper;
@@ -158,7 +157,7 @@ public class FreePatternServiceImpl implements FreePatternService {
     @Override
     public List<FreePatternResponse> getLimitedFreePatterns() {
         log.info("Fetching limited free patterns");
-        var freePatterns = freePatternRepo.findLimitedNumFreePatternByCreatedDateDesc(AppConstant.FREE_PATTERN_LIMITED);
+        var freePatterns = freePatternRepo.findLimitedNumFreePatternByCreatedDateDesc();
         return FreePatternMapper.INSTANCE.toResponses(freePatterns);
     }
 
