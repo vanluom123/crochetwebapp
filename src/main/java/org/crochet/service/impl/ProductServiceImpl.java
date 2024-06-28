@@ -6,6 +6,7 @@ import org.crochet.mapper.FileMapper;
 import org.crochet.mapper.ProductMapper;
 import org.crochet.model.Product;
 import org.crochet.payload.request.ProductRequest;
+import org.crochet.payload.response.ProductDetailResponse;
 import org.crochet.payload.response.ProductPaginationResponse;
 import org.crochet.payload.response.ProductResponse;
 import org.crochet.repository.CategoryRepo;
@@ -166,11 +167,11 @@ public class ProductServiceImpl implements ProductService {
      * @return A {@link ProductResponse} containing detailed information about the product.
      */
     @Override
-    public ProductResponse getDetail(String id) {
+    public ProductDetailResponse getDetail(String id) {
         var product = productRepo.getDetail(id).orElseThrow(
                 () -> new IllegalArgumentException("Product not found")
         );
-        return ProductMapper.INSTANCE.toResponse(product);
+        return ProductMapper.INSTANCE.toProductDetailResponse(product);
     }
 
     /**

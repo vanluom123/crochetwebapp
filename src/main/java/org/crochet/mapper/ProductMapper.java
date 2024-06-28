@@ -2,6 +2,7 @@ package org.crochet.mapper;
 
 import org.crochet.model.Product;
 import org.crochet.payload.request.ProductRequest;
+import org.crochet.payload.response.ProductDetailResponse;
 import org.crochet.payload.response.ProductResponse;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
@@ -16,13 +17,15 @@ import java.util.List;
 
 @Mapper(
         unmappedTargetPolicy = ReportingPolicy.IGNORE,
-        uses = {FileMapper.class}
+        uses = {FileMapper.class, CategoryMapper.class}
 )
 public interface ProductMapper {
     ProductMapper INSTANCE = Mappers.getMapper(ProductMapper.class);
 
     @Mapping(target = "isHome", source = "home")
     ProductResponse toResponse(Product product);
+
+    ProductDetailResponse toProductDetailResponse(Product product);
 
     List<ProductResponse> toResponses(Collection<Product> products);
 

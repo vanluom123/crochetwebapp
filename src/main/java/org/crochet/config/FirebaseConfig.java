@@ -5,20 +5,25 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.cloud.StorageClient;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ClassPathResource;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.util.Base64;
 
 @RequiredArgsConstructor
 @Configuration
 public class FirebaseConfig {
 
+    @Value("${firebase.serviceAccountKey}")
+    private String serviceAccountKey;
+
     @Bean
     public FirebaseApp firebaseApp() throws IOException {
-        InputStream is = new ClassPathResource("serviceAccount.json").getInputStream();
+        byte[] decodedKey = Base64.getDecoder().decode(serviceAccountKey);
+        ByteArrayInputStream is = new ByteArrayInputStream(decodedKey);
 
         FirebaseOptions options = FirebaseOptions.builder()
                 .setCredentials(GoogleCredentials.fromStream(is))

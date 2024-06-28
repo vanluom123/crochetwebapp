@@ -18,6 +18,7 @@ ARG PAYPAL_CLIENT_SECRET
 ARG REDIS_HOST
 ARG REDIS_PORT
 ARG REDIS_PASSWORD
+ARG SERVICE_ACCOUNT_KEY
 
 # Environment variables
 ENV env ${env}
@@ -36,12 +37,11 @@ ENV PAYPAL_CLIENT_SECRET ${PAYPAL_CLIENT_SECRET}
 ENV REDIS_HOST ${REDIS_HOST}
 ENV REDIS_PORT ${REDIS_PORT}
 ENV REDIS_PASSWORD ${REDIS_PASSWORD}
+ENV SERVICE_ACCOUNT_KEY ${SERVICE_ACCOUNT_KEY}
 
 COPY . /workspace/app
 RUN --mount=type=cache,target=/root/.gradle
 RUN chmod +x ./gradlew
-RUN ./gradlew preReleaseVersion
-RUN ./gradlew majorVersionUpdate
 RUN ./gradlew clean build
 RUN mkdir -p build/dependency && (cd build/dependency; jar -xf ../libs/*-SNAPSHOT.jar)
 

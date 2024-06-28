@@ -7,6 +7,7 @@ import org.crochet.mapper.FileMapper;
 import org.crochet.mapper.FreePatternMapper;
 import org.crochet.model.FreePattern;
 import org.crochet.payload.request.FreePatternRequest;
+import org.crochet.payload.response.FreeChartDetailResponse;
 import org.crochet.payload.response.FreePatternResponse;
 import org.crochet.payload.response.PaginatedFreePatternResponse;
 import org.crochet.repository.CategoryRepo;
@@ -168,11 +169,11 @@ public class FreePatternServiceImpl implements FreePatternService {
      * @return A {@link FreePatternResponse} containing detailed information about the FreePattern.
      */
     @Override
-    public FreePatternResponse getDetail(String id) {
+    public FreeChartDetailResponse getDetail(String id) {
         var freePattern = freePatternRepo.getDetail(id).orElseThrow(
                 () -> new ResourceNotFoundException("FreePattern not found")
         );
-        return FreePatternMapper.INSTANCE.toResponse(freePattern);
+        return FreePatternMapper.INSTANCE.toFreeChartDetailResponse(freePattern);
     }
 
     @Transactional

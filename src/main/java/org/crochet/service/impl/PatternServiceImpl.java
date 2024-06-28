@@ -7,6 +7,7 @@ import org.crochet.mapper.FileMapper;
 import org.crochet.mapper.PatternMapper;
 import org.crochet.model.Pattern;
 import org.crochet.payload.request.PatternRequest;
+import org.crochet.payload.response.PatternDetailResponse;
 import org.crochet.payload.response.PatternPaginationResponse;
 import org.crochet.payload.response.PatternResponse;
 import org.crochet.repository.CategoryRepo;
@@ -145,11 +146,11 @@ public class PatternServiceImpl implements PatternService {
      * @return PatternResponse
      */
     @Override
-    public PatternResponse getDetail(String id) {
+    public PatternDetailResponse getDetail(String id) {
         var pattern = patternRepo.getDetail(id).orElseThrow(
                 () -> new ResourceNotFoundException("Pattern not found")
         );
-        return PatternMapper.INSTANCE.toResponse(pattern);
+        return PatternMapper.INSTANCE.toPatternDetailResponse(pattern);
     }
 
     /**
