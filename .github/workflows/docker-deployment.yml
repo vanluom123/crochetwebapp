@@ -41,6 +41,7 @@ jobs:
             REDIS_HOST=${{ secrets.REDIS_HOST }}
             REDIS_PORT=${{ secrets.REDIS_PORT }}
             REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
+            SERVICE_ACCOUNT_KEY=${{ secrets.SERVICE_ACCOUNT_KEY }}
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/crochet:latest
       - name: Verify
