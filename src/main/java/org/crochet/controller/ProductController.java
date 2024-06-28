@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.crochet.constant.AppConstant;
 import org.crochet.payload.request.ProductRequest;
+import org.crochet.payload.response.ProductDetailResponse;
 import org.crochet.payload.response.ProductPaginationResponse;
 import org.crochet.payload.response.ProductResponse;
 import org.crochet.repository.Filter;
@@ -80,10 +81,10 @@ public class ProductController {
     @ApiResponse(responseCode = "200",
             description = "Product details retrieved successfully",
             content = @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = ProductResponse.class)))
+                    schema = @Schema(implementation = ProductDetailResponse.class)))
     @ApiResponse(responseCode = "404", description = "Product not found")
     @GetMapping("/detail")
-    public ResponseEntity<ProductResponse> getProductDetail(@RequestParam("id") String id) {
+    public ResponseEntity<ProductDetailResponse> getProductDetail(@RequestParam("id") String id) {
         return ResponseEntity.ok(productService.getDetail(id));
     }
 
