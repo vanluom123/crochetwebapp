@@ -1,6 +1,7 @@
 package org.crochet.service;
 
 import org.crochet.payload.request.PatternRequest;
+import org.crochet.payload.response.PatternDetailResponse;
 import org.crochet.payload.response.PatternPaginationResponse;
 import org.crochet.payload.response.PatternResponse;
 import org.crochet.repository.Filter;
@@ -15,7 +16,7 @@ public interface PatternService {
 
     List<PatternResponse> getLimitedPatterns();
 
-    PatternResponse getDetail(String id);
+    PatternDetailResponse getDetail(String id);
 
     void deletePattern(String id);
 }
