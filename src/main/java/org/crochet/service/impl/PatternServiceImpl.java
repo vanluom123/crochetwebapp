@@ -29,7 +29,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -72,8 +71,8 @@ public class PatternServiceImpl implements PatternService {
                     .isHome(request.isHome())
                     .link(request.getLink())
                     .content(request.getContent())
-                    .files(new HashSet<>(FileMapper.INSTANCE.toEntities(request.getFiles())))
-                    .images(new HashSet<>(FileMapper.INSTANCE.toEntities(request.getImages())))
+                    .files(FileMapper.INSTANCE.toSetEntities(request.getFiles()))
+                    .images(FileMapper.INSTANCE.toSetEntities(request.getImages()))
                     .build();
         } else {
             pattern = patternRepo.findById(request.getId()).orElseThrow(
