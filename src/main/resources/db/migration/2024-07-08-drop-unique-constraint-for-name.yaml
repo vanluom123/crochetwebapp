@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - changeSet:
+      id: DROP_CONSTRAINT_CATEGORY_NAME
+      author: pvanluom
+      changes:
+        - dropUniqueConstraint:
+            columnNames: name
+            constraintName: uc_category_name
+            tableName: category
