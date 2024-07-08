@@ -1,17 +1,17 @@
 package org.crochet.service;
 
+import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.ProductRequest;
 import org.crochet.payload.response.ProductDetailResponse;
 import org.crochet.payload.response.ProductPaginationResponse;
 import org.crochet.payload.response.ProductResponse;
-import org.crochet.repository.Filter;
 
 import java.util.List;
 
 public interface ProductService {
     ProductResponse createOrUpdate(ProductRequest request);
 
-    ProductPaginationResponse getProducts(int pageNo, int pageSize, String sortBy, String sortDir, String searchText, String categoryId, List<Filter> filters);
+    ProductPaginationResponse getProducts(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters);
 
     List<ProductResponse> getLimitedProducts();
 

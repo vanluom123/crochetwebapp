@@ -7,11 +7,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.crochet.constant.AppConstant;
+import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.ProductRequest;
 import org.crochet.payload.response.ProductDetailResponse;
 import org.crochet.payload.response.ProductPaginationResponse;
 import org.crochet.payload.response.ProductResponse;
-import org.crochet.repository.Filter;
 import org.crochet.service.ProductService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,8 +23,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/product")
@@ -68,12 +66,9 @@ public class ProductController {
             @Parameter(description = "Sort direction")
             @RequestParam(value = "sortDir", defaultValue = AppConstant.DEFAULT_SORT_DIRECTION,
                     required = false) String sortDir,
-            @Parameter(description = "Search by name or description")
-            @RequestParam(value = "searchText", required = false) String searchText,
-            @Parameter(description = "Category ID")
-            @RequestParam(value = "categoryId", required = false) String categoryId,
-            @RequestBody(required = false) List<Filter> filters) {
-        var response = productService.getProducts(pageNo, pageSize, sortBy, sortDir, searchText, categoryId, filters);
+            @Parameter(description = "The list of filters")
+            @RequestBody(required = false) Filter[] filters) {
+        var response = productService.getProducts(pageNo, pageSize, sortBy, sortDir, filters);
         return ResponseEntity.ok(response);
     }
 
