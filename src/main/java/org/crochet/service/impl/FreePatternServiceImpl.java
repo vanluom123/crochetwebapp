@@ -29,7 +29,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -72,8 +71,8 @@ public class FreePatternServiceImpl implements FreePatternService {
                     .isHome(request.isHome())
                     .link(request.getLink())
                     .content(request.getContent())
-                    .files(new HashSet<>(FileMapper.INSTANCE.toEntities(request.getFiles())))
-                    .images(new HashSet<>(FileMapper.INSTANCE.toEntities(request.getImages())))
+                    .files(FileMapper.INSTANCE.toSetEntities(request.getFiles()))
+                    .images(FileMapper.INSTANCE.toSetEntities(request.getImages()))
                     .build();
         } else {
             freePattern = freePatternRepo.findById(request.getId()).orElseThrow(
