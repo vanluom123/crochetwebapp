@@ -23,14 +23,6 @@ public interface FreePatternRepository extends JpaRepository<FreePattern, String
     List<FreePattern> findLimitedNumFreePattern(Pageable pageable);
 
     @Query("""
-            select fp
-            from FreePattern fp
-            join fetch fp.category c
-            where c.id = ?1
-            """)
-    List<FreePattern> findFreePatternByCategory(String categoryId);
-
-    @Query("""
             select f
             from FreePattern f
             left join fetch f.files
@@ -38,4 +30,5 @@ public interface FreePatternRepository extends JpaRepository<FreePattern, String
             where f.id = ?1
             """)
     Optional<FreePattern> getDetail(String id);
+
 }

@@ -11,6 +11,7 @@ public class PaymentOrder {
     private String status;
     private String payId;
     private String redirectUrl;
+
     public PaymentOrder(String status) {
         this.status = status;
     }

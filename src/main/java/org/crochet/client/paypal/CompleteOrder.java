@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 public class CompleteOrder {
     private String status;
     private String payId;
+
     public CompleteOrder(String status) {
         this.status = status;
     }

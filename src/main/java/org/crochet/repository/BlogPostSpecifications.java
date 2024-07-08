@@ -6,7 +6,7 @@ import org.springframework.data.jpa.domain.Specification;
 
 public class BlogPostSpecifications {
 
-    public static Specification<BlogPost> getAll() {
+    public static Specification<BlogPost> fetchJoin() {
         return (r, q, cb) -> {
             if (Long.class != q.getResultType()) {
                 r.fetch("files", JoinType.LEFT);
@@ -14,10 +14,5 @@ public class BlogPostSpecifications {
             q.distinct(true);
             return cb.conjunction();
         };
-    }
-
-    public static Specification<BlogPost> searchBy(String text) {
-        return (root, query, criteriaBuilder) ->
-                criteriaBuilder.like(criteriaBuilder.lower(root.get("title")), "%" + text.toLowerCase() + "%");
     }
 }

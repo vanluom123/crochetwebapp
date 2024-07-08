@@ -5,6 +5,7 @@ import java.util.Map;
 
 public class MessageCodeConstant {
     public static final Map<String, Integer> MAP_CODE = new HashMap<>();
+
     static {
         MAP_CODE.put(MessageConstant.ACTIVE_NOW, 1);
         MAP_CODE.put(MessageConstant.CLICK_TO_ACTIVE_CONTENT, 2);
@@ -49,6 +50,7 @@ public class MessageCodeConstant {
         MAP_CODE.put(MessageConstant.FORBIDDEN, 41);
         MAP_CODE.put(MessageConstant.DATA_INTEGRITY_VIOLATION, 42);
     }
+
     private MessageCodeConstant() {
     }
 }

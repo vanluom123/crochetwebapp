@@ -4,11 +4,9 @@ import jakarta.persistence.criteria.JoinType;
 import org.crochet.model.Pattern;
 import org.springframework.data.jpa.domain.Specification;
 
-import java.util.List;
-
 public class PatternSpecifications {
 
-    public static Specification<Pattern> getAll() {
+    public static Specification<Pattern> fetchJoin() {
         return (r, q, cb) -> {
             if (Long.class != q.getResultType()) {
                 r.fetch("files", JoinType.LEFT);
@@ -17,14 +15,5 @@ public class PatternSpecifications {
             q.distinct(true);
             return cb.conjunction();
         };
-    }
-
-    public static Specification<Pattern> searchByNameOrDesc(String searchText) {
-        return (r, q, cb) ->
-                cb.like(cb.lower(r.get("name")), "%" + searchText.toLowerCase() + "%");
-    }
-
-    public static Specification<Pattern> in(List<Pattern> patterns) {
-        return (root, query, criteriaBuilder) -> root.in(patterns);
     }
 }
