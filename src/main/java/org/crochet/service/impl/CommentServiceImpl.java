@@ -27,9 +27,9 @@ import static org.crochet.constant.MessageConstant.USER_NOT_FOUND_MESSAGE;
 @Service
 @RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
-    final CommentRepository commentRepo;
-    final UserRepository userRepo;
-    final BlogPostRepository blogPostRepo;
+    private final CommentRepository commentRepo;
+    private final UserRepository userRepo;
+    private final BlogPostRepository blogPostRepo;
 
     /**
      * Creates a new comment or updates an existing one based on the provided {@link CommentRequest}.

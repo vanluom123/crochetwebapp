@@ -11,3 +11,5 @@ databaseChangeLog:
       file: src/main/resources/db/migration/2024-05-18-add-blog-category-table.yaml
   - include:
       file: src/main/resources/db/migration/2024-07-08-drop-unique-constraint-for-name.yaml
+  - include:
+      file: src/main/resources/db/migration/2024-07-11-create-settings-table.yaml
