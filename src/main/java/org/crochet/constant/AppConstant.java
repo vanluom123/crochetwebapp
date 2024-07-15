@@ -11,4 +11,5 @@ public class AppConstant {
     public static final int MAX_POOL_SIZE = 50;
     public static final int QUEUE_CAPACITY = 100;
     public static final String CROCHET_TASK_EXECUTOR = "crochetTaskExecutor";
+    public static final String DEFAULT_LIMIT = "12";
 }

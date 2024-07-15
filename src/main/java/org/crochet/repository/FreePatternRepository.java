@@ -1,6 +1,7 @@
 package org.crochet.repository;
 
 import org.crochet.model.FreePattern;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -11,16 +12,15 @@ import java.util.Optional;
 
 @Repository
 public interface FreePatternRepository extends JpaRepository<FreePattern, String>, JpaSpecificationExecutor<FreePattern> {
+
     @Query("""
             select f
             from FreePattern f
             left join fetch f.files
             left join fetch f.images
             where f.isHome = true
-            order by f.createdDate desc
-            limit 12
             """)
-    List<FreePattern> findLimitedNumFreePatternByCreatedDateDesc();
+    List<FreePattern> findLimitedNumFreePattern(Pageable pageable);
 
     @Query("""
             select fp

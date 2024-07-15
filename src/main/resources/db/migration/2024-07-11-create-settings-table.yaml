@@ -1,0 +1,19 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1720695261815-5
+      author: pvanluom
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_settings
+                  name: setting_key
+                  type: VARCHAR(255)
+              - column:
+                  name: value
+                  type: VARCHAR(255)
+            tableName: settings
+
