@@ -5,18 +5,15 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.crochet.enumerator.QueryOperator;
-
-import java.util.List;
+import org.crochet.enumerator.FilterOperation;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Filter {
-    private String field;
-    private QueryOperator operator;
-    private String value;
-    private List<String> values;
+public class FilterCriteria {
+    private String key;
+    private Object value;
+    private FilterOperation operation;
 }

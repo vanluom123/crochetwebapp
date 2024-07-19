@@ -7,14 +7,13 @@ import org.crochet.exception.BadRequestException;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.UserMapper;
 import org.crochet.model.User;
+import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.SignUpRequest;
 import org.crochet.payload.request.UserUpdateRequest;
 import org.crochet.payload.response.UserPaginationResponse;
 import org.crochet.payload.response.UserResponse;
-import org.crochet.repository.Filter;
-import org.crochet.repository.Specifications;
+import org.crochet.repository.GenericFilter;
 import org.crochet.repository.UserRepository;
-import org.crochet.repository.UserSpecification;
 import org.crochet.service.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,7 +23,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import java.util.List;
 
@@ -68,27 +66,26 @@ public class UserServiceImpl implements UserService {
     /**
      * Retrieves all users with pagination and optional filters.
      *
-     * @param pageNo     The page number to retrieve. Page numbers start from 0.
-     * @param pageSize   The number of records to retrieve per page.
-     * @param sortBy     The field by which to sort the records.
-     * @param sortDir    The direction of the sort. Can be 'ASC' for ascending or 'DESC' for descending.
-     * @param searchText The text to search for in the name or email fields.
-     * @param filters    The list of filters.
+     * @param pageNo   The page number to retrieve. Page numbers start from 0.
+     * @param pageSize The number of records to retrieve per page.
+     * @param sortBy   The field by which to sort the records.
+     * @param sortDir  The direction of the sort. Can be 'ASC' for ascending or 'DESC' for descending.
+     * @param filters  The list of filters.
      * @return A UserPaginationResponse object containing the retrieved records and pagination details.
      */
     @Override
-    public UserPaginationResponse getAll(int pageNo, int pageSize, String sortBy, String sortDir,
-                                         String searchText, List<Filter> filters) {
+    public UserPaginationResponse getAll(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters) {
+        GenericFilter<User> filter = GenericFilter.create(filters);
+        Specification<User> spec = filter.build();
+
         Sort sort = Sort.by(sortBy);
         sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? sort.ascending() : sort.descending();
+
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
-        Specification<User> spec = Specifications.getSpecFromFilters(filters);
-        // Search by search text
-        if (StringUtils.hasText(searchText)) {
-            spec = spec.or(UserSpecification.searchByNameOrEmail(searchText));
-        }
         Page<User> page = userRepository.findAll(spec, pageable);
+
         List<UserResponse> users = UserMapper.INSTANCE.toResponses(page.getContent());
+
         return UserPaginationResponse.builder()
                 .contents(users)
                 .pageNo(pageNo)
@@ -125,13 +122,6 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_WITH_EMAIL_MESSAGE + email,
                         MAP_CODE.get(USER_NOT_FOUND_WITH_EMAIL_MESSAGE)));
-    }
-
-    @Override
-    public User getById(String id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_WITH_ID_MESSAGE + id,
-                        MAP_CODE.get(USER_NOT_FOUND_WITH_ID_MESSAGE)));
     }
 
     @Override

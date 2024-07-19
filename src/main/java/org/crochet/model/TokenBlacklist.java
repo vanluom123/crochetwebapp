@@ -13,7 +13,8 @@ import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 
-@Getter@Setter
+@Getter
+@Setter
 @Entity
 @Table(name = "token_blacklist")
 @SuperBuilder

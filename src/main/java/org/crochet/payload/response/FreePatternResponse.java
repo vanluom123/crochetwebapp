@@ -14,7 +14,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonPropertyOrder({"id", "name", "description", "author", "is_home", "link", "content", "images", "files"})
+@JsonPropertyOrder({"id", "name", "description", "author", "is_home", "link", "content", "images", "files", "createdDate"})
 public class FreePatternResponse implements Serializable {
     private String id;
     private String name;

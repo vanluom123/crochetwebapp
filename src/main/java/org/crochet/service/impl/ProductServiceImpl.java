@@ -11,11 +11,11 @@ import org.crochet.payload.response.ProductDetailResponse;
 import org.crochet.payload.response.ProductPaginationResponse;
 import org.crochet.payload.response.ProductResponse;
 import org.crochet.repository.CategoryRepo;
-import org.crochet.repository.Filter;
+import org.crochet.payload.request.Filter;
 import org.crochet.repository.ProductRepository;
 import org.crochet.repository.ProductSpecifications;
 import org.crochet.repository.SettingsRepo;
-import org.crochet.repository.Specifications;
+import org.crochet.repository.GenericFilter;
 import org.crochet.service.ProductService;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -24,7 +24,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -90,40 +89,28 @@ public class ProductServiceImpl implements ProductService {
     /**
      * Retrieves a paginated list of products based on the provided parameters.
      *
-     * @param pageNo     The page number to retrieve (0-indexed).
-     * @param pageSize   The number of products to include in each page.
-     * @param sortBy     The attribute by which the products should be sorted.
-     * @param sortDir    The sorting direction, either "ASC" (ascending) or "DESC" (descending).
-     * @param searchText The text used to filter products by name or description.
-     * @param categoryId The unique identifiers of the categories used to filter products.
-     * @param filters    The list of filters
+     * @param pageNo   The page number to retrieve (0-indexed).
+     * @param pageSize The number of products to include in each page.
+     * @param sortBy   The attribute by which the products should be sorted.
+     * @param sortDir  The sorting direction, either "ASC" (ascending) or "DESC" (descending).
+     * @param filters  The list of filters.
      * @return A {@link ProductPaginationResponse} containing the paginated list of products.
      */
     @Override
-    @Cacheable(value = "products",
-            key = "T(java.util.Objects).hash(#pageNo, #pageSize, #sortBy, #sortDir, #searchText, #categoryId, #filters)")
-    public ProductPaginationResponse getProducts(int pageNo, int pageSize, String sortBy, String sortDir,
-                                                 String searchText, String categoryId, List<Filter> filters) {
-        log.info("Fetching products");
+    @Cacheable(value = "products", key = "T(java.util.Objects).hash(#pageNo, #pageSize, #sortBy, #sortDir, #filters)")
+    public ProductPaginationResponse getProducts(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters) {
+        GenericFilter<Product> filter = GenericFilter.create(filters);
+        var spec = filter.build();
+        spec = spec.and(ProductSpecifications.fetchJoin());
+
         Sort sort = Sort.by(sortBy);
         sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? sort.ascending() : sort.descending();
 
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
-
-        Specification<Product> spec = Specifications.getSpecFromFilters(filters);
-
-        if (StringUtils.hasText(searchText)) {
-            spec = spec.or(ProductSpecifications.searchByNameOrDesc(searchText));
-        }
-        if (StringUtils.hasText(categoryId)) {
-            spec = spec.or(ProductSpecifications.in(getProductsByCategory(categoryId)));
-        }
-
-        spec = spec.and(ProductSpecifications.getAll());
-
         Page<Product> menuPage = productRepo.findAll(spec, pageable);
 
         List<ProductResponse> contents = ProductMapper.INSTANCE.toResponses(menuPage.getContent());
+
         return ProductPaginationResponse.builder()
                 .contents(contents)
                 .pageNo(menuPage.getNumber())
@@ -132,21 +119,6 @@ public class ProductServiceImpl implements ProductService {
                 .totalPages(menuPage.getTotalPages())
                 .last(menuPage.isLast())
                 .build();
-    }
-
-    /**
-     * Get all products by category
-     *
-     * @param categoryId The unique identifier of the category.
-     * @return A list of {@link Product} containing products.
-     */
-    private List<Product> getProductsByCategory(String categoryId) {
-        List<Product> products = productRepo.findProductByCategory(categoryId);
-        var categoryIds = categoryRepo.findChildrenIds(categoryId);
-        for (var subCategoryId : categoryIds) {
-            products.addAll(getProductsByCategory(subCategoryId));
-        }
-        return products;
     }
 
     /**
