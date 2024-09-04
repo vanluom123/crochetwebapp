@@ -1,0 +1,12 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1725417274084-5
+      author: admin
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  name: status
+                  type: VARCHAR(25)
+            tableName: free_pattern
+

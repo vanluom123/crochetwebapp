@@ -13,3 +13,5 @@ databaseChangeLog:
       file: src/main/resources/db/migration/2024-07-08-drop-unique-constraint-for-name.yaml
   - include:
       file: src/main/resources/db/migration/2024-07-11-create-settings-table.yaml
+  - include:
+      file: src/main/resources/db/migration/2024-09-04-add-status-for-pattern.yaml
