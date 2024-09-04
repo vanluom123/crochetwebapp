@@ -2,6 +2,7 @@ package org.crochet.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.crochet.constant.AppConstant;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.FileMapper;
 import org.crochet.mapper.FreePatternMapper;
@@ -14,6 +15,7 @@ import org.crochet.repository.CategoryRepo;
 import org.crochet.repository.Filter;
 import org.crochet.repository.FreePatternRepository;
 import org.crochet.repository.FreePatternSpecifications;
+import org.crochet.repository.SettingsRepo;
 import org.crochet.repository.Specifications;
 import org.crochet.service.FreePatternService;
 import org.springframework.cache.annotation.CacheEvict;
@@ -38,8 +40,9 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class FreePatternServiceImpl implements FreePatternService {
-    final FreePatternRepository freePatternRepo;
-    final CategoryRepo categoryRepo;
+    private final FreePatternRepository freePatternRepo;
+    private final CategoryRepo categoryRepo;
+    private final SettingsRepo settingsRepo;
 
     /**
      * Creates a new FreePattern or updates an existing one based on the provided {@link FreePatternRequest}.
@@ -71,6 +74,7 @@ public class FreePatternServiceImpl implements FreePatternService {
                     .isHome(request.isHome())
                     .link(request.getLink())
                     .content(request.getContent())
+                    .status(request.getStatus())
                     .files(FileMapper.INSTANCE.toSetEntities(request.getFiles()))
                     .images(FileMapper.INSTANCE.toSetEntities(request.getImages()))
                     .build();
@@ -157,7 +161,15 @@ public class FreePatternServiceImpl implements FreePatternService {
     @Override
     public List<FreePatternResponse> getLimitedFreePatterns() {
         log.info("Fetching limited free patterns");
-        var freePatterns = freePatternRepo.findLimitedNumFreePatternByCreatedDateDesc();
+        var direction = settingsRepo.findByKey("homepage.fp.direction")
+                .orElse(Sort.Direction.ASC.name());
+        var orderBy = settingsRepo.findByKey("homepage.fp.orderBy")
+                .orElse("id");
+        var limit = settingsRepo.findByKey("homepage.fp.limit")
+                .orElse(AppConstant.DEFAULT_LIMIT);
+        Sort sort = Sort.by(Sort.Direction.fromString(direction), orderBy);
+        Pageable pageable = PageRequest.of(0, Integer.parseInt(limit), sort);
+        var freePatterns = freePatternRepo.findLimitedNumFreePattern(pageable);
         return FreePatternMapper.INSTANCE.toResponses(freePatterns);
     }
 
