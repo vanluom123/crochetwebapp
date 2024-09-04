@@ -42,7 +42,7 @@ public class FreePattern extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", columnDefinition = "VARCHAR(25)")
-    private ChartStatus chartStatus;
+    private ChartStatus status;
 
     @ElementCollection
     @CollectionTable(name = "free_pattern_file",

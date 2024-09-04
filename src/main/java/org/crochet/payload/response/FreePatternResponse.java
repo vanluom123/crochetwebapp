@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.crochet.enumerator.ChartStatus;
 
 import java.io.Serializable;
 import java.util.List;
@@ -14,7 +15,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonPropertyOrder({"id", "name", "description", "author", "is_home", "link", "content", "images", "files"})
+@JsonPropertyOrder({"id", "name", "description", "author", "is_home", "link", "content", "status", "images", "files"})
 public class FreePatternResponse implements Serializable {
     private String id;
     private String name;
@@ -24,6 +25,7 @@ public class FreePatternResponse implements Serializable {
     private boolean isHome;
     private String link;
     private String content;
+    private ChartStatus status;
     private List<FileResponse> images;
     private List<FileResponse> files;
 }
