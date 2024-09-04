@@ -69,6 +69,7 @@ authorize:
       - "/blog-categories/create"
       - "/blog-categories/update"
       - "/blog-categories/delete/**"
+      - "/setting/**"
 
 firebase:
   serviceAccountKey: ${SERVICE_ACCOUNT_KEY}

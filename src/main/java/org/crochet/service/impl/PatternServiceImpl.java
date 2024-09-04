@@ -2,6 +2,7 @@ package org.crochet.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.crochet.constant.AppConstant;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.FileMapper;
 import org.crochet.mapper.PatternMapper;
@@ -14,6 +15,7 @@ import org.crochet.repository.CategoryRepo;
 import org.crochet.repository.Filter;
 import org.crochet.repository.PatternRepository;
 import org.crochet.repository.PatternSpecifications;
+import org.crochet.repository.SettingsRepo;
 import org.crochet.repository.Specifications;
 import org.crochet.service.PatternService;
 import org.springframework.cache.annotation.CacheEvict;
@@ -40,8 +42,9 @@ import java.util.Queue;
 @Service
 @RequiredArgsConstructor
 public class PatternServiceImpl implements PatternService {
-    final PatternRepository patternRepo;
-    final CategoryRepo categoryRepo;
+    private final PatternRepository patternRepo;
+    private final CategoryRepo categoryRepo;
+    private final SettingsRepo settingsRepo;
 
     /**
      * Create or update pattern
@@ -134,7 +137,15 @@ public class PatternServiceImpl implements PatternService {
     @Override
     public List<PatternResponse> getLimitedPatterns() {
         log.info("Fetching limited patterns");
-        var patterns = patternRepo.findLimitedNumPatternByCreatedDateDesc();
+        var direction = settingsRepo.findByKey("homepage.pattern.direction")
+                .orElse(Sort.Direction.ASC.name());
+        var orderBy = settingsRepo.findByKey("homepage.pattern.orderBy")
+                .orElse("id");
+        var limit = settingsRepo.findByKey("homepage.pattern.limit")
+                .orElse(AppConstant.DEFAULT_LIMIT);
+        Sort sort = Sort.by(Sort.Direction.fromString(direction), orderBy);
+        Pageable pageable = PageRequest.of(0, Integer.parseInt(limit), sort);
+        var patterns = patternRepo.findLimitedNumPattern(pageable);
         return PatternMapper.INSTANCE.toResponses(patterns);
     }
 

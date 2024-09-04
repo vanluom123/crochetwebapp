@@ -2,6 +2,7 @@ package org.crochet.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.crochet.constant.AppConstant;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.BlogPostMapper;
 import org.crochet.mapper.FileMapper;
@@ -13,6 +14,7 @@ import org.crochet.payload.response.BlogPostResponse;
 import org.crochet.repository.BlogCategoryRepo;
 import org.crochet.repository.BlogPostRepository;
 import org.crochet.repository.BlogPostSpecifications;
+import org.crochet.repository.SettingsRepo;
 import org.crochet.service.BlogPostService;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -36,8 +38,9 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class BlogPostServiceImpl implements BlogPostService {
-    final BlogPostRepository blogPostRepo;
-    final BlogCategoryRepo blogCategoryRepo;
+    private final BlogPostRepository blogPostRepo;
+    private final BlogCategoryRepo blogCategoryRepo;
+    private final SettingsRepo settingsRepo;
 
     /**
      * Creates a new blog post or updates an existing one based on the provided {@link BlogPostRequest}.
@@ -146,7 +149,15 @@ public class BlogPostServiceImpl implements BlogPostService {
     @Override
     public List<BlogPostResponse> getLimitedBlogPosts() {
         log.info("Fetching limited blog posts");
-        var blogPosts = blogPostRepo.findLimitedNumPostsByCreatedDateDesc();
+        String direction = settingsRepo.findByKey("homepage.blog.direction")
+                .orElse(Sort.Direction.ASC.name());
+        String orderBy = settingsRepo.findByKey("homepage.blog.orderBy")
+                .orElse("id");
+        String limit = settingsRepo.findByKey("homepage.blog.limit")
+                .orElse(AppConstant.DEFAULT_LIMIT);
+        Sort sort = Sort.by(Sort.Direction.fromString(direction), orderBy);
+        Pageable pageable = PageRequest.of(0, Integer.parseInt(limit), sort);
+        var blogPosts = blogPostRepo.findLimitedNumPosts(pageable);
         return BlogPostMapper.INSTANCE.toResponses(blogPosts);
     }
 
@@ -176,7 +187,7 @@ public class BlogPostServiceImpl implements BlogPostService {
      * @return The {@link BlogPost} identified by the given ID.
      * @throws ResourceNotFoundException If the specified blog post ID does not correspond to an existing blog post.
      */
-    BlogPost getById(String id) {
+    private BlogPost getById(String id) {
         return blogPostRepo.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("Blog post not found")
         );

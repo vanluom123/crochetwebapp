@@ -24,7 +24,7 @@ import static org.crochet.constant.MessageConstant.EXISTS_AS_A_PARENT_MESSAGE;
 @Service
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
-    final CategoryRepo categoryRepo;
+    private final CategoryRepo categoryRepo;
 
     /**
      * Create a new category or multiple categories
@@ -136,7 +136,7 @@ public class CategoryServiceImpl implements CategoryService {
      * @param id the parent category ID
      * @return a list of CategoryResponse objects
      */
-    Category findById(String id) {
+    private Category findById(String id) {
         return categoryRepo
                 .getCategory(id)
                 .orElseThrow(() ->

@@ -1,6 +1,7 @@
 package org.crochet.repository;
 
 import org.crochet.model.Product;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -17,10 +18,9 @@ public interface ProductRepository extends JpaRepository<Product, String>, JpaSp
             from Product p
             left join fetch p.images
             where p.isHome = true
-            order by p.createdDate desc
-            limit 12
             """)
-    List<Product> findLimitedNumProductByCreatedDateDesc();
+    List<Product> findLimitedNumProduct(Pageable pageable);
+
 
     @Query("""
             select prod

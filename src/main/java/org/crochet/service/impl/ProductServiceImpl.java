@@ -2,6 +2,7 @@ package org.crochet.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.crochet.constant.AppConstant;
 import org.crochet.mapper.FileMapper;
 import org.crochet.mapper.ProductMapper;
 import org.crochet.model.Product;
@@ -13,6 +14,7 @@ import org.crochet.repository.CategoryRepo;
 import org.crochet.repository.Filter;
 import org.crochet.repository.ProductRepository;
 import org.crochet.repository.ProductSpecifications;
+import org.crochet.repository.SettingsRepo;
 import org.crochet.repository.Specifications;
 import org.crochet.service.ProductService;
 import org.springframework.cache.annotation.CacheEvict;
@@ -37,8 +39,9 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
-    final ProductRepository productRepo;
-    final CategoryRepo categoryRepo;
+    private final ProductRepository productRepo;
+    private final CategoryRepo categoryRepo;
+    private final SettingsRepo settingsRepo;
 
     /**
      * Creates a new product or updates an existing one based on the provided {@link ProductRequest}.
@@ -156,7 +159,15 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<ProductResponse> getLimitedProducts() {
         log.info("Fetching limited products");
-        var products = productRepo.findLimitedNumProductByCreatedDateDesc();
+        var direction = settingsRepo.findByKey("homepage.product.direction")
+                .orElse(Sort.Direction.ASC.name());
+        var orderBy = settingsRepo.findByKey("homepage.product.orderBy")
+                .orElse("id");
+        var limit = settingsRepo.findByKey("homepage.product.limit")
+                .orElse(AppConstant.DEFAULT_LIMIT);
+        Sort sort = Sort.by(Sort.Direction.fromString(direction), orderBy);
+        Pageable pageable = PageRequest.of(0, Integer.parseInt(limit), sort);
+        var products = productRepo.findLimitedNumProduct(pageable);
         return ProductMapper.INSTANCE.toResponses(products);
     }
 
