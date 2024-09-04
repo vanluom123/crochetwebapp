@@ -74,6 +74,7 @@ public class FreePatternServiceImpl implements FreePatternService {
                     .isHome(request.isHome())
                     .link(request.getLink())
                     .content(request.getContent())
+                    .status(request.getStatus())
                     .files(FileMapper.INSTANCE.toSetEntities(request.getFiles()))
                     .images(FileMapper.INSTANCE.toSetEntities(request.getImages()))
                     .build();

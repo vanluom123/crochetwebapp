@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.crochet.enumerator.ChartStatus;
 
 import java.util.List;
 
@@ -19,6 +20,7 @@ public class FreeChartDetailResponse {
     private boolean isHome;
     private String link;
     private String content;
+    private ChartStatus status;
     private List<FileResponse> images;
     private List<FileResponse> files;
     private CategoryResponse category;
