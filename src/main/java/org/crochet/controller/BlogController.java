@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.crochet.constant.AppConstant;
 import org.crochet.payload.request.BlogPostRequest;
+import org.crochet.payload.request.Filter;
 import org.crochet.payload.response.BlogPostPaginationResponse;
 import org.crochet.payload.response.BlogPostResponse;
 import org.crochet.service.BlogPostService;
@@ -47,7 +48,7 @@ public class BlogController {
     @ApiResponse(responseCode = "200", description = "List of blog posts",
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = BlogPostPaginationResponse.class)))
-    @GetMapping("/pagination")
+    @PostMapping("/pagination")
     public ResponseEntity<BlogPostPaginationResponse> getBlogs(
             @Parameter(description = "Page number (default: 0)")
             @RequestParam(value = "pageNo", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER,
@@ -60,9 +61,9 @@ public class BlogController {
             @Parameter(description = "Sort direction (default: ASC)")
             @RequestParam(value = "sortDir", defaultValue = AppConstant.DEFAULT_SORT_DIRECTION,
                     required = false) String sortDir,
-            @Parameter(description = "Search text")
-            @RequestParam(value = "searchText", required = false) String searchText) {
-        var response = blogPostService.getBlogs(pageNo, pageSize, sortBy, sortDir, searchText);
+            @Parameter(description = "The list of filters")
+            @RequestBody(required = false) Filter[] filters) {
+        var response = blogPostService.getBlogs(pageNo, pageSize, sortBy, sortDir, filters);
         return ResponseEntity.ok(response);
     }
 
