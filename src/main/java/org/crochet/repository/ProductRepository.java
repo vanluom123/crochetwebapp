@@ -23,14 +23,6 @@ public interface ProductRepository extends JpaRepository<Product, String>, JpaSp
 
 
     @Query("""
-            select prod
-            from Product prod
-            join fetch prod.category c
-            where c.id = ?1
-            """)
-    List<Product> findProductByCategory(String categoryId);
-
-    @Query("""
             select p
             from Product p
             left join fetch p.images

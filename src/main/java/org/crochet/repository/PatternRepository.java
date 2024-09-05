@@ -23,14 +23,6 @@ public interface PatternRepository extends JpaRepository<Pattern, String>, JpaSp
     List<Pattern> findLimitedNumPattern(Pageable pageable);
 
     @Query("""
-            select p
-            from Pattern p
-            join fetch p.category c
-            where c.id = ?1
-            """)
-    List<Pattern> findPatternByCategory(String categoryId);
-
-    @Query("""
             SELECT p
             FROM Pattern p
             LEFT JOIN FETCH p.files
