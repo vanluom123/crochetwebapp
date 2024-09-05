@@ -88,9 +88,9 @@ public class JwtTokenServiceImpl implements JwtTokenService {
     /**
      * Extracts a claim from the provided token using the specified claims resolver function.
      *
-     * @param token         The token from which to extract the claim.
+     * @param token          The token from which to extract the claim.
      * @param claimsResolver The claims resolver function to use.
-     * @param <T>           The type of the claim to extract.
+     * @param <T>            The type of the claim to extract.
      * @return The extracted claim.
      */
     @Override

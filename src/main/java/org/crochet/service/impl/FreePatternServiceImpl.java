@@ -7,16 +7,16 @@ import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.FileMapper;
 import org.crochet.mapper.FreePatternMapper;
 import org.crochet.model.FreePattern;
+import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.FreePatternRequest;
 import org.crochet.payload.response.FreeChartDetailResponse;
 import org.crochet.payload.response.FreePatternResponse;
 import org.crochet.payload.response.PaginatedFreePatternResponse;
 import org.crochet.repository.CategoryRepo;
-import org.crochet.repository.Filter;
 import org.crochet.repository.FreePatternRepository;
 import org.crochet.repository.FreePatternSpecifications;
 import org.crochet.repository.SettingsRepo;
-import org.crochet.repository.Specifications;
+import org.crochet.repository.GenericFilter;
 import org.crochet.service.FreePatternService;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -89,41 +89,30 @@ public class FreePatternServiceImpl implements FreePatternService {
     }
 
     /**
-     * Retrieves a paginated list of FreePatterns based on the provided parameters.
+     * Get all free patterns with filter
      *
-     * @param pageNo     The page number to retrieve (0-indexed).
-     * @param pageSize   The number of FreePatterns to include in each page.
-     * @param sortBy     The attribute by which the FreePatterns should be sorted.
-     * @param sortDir    The sorting direction, either "ASC" (ascending) or "DESC" (descending).
-     * @param searchText The text to search for in the FreePatterns.
-     * @param categoryId The unique identifier of the category to filter FreePatterns by.
-     * @param filters    The list of filters.
-     * @return A {@link PaginatedFreePatternResponse} containing the paginated list of FreePatterns.
+     * @param pageNo   Page number
+     * @param pageSize Page size
+     * @param sortBy   Sort by
+     * @param sortDir  Sort direction
+     * @param filters  List Filters
+     * @return PaginatedFreePatternResponse
      */
     @Override
-    @Cacheable(value = "freepatterns",
-            key = "T(java.util.Objects).hash(#pageNo, #pageSize, #sortBy, #sortDir, #searchText, #categoryId, #filters)")
-    public PaginatedFreePatternResponse getFreePatterns(int pageNo, int pageSize, String sortBy, String sortDir,
-                                                        String searchText, String categoryId, List<Filter> filters) {
-        log.info("Fetching free patterns");
+    @Cacheable(value = "freepatterns", key = "T(java.util.Objects).hash(#pageNo, #pageSize, #sortBy, #sortDir, #filters)")
+    public PaginatedFreePatternResponse getAllFreePatterns(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters) {
+        GenericFilter<FreePattern> filter = GenericFilter.create(filters);
+        Specification<FreePattern> spec = filter.build();
+        spec = spec.and(FreePatternSpecifications.fetchJoin());
+
         Sort sort = Sort.by(sortBy);
         sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? sort.ascending() : sort.descending();
 
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
-
-        Specification<FreePattern> spec = Specifications.getSpecFromFilters(filters);
-
-        if (StringUtils.hasText(searchText)) {
-            spec = spec.or(FreePatternSpecifications.searchByNameDescOrAuthor(searchText));
-        }
-        if (StringUtils.hasText(categoryId)) {
-            spec = spec.or(FreePatternSpecifications.existIn(getAllFreePatterns(categoryId)));
-        }
-
-        spec = spec.and(FreePatternSpecifications.getAll());
-
         Page<FreePattern> page = freePatternRepo.findAll(spec, pageable);
+
         List<FreePatternResponse> contents = FreePatternMapper.INSTANCE.toResponses(page.getContent());
+
         return PaginatedFreePatternResponse.builder()
                 .contents(contents)
                 .pageNo(page.getNumber())
@@ -135,24 +124,7 @@ public class FreePatternServiceImpl implements FreePatternService {
     }
 
     /**
-     * Retrieves a list of FreePatterns based on the provided category ID using a recursive approach.
-     * This method traverses the category hierarchy by recursively calling itself for each child category.
-     *
-     * @param categoryId The unique identifier of the category.
-     * @return A list of {@link FreePattern} objects containing information about the FreePatterns.
-     */
-    private List<FreePattern> getAllFreePatterns(String categoryId) {
-        List<FreePattern> freePatterns = freePatternRepo.findFreePatternByCategory(categoryId);
-        List<String> categoryIds = categoryRepo.findChildrenIds(categoryId);
-        for (String subCategoryId : categoryIds) {
-            freePatterns.addAll(getAllFreePatterns(subCategoryId));
-        }
-        return freePatterns;
-    }
-
-    /**
      * Retrieves a limited list of FreePatterns.
-     * The limit is defined by the constant {@code AppConstant.FREE_PATTERN_SIZE}.
      *
      * @return A list of {@link FreePatternResponse} objects containing information about the FreePatterns.
      */

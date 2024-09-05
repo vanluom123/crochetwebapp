@@ -7,11 +7,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.crochet.constant.AppConstant;
+import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.FreePatternRequest;
 import org.crochet.payload.response.FreeChartDetailResponse;
 import org.crochet.payload.response.FreePatternResponse;
 import org.crochet.payload.response.PaginatedFreePatternResponse;
-import org.crochet.repository.Filter;
 import org.crochet.service.FreePatternService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,8 +23,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/free-pattern")
@@ -46,33 +44,6 @@ public class FreePatternController {
             @RequestBody FreePatternRequest request) {
         var result = freePatternService.createOrUpdate(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(result);
-    }
-
-    @Operation(summary = "Get paginated list of patterns")
-    @ApiResponse(responseCode = "200", description = "List of patterns",
-            content = @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = PaginatedFreePatternResponse.class)))
-    @PostMapping("/pagination")
-    public ResponseEntity<PaginatedFreePatternResponse> getPatterns(
-            @Parameter(description = "Page number (default: 0)")
-            @RequestParam(value = "pageNo", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER,
-                    required = false) int pageNo,
-            @Parameter(description = "Page size (default: 10)")
-            @RequestParam(value = "pageSize", defaultValue = AppConstant.DEFAULT_PAGE_SIZE,
-                    required = false) int pageSize,
-            @Parameter(description = "Sort by field (default: id)")
-            @RequestParam(value = "sortBy", defaultValue = AppConstant.DEFAULT_SORT_BY, required = false) String sortBy,
-            @Parameter(description = "Sort direction (default: ASC)")
-            @RequestParam(value = "sortDir", defaultValue = AppConstant.DEFAULT_SORT_DIRECTION,
-                    required = false) String sortDir,
-            @Parameter(description = "Search by name, desc, or author")
-            @RequestParam(value = "searchText", required = false) String searchText,
-            @Parameter(description = "Category ID")
-            @RequestParam(value = "categoryId", required = false) String categoryId,
-            @Parameter(description = "Filters")
-            @RequestBody(required = false) List<Filter> filters) {
-        var response = freePatternService.getFreePatterns(pageNo, pageSize, sortBy, sortDir, searchText, categoryId, filters);
-        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "Get pattern details by ID")
@@ -101,5 +72,28 @@ public class FreePatternController {
             @RequestParam("id") String id) {
         freePatternService.delete(id);
         return ResponseEntity.ok("Pattern deleted successfully");
+    }
+
+    @Operation(summary = "Get paginated list of patterns")
+    @ApiResponse(responseCode = "200", description = "List of patterns",
+            content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = PaginatedFreePatternResponse.class)))
+    @PostMapping("/pagination")
+    public ResponseEntity<PaginatedFreePatternResponse> getAllFreePatterns(
+            @Parameter(description = "Page number (default: 0)")
+            @RequestParam(value = "pageNo", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER,
+                    required = false) int pageNo,
+            @Parameter(description = "Page size (default: 10)")
+            @RequestParam(value = "pageSize", defaultValue = AppConstant.DEFAULT_PAGE_SIZE,
+                    required = false) int pageSize,
+            @Parameter(description = "Sort by field (default: id)")
+            @RequestParam(value = "sortBy", defaultValue = AppConstant.DEFAULT_SORT_BY, required = false) String sortBy,
+            @Parameter(description = "Sort direction (default: ASC)")
+            @RequestParam(value = "sortDir", defaultValue = AppConstant.DEFAULT_SORT_DIRECTION,
+                    required = false) String sortDir,
+            @Parameter(description = "List filters")
+            @RequestBody(required = false) Filter[] filters) {
+        var response = freePatternService.getAllFreePatterns(pageNo, pageSize, sortBy, sortDir, filters);
+        return ResponseEntity.ok(response);
     }
 }

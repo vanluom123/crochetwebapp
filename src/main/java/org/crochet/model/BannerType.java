@@ -13,7 +13,8 @@ import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 
-@Getter@Setter
+@Getter
+@Setter
 @Entity
 @Table(name = "banner_type")
 @SuperBuilder

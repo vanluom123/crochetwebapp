@@ -9,12 +9,14 @@ import org.crochet.mapper.FileMapper;
 import org.crochet.model.BlogCategory;
 import org.crochet.model.BlogPost;
 import org.crochet.payload.request.BlogPostRequest;
+import org.crochet.payload.request.Filter;
 import org.crochet.payload.response.BlogPostPaginationResponse;
 import org.crochet.payload.response.BlogPostResponse;
 import org.crochet.repository.BlogCategoryRepo;
 import org.crochet.repository.BlogPostRepository;
 import org.crochet.repository.BlogPostSpecifications;
 import org.crochet.repository.SettingsRepo;
+import org.crochet.repository.GenericFilter;
 import org.crochet.service.BlogPostService;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -23,7 +25,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -86,31 +87,24 @@ public class BlogPostServiceImpl implements BlogPostService {
     /**
      * Retrieves a paginated list of blog posts based on the provided parameters.
      *
-     * @param pageNo     The page number to retrieve (0-indexed).
-     * @param pageSize   The number of blog posts to include in each page.
-     * @param sortBy     The attribute by which the blog posts should be sorted.
-     * @param sortDir    The sorting direction, either "ASC" (ascending) or "DESC" (descending).
-     * @param searchText The search searchText used to filter blog posts by title or content.
+     * @param pageNo   The page number to retrieve (0-indexed).
+     * @param pageSize The number of blog posts to include in each page.
+     * @param sortBy   The attribute by which the blog posts should be sorted.
+     * @param sortDir  The sorting direction, either "ASC" (ascending) or "DESC" (descending).
+     * @param filters  The list of filters.
      * @return A {@link BlogPostPaginationResponse} containing the paginated list of blog posts.
      */
     @Override
-    @Cacheable(value = "blogs", key = "T(java.util.Objects).hash(#pageNo, #pageSize, #sortBy, #sortDir, #searchText)")
-    public BlogPostPaginationResponse getBlogs(int pageNo, int pageSize, String sortBy, String sortDir,
-                                               String searchText) {
-        log.info("Fetching blog posts");
+    @Cacheable(value = "blogs", key = "T(java.util.Objects).hash(#pageNo, #pageSize, #sortBy, #sortDir, #filters)")
+    public BlogPostPaginationResponse getBlogs(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters) {
+        GenericFilter<BlogPost> filter = GenericFilter.create(filters);
+        var spec = filter.build();
+        spec = spec.and(BlogPostSpecifications.fetchJoin());
+
         Sort sort = Sort.by(sortBy);
         sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? sort.ascending() : sort.descending();
 
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
-
-        Specification<BlogPost> spec = Specification.where(null);
-
-        if (StringUtils.hasText(searchText)) {
-            spec = spec.or(BlogPostSpecifications.searchBy(searchText));
-        }
-
-        spec = spec.and(BlogPostSpecifications.getAll());
-
         Page<BlogPost> menuPage = blogPostRepo.findAll(spec, pageable);
         var contents = BlogPostMapper.INSTANCE.toResponses(menuPage.getContent());
 
