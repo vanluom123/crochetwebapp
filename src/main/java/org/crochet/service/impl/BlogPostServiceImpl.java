@@ -55,8 +55,7 @@ public class BlogPostServiceImpl implements BlogPostService {
     @Override
     @Caching(
             evict = {
-                    @CacheEvict(value = "limitedblogs", allEntries = true),
-                    @CacheEvict(value = "blogs", allEntries = true)
+                    @CacheEvict(value = "limitedblogs", allEntries = true)
             }
     )
     public BlogPostResponse createOrUpdatePost(BlogPostRequest request) {
@@ -95,7 +94,6 @@ public class BlogPostServiceImpl implements BlogPostService {
      * @return A {@link BlogPostPaginationResponse} containing the paginated list of blog posts.
      */
     @Override
-    @Cacheable(value = "blogs", key = "T(java.util.Objects).hash(#pageNo, #pageSize, #sortBy, #sortDir, #filters)")
     public BlogPostPaginationResponse getBlogs(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters) {
         GenericFilter<BlogPost> filter = GenericFilter.create(filters);
         var spec = filter.build();
@@ -165,8 +163,7 @@ public class BlogPostServiceImpl implements BlogPostService {
     @Override
     @Caching(
             evict = {
-                    @CacheEvict(value = "limitedblogs", allEntries = true),
-                    @CacheEvict(value = "blogs", allEntries = true)
+                    @CacheEvict(value = "limitedblogs", allEntries = true)
             }
     )
     public void deletePost(String id) {

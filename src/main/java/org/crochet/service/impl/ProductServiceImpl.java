@@ -55,8 +55,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Caching(
             evict = {
-                    @CacheEvict(value = "limitedproducts", allEntries = true),
-                    @CacheEvict(value = "products", allEntries = true)
+                    @CacheEvict(value = "limitedproducts", allEntries = true)
             }
     )
     public ProductResponse createOrUpdate(ProductRequest request) {

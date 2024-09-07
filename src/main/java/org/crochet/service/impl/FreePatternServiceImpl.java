@@ -56,8 +56,7 @@ public class FreePatternServiceImpl implements FreePatternService {
     @Override
     @Caching(
             evict = {
-                    @CacheEvict(value = "limitedfreepatterns", allEntries = true),
-                    @CacheEvict(value = "freepatterns", allEntries = true)
+                    @CacheEvict(value = "limitedfreepatterns", allEntries = true)
             }
     )
     public FreePatternResponse createOrUpdate(FreePatternRequest request) {
@@ -99,7 +98,6 @@ public class FreePatternServiceImpl implements FreePatternService {
      * @return PaginatedFreePatternResponse
      */
     @Override
-    @Cacheable(value = "freepatterns", key = "T(java.util.Objects).hash(#pageNo, #pageSize, #sortBy, #sortDir, #filters)")
     public PaginatedFreePatternResponse getAllFreePatterns(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters) {
         GenericFilter<FreePattern> filter = GenericFilter.create(filters);
         Specification<FreePattern> spec = filter.build();
@@ -163,8 +161,7 @@ public class FreePatternServiceImpl implements FreePatternService {
     @Override
     @Caching(
             evict = {
-                    @CacheEvict(value = "limitedfreepatterns", allEntries = true),
-                    @CacheEvict(value = "freepatterns", allEntries = true)
+                    @CacheEvict(value = "limitedfreepatterns", allEntries = true)
             }
     )
     public void delete(String id) {

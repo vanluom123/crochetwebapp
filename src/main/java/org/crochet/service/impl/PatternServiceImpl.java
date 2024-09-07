@@ -51,8 +51,7 @@ public class PatternServiceImpl implements PatternService {
     @Override
     @Caching(
             evict = {
-                    @CacheEvict(value = "limitedpatterns", allEntries = true),
-                    @CacheEvict(value = "patterns", allEntries = true)
+                    @CacheEvict(value = "limitedpatterns", allEntries = true)
             }
     )
     public PatternResponse createOrUpdate(PatternRequest request) {
@@ -94,7 +93,6 @@ public class PatternServiceImpl implements PatternService {
      * @return Pattern is paginated
      */
     @Override
-    @Cacheable(value = "patterns", key = "T(java.util.Objects).hash(#pageNo, #pageSize, #sortBy, #sortDir, #filters)")
     public PatternPaginationResponse getPatterns(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters) {
         GenericFilter<Pattern> filter = GenericFilter.create(filters);
         var spec = filter.build();
@@ -158,8 +156,7 @@ public class PatternServiceImpl implements PatternService {
     @Override
     @Caching(
             evict = {
-                    @CacheEvict(value = "limitedpatterns", allEntries = true),
-                    @CacheEvict(value = "patterns", allEntries = true)
+                    @CacheEvict(value = "limitedpatterns", allEntries = true)
             }
     )
     public void deletePattern(String id) {
