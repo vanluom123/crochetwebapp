@@ -17,8 +17,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
-import static org.crochet.constant.MessageConstant.REFRESH_TOKEN_IS_EXPIRED_MESSAGE;
-import static org.crochet.constant.MessageConstant.REFRESH_TOKEN_NOT_FOUND_MESSAGE;
+import static org.crochet.constant.MessageConstant.MSG_REFRESH_TOKEN_EXPIRED;
+import static org.crochet.constant.MessageConstant.MSG_REFRESH_TOKEN_NOT_FOUND;
 import static org.crochet.constant.MessageConstant.USER_NOT_FOUND_WITH_EMAIL_MESSAGE;
 
 @Service
@@ -60,8 +60,8 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     public RefreshToken verifyExpiration(RefreshToken token) {
         if (token.getExpiresAt().isBefore(LocalDateTime.now()) || token.isRevoked()) {
             refreshTokenRepo.delete(token);
-            throw new TokenException(token.getToken() + REFRESH_TOKEN_IS_EXPIRED_MESSAGE,
-                    MAP_CODE.get(REFRESH_TOKEN_IS_EXPIRED_MESSAGE));
+            throw new TokenException(token.getToken() + MSG_REFRESH_TOKEN_EXPIRED,
+                    MAP_CODE.get(MSG_REFRESH_TOKEN_EXPIRED));
         }
         return token;
     }
@@ -69,8 +69,8 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     @Override
     public void revokeByToken(String token) {
         var refreshToken = findByToken(token)
-                .orElseThrow(() -> new ResourceNotFoundException(REFRESH_TOKEN_NOT_FOUND_MESSAGE + token,
-                        MAP_CODE.get(REFRESH_TOKEN_NOT_FOUND_MESSAGE)));
+                .orElseThrow(() -> new ResourceNotFoundException(MSG_REFRESH_TOKEN_NOT_FOUND + token,
+                        MAP_CODE.get(MSG_REFRESH_TOKEN_NOT_FOUND)));
         refreshToken.setRevoked(true);
         refreshTokenRepo.save(refreshToken);
     }
