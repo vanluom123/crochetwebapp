@@ -3,19 +3,21 @@ package org.crochet.service.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.crochet.constant.AppConstant;
+import org.crochet.constant.MessageConstant;
+import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.FileMapper;
 import org.crochet.mapper.ProductMapper;
 import org.crochet.model.Product;
+import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.ProductRequest;
 import org.crochet.payload.response.ProductDetailResponse;
 import org.crochet.payload.response.ProductPaginationResponse;
 import org.crochet.payload.response.ProductResponse;
 import org.crochet.repository.CategoryRepo;
-import org.crochet.payload.request.Filter;
+import org.crochet.repository.GenericFilter;
 import org.crochet.repository.ProductRepository;
 import org.crochet.repository.ProductSpecifications;
 import org.crochet.repository.SettingsRepo;
-import org.crochet.repository.GenericFilter;
 import org.crochet.service.ProductService;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -30,6 +32,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
+
+import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
 
 /**
  * ProductServiceImpl class
@@ -62,7 +66,8 @@ public class ProductServiceImpl implements ProductService {
         Product product;
         if (!StringUtils.hasText(request.getId())) {
             var category = categoryRepo.findById(request.getCategoryId()).orElseThrow(
-                    () -> new IllegalArgumentException("Category not found")
+                    () -> new ResourceNotFoundException(MessageConstant.MSG_CATEGORY_NOT_FOUND,
+                            MAP_CODE.get(MessageConstant.MSG_CATEGORY_NOT_FOUND))
             );
             product = Product.builder()
                     .category(category)
@@ -77,7 +82,8 @@ public class ProductServiceImpl implements ProductService {
                     .build();
         } else {
             product = productRepo.findById(request.getId()).orElseThrow(
-                    () -> new IllegalArgumentException("Product not found")
+                    () -> new ResourceNotFoundException(MessageConstant.MSG_PRODUCT_NOT_FOUND,
+                            MAP_CODE.get(MessageConstant.MSG_PRODUCT_NOT_FOUND))
             );
             product = ProductMapper.INSTANCE.update(request, product);
         }
@@ -96,7 +102,6 @@ public class ProductServiceImpl implements ProductService {
      * @return A {@link ProductPaginationResponse} containing the paginated list of products.
      */
     @Override
-    @Cacheable(value = "products", key = "T(java.util.Objects).hash(#pageNo, #pageSize, #sortBy, #sortDir, #filters)")
     public ProductPaginationResponse getProducts(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters) {
         GenericFilter<Product> filter = GenericFilter.create(filters);
         var spec = filter.build();
@@ -151,7 +156,8 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductDetailResponse getDetail(String id) {
         var product = productRepo.getDetail(id).orElseThrow(
-                () -> new IllegalArgumentException("Product not found")
+                () -> new ResourceNotFoundException(MessageConstant.MSG_PRODUCT_NOT_FOUND,
+                        MAP_CODE.get(MessageConstant.MSG_PRODUCT_NOT_FOUND))
         );
         return ProductMapper.INSTANCE.toProductDetailResponse(product);
     }
@@ -165,8 +171,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Caching(
             evict = {
-                    @CacheEvict(value = "limitedproducts", allEntries = true),
-                    @CacheEvict(value = "products", allEntries = true)
+                    @CacheEvict(value = "limitedproducts", allEntries = true)
             }
     )
     public void delete(String id) {

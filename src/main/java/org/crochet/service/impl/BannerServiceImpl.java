@@ -1,6 +1,7 @@
 package org.crochet.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
+import org.crochet.constant.MessageConstant;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.BannerMapper;
 import org.crochet.model.Banner;
@@ -44,7 +45,7 @@ public class BannerServiceImpl implements BannerService {
             Banner banner;
             if (!StringUtils.hasText(request.getId())) {
                 var bannerType = bannerTypeRepo.findById(request.getBannerTypeId())
-                        .orElseThrow(() -> new ResourceNotFoundException("Banner type not found"));
+                        .orElseThrow(() -> new ResourceNotFoundException(MessageConstant.MSG_BANNER_TYPE_NOT_FOUND));
                 banner = Banner.builder()
                         .title(request.getTitle())
                         .content(request.getContent())
@@ -57,7 +58,7 @@ public class BannerServiceImpl implements BannerService {
                         .build();
             } else {
                 banner = bannerRepo.findById(request.getId())
-                        .orElseThrow(() -> new ResourceNotFoundException("Banner not found"));
+                        .orElseThrow(() -> new ResourceNotFoundException(MessageConstant.MSG_BANNER_NOT_FOUND));
                 banner = BannerMapper.INSTANCE.partialUpdate(request, banner);
             }
             banners.add(banner);

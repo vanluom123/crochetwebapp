@@ -32,7 +32,7 @@ public class BlogCategoryController {
     @PreAuthorize("hasRole('ADMIN')")
     @SecurityRequirement(name = "BearerAuth")
     public BlogCategoryResponse createBlogCategory(@RequestBody BlogCategoryRequest request) {
-        return blogCategoryService.createBlogCategory(request);
+        return blogCategoryService.create(request);
     }
 
     @PutMapping("/update")
@@ -41,7 +41,7 @@ public class BlogCategoryController {
     @PreAuthorize("hasRole('ADMIN')")
     @SecurityRequirement(name = "BearerAuth")
     public BlogCategoryResponse updateBlogCategory(@RequestBody BlogCategoryRequest request) {
-        return blogCategoryService.updateBlogCategory(request);
+        return blogCategoryService.update(request);
     }
 
     @DeleteMapping("/delete/{id}")
@@ -49,20 +49,20 @@ public class BlogCategoryController {
     @PreAuthorize("hasRole('ADMIN')")
     @SecurityRequirement(name = "BearerAuth")
     public void deleteBlogCategory(@PathVariable String id) {
-        blogCategoryService.deleteBlogCategory(id);
+        blogCategoryService.delete(id);
     }
 
     @GetMapping("/detail/{id}")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     public BlogCategoryResponse getDetail(@PathVariable String id) {
-        return blogCategoryService.getBlogCategory(id);
+        return blogCategoryService.getDetail(id);
     }
 
     @GetMapping
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     public List<BlogCategoryResponse> getAll() {
-        return blogCategoryService.getBlogCategories();
+        return blogCategoryService.getAll();
     }
 }

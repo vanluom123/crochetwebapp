@@ -1,7 +1,6 @@
 package org.crochet.service;
 
 import org.crochet.exception.IllegalArgumentException;
-import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.model.Category;
 import org.crochet.payload.request.CategoryCreationRequest;
 import org.crochet.payload.response.CategoryResponse;
@@ -151,26 +150,5 @@ public class CategoryServiceTest {
         // Verify repository interactions
         verify(categoryRepo, times(1)).findAllById(List.of("parent-id"));
     }
-
-//    @Test
-//    void testCreateCategoryWithNonExistentParentThrowsException() {
-//        // Arrange
-//        CategoryCreationRequest request = new CategoryCreationRequest();
-//        request.setName("New Category");
-//        request.setParentIds(List.of("non-existent-id"));
-//
-//        when(categoryRepo.existsByNameAndParentIsNull("New Category")).thenReturn(false);
-//        when(categoryRepo.findAllById(List.of("non-existent-id"))).thenReturn(Collections.emptyList());
-//
-//        // Act & Assert
-//        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () -> {
-//            categoryService.create(request);
-//        });
-//
-//        assertEquals("One or more parent categories do not exist.", exception.getMessage());
-//
-//        // Verify repository interactions
-//        verify(categoryRepo, times(1)).findAllById(List.of("non-existent-id"));
-//    }
 }
 

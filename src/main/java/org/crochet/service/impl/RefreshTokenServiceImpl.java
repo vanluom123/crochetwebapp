@@ -19,7 +19,7 @@ import java.util.UUID;
 import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
 import static org.crochet.constant.MessageConstant.MSG_REFRESH_TOKEN_EXPIRED;
 import static org.crochet.constant.MessageConstant.MSG_REFRESH_TOKEN_NOT_FOUND;
-import static org.crochet.constant.MessageConstant.USER_NOT_FOUND_WITH_EMAIL_MESSAGE;
+import static org.crochet.constant.MessageConstant.MSG_USER_NOT_FOUND_WITH_EMAIL;
 
 @Service
 public class RefreshTokenServiceImpl implements RefreshTokenService {
@@ -39,7 +39,8 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     @Override
     public RefreshToken createRefreshToken(String username) {
         var user = userRepository.findByEmail(username)
-                .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_WITH_EMAIL_MESSAGE + username));
+                .orElseThrow(() -> new ResourceNotFoundException(MSG_USER_NOT_FOUND_WITH_EMAIL + username,
+                        MAP_CODE.get(MSG_USER_NOT_FOUND_WITH_EMAIL)));
         LocalDateTime now = LocalDateTime.now();
         var expiryDate = now.plus(appProps.getAuth().getRefreshTokenExpirationMs(), ChronoUnit.MILLIS);
         var refreshToken = RefreshToken.builder()

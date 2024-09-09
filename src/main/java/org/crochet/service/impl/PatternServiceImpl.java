@@ -3,6 +3,7 @@ package org.crochet.service.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.crochet.constant.AppConstant;
+import org.crochet.constant.MessageConstant;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.FileMapper;
 import org.crochet.mapper.PatternMapper;
@@ -31,6 +32,8 @@ import org.springframework.util.StringUtils;
 
 import java.util.List;
 
+import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
+
 /**
  * PatternServiceImpl class
  */
@@ -58,7 +61,8 @@ public class PatternServiceImpl implements PatternService {
         Pattern pattern;
         if (!StringUtils.hasText(request.getId())) {
             var category = categoryRepo.findById(request.getCategoryId()).orElseThrow(
-                    () -> new ResourceNotFoundException("Category not found")
+                    () -> new ResourceNotFoundException(MessageConstant.MSG_CATEGORY_NOT_FOUND,
+                            MAP_CODE.get(MessageConstant.MSG_CATEGORY_NOT_FOUND))
             );
             pattern = Pattern.builder()
                     .category(category)
@@ -74,7 +78,8 @@ public class PatternServiceImpl implements PatternService {
                     .build();
         } else {
             pattern = patternRepo.findById(request.getId()).orElseThrow(
-                    () -> new ResourceNotFoundException("Pattern not found")
+                    () -> new ResourceNotFoundException(MessageConstant.MSG_PATTERN_NOT_FOUND,
+                            MAP_CODE.get(MessageConstant.MSG_PATTERN_NOT_FOUND))
             );
             pattern = PatternMapper.INSTANCE.partialUpdate(request, pattern);
         }
@@ -142,7 +147,8 @@ public class PatternServiceImpl implements PatternService {
     @Override
     public PatternDetailResponse getDetail(String id) {
         var pattern = patternRepo.getDetail(id).orElseThrow(
-                () -> new ResourceNotFoundException("Pattern not found")
+                () -> new ResourceNotFoundException(MessageConstant.MSG_PATTERN_NOT_FOUND,
+                        MAP_CODE.get(MessageConstant.MSG_PATTERN_NOT_FOUND))
         );
         return PatternMapper.INSTANCE.toPatternDetailResponse(pattern);
     }
