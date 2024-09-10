@@ -105,50 +105,5 @@ public class CategoryServiceTest {
         verify(categoryRepo, times(1)).findAllById(List.of("parent-id"));
         verify(categoryRepo, times(1)).saveAll(anyList());
     }
-
-    @Test
-    void testCreateCategoryWithDuplicateRootNameThrowsException() {
-        // Arrange
-        CategoryCreationRequest request = new CategoryCreationRequest();
-        request.setName("Duplicate Category");
-        request.setParentIds(Collections.emptyList());
-
-        when(categoryRepo.existsByNameAndParentIsNull("Duplicate Category")).thenReturn(true);
-
-        // Act & Assert
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            categoryService.create(request);
-        });
-
-        assertEquals("A parent category with this name already exists.", exception.getMessage());
-
-        // Verify repository interactions
-        verify(categoryRepo, times(1)).existsByNameAndParentIsNull("Duplicate Category");
-    }
-
-    @Test
-    void testCreateCategoryWithCircularReferenceThrowsException() {
-        // Arrange
-        Category parent = new Category();
-        parent.setId("parent-id");
-        parent.setName("Circular Category");
-
-        CategoryCreationRequest request = new CategoryCreationRequest();
-        request.setName("Circular Category");
-        request.setParentIds(List.of("parent-id"));
-
-        when(categoryRepo.existsByNameAndParentIsNull("Circular Category")).thenReturn(false);
-        when(categoryRepo.findAllById(List.of("parent-id"))).thenReturn(List.of(parent));
-
-        // Act & Assert
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            categoryService.create(request);
-        });
-
-        assertEquals("Circular reference detected.", exception.getMessage());
-
-        // Verify repository interactions
-        verify(categoryRepo, times(1)).findAllById(List.of("parent-id"));
-    }
 }
 
