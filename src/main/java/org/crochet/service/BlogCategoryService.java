@@ -6,13 +6,13 @@ import org.crochet.payload.response.BlogCategoryResponse;
 import java.util.List;
 
 public interface BlogCategoryService {
-    BlogCategoryResponse createBlogCategory(BlogCategoryRequest request);
+    BlogCategoryResponse create(BlogCategoryRequest request);
 
-    BlogCategoryResponse updateBlogCategory(BlogCategoryRequest request);
+    BlogCategoryResponse update(BlogCategoryRequest request);
 
-    BlogCategoryResponse getBlogCategory(String id);
+    BlogCategoryResponse getDetail(String id);
 
-    List<BlogCategoryResponse> getBlogCategories();
+    List<BlogCategoryResponse> getAll();
 
-    void deleteBlogCategory(String id);
+    void delete(String id);
 }

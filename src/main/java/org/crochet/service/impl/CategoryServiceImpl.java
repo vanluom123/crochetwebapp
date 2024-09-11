@@ -17,9 +17,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
-import static org.crochet.constant.MessageConstant.CATEGORY_NOT_FOUND_MESSAGE;
-import static org.crochet.constant.MessageConstant.EXISTS_AS_A_CHILD_MESSAGE;
-import static org.crochet.constant.MessageConstant.EXISTS_AS_A_PARENT_MESSAGE;
+import static org.crochet.constant.MessageConstant.ERROR_CHILD_CATEGORY_EXISTS;
+import static org.crochet.constant.MessageConstant.ERROR_PARENT_CATEGORY_EXISTS;
+import static org.crochet.constant.MessageConstant.MSG_CATEGORY_NOT_FOUND;
+import static org.crochet.constant.MessageConstant.MSG_DUPLICATE_CATEGORY_NAME_UNDER_PROVIDED_PARENTS;
 
 @Service
 @RequiredArgsConstructor
@@ -35,35 +36,42 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     @Override
     public List<CategoryResponse> create(CategoryCreationRequest request) {
-        // Extract parent IDs and category name from the request
         String name = request.getName();
 
-        // Check if a category with the same name already exists as a parent
+        // Check if the category already exists as a root (parent) category
         if (categoryRepo.existsByNameAndParentIsNull(name)) {
-            throw new IllegalArgumentException(EXISTS_AS_A_PARENT_MESSAGE, MAP_CODE.get(EXISTS_AS_A_PARENT_MESSAGE));
+            throw new IllegalArgumentException(ERROR_PARENT_CATEGORY_EXISTS,
+                    MAP_CODE.get(ERROR_PARENT_CATEGORY_EXISTS));
         }
-        // Retrieve parent categories from the database
+
+        // Fetch parent categories based on the provided parent IDs
         List<Category> parents = categoryRepo.findAllById(request.getParentIds());
 
-        // Create child categories and add them to their respective parents
         List<Category> children = new ArrayList<>();
 
         if (parents.isEmpty()) {
+            // If no parents are provided, create a root category
             if (categoryRepo.existsByNameAndParentIsNotNull(name)) {
-                throw new IllegalArgumentException(EXISTS_AS_A_CHILD_MESSAGE, MAP_CODE.get(EXISTS_AS_A_CHILD_MESSAGE));
+                throw new IllegalArgumentException(ERROR_CHILD_CATEGORY_EXISTS,
+                        MAP_CODE.get(ERROR_CHILD_CATEGORY_EXISTS));
             }
-            // Create a new category
             Category category = new Category();
             category.setName(name);
             children.add(category);
         } else {
             for (Category parent : parents) {
-                // Check if a child category with the same name already exists
+                // Check for circular reference
+                if (isCircularReference(parent, request)) {
+                    continue;
+                }
+
+                // Check if a child category with the same name already exists under this parent
                 if (parent.getChildren().stream().anyMatch(child -> child.getName().equals(name))) {
                     // Skip this parent if a child with the same name already exists
                     continue;
                 }
-                // Create a new category
+
+                // Create a new child category under this parent
                 Category category = new Category();
                 category.setName(name);
                 category.setParent(parent);
@@ -71,15 +79,29 @@ public class CategoryServiceImpl implements CategoryService {
             }
         }
 
+        // If no children were created, throw an error
         if (children.isEmpty()) {
-            throw new IllegalArgumentException(EXISTS_AS_A_CHILD_MESSAGE, MAP_CODE.get(EXISTS_AS_A_CHILD_MESSAGE));
+            throw new IllegalArgumentException(MSG_DUPLICATE_CATEGORY_NAME_UNDER_PROVIDED_PARENTS,
+                    MAP_CODE.get(MSG_DUPLICATE_CATEGORY_NAME_UNDER_PROVIDED_PARENTS));
         }
 
-        // Save all categories to the database at once
-        categoryRepo.saveAll(children);
+        // Save all new categories to the database
+        List<Category> savedCategories = categoryRepo.saveAll(children);
 
         // Map child categories to CategoryResponse objects and return them
-        return CategoryMapper.INSTANCE.toResponses(children);
+        return CategoryMapper.INSTANCE.toResponses(savedCategories);
+    }
+
+    // Recursive method to detect circular references
+    private boolean isCircularReference(Category parent, CategoryCreationRequest request) {
+        Category current = parent;
+        while (current != null) {
+            if (current.getName().equals(request.getName())) {  // Assuming uniqueness by name
+                return true;
+            }
+            current = current.getParent();
+        }
+        return false;
     }
 
     /**
@@ -91,16 +113,32 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     @Override
     public CategoryResponse update(CategoryUpdateRequest request) {
-        var category = findById(request.getId());
-        String name = request.getName();
-        if (categoryRepo.existsByNameAndParentIsNull(name)) {
-            throw new IllegalArgumentException(EXISTS_AS_A_PARENT_MESSAGE, MAP_CODE.get(EXISTS_AS_A_PARENT_MESSAGE));
+        // Find the existing category by ID
+        Category category = findById(request.getId());
+
+        // Extract the new name from the request
+        String newName = request.getName();
+
+        // Check if the new name already exists as a parent category
+        if (categoryRepo.existsByNameAndParentIsNull(newName)) {
+            throw new IllegalArgumentException(ERROR_PARENT_CATEGORY_EXISTS,
+                    MAP_CODE.get(ERROR_PARENT_CATEGORY_EXISTS));
         }
-        if (category.getChildren().stream().anyMatch(c -> c.getName().equals(name))) {
-            throw new IllegalArgumentException(EXISTS_AS_A_CHILD_MESSAGE, MAP_CODE.get(EXISTS_AS_A_CHILD_MESSAGE));
+
+        // Check if the new name already exists as a child category under this category's parent
+        if (category.getParent() != null && category.getParent().getChildren().stream()
+                .anyMatch(c -> c.getName().equals(newName) && !c.getId().equals(request.getId()))) {
+            throw new IllegalArgumentException(ERROR_CHILD_CATEGORY_EXISTS,
+                    MAP_CODE.get(ERROR_CHILD_CATEGORY_EXISTS));
         }
-        category.setName(name);
+
+        // Update the category's name
+        category.setName(newName);
+
+        // Save the updated category
         category = categoryRepo.save(category);
+
+        // Map the updated category to a response object and return it
         return CategoryMapper.INSTANCE.toResponse(category);
     }
 
@@ -140,8 +178,8 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryRepo
                 .getCategory(id)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException(CATEGORY_NOT_FOUND_MESSAGE,
-                                MAP_CODE.get(CATEGORY_NOT_FOUND_MESSAGE))
+                        new ResourceNotFoundException(MSG_CATEGORY_NOT_FOUND,
+                                MAP_CODE.get(MSG_CATEGORY_NOT_FOUND))
                 );
     }
 

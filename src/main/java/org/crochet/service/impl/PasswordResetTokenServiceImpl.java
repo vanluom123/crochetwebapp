@@ -11,8 +11,8 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
-import static org.crochet.constant.MessageConstant.PASSWORD_RESET_TOKEN_NOT_FOUND_MESSAGE;
-import static org.crochet.constant.MessageConstant.USER_NOT_FOUND_WITH_TOKEN_MESSAGE;
+import static org.crochet.constant.MessageConstant.MSG_PASSWORD_RESET_TOKEN_NOT_FOUND;
+import static org.crochet.constant.MessageConstant.MSG_USER_NOT_FOUND_WITH_TOKEN;
 
 @Service
 public class PasswordResetTokenServiceImpl implements PasswordResetTokenService {
@@ -46,8 +46,8 @@ public class PasswordResetTokenServiceImpl implements PasswordResetTokenService 
     public String getEmailByToken(String token) {
         return passwordResetTokenRepository.findEmailByToken(token)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException(USER_NOT_FOUND_WITH_TOKEN_MESSAGE + token,
-                                MAP_CODE.get(USER_NOT_FOUND_WITH_TOKEN_MESSAGE))
+                        new ResourceNotFoundException(MSG_USER_NOT_FOUND_WITH_TOKEN + token,
+                                MAP_CODE.get(MSG_USER_NOT_FOUND_WITH_TOKEN))
                 );
     }
 
@@ -60,8 +60,8 @@ public class PasswordResetTokenServiceImpl implements PasswordResetTokenService 
     public PasswordResetToken getPasswordResetToken(String token) {
         return passwordResetTokenRepository.findByToken(token)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException(PASSWORD_RESET_TOKEN_NOT_FOUND_MESSAGE,
-                                MAP_CODE.get(PASSWORD_RESET_TOKEN_NOT_FOUND_MESSAGE))
+                        new ResourceNotFoundException(MSG_PASSWORD_RESET_TOKEN_NOT_FOUND,
+                                MAP_CODE.get(MSG_PASSWORD_RESET_TOKEN_NOT_FOUND))
                 );
     }
 }

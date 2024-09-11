@@ -27,9 +27,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
-import static org.crochet.constant.MessageConstant.INCORRECT_PASSWORD_MESSAGE;
-import static org.crochet.constant.MessageConstant.USER_NOT_FOUND_WITH_EMAIL_MESSAGE;
-import static org.crochet.constant.MessageConstant.USER_NOT_FOUND_WITH_ID_MESSAGE;
+import static org.crochet.constant.MessageConstant.MSG_INCORRECT_PASSWORD;
+import static org.crochet.constant.MessageConstant.MSG_USER_NOT_FOUND_WITH_EMAIL;
+import static org.crochet.constant.MessageConstant.MSG_USER_NOT_FOUND_WITH_ID;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -46,8 +46,8 @@ public class UserServiceImpl implements UserService {
     public User createUser(SignUpRequest signUpRequest) {
         // Check if the email address is already in use
         if (isValidEmail(signUpRequest.getEmail())) {
-            throw new BadRequestException(MessageConstant.EMAIL_ADDRESS_ALREADY_IN_USE_MESSAGE,
-                    MAP_CODE.get(MessageConstant.EMAIL_ADDRESS_ALREADY_IN_USE_MESSAGE));
+            throw new BadRequestException(MessageConstant.MSG_EMAIL_ALREADY_IN_USE,
+                    MAP_CODE.get(MessageConstant.MSG_EMAIL_ALREADY_IN_USE));
         }
 
         // Creating user's account
@@ -100,8 +100,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public void updateUser(UserUpdateRequest request) {
         User user = userRepository.findById(request.getId())
-                .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_WITH_ID_MESSAGE + request.getId(),
-                        MAP_CODE.get(USER_NOT_FOUND_WITH_ID_MESSAGE)));
+                .orElseThrow(() -> new ResourceNotFoundException(MSG_USER_NOT_FOUND_WITH_ID + request.getId(),
+                        MAP_CODE.get(MSG_USER_NOT_FOUND_WITH_ID)));
         if (request.getName() != null) {
             user.setName(request.getName());
         }
@@ -120,15 +120,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getByEmail(String email) {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_WITH_EMAIL_MESSAGE + email,
-                        MAP_CODE.get(USER_NOT_FOUND_WITH_EMAIL_MESSAGE)));
+                .orElseThrow(() -> new ResourceNotFoundException(MSG_USER_NOT_FOUND_WITH_EMAIL + email,
+                        MAP_CODE.get(MSG_USER_NOT_FOUND_WITH_EMAIL)));
     }
 
     @Override
     public UserResponse getDetail(String id) {
         return userRepository.getDetail(id)
-                .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_WITH_ID_MESSAGE + id,
-                        MAP_CODE.get(USER_NOT_FOUND_WITH_ID_MESSAGE)));
+                .orElseThrow(() -> new ResourceNotFoundException(MSG_USER_NOT_FOUND_WITH_ID + id,
+                        MAP_CODE.get(MSG_USER_NOT_FOUND_WITH_ID)));
     }
 
     @Override
@@ -146,8 +146,8 @@ public class UserServiceImpl implements UserService {
         var user = this.getByEmail(email);
         var isMatch = passwordEncoder.matches(password, user.getPassword());
         if (!isMatch) {
-            throw new BadRequestException(INCORRECT_PASSWORD_MESSAGE,
-                    MAP_CODE.get(INCORRECT_PASSWORD_MESSAGE));
+            throw new BadRequestException(MSG_INCORRECT_PASSWORD,
+                    MAP_CODE.get(MSG_INCORRECT_PASSWORD));
         }
         return user;
     }

@@ -16,6 +16,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.BatchSize;
 
 import java.util.List;
 
@@ -39,6 +40,7 @@ public class BlogPost extends BaseEntity {
     @OneToMany(mappedBy = "blogPost")
     private List<Comment> comments;
 
+    @BatchSize(size = 10)
     @ElementCollection
     @CollectionTable(name = "blog_post_file",
             joinColumns = @JoinColumn(name = "blog_post_id", referencedColumnName = "id", nullable = false))

@@ -45,7 +45,7 @@ public class ApiExceptionHandler {
     @ExceptionHandler({AccessDeniedException.class})
     public ResponseEntity<ApiError> handleAccessDeniedException(AccessDeniedException ex) {
         ApiError error = ApiError.builder()
-                .message(MessageConstant.NOT_HAVE_PERMISSION_TO_ACCESS_MESSAGE)
+                .message(MessageConstant.MSG_NO_PERMISSION)
                 .code(HttpStatus.FORBIDDEN.value())
                 .error(HttpStatus.FORBIDDEN.getReasonPhrase())
                 .messageCode(MAP_CODE.get(MessageConstant.FORBIDDEN))
@@ -111,7 +111,7 @@ public class ApiExceptionHandler {
                 .message(ex.getMessage())
                 .code(HttpStatus.NOT_FOUND.value())
                 .error(HttpStatus.NOT_FOUND.getReasonPhrase())
-                .messageCode(MAP_CODE.get(MessageConstant.USER_NOT_FOUND_MESSAGE))
+                .messageCode(MAP_CODE.get(MessageConstant.MSG_USER_NOT_FOUND))
                 .build();
         log.error(ex.getMessage());
         log.error(ex.toString());

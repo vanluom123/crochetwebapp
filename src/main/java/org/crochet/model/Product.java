@@ -18,6 +18,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.crochet.enumerator.CurrencyCode;
+import org.hibernate.annotations.BatchSize;
 
 import java.util.List;
 
@@ -57,6 +58,7 @@ public class Product extends BaseEntity {
     @Column(name = "content", columnDefinition = "TEXT")
     private String content;
 
+    @BatchSize(size = 10)
     @ElementCollection
     @CollectionTable(name = "product_image",
             joinColumns = @JoinColumn(name = "product_id", referencedColumnName = "id", nullable = false))

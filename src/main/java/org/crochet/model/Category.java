@@ -14,6 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.BatchSize;
 
 import java.util.List;
 
@@ -33,6 +34,7 @@ public class Category extends BaseEntity {
     @JsonBackReference
     private Category parent;
 
+    @BatchSize(size = 10)
     @OneToMany(mappedBy = "parent", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Category> children;
 

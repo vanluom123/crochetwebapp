@@ -18,6 +18,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.crochet.enumerator.CurrencyCode;
+import org.hibernate.annotations.BatchSize;
 
 import java.util.Set;
 
@@ -59,6 +60,7 @@ public class Pattern extends BaseEntity {
     @Column(name = "content", columnDefinition = "TEXT")
     private String content;
 
+    @BatchSize(size = 10)
     @ElementCollection
     @CollectionTable(name = "pattern_file",
             joinColumns = @JoinColumn(name = "pattern_id", referencedColumnName = "id", nullable = false))
@@ -68,6 +70,7 @@ public class Pattern extends BaseEntity {
     })
     private Set<File> files;
 
+    @BatchSize(size = 10)
     @ElementCollection
     @CollectionTable(name = "pattern_image",
             joinColumns = @JoinColumn(name = "pattern_id", referencedColumnName = "id", nullable = false))
