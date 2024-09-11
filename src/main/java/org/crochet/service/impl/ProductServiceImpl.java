@@ -16,7 +16,6 @@ import org.crochet.payload.response.ProductResponse;
 import org.crochet.repository.CategoryRepo;
 import org.crochet.repository.GenericFilter;
 import org.crochet.repository.ProductRepository;
-import org.crochet.repository.ProductSpecifications;
 import org.crochet.repository.SettingsRepo;
 import org.crochet.service.ProductService;
 import org.springframework.cache.annotation.CacheEvict;
@@ -105,7 +104,6 @@ public class ProductServiceImpl implements ProductService {
     public ProductPaginationResponse getProducts(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters) {
         GenericFilter<Product> filter = GenericFilter.create(filters);
         var spec = filter.build();
-        spec = spec.and(ProductSpecifications.fetchJoin());
 
         Sort sort = Sort.by(sortBy);
         sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? sort.ascending() : sort.descending();

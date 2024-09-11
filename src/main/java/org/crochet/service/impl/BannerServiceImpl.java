@@ -21,6 +21,8 @@ import org.springframework.util.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
+
 @Slf4j
 @Service
 public class BannerServiceImpl implements BannerService {
@@ -45,7 +47,8 @@ public class BannerServiceImpl implements BannerService {
             Banner banner;
             if (!StringUtils.hasText(request.getId())) {
                 var bannerType = bannerTypeRepo.findById(request.getBannerTypeId())
-                        .orElseThrow(() -> new ResourceNotFoundException(MessageConstant.MSG_BANNER_TYPE_NOT_FOUND));
+                        .orElseThrow(() -> new ResourceNotFoundException(MessageConstant.MSG_BANNER_TYPE_NOT_FOUND,
+                                MAP_CODE.get(MessageConstant.MSG_BANNER_TYPE_NOT_FOUND)));
                 banner = Banner.builder()
                         .title(request.getTitle())
                         .content(request.getContent())
@@ -58,7 +61,8 @@ public class BannerServiceImpl implements BannerService {
                         .build();
             } else {
                 banner = bannerRepo.findById(request.getId())
-                        .orElseThrow(() -> new ResourceNotFoundException(MessageConstant.MSG_BANNER_NOT_FOUND));
+                        .orElseThrow(() -> new ResourceNotFoundException(MessageConstant.MSG_BANNER_NOT_FOUND,
+                                MAP_CODE.get(MessageConstant.MSG_BANNER_NOT_FOUND)));
                 banner = BannerMapper.INSTANCE.partialUpdate(request, banner);
             }
             banners.add(banner);

@@ -52,6 +52,9 @@ public class MessageCodeConstant {
         MAP_CODE.put(MessageConstant.MSG_DUPLICATE_CATEGORY_NAME_UNDER_PROVIDED_PARENTS, 43);
         MAP_CODE.put(MessageConstant.MSG_BLOG_CATEGORY_NOT_FOUND, 44);
         MAP_CODE.put(MessageConstant.MSG_SETTINGS_NOT_FOUND, 45);
+        MAP_CODE.put(MessageConstant.MSG_BANNER_TYPE_NOT_FOUND, 46);
+        MAP_CODE.put(MessageConstant.MSG_BANNER_NOT_FOUND, 47);
+        MAP_CODE.put(MessageConstant.ERROR_IMAGE_UPLOAD_FAILED, 48);
     }
 
     private MessageCodeConstant() {

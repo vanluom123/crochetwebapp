@@ -8,16 +8,15 @@ import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.FileMapper;
 import org.crochet.mapper.PatternMapper;
 import org.crochet.model.Pattern;
+import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.PatternRequest;
 import org.crochet.payload.response.PatternDetailResponse;
 import org.crochet.payload.response.PatternPaginationResponse;
 import org.crochet.payload.response.PatternResponse;
 import org.crochet.repository.CategoryRepo;
-import org.crochet.payload.request.Filter;
-import org.crochet.repository.PatternRepository;
-import org.crochet.repository.PatternSpecifications;
-import org.crochet.repository.SettingsRepo;
 import org.crochet.repository.GenericFilter;
+import org.crochet.repository.PatternRepository;
+import org.crochet.repository.SettingsRepo;
 import org.crochet.service.PatternService;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -101,7 +100,6 @@ public class PatternServiceImpl implements PatternService {
     public PatternPaginationResponse getPatterns(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters) {
         GenericFilter<Pattern> filter = GenericFilter.create(filters);
         var spec = filter.build();
-        spec = spec.and(PatternSpecifications.fetchJoin());
 
         Sort sort = Sort.by(sortBy);
         sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? sort.ascending() : sort.descending();

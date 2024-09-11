@@ -15,9 +15,8 @@ import org.crochet.payload.response.FreePatternResponse;
 import org.crochet.payload.response.PaginatedFreePatternResponse;
 import org.crochet.repository.CategoryRepo;
 import org.crochet.repository.FreePatternRepository;
-import org.crochet.repository.FreePatternSpecifications;
-import org.crochet.repository.SettingsRepo;
 import org.crochet.repository.GenericFilter;
+import org.crochet.repository.SettingsRepo;
 import org.crochet.service.FreePatternService;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -106,7 +105,6 @@ public class FreePatternServiceImpl implements FreePatternService {
     public PaginatedFreePatternResponse getAllFreePatterns(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters) {
         GenericFilter<FreePattern> filter = GenericFilter.create(filters);
         Specification<FreePattern> spec = filter.build();
-        spec = spec.and(FreePatternSpecifications.fetchJoin());
 
         Sort sort = Sort.by(sortBy);
         sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? sort.ascending() : sort.descending();
