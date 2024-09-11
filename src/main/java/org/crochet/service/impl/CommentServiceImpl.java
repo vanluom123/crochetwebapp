@@ -1,6 +1,7 @@
 package org.crochet.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.crochet.constant.MessageConstant;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.CommentMapper;
 import org.crochet.model.Comment;
@@ -19,7 +20,7 @@ import org.springframework.util.StringUtils;
 import java.time.LocalDateTime;
 
 import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
-import static org.crochet.constant.MessageConstant.USER_NOT_FOUND_MESSAGE;
+import static org.crochet.constant.MessageConstant.MSG_USER_NOT_FOUND;
 
 /**
  * CommentServiceImpl class
@@ -45,14 +46,15 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public CommentResponse createOrUpdate(UserPrincipal principal, CommentRequest request) {
         if (principal == null) {
-            throw new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE, MAP_CODE.get(USER_NOT_FOUND_MESSAGE));
+            throw new ResourceNotFoundException(MSG_USER_NOT_FOUND, MAP_CODE.get(MSG_USER_NOT_FOUND));
         }
         User user = userRepo.findById(principal.getId()).orElseThrow(
-                () -> new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE, MAP_CODE.get(USER_NOT_FOUND_MESSAGE))
+                () -> new ResourceNotFoundException(MSG_USER_NOT_FOUND, MAP_CODE.get(MSG_USER_NOT_FOUND))
         );
 
         var blog = blogPostRepo.findById(request.getBlogPostId()).orElseThrow(
-                () -> new ResourceNotFoundException("Blog post not found", MAP_CODE.get("Blog post not found"))
+                () -> new ResourceNotFoundException(MessageConstant.MSG_BLOG_NOT_FOUND,
+                        MAP_CODE.get(MessageConstant.MSG_BLOG_NOT_FOUND))
         );
 
         var id = request.getId();
@@ -64,7 +66,8 @@ public class CommentServiceImpl implements CommentService {
                     .build();
         } else {
             comment = commentRepo.findById(id).orElseThrow(
-                    () -> new ResourceNotFoundException("Comment not found", MAP_CODE.get("Comment not found"))
+                    () -> new ResourceNotFoundException(MessageConstant.MSG_COMMENT_NOT_FOUND,
+                            MAP_CODE.get(MessageConstant.MSG_COMMENT_NOT_FOUND))
             );
         }
         comment.setContent(request.getContent());

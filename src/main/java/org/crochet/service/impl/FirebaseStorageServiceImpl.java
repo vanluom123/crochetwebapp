@@ -58,8 +58,8 @@ public class FirebaseStorageServiceImpl implements FirebaseStorageService {
             blob = storageClient.bucket(BUCKET_NAME)
                     .create(fileName, imageFile.getInputStream(), imageFile.getContentType());
         } catch (IOException e) {
-            log.error(MessageConstant.CANNOT_UPLOAD_FILE_MESSAGE);
-            throw new StorageException(MessageConstant.CANNOT_UPLOAD_FILE_MESSAGE, MAP_CODE.get(MessageConstant.CANNOT_UPLOAD_FILE_MESSAGE));
+            log.error(MessageConstant.ERROR_IMAGE_UPLOAD_FAILED);
+            throw new StorageException(MessageConstant.ERROR_IMAGE_UPLOAD_FAILED, MAP_CODE.get(MessageConstant.ERROR_IMAGE_UPLOAD_FAILED));
         }
 
         log.info("image name: {}", blob.getName());
