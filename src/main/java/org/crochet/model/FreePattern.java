@@ -18,6 +18,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.crochet.enumerator.ChartStatus;
+import org.hibernate.annotations.BatchSize;
 
 import java.util.Set;
 
@@ -55,6 +56,7 @@ public class FreePattern extends BaseEntity {
     @Column(name = "status", columnDefinition = "VARCHAR(25)")
     private ChartStatus status;
 
+    @BatchSize(size = 10)
     @ElementCollection
     @CollectionTable(name = "free_pattern_file",
             joinColumns = @JoinColumn(name = "free_pattern_id", referencedColumnName = "id", nullable = false))
@@ -65,6 +67,7 @@ public class FreePattern extends BaseEntity {
     })
     private Set<File> files;
 
+    @BatchSize(size = 10)
     @ElementCollection
     @CollectionTable(name = "free_pattern_image",
             joinColumns = @JoinColumn(name = "free_pattern_id", referencedColumnName = "id", nullable = false))

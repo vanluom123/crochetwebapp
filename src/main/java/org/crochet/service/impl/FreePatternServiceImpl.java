@@ -3,6 +3,7 @@ package org.crochet.service.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.crochet.constant.AppConstant;
+import org.crochet.constant.MessageConstant;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.FileMapper;
 import org.crochet.mapper.FreePatternMapper;
@@ -14,9 +15,8 @@ import org.crochet.payload.response.FreePatternResponse;
 import org.crochet.payload.response.PaginatedFreePatternResponse;
 import org.crochet.repository.CategoryRepo;
 import org.crochet.repository.FreePatternRepository;
-import org.crochet.repository.FreePatternSpecifications;
-import org.crochet.repository.SettingsRepo;
 import org.crochet.repository.GenericFilter;
+import org.crochet.repository.SettingsRepo;
 import org.crochet.service.FreePatternService;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -32,6 +32,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
+
+import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
 
 /**
  * FreePatternServiceImpl class
@@ -63,7 +65,8 @@ public class FreePatternServiceImpl implements FreePatternService {
         FreePattern freePattern;
         if (!StringUtils.hasText(request.getId())) {
             var category = categoryRepo.findById(request.getCategoryId()).orElseThrow(
-                    () -> new ResourceNotFoundException("Category not found")
+                    () -> new ResourceNotFoundException(MessageConstant.MSG_CATEGORY_NOT_FOUND,
+                            MAP_CODE.get(MessageConstant.MSG_CATEGORY_NOT_FOUND))
             );
             freePattern = FreePattern.builder()
                     .category(category)
@@ -79,7 +82,8 @@ public class FreePatternServiceImpl implements FreePatternService {
                     .build();
         } else {
             freePattern = freePatternRepo.findById(request.getId()).orElseThrow(
-                    () -> new ResourceNotFoundException("FreePattern not found")
+                    () -> new ResourceNotFoundException(MessageConstant.MSG_FREE_PATTERN_NOT_FOUND,
+                            MAP_CODE.get(MessageConstant.MSG_FREE_PATTERN_NOT_FOUND))
             );
             freePattern = FreePatternMapper.INSTANCE.partialUpdate(request, freePattern);
         }
@@ -101,7 +105,6 @@ public class FreePatternServiceImpl implements FreePatternService {
     public PaginatedFreePatternResponse getAllFreePatterns(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters) {
         GenericFilter<FreePattern> filter = GenericFilter.create(filters);
         Specification<FreePattern> spec = filter.build();
-        spec = spec.and(FreePatternSpecifications.fetchJoin());
 
         Sort sort = Sort.by(sortBy);
         sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? sort.ascending() : sort.descending();
@@ -152,7 +155,8 @@ public class FreePatternServiceImpl implements FreePatternService {
     @Override
     public FreeChartDetailResponse getDetail(String id) {
         var freePattern = freePatternRepo.getDetail(id).orElseThrow(
-                () -> new ResourceNotFoundException("FreePattern not found")
+                () -> new ResourceNotFoundException(MessageConstant.MSG_FREE_PATTERN_NOT_FOUND,
+                        MAP_CODE.get(MessageConstant.MSG_FREE_PATTERN_NOT_FOUND))
         );
         return FreePatternMapper.INSTANCE.toFreeChartDetailResponse(freePattern);
     }

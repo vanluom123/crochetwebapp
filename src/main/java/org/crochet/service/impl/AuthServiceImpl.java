@@ -32,21 +32,21 @@ import java.time.LocalDateTime;
 
 import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
 import static org.crochet.constant.MessageConstant.ACTIVE_NOW;
-import static org.crochet.constant.MessageConstant.CLICK_TO_ACTIVE_CONTENT;
+import static org.crochet.constant.MessageConstant.MSG_ACCOUNT_ACTIVATION_LINK;
 import static org.crochet.constant.MessageConstant.CONFIRM_YOUR_EMAIL;
-import static org.crochet.constant.MessageConstant.EMAIL_ALREADY_CONFIRMED_MESSAGE;
-import static org.crochet.constant.MessageConstant.EMAIL_NOT_VERIFIED_MESSAGE;
-import static org.crochet.constant.MessageConstant.LINK_RESET_PASSWORD;
-import static org.crochet.constant.MessageConstant.PASSWORD_RESET_TOKEN_IS_EXPIRED_MESSAGE;
-import static org.crochet.constant.MessageConstant.REFRESH_TOKEN_IS_NOT_IN_DB_MESSAGE;
-import static org.crochet.constant.MessageConstant.RESEND_SUCCESSFULLY_MESSAGE;
+import static org.crochet.constant.MessageConstant.MSG_EMAIL_ALREADY_CONFIRMED;
+import static org.crochet.constant.MessageConstant.MSG_EMAIL_NOT_VERIFIED;
+import static org.crochet.constant.MessageConstant.RESET_PASSWORD_LINK;
+import static org.crochet.constant.MessageConstant.MSG_PASSWORD_RESET_TOKEN_EXPIRED;
+import static org.crochet.constant.MessageConstant.REFRESH_TOKEN_NOT_IN_DB;
+import static org.crochet.constant.MessageConstant.MSG_RESEND_SUCCESS;
 import static org.crochet.constant.MessageConstant.RESET_NOTIFICATION;
 import static org.crochet.constant.MessageConstant.RESET_PASSWORD;
-import static org.crochet.constant.MessageConstant.RESET_PASSWORD_SUCCESSFULLY_MESSAGE;
-import static org.crochet.constant.MessageConstant.RESET_YOUR_PASSWORD_CONTENT;
-import static org.crochet.constant.MessageConstant.SUCCESSFUL_CONFIRMATION_MESSAGE;
-import static org.crochet.constant.MessageConstant.TOKEN_EXPIRED_MESSAGE;
-import static org.crochet.constant.MessageConstant.USER_REGISTERED_SUCCESSFULLY_MESSAGE;
+import static org.crochet.constant.MessageConstant.MSG_RESET_PASSWORD_SUCCESS;
+import static org.crochet.constant.MessageConstant.MSG_RESET_PASSWORD_LINK;
+import static org.crochet.constant.MessageConstant.MSG_SUCCESSFUL_CONFIRMATION;
+import static org.crochet.constant.MessageConstant.MSG_TOKEN_EXPIRED;
+import static org.crochet.constant.MessageConstant.MSG_USER_REGISTER_SUCCESS;
 import static org.springframework.util.StringUtils.hasText;
 
 /**
@@ -105,7 +105,7 @@ public class AuthServiceImpl implements AuthService {
         var user = userService.checkLogin(loginRequest.getEmail(), loginRequest.getPassword());
         // Check email verified
         if (!user.isEmailVerified()) {
-            throw new EmailVerificationException(EMAIL_NOT_VERIFIED_MESSAGE, MAP_CODE.get(EMAIL_NOT_VERIFIED_MESSAGE));
+            throw new EmailVerificationException(MSG_EMAIL_NOT_VERIFIED, MAP_CODE.get(MSG_EMAIL_NOT_VERIFIED));
         }
         // Create refresh token
         var refreshToken = refreshTokenService.createRefreshToken(user.getEmail());
@@ -144,10 +144,10 @@ public class AuthServiceImpl implements AuthService {
         // Send confirmation email
         emailSender.send(signUpRequest.getEmail(),
                 CONFIRM_YOUR_EMAIL,
-                buildEmailLink(signUpRequest.getEmail(), link, CONFIRM_YOUR_EMAIL, CLICK_TO_ACTIVE_CONTENT,
+                buildEmailLink(signUpRequest.getEmail(), link, CONFIRM_YOUR_EMAIL, MSG_ACCOUNT_ACTIVATION_LINK,
                         ACTIVE_NOW));
 
-        return USER_REGISTERED_SUCCESSFULLY_MESSAGE;
+        return MSG_USER_REGISTER_SUCCESS;
     }
 
     /**
@@ -172,9 +172,9 @@ public class AuthServiceImpl implements AuthService {
 
         // Send confirmation email
         emailSender.send(email, CONFIRM_YOUR_EMAIL,
-                buildEmailLink(email, link, CONFIRM_YOUR_EMAIL, CLICK_TO_ACTIVE_CONTENT, ACTIVE_NOW));
+                buildEmailLink(email, link, CONFIRM_YOUR_EMAIL, MSG_ACCOUNT_ACTIVATION_LINK, ACTIVE_NOW));
 
-        return RESEND_SUCCESSFULLY_MESSAGE;
+        return MSG_RESEND_SUCCESS;
     }
 
     /**
@@ -195,11 +195,11 @@ public class AuthServiceImpl implements AuthService {
         LocalDateTime confirmedAt = confirmationToken.getConfirmedAt();
 
         if (confirmedAt != null) {
-            throw new EmailVerificationException(EMAIL_ALREADY_CONFIRMED_MESSAGE, MAP_CODE.get(EMAIL_ALREADY_CONFIRMED_MESSAGE));
+            throw new EmailVerificationException(MSG_EMAIL_ALREADY_CONFIRMED, MAP_CODE.get(MSG_EMAIL_ALREADY_CONFIRMED));
         }
 
         if (expiredAt.isBefore(now)) {
-            throw new TokenException(TOKEN_EXPIRED_MESSAGE, MAP_CODE.get(TOKEN_EXPIRED_MESSAGE));
+            throw new TokenException(MSG_TOKEN_EXPIRED, MAP_CODE.get(MSG_TOKEN_EXPIRED));
         }
 
         // Update confirmedAt
@@ -208,7 +208,7 @@ public class AuthServiceImpl implements AuthService {
         // Update emailVerified to true
         userService.verifyEmail(confirmationToken.getUser().getEmail());
 
-        return SUCCESSFUL_CONFIRMATION_MESSAGE;
+        return MSG_SUCCESSFUL_CONFIRMATION;
     }
 
     /**
@@ -318,10 +318,10 @@ public class AuthServiceImpl implements AuthService {
 
         // Send password reset link to email
         var passwordResetLink =
-                buildEmailLink(email, link, RESET_NOTIFICATION, RESET_YOUR_PASSWORD_CONTENT, RESET_PASSWORD);
+                buildEmailLink(email, link, RESET_NOTIFICATION, MSG_RESET_PASSWORD_LINK, RESET_PASSWORD);
         emailSender.send(email, RESET_NOTIFICATION, passwordResetLink);
 
-        return LINK_RESET_PASSWORD + link;
+        return RESET_PASSWORD_LINK + link;
     }
 
     /**
@@ -343,7 +343,7 @@ public class AuthServiceImpl implements AuthService {
         LocalDateTime expiredAt = passwordResetToken.getExpiresAt();
 
         if (expiredAt.isBefore(now)) {
-            throw new TokenException(PASSWORD_RESET_TOKEN_IS_EXPIRED_MESSAGE, MAP_CODE.get(PASSWORD_RESET_TOKEN_IS_EXPIRED_MESSAGE));
+            throw new TokenException(MSG_PASSWORD_RESET_TOKEN_EXPIRED, MAP_CODE.get(MSG_PASSWORD_RESET_TOKEN_EXPIRED));
         }
 
         // Get email by token
@@ -358,7 +358,7 @@ public class AuthServiceImpl implements AuthService {
         // Delete password reset token
         passwordResetTokenService.deletePasswordToken(passwordResetToken);
 
-        return RESET_PASSWORD_SUCCESSFULLY_MESSAGE;
+        return MSG_RESET_PASSWORD_SUCCESS;
     }
 
     @Override
@@ -373,8 +373,8 @@ public class AuthServiceImpl implements AuthService {
                             .refreshToken(refreshToken)
                             .build();
                 }).orElseThrow(() ->
-                        new ResourceNotFoundException(REFRESH_TOKEN_IS_NOT_IN_DB_MESSAGE,
-                                MAP_CODE.get(REFRESH_TOKEN_IS_NOT_IN_DB_MESSAGE))
+                        new ResourceNotFoundException(REFRESH_TOKEN_NOT_IN_DB,
+                                MAP_CODE.get(REFRESH_TOKEN_NOT_IN_DB))
                 );
     }
 

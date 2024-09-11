@@ -1,6 +1,7 @@
 package org.crochet.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.crochet.constant.MessageConstant;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.BlogCategoryMapper;
 import org.crochet.model.BlogCategory;
@@ -13,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
+
 @Service
 @RequiredArgsConstructor
 public class BlogCategoryServiceImpl implements BlogCategoryService {
@@ -20,7 +23,7 @@ public class BlogCategoryServiceImpl implements BlogCategoryService {
 
     @Transactional
     @Override
-    public BlogCategoryResponse createBlogCategory(BlogCategoryRequest request) {
+    public BlogCategoryResponse create(BlogCategoryRequest request) {
         BlogCategory blogCategory = new BlogCategory();
         blogCategory.setName(request.getName());
         blogCategory = blogCategoryRepo.save(blogCategory);
@@ -29,7 +32,7 @@ public class BlogCategoryServiceImpl implements BlogCategoryService {
 
     @Transactional
     @Override
-    public BlogCategoryResponse updateBlogCategory(BlogCategoryRequest request) {
+    public BlogCategoryResponse update(BlogCategoryRequest request) {
         BlogCategory blogCategory = getById(request.getId());
         blogCategory.setName(request.getName());
         blogCategory = blogCategoryRepo.save(blogCategory);
@@ -37,27 +40,28 @@ public class BlogCategoryServiceImpl implements BlogCategoryService {
     }
 
     @Override
-    public BlogCategoryResponse getBlogCategory(String id) {
+    public BlogCategoryResponse getDetail(String id) {
         BlogCategory blogCategory = getById(id);
         return BlogCategoryMapper.INSTANCE.toResponse(blogCategory);
     }
 
     @Override
-    public List<BlogCategoryResponse> getBlogCategories() {
+    public List<BlogCategoryResponse> getAll() {
         List<BlogCategory> blogCategories = blogCategoryRepo.findAll();
         return BlogCategoryMapper.INSTANCE.toResponses(blogCategories);
     }
 
     @Transactional
     @Override
-    public void deleteBlogCategory(String id) {
+    public void delete(String id) {
         BlogCategory blogCategory = getById(id);
         blogCategoryRepo.delete(blogCategory);
     }
 
-    BlogCategory getById(String id) {
+    private BlogCategory getById(String id) {
         return blogCategoryRepo.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("Blog category not found.")
+                () -> new ResourceNotFoundException(MessageConstant.MSG_BLOG_CATEGORY_NOT_FOUND,
+                        MAP_CODE.get(MessageConstant.MSG_BLOG_CATEGORY_NOT_FOUND))
         );
     }
 }

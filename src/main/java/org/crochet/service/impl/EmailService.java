@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import java.io.UnsupportedEncodingException;
 
 import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
-import static org.crochet.constant.MessageConstant.FAILED_TO_SEND_EMAIL_MESSAGE;
+import static org.crochet.constant.MessageConstant.MSG_FAILED_SEND_EMAIL;
 
 /**
  * EmailService class
@@ -53,8 +53,8 @@ public class EmailService implements EmailSender {
             helper.setFrom("phanvanluom97bd@gmail.com", "Little Crochet");
             javaMailSender.send(mimeMessage);
         } catch (MessagingException e) {
-            log.error(FAILED_TO_SEND_EMAIL_MESSAGE, e);
-            throw new IllegalStateException(FAILED_TO_SEND_EMAIL_MESSAGE, MAP_CODE.get(FAILED_TO_SEND_EMAIL_MESSAGE));
+            log.error(MSG_FAILED_SEND_EMAIL, e);
+            throw new IllegalStateException(MSG_FAILED_SEND_EMAIL, MAP_CODE.get(MSG_FAILED_SEND_EMAIL));
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }

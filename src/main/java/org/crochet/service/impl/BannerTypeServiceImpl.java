@@ -1,5 +1,6 @@
 package org.crochet.service.impl;
 
+import org.crochet.constant.MessageConstant;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.BannerTypeMapper;
 import org.crochet.model.BannerType;
@@ -12,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
+
+import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
 
 @Service
 public class BannerTypeServiceImpl implements BannerTypeService {
@@ -30,7 +33,8 @@ public class BannerTypeServiceImpl implements BannerTypeService {
             bannerType.setName(request.getName());
         } else {
             bannerType = bannerTypeRepo.findById(request.getId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Banner type not found"));
+                    .orElseThrow(() -> new ResourceNotFoundException(MessageConstant.MSG_BANNER_TYPE_NOT_FOUND,
+                            MAP_CODE.get(MessageConstant.MSG_BANNER_TYPE_NOT_FOUND)));
             bannerType.setName(request.getName());
         }
         bannerType = bannerTypeRepo.save(bannerType);
@@ -51,7 +55,8 @@ public class BannerTypeServiceImpl implements BannerTypeService {
     @Override
     public BannerTypeResponse getById(String id) {
         var banner = bannerTypeRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Banner type not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(MessageConstant.MSG_BANNER_TYPE_NOT_FOUND,
+                        MAP_CODE.get(MessageConstant.MSG_BANNER_TYPE_NOT_FOUND)));
         return BannerTypeMapper.INSTANCE.toResponse(banner);
     }
 }
