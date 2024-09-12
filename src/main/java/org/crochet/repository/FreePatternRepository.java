@@ -16,8 +16,6 @@ public interface FreePatternRepository extends JpaRepository<FreePattern, String
     @Query("""
             select f
             from FreePattern f
-            left join fetch f.files
-            left join fetch f.images
             where f.isHome = true
             """)
     List<FreePattern> findLimitedNumFreePattern(Pageable pageable);

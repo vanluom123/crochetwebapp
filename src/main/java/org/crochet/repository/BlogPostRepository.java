@@ -16,7 +16,6 @@ public interface BlogPostRepository extends JpaRepository<BlogPost, String>, Jpa
     @Query("""
             select p
             from BlogPost p
-            left join fetch p.files
             where p.home = true
             """)
     List<BlogPost> findLimitedNumPosts(Pageable pageable);
