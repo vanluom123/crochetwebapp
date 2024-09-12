@@ -16,7 +16,6 @@ public interface ProductRepository extends JpaRepository<Product, String>, JpaSp
     @Query("""
             select p
             from Product p
-            left join fetch p.images
             where p.isHome = true
             """)
     List<Product> findLimitedNumProduct(Pageable pageable);
