@@ -16,8 +16,6 @@ public interface PatternRepository extends JpaRepository<Pattern, String>, JpaSp
     @Query("""
             SELECT p
             FROM Pattern p
-            LEFT JOIN FETCH p.files
-            LEFT JOIN FETCH p.images
             WHERE p.isHome = true
             """)
     List<Pattern> findLimitedNumPattern(Pageable pageable);
