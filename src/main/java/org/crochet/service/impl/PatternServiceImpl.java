@@ -24,6 +24,7 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -98,8 +99,11 @@ public class PatternServiceImpl implements PatternService {
      */
     @Override
     public PatternPaginationResponse getPatterns(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters) {
-        GenericFilter<Pattern> filter = GenericFilter.create(filters);
-        var spec = filter.build();
+        Specification<Pattern> spec = Specification.where(null);
+        if (filters != null && filters.length > 0) {
+            GenericFilter<Pattern> filter = GenericFilter.create(filters);
+            spec = filter.build();
+        }
 
         Sort sort = Sort.by(sortBy);
         sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? sort.ascending() : sort.descending();
