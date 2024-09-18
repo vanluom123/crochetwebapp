@@ -26,6 +26,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -99,9 +100,11 @@ public class BlogPostServiceImpl implements BlogPostService {
      */
     @Override
     public BlogPostPaginationResponse getBlogs(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters) {
-        GenericFilter<BlogPost> filter = GenericFilter.create(filters);
-        var spec = filter.build();
-        spec = spec.and(BlogPostSpecifications.fetchJoin());
+        Specification<BlogPost> spec = Specification.where(null);
+        if (filters != null && filters.length > 0) {
+            GenericFilter<BlogPost> filter = GenericFilter.create(filters);
+            spec = filter.build();
+        }
 
         Sort sort = Sort.by(sortBy);
         sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? sort.ascending() : sort.descending();
