@@ -73,6 +73,31 @@ public class GenericFilter<T> {
     }
 
     /**
+     * Constructor
+     */
+    public GenericFilter() {
+        this.rootNode = new FilterNode(FilterLogic.ALL);
+    }
+
+    /**
+     * Get root
+     *
+     * @return FilterNode
+     */
+    public FilterNode getRoot() {
+        return rootNode;
+    }
+
+    /**
+     * Build
+     *
+     * @return Specification
+     */
+    public Specification<T> build() {
+        return (root, query, criteriaBuilder) -> buildPredicate(rootNode, root, query, criteriaBuilder);
+    }
+
+    /**
      * Checks if the array of filters is empty or null.
      *
      * @param filters An array of filters to check.
@@ -105,31 +130,6 @@ public class GenericFilter<T> {
                 .toList();
         parentNode.addAllChildren(childNodes);
         return parentNode;
-    }
-
-    /**
-     * Constructor
-     */
-    public GenericFilter() {
-        this.rootNode = new FilterNode(FilterLogic.ALL);
-    }
-
-    /**
-     * Get root
-     *
-     * @return FilterNode
-     */
-    public FilterNode getRoot() {
-        return rootNode;
-    }
-
-    /**
-     * Build
-     *
-     * @return Specification
-     */
-    public Specification<T> build() {
-        return (root, query, criteriaBuilder) -> buildPredicate(rootNode, root, query, criteriaBuilder);
     }
 
     /**
