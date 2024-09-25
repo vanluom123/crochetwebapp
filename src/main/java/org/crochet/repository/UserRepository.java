@@ -1,6 +1,7 @@
 package org.crochet.repository;
 
 import org.crochet.model.User;
+import org.crochet.payload.response.UserProjection;
 import org.crochet.payload.response.UserResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -13,7 +14,7 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, String>, JpaSpecificationExecutor<User> {
-
+    
     Optional<User> findByEmail(String email);
 
     @Transactional
@@ -47,4 +48,14 @@ public interface UserRepository extends JpaRepository<User, String>, JpaSpecific
             where u.id = ?1
             """)
     Optional<UserResponse> getDetail(String id);
+
+    @Query("""
+            select count(u.id) > 0
+            from User u
+            where u.id = ?1
+            and u.emailVerified = true
+            """)
+    boolean isValidUser(String id);
+    
+//    Optional<UserProjection> getUser(String id);
 }

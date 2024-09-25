@@ -1,14 +1,7 @@
 package org.crochet.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,6 +11,7 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.crochet.enumerator.AuthProvider;
 import org.crochet.enumerator.RoleType;
+import org.hibernate.annotations.BatchSize;
 
 import java.util.List;
 
@@ -75,4 +69,11 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<RefreshToken> refreshTokens;
+
+    @BatchSize(size = 10)
+    @OneToMany(mappedBy = "user",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY,
+            orphanRemoval = true)
+    private List<SavingChart> savingCharts;
 }

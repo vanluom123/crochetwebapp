@@ -29,4 +29,10 @@ public interface FreePatternRepository extends JpaRepository<FreePattern, String
             """)
     Optional<FreePattern> getDetail(String id);
 
+    @Query("""
+            select count(f.id) > 0
+            from FreePattern f
+            where f.id = ?1
+            """)
+    boolean existsById(String id);
 }
