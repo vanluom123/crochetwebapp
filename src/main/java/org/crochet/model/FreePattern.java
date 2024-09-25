@@ -1,17 +1,6 @@
 package org.crochet.model;
 
-import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.AttributeOverrides;
-import jakarta.persistence.CollectionTable;
-import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,6 +9,7 @@ import lombok.experimental.SuperBuilder;
 import org.crochet.enumerator.ChartStatus;
 import org.hibernate.annotations.BatchSize;
 
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -77,4 +67,11 @@ public class FreePattern extends BaseEntity {
 
     })
     private Set<File> images;
+
+    @BatchSize(size = 10)
+    @OneToMany(mappedBy = "freePattern",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY,
+            orphanRemoval = true)
+    private List<SavingChart> savingCharts;
 }

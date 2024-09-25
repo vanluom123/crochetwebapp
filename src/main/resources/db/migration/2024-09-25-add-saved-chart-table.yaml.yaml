@@ -1,0 +1,61 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1727277343764-1
+      author: admin
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_saving_chart
+                  name: id
+                  type: VARCHAR(255)
+              - column:
+                  name: created_by
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: created_date
+                  type: DATETIME
+              - column:
+                  name: last_modified_by
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: last_modified_date
+                  type: DATETIME
+              - column:
+                  name: free_pattern_id
+                  type: VARCHAR(255)
+              - column:
+                  name: user_id
+                  type: VARCHAR(255)
+            tableName: saving_chart
+  - changeSet:
+      id: 1727277343764-2
+      author: admin
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: free_pattern_id
+            baseTableName: saving_chart
+            constraintName: FK_SAVING_CHART_ON_FREE_PATTERN
+            referencedColumnNames: id
+            referencedTableName: free_pattern
+  - changeSet:
+      id: 1727277343764-3
+      author: admin
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: saving_chart
+            constraintName: FK_SAVING_CHART_ON_USER
+            referencedColumnNames: id
+            referencedTableName: users
+
