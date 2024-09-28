@@ -5,6 +5,7 @@ import org.crochet.payload.request.FreePatternRequest;
 import org.crochet.payload.response.FreeChartDetailResponse;
 import org.crochet.payload.response.FreePatternResponse;
 import org.crochet.payload.response.PaginatedFreePatternResponse;
+import org.crochet.security.UserPrincipal;
 
 import java.util.List;
 
@@ -18,4 +19,7 @@ public interface FreePatternService {
     FreeChartDetailResponse getDetail(String id);
 
     void delete(String id);
+
+    PaginatedFreePatternResponse getAllSavedPatternByUser(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters,
+                                                          UserPrincipal principal);
 }

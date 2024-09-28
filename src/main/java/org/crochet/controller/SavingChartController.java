@@ -2,16 +2,18 @@ package org.crochet.controller;
 
 import org.crochet.payload.request.SavingChartRequest;
 import org.crochet.service.SavingChartService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/saving-chart")
+@RequestMapping("/saving-free-pattern")
 public class SavingChartController {
 
-    @Autowired
-    private SavingChartService savingChartService;
+    private final SavingChartService savingChartService;
+
+    public SavingChartController(SavingChartService savingChartService) {
+        this.savingChartService = savingChartService;
+    }
 
     @ResponseBody
     @ResponseStatus(HttpStatus.CREATED)
