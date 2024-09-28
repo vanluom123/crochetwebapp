@@ -18,6 +18,7 @@ public class FreeChartDetailResponse {
     private String description;
     private String author;
     private boolean isHome;
+    private boolean saved;
     private String link;
     private String content;
     private ChartStatus status;

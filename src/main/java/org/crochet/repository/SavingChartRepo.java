@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,10 +23,10 @@ public interface SavingChartRepo extends JpaRepository<SavingChart, String>, Jpa
             VALUES (uuid(),
                     current_timestamp,
                     current_timestamp,
-                    ?1,
-                    ?2)
+                    :freePatternId,
+                    :userId)
             """, nativeQuery = true)
-    void createSavingChart(String freePatternId, String userId);
+    void createSavingChart(@Param("freePatternId") String freePatternId, @Param("userId") String userId);
 
     boolean existsByUserIdAndFreePatternId(String userId, String freePatternId);
 
@@ -33,10 +34,8 @@ public interface SavingChartRepo extends JpaRepository<SavingChart, String>, Jpa
     @Modifying
     @Query("""
                 delete from SavingChart sc
-                where sc.user.id = ?1 and sc.freePattern.id = ?2
+                where sc.user.id = :userId and sc.freePattern.id = :freePatternId
             """)
-    void deleteByUserIdAndFreePatternId(String userId,
-                                        String freePatternId);
-
-    boolean existsByFreePatternId(String freePatternId);
+    void deleteByUserIdAndFreePatternId(@Param("userId") String userId,
+                                        @Param("freePatternId") String freePatternId);
 }

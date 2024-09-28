@@ -39,6 +39,7 @@ import org.springframework.util.StringUtils;
 import java.util.List;
 
 import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
+import static org.crochet.constant.MessageConstant.MSG_USER_LOGIN_REQUIRED;
 import static org.crochet.constant.MessageConstant.MSG_USER_NOT_FOUND;
 
 /**
@@ -87,6 +88,7 @@ public class FreePatternServiceImpl implements FreePatternService {
                     .status(request.getStatus())
                     .files(FileMapper.INSTANCE.toSetEntities(request.getFiles()))
                     .images(FileMapper.INSTANCE.toSetEntities(request.getImages()))
+                    .saved(false)
                     .build();
         } else {
             freePattern = freePatternRepo.findById(request.getId()).orElseThrow(
@@ -102,53 +104,36 @@ public class FreePatternServiceImpl implements FreePatternService {
     /**
      * Get all free patterns with filter
      *
-     * @param pageNo   Page number
-     * @param pageSize Page size
-     * @param sortBy   Sort by
-     * @param sortDir  Sort direction
-     * @param filters  List Filters
+     * @param pageNo    Page number
+     * @param pageSize  Page size
+     * @param sortBy    Sort by
+     * @param sortDir   Sort direction
+     * @param filters   List Filters
+     * @param principal UserPrincipal
      * @return PaginatedFreePatternResponse
      */
     @Override
-    public PaginatedFreePatternResponse getAllFreePatterns(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters) {
-        // Validate input parameters
-        if (pageNo < 0 || pageSize <= 0) {
-            throw new IllegalArgumentException("Invalid page number or page size");
-        }
-
-        if (sortBy == null || sortBy.isBlank()) {
-            throw new IllegalArgumentException("Sort field cannot be null or empty");
-        }
-
-        if (!sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) &&
-                !sortDir.equalsIgnoreCase(Sort.Direction.DESC.name())) {
-            throw new IllegalArgumentException("Invalid sort direction");
-        }
-
+    public PaginatedFreePatternResponse getAllFreePatterns(int pageNo,
+                                                           int pageSize,
+                                                           String sortBy,
+                                                           Sort.Direction sortDir,
+                                                           Filter[] filters,
+                                                           UserPrincipal principal) {
         Specification<FreePattern> spec = Specification.where(null);
         if (filters != null && filters.length > 0) {
             GenericFilter<FreePattern> filter = GenericFilter.create(filters);
             spec = filter.build();
         }
 
-        // Construct Sort object
-        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
+        Sort sort = Sort.by(sortDir, sortBy);
 
-        // Create pageable object
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+        Page<FreePattern> page = freePatternRepo.findAll(spec, pageable);
 
-        // Fetch data
-        Page<FreePattern> page;
-        try {
-            page = freePatternRepo.findAll(spec, pageable);
-        } catch (Exception e) {
-            throw new RuntimeException("Database query failed", e);
-        }
+        List<FreePatternResponse> contents = page.getContent().stream()
+                .map(pattern -> mapToFreePatternResponse(pattern, principal))
+                .toList();
 
-        // Map entity objects to response objects
-        List<FreePatternResponse> contents = FreePatternMapper.INSTANCE.toResponses(page.getContent());
-
-        // Build response
         return PaginatedFreePatternResponse.builder()
                 .contents(contents)
                 .pageNo(page.getNumber())
@@ -207,11 +192,28 @@ public class FreePatternServiceImpl implements FreePatternService {
         freePatternRepo.deleteById(id);
     }
 
+    /**
+     * Retrieves a paginated response of all saved patterns for a specific user, based on provided pagination
+     * and sorting parameters, and optional filters.
+     *
+     * @param pageNo The page number to retrieve.
+     * @param pageSize The number of records per page.
+     * @param sortBy The attribute to sort the records by.
+     * @param sortDir The direction of the sort, either "asc" or "desc".
+     * @param filters An array of filters to apply to the search.
+     * @param principal The authentication principal representing the user.
+     * @return A paginated response containing the saved patterns for the user.
+     * @throws ResourceNotFoundException If the user is not authenticated or if the user is not found.
+     */
     @Override
-    public PaginatedFreePatternResponse getAllSavedPatternByUser(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters,
+    public PaginatedFreePatternResponse getAllSavedPatternByUser(int pageNo,
+                                                                 int pageSize,
+                                                                 String sortBy,
+                                                                 Sort.Direction sortDir,
+                                                                 Filter[] filters,
                                                                  UserPrincipal principal) {
         if (principal == null) {
-            throw new ResourceNotFoundException(MSG_USER_NOT_FOUND, MAP_CODE.get(MSG_USER_NOT_FOUND));
+            throw new ResourceNotFoundException(MSG_USER_LOGIN_REQUIRED, MAP_CODE.get(MSG_USER_LOGIN_REQUIRED));
         }
         User user = userRepo.findById(principal.getId()).orElseThrow(
                 () -> new ResourceNotFoundException(MSG_USER_NOT_FOUND, MAP_CODE.get(MSG_USER_NOT_FOUND))
@@ -223,8 +225,7 @@ public class FreePatternServiceImpl implements FreePatternService {
             spec = spec.and(filter.build());
         }
 
-        Sort sort = Sort.by(sortBy);
-        sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? sort.ascending() : sort.descending();
+        Sort sort = Sort.by(sortDir, sortBy);
 
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
         Page<SavingChart> page = savingChartRepo.findAll(spec, pageable);
@@ -241,5 +242,18 @@ public class FreePatternServiceImpl implements FreePatternService {
                 .totalPages(page.getTotalPages())
                 .last(page.isLast())
                 .build();
+    }
+
+    private FreePatternResponse mapToFreePatternResponse(FreePattern pattern, UserPrincipal userPrincipal) {
+        FreePatternResponse response = FreePatternMapper.INSTANCE.toResponse(pattern);
+
+        if (userPrincipal != null) {
+            boolean isSaved = savingChartRepo.existsByUserIdAndFreePatternId(userPrincipal.getId(), pattern.getId());
+            response.setSaved(isSaved);
+        } else {
+            response.setSaved(false);
+        }
+
+        return response;
     }
 }

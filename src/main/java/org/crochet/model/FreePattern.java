@@ -7,7 +7,6 @@ import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
@@ -21,7 +20,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.crochet.enumerator.ChartStatus;
-import org.crochet.listener.FreePatternListener;
 import org.hibernate.annotations.BatchSize;
 
 import java.util.List;
@@ -30,7 +28,6 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
-@EntityListeners({FreePatternListener.class})
 @Table(name = "free_pattern")
 @SuperBuilder
 @NoArgsConstructor
@@ -62,8 +59,8 @@ public class FreePattern extends BaseEntity {
     @Column(name = "status", columnDefinition = "VARCHAR(25)")
     private ChartStatus status;
 
-    @Column(name = "is_saved")
-    private boolean isSaved;
+    @Column(name = "saved")
+    private boolean saved;
 
     @BatchSize(size = 10)
     @ElementCollection
