@@ -37,4 +37,6 @@ public interface SavingChartRepo extends JpaRepository<SavingChart, String>, Jpa
             """)
     void deleteByUserIdAndFreePatternId(String userId,
                                         String freePatternId);
+
+    boolean existsByFreePatternId(String freePatternId);
 }

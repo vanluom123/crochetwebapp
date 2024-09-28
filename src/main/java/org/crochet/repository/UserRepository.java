@@ -1,7 +1,6 @@
 package org.crochet.repository;
 
 import org.crochet.model.User;
-import org.crochet.payload.response.UserProjection;
 import org.crochet.payload.response.UserResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;

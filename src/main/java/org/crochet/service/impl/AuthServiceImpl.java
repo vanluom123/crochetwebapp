@@ -32,21 +32,21 @@ import java.time.LocalDateTime;
 
 import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
 import static org.crochet.constant.MessageConstant.ACTIVE_NOW;
-import static org.crochet.constant.MessageConstant.MSG_ACCOUNT_ACTIVATION_LINK;
 import static org.crochet.constant.MessageConstant.CONFIRM_YOUR_EMAIL;
+import static org.crochet.constant.MessageConstant.MSG_ACCOUNT_ACTIVATION_LINK;
 import static org.crochet.constant.MessageConstant.MSG_EMAIL_ALREADY_CONFIRMED;
 import static org.crochet.constant.MessageConstant.MSG_EMAIL_NOT_VERIFIED;
-import static org.crochet.constant.MessageConstant.RESET_PASSWORD_LINK;
 import static org.crochet.constant.MessageConstant.MSG_PASSWORD_RESET_TOKEN_EXPIRED;
-import static org.crochet.constant.MessageConstant.REFRESH_TOKEN_NOT_IN_DB;
 import static org.crochet.constant.MessageConstant.MSG_RESEND_SUCCESS;
-import static org.crochet.constant.MessageConstant.RESET_NOTIFICATION;
-import static org.crochet.constant.MessageConstant.RESET_PASSWORD;
-import static org.crochet.constant.MessageConstant.MSG_RESET_PASSWORD_SUCCESS;
 import static org.crochet.constant.MessageConstant.MSG_RESET_PASSWORD_LINK;
+import static org.crochet.constant.MessageConstant.MSG_RESET_PASSWORD_SUCCESS;
 import static org.crochet.constant.MessageConstant.MSG_SUCCESSFUL_CONFIRMATION;
 import static org.crochet.constant.MessageConstant.MSG_TOKEN_EXPIRED;
 import static org.crochet.constant.MessageConstant.MSG_USER_REGISTER_SUCCESS;
+import static org.crochet.constant.MessageConstant.REFRESH_TOKEN_NOT_IN_DB;
+import static org.crochet.constant.MessageConstant.RESET_NOTIFICATION;
+import static org.crochet.constant.MessageConstant.RESET_PASSWORD;
+import static org.crochet.constant.MessageConstant.RESET_PASSWORD_LINK;
 import static org.springframework.util.StringUtils.hasText;
 
 /**
