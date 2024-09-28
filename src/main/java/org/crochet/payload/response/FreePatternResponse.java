@@ -23,6 +23,7 @@ public class FreePatternResponse implements Serializable {
     private String author;
     @JsonProperty("is_home")
     private boolean isHome;
+    private boolean saved;
     private String link;
     private String content;
     private ChartStatus status;

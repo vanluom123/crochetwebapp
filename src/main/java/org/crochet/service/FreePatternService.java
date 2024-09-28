@@ -5,13 +5,14 @@ import org.crochet.payload.request.FreePatternRequest;
 import org.crochet.payload.response.FreePatternResponse;
 import org.crochet.payload.response.PaginatedFreePatternResponse;
 import org.crochet.security.UserPrincipal;
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
 public interface FreePatternService {
     FreePatternResponse createOrUpdate(FreePatternRequest request);
 
-    PaginatedFreePatternResponse getAllFreePatterns(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters);
+    PaginatedFreePatternResponse getAllFreePatterns(int pageNo, int pageSize, String sortBy, Sort.Direction sortDir, Filter[] filters, UserPrincipal principal);
 
     List<FreePatternResponse> getLimitedFreePatterns();
 
@@ -19,6 +20,6 @@ public interface FreePatternService {
 
     void delete(String id);
 
-    PaginatedFreePatternResponse getAllSavedPatternByUser(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters,
+    PaginatedFreePatternResponse getAllSavedPatternByUser(int pageNo, int pageSize, String sortBy, Sort.Direction sortDir, Filter[] filters,
                                                           UserPrincipal principal);
 }

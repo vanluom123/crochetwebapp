@@ -7,7 +7,7 @@ databaseChangeLog:
         - addColumn:
             columns:
               - column:
-                  name: is_saved
+                  name: saved
                   type: BOOLEAN
             tableName: free_pattern
 

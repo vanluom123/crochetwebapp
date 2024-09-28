@@ -13,6 +13,7 @@ import org.crochet.payload.response.FreePatternResponse;
 import org.crochet.payload.response.PaginatedFreePatternResponse;
 import org.crochet.security.UserPrincipal;
 import org.crochet.service.FreePatternService;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -91,10 +92,11 @@ public class FreePatternController {
             @RequestParam(value = "sortBy", defaultValue = AppConstant.DEFAULT_SORT_BY, required = false) String sortBy,
             @Parameter(description = "Sort direction (default: ASC)")
             @RequestParam(value = "sortDir", defaultValue = AppConstant.DEFAULT_SORT_DIRECTION,
-                    required = false) String sortDir,
+                    required = false) Sort.Direction sortDir,
             @Parameter(description = "List filters")
-            @RequestBody(required = false) Filter[] filters) {
-        var response = freePatternService.getAllFreePatterns(pageNo, pageSize, sortBy, sortDir, filters);
+            @RequestBody(required = false) Filter[] filters,
+            @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        var response = freePatternService.getAllFreePatterns(pageNo, pageSize, sortBy, sortDir, filters, userPrincipal);
         return ResponseEntity.ok(response);
     }
 
@@ -112,7 +114,7 @@ public class FreePatternController {
             @Parameter(description = "Sort by field (default: id)")
             @RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
             @Parameter(description = "Sort direction (default: ASC)")
-            @RequestParam(value = "sortDir", defaultValue = "ASC") String sortDir,
+            @RequestParam(value = "sortDir", defaultValue = "ASC") Sort.Direction sortDir,
             @Parameter(description = "List of filters")
             @RequestBody(required = false) Filter[] filters,
             @AuthenticationPrincipal UserPrincipal userPrincipal) {

@@ -59,8 +59,8 @@ public class FreePattern extends BaseEntity {
     @Column(name = "status", columnDefinition = "VARCHAR(25)")
     private ChartStatus status;
 
-    @Column(name = "is_saved")
-    private boolean isSaved;
+    @Column(name = "saved")
+    private boolean saved;
 
     @BatchSize(size = 10)
     @ElementCollection

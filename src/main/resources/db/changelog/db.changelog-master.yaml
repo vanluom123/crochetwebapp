@@ -16,6 +16,6 @@ databaseChangeLog:
   - include:
       file: src/main/resources/db/migration/2024-09-04-add-status-for-pattern.yaml
   - include:
-      file: src/main/resources/db/migration/2024-09-25-add-saved-chart-table.yaml.yaml
+      file: src/main/resources/db/migration/2024-09-25-add-saved-chart-table.yaml
   - include:
-      file: src/main/resources/db/migration/2024-09-28-add-is-saved-table.yaml
+      file: src/main/resources/db/migration/2024-09-28-add-saved-column-free-pattern.yaml

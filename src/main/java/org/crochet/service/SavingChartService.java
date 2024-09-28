@@ -1,10 +1,10 @@
 package org.crochet.service;
 
-import org.crochet.payload.request.SavingChartRequest;
+import org.crochet.security.UserPrincipal;
 
 public interface SavingChartService {
 
-    void createChart(SavingChartRequest chartRequest);
+    void saveChart(UserPrincipal principal, String freePatternId);
 
     void deleteChartById(String id);
 }
