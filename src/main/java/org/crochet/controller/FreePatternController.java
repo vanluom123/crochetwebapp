@@ -11,17 +11,13 @@ import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.FreePatternRequest;
 import org.crochet.payload.response.FreePatternResponse;
 import org.crochet.payload.response.PaginatedFreePatternResponse;
+import org.crochet.security.UserPrincipal;
 import org.crochet.service.FreePatternService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/free-pattern")
@@ -94,5 +90,29 @@ public class FreePatternController {
             @RequestBody(required = false) Filter[] filters) {
         var response = freePatternService.getAllFreePatterns(pageNo, pageSize, sortBy, sortDir, filters);
         return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Get all saved patterns by user with specific filters")
+    @ApiResponse(responseCode = "200", description = "Patterns retrieved successfully",
+            content = @Content(mediaType = "application/json"))
+    @PostMapping("/getAllSavedPatternByUser")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    @SecurityRequirement(name = "BearerAuth")
+    public ResponseEntity<PaginatedFreePatternResponse> getAllSavedPatternByUser(
+            @Parameter(description = "Page number (default: 0)")
+            @RequestParam(value = "pageNo", defaultValue = "0") int pageNo,
+            @Parameter(description = "Page size (default: 10)")
+            @RequestParam(value = "pageSize", defaultValue = "10") int pageSize,
+            @Parameter(description = "Sort by field (default: id)")
+            @RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
+            @Parameter(description = "Sort direction (default: ASC)")
+            @RequestParam(value = "sortDir", defaultValue = "ASC") String sortDir,
+            @Parameter(description = "List of filters")
+            @RequestBody(required = false) Filter[] filters,
+            @AuthenticationPrincipal UserPrincipal userPrincipal) {
+
+        PaginatedFreePatternResponse patterns = freePatternService.getAllSavedPatternByUser(
+                pageNo, pageSize, sortBy, sortDir, filters, userPrincipal);
+        return ResponseEntity.ok(patterns);
     }
 }

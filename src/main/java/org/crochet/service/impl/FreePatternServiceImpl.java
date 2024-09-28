@@ -8,14 +8,14 @@ import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.FileMapper;
 import org.crochet.mapper.FreePatternMapper;
 import org.crochet.model.FreePattern;
+import org.crochet.model.SavingChart;
+import org.crochet.model.User;
 import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.FreePatternRequest;
 import org.crochet.payload.response.FreePatternResponse;
 import org.crochet.payload.response.PaginatedFreePatternResponse;
-import org.crochet.repository.CategoryRepo;
-import org.crochet.repository.FreePatternRepository;
-import org.crochet.repository.GenericFilter;
-import org.crochet.repository.SettingsRepo;
+import org.crochet.repository.*;
+import org.crochet.security.UserPrincipal;
 import org.crochet.service.FreePatternService;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -33,6 +33,7 @@ import org.springframework.util.StringUtils;
 import java.util.List;
 
 import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
+import static org.crochet.constant.MessageConstant.MSG_USER_NOT_FOUND;
 
 /**
  * FreePatternServiceImpl class
@@ -44,6 +45,8 @@ public class FreePatternServiceImpl implements FreePatternService {
     private final FreePatternRepository freePatternRepo;
     private final CategoryRepo categoryRepo;
     private final SettingsRepo settingsRepo;
+    private final UserRepository userRepo;
+    private final SavingChartRepo savingChartRepo;
 
     /**
      * Creates a new FreePattern or updates an existing one based on the provided {@link FreePatternRequest}.
@@ -196,5 +199,41 @@ public class FreePatternServiceImpl implements FreePatternService {
     )
     public void delete(String id) {
         freePatternRepo.deleteById(id);
+    }
+
+    @Override
+    public PaginatedFreePatternResponse getAllSavedPatternByUser(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters,
+                                                                 UserPrincipal principal) {
+        if (principal == null) {
+            throw new ResourceNotFoundException(MSG_USER_NOT_FOUND, MAP_CODE.get(MSG_USER_NOT_FOUND));
+        }
+        User user = userRepo.findById(principal.getId()).orElseThrow(
+                () -> new ResourceNotFoundException(MSG_USER_NOT_FOUND, MAP_CODE.get(MSG_USER_NOT_FOUND))
+        );
+
+        Specification<SavingChart> spec = Specification.where((root, query, cb) -> cb.equal(root.get("user"), user));
+        if (filters != null && filters.length > 0) {
+            GenericFilter<SavingChart> filter = GenericFilter.create(filters);
+            spec = spec.and(filter.build());
+        }
+
+        Sort sort = Sort.by(sortBy);
+        sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? sort.ascending() : sort.descending();
+
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+        Page<SavingChart> page = savingChartRepo.findAll(spec, pageable);
+
+        List<FreePatternResponse> contents = page.getContent().stream()
+                .map(savingChart -> FreePatternMapper.INSTANCE.toResponse(savingChart.getFreePattern()))
+                .toList();
+
+        return PaginatedFreePatternResponse.builder()
+                .contents(contents)
+                .pageNo(page.getNumber())
+                .pageSize(page.getSize())
+                .totalElements(page.getTotalElements())
+                .totalPages(page.getTotalPages())
+                .last(page.isLast())
+                .build();
     }
 }
