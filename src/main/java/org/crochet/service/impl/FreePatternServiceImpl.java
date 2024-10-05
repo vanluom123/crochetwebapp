@@ -124,8 +124,7 @@ public class FreePatternServiceImpl implements FreePatternService {
         }
 
         // Construct Sort object
-        Sort sort = Sort.by(sortBy);
-        sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? sort.ascending() : sort.descending();
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
 
         // Create pageable object
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);

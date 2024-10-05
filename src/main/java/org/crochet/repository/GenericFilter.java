@@ -64,6 +64,7 @@ public class GenericFilter<T> {
 
         FilterNode rootNode = genericFilter.getRoot();
         List<FilterNode> filterNodes = Stream.of(filters)
+                .parallel()
                 .filter(GenericFilter::hasFilterCriteria)
                 .map(GenericFilter::createFilterNode)
                 .toList();
@@ -75,7 +76,7 @@ public class GenericFilter<T> {
     /**
      * Constructor
      */
-    public GenericFilter() {
+    private GenericFilter() {
         this.rootNode = new FilterNode(FilterLogic.ALL);
     }
 
@@ -84,7 +85,7 @@ public class GenericFilter<T> {
      *
      * @return FilterNode
      */
-    public FilterNode getRoot() {
+    private FilterNode getRoot() {
         return rootNode;
     }
 
@@ -126,6 +127,7 @@ public class GenericFilter<T> {
     private static FilterNode createFilterNode(Filter filter) {
         FilterNode parentNode = new FilterNode(filter.getFilterLogic());
         List<FilterNode> childNodes = filter.getFilterCriteria().stream()
+                .parallel()
                 .map(FilterNode::new)
                 .toList();
         parentNode.addAllChildren(childNodes);
@@ -141,7 +143,7 @@ public class GenericFilter<T> {
      * @return Predicate
      */
     private Predicate buildPredicate(FilterNode node, Root<T> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
-        List<Predicate> predicates = new ArrayList<>();
+        List<Predicate> predicates = new ArrayList<>(node.getChildren().size());
 
         for (FilterNode child : node.getChildren()) {
             if (child.getCriteria() != null) {
@@ -152,7 +154,7 @@ public class GenericFilter<T> {
         }
 
         if (predicates.isEmpty()) {
-            return null;
+            return criteriaBuilder.conjunction();
         }
 
         return node.getLogic() == FilterLogic.ALL
@@ -168,6 +170,7 @@ public class GenericFilter<T> {
      * @param criteriaBuilder CriteriaBuilder
      * @return Predicate
      */
+    @SuppressWarnings({"unchecked", "rawtypes"})
     private Predicate createPredicate(FilterCriteria criteria, Root<T> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
         return switch (criteria.getOperation()) {
             case EQUAL -> criteriaBuilder.equal(getPath(root, criteria.getKey()), parseValue(root, criteria));
@@ -253,6 +256,7 @@ public class GenericFilter<T> {
      * @param value the string value to be converted to an Enum constant.
      * @return the Enum constant corresponding to the provided string value.
      */
+    @SuppressWarnings({"unchecked", "rawtypes"})
     private Object parseEnumValue(Class<?> fieldType, String value) {
         return Enum.valueOf((Class<Enum>) fieldType, value);
     }

@@ -15,7 +15,6 @@ import org.crochet.payload.response.BlogPostPaginationResponse;
 import org.crochet.payload.response.BlogPostResponse;
 import org.crochet.repository.BlogCategoryRepo;
 import org.crochet.repository.BlogPostRepository;
-import org.crochet.repository.BlogPostSpecifications;
 import org.crochet.repository.SettingsRepo;
 import org.crochet.repository.GenericFilter;
 import org.crochet.service.BlogPostService;
@@ -106,9 +105,7 @@ public class BlogPostServiceImpl implements BlogPostService {
             spec = filter.build();
         }
 
-        Sort sort = Sort.by(sortBy);
-        sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? sort.ascending() : sort.descending();
-
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
         Page<BlogPost> menuPage = blogPostRepo.findAll(spec, pageable);
         var contents = BlogPostMapper.INSTANCE.toResponses(menuPage.getContent());

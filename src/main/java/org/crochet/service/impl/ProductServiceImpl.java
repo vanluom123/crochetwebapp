@@ -109,9 +109,7 @@ public class ProductServiceImpl implements ProductService {
             spec = filter.build();
         }
 
-        Sort sort = Sort.by(sortBy);
-        sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? sort.ascending() : sort.descending();
-
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
         Page<Product> menuPage = productRepo.findAll(spec, pageable);
 
