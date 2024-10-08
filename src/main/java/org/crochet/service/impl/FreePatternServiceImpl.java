@@ -103,17 +103,44 @@ public class FreePatternServiceImpl implements FreePatternService {
      */
     @Override
     public PaginatedFreePatternResponse getAllFreePatterns(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters) {
-        GenericFilter<FreePattern> filter = GenericFilter.create(filters);
-        Specification<FreePattern> spec = filter.build();
+        // Validate input parameters
+        if (pageNo < 0 || pageSize <= 0) {
+            throw new IllegalArgumentException("Invalid page number or page size");
+        }
 
-        Sort sort = Sort.by(sortBy);
-        sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? sort.ascending() : sort.descending();
+        if (sortBy == null || sortBy.isBlank()) {
+            throw new IllegalArgumentException("Sort field cannot be null or empty");
+        }
 
+        if (!sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) &&
+                !sortDir.equalsIgnoreCase(Sort.Direction.DESC.name())) {
+            throw new IllegalArgumentException("Invalid sort direction");
+        }
+
+        Specification<FreePattern> spec = Specification.where(null);
+        if (filters != null && filters.length > 0) {
+            GenericFilter<FreePattern> filter = GenericFilter.create(filters);
+            spec = filter.build();
+        }
+
+        // Construct Sort object
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
+
+        // Create pageable object
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
-        Page<FreePattern> page = freePatternRepo.findAll(spec, pageable);
 
+        // Fetch data
+        Page<FreePattern> page;
+        try {
+            page = freePatternRepo.findAll(spec, pageable);
+        } catch (Exception e) {
+            throw new RuntimeException("Database query failed", e);
+        }
+
+        // Map entity objects to response objects
         List<FreePatternResponse> contents = FreePatternMapper.INSTANCE.toResponses(page.getContent());
 
+        // Build response
         return PaginatedFreePatternResponse.builder()
                 .contents(contents)
                 .pageNo(page.getNumber())

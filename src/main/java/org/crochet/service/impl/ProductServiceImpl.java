@@ -25,6 +25,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -102,12 +103,13 @@ public class ProductServiceImpl implements ProductService {
      */
     @Override
     public ProductPaginationResponse getProducts(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters) {
-        GenericFilter<Product> filter = GenericFilter.create(filters);
-        var spec = filter.build();
+        Specification<Product> spec = Specification.where(null);
+        if (filters != null && filters.length > 0) {
+            GenericFilter<Product> filter = GenericFilter.create(filters);
+            spec = filter.build();
+        }
 
-        Sort sort = Sort.by(sortBy);
-        sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? sort.ascending() : sort.descending();
-
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
         Page<Product> menuPage = productRepo.findAll(spec, pageable);
 

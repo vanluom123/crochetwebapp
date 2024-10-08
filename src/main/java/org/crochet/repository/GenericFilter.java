@@ -9,7 +9,6 @@ import jakarta.persistence.criteria.Subquery;
 import org.crochet.enumerator.FilterLogic;
 import org.crochet.model.Category;
 import org.crochet.payload.request.Filter;
-import org.crochet.util.ObjectUtils;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;
@@ -52,35 +51,32 @@ public class GenericFilter<T> {
     private final FilterNode rootNode;
 
     /**
-     * Create generic filter
+     * Creates a GenericFilter object from an array of Filter objects.
      *
-     * @param filters List
-     * @param <T>     BaseEntity
-     * @return GenericFilter
+     * @param filters An array of Filter objects containing filter logic and criteria.
+     * @return A GenericFilter object with the specified filters applied.
      */
     public static <T> GenericFilter<T> create(Filter[] filters) {
-        GenericFilter<T> filter = new GenericFilter<>();
-        if (ObjectUtils.isEmpty(filters)) {
-            return filter;
+        GenericFilter<T> genericFilter = new GenericFilter<>();
+        if (isEmpty(filters)) {
+            return genericFilter;
         }
-        FilterNode root = filter.getRoot();
-        root.addAllChildren(Stream.of(filters)
-                .filter(f -> ObjectUtils.isNotEmpty(f.getFilterCriteria()))
-                .map(f -> {
-                    FilterNode node = new FilterNode(f.getFilterLogic());
-                    node.addAllChildren(f.getFilterCriteria().stream()
-                            .map(FilterNode::new)
-                            .toList());
-                    return node;
-                })
-                .toList());
-        return filter;
+
+        FilterNode rootNode = genericFilter.getRoot();
+        List<FilterNode> filterNodes = Stream.of(filters)
+                .parallel()
+                .filter(GenericFilter::hasFilterCriteria)
+                .map(GenericFilter::createFilterNode)
+                .toList();
+        rootNode.addAllChildren(filterNodes);
+
+        return genericFilter;
     }
 
     /**
      * Constructor
      */
-    public GenericFilter() {
+    private GenericFilter() {
         this.rootNode = new FilterNode(FilterLogic.ALL);
     }
 
@@ -89,7 +85,7 @@ public class GenericFilter<T> {
      *
      * @return FilterNode
      */
-    public FilterNode getRoot() {
+    private FilterNode getRoot() {
         return rootNode;
     }
 
@@ -103,6 +99,42 @@ public class GenericFilter<T> {
     }
 
     /**
+     * Checks if the array of filters is empty or null.
+     *
+     * @param filters An array of filters to check.
+     * @return true if the filters array is null or has no elements; false otherwise.
+     */
+    private static boolean isEmpty(Filter[] filters) {
+        return filters == null || filters.length == 0;
+    }
+
+    /**
+     * Determines if a given filter contains any filter criteria.
+     *
+     * @param filter the Filter object to be checked.
+     * @return true if the filter contains criteria; false otherwise.
+     */
+    private static boolean hasFilterCriteria(Filter filter) {
+        return !filter.getFilterCriteria().isEmpty();
+    }
+
+    /**
+     * Creates a FilterNode from a given Filter object.
+     *
+     * @param filter the Filter object containing filter logic and criteria.
+     * @return a FilterNode representing the root of the filter tree with its child nodes.
+     */
+    private static FilterNode createFilterNode(Filter filter) {
+        FilterNode parentNode = new FilterNode(filter.getFilterLogic());
+        List<FilterNode> childNodes = filter.getFilterCriteria().stream()
+                .parallel()
+                .map(FilterNode::new)
+                .toList();
+        parentNode.addAllChildren(childNodes);
+        return parentNode;
+    }
+
+    /**
      * Build predicate
      *
      * @param node            FilterNode
@@ -111,7 +143,7 @@ public class GenericFilter<T> {
      * @return Predicate
      */
     private Predicate buildPredicate(FilterNode node, Root<T> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
-        List<Predicate> predicates = new ArrayList<>();
+        List<Predicate> predicates = new ArrayList<>(node.getChildren().size());
 
         for (FilterNode child : node.getChildren()) {
             if (child.getCriteria() != null) {
@@ -122,7 +154,7 @@ public class GenericFilter<T> {
         }
 
         if (predicates.isEmpty()) {
-            return null;
+            return criteriaBuilder.conjunction();
         }
 
         return node.getLogic() == FilterLogic.ALL
@@ -138,6 +170,7 @@ public class GenericFilter<T> {
      * @param criteriaBuilder CriteriaBuilder
      * @return Predicate
      */
+    @SuppressWarnings({"unchecked", "rawtypes"})
     private Predicate createPredicate(FilterCriteria criteria, Root<T> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
         return switch (criteria.getOperation()) {
             case EQUAL -> criteriaBuilder.equal(getPath(root, criteria.getKey()), parseValue(root, criteria));
@@ -197,13 +230,46 @@ public class GenericFilter<T> {
         Class<?> fieldType = getPath(root, criteria.getKey()).getJavaType();
         Object value = criteria.getValue();
 
-        if (fieldType.isEnum() && value instanceof String) {
-            return Enum.valueOf((Class<Enum>) fieldType, (String) value);
-        } else if ((LocalDateTime.class.isAssignableFrom(fieldType) || LocalDate.class.isAssignableFrom(fieldType)) && value instanceof String) {
-            return parseDateTime((String) value, LocalDateTime.class.isAssignableFrom(fieldType));
+        if (isEnumType(fieldType, value)) {
+            return parseEnumValue(fieldType, (String) value);
+        } else if (isDateTimeType(fieldType, value)) {
+            return parseDateTime((String) value, fieldType.isAssignableFrom(LocalDateTime.class));
         }
-
         return value;
+    }
+
+    /**
+     * Determines if a given field type is an enumeration and the value is a string.
+     *
+     * @param fieldType the Class object representing the field type.
+     * @param value the value to check.
+     * @return true if the field type is an enumeration and the value is a string; false otherwise.
+     */
+    private boolean isEnumType(Class<?> fieldType, Object value) {
+        return fieldType.isEnum() && value instanceof String;
+    }
+
+    /**
+     * Parses the provided string value into an Enum of the specified field type.
+     *
+     * @param fieldType the Class object representing the Enum type.
+     * @param value the string value to be converted to an Enum constant.
+     * @return the Enum constant corresponding to the provided string value.
+     */
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private Object parseEnumValue(Class<?> fieldType, String value) {
+        return Enum.valueOf((Class<Enum>) fieldType, value);
+    }
+
+    /**
+     * Determines if a given field type is a LocalDateTime or LocalDate and the value is a string.
+     *
+     * @param fieldType the Class object representing the field type.
+     * @param value the value to check.
+     * @return true if the field type is a LocalDateTime or LocalDate and the value is a string; false otherwise.
+     */
+    private boolean isDateTimeType(Class<?> fieldType, Object value) {
+        return (LocalDateTime.class.isAssignableFrom(fieldType) || LocalDate.class.isAssignableFrom(fieldType)) && value instanceof String;
     }
 
     /**
