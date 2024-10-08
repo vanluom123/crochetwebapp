@@ -369,7 +369,7 @@ public class AuthServiceImpl implements AuthService {
                 .map(user -> {
                     String accessToken = jwtTokenService.generateToken(user.getEmail());
                     return TokenResponse.builder()
-                            .jwtToken(accessToken)
+                            .accessToken(accessToken)
                             .refreshToken(refreshToken)
                             .build();
                 }).orElseThrow(() ->
