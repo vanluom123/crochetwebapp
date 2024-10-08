@@ -10,7 +10,6 @@ import org.crochet.mapper.ProductMapper;
 import org.crochet.model.Product;
 import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.ProductRequest;
-import org.crochet.payload.response.ProductDetailResponse;
 import org.crochet.payload.response.ProductPaginationResponse;
 import org.crochet.payload.response.ProductResponse;
 import org.crochet.repository.CategoryRepo;
@@ -154,12 +153,12 @@ public class ProductServiceImpl implements ProductService {
      * @return A {@link ProductResponse} containing detailed information about the product.
      */
     @Override
-    public ProductDetailResponse getDetail(String id) {
+    public ProductResponse getDetail(String id) {
         var product = productRepo.getDetail(id).orElseThrow(
                 () -> new ResourceNotFoundException(MessageConstant.MSG_PRODUCT_NOT_FOUND,
                         MAP_CODE.get(MessageConstant.MSG_PRODUCT_NOT_FOUND))
         );
-        return ProductMapper.INSTANCE.toProductDetailResponse(product);
+        return ProductMapper.INSTANCE.toResponse(product);
     }
 
     /**

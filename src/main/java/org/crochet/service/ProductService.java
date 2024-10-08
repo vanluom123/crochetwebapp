@@ -2,7 +2,6 @@ package org.crochet.service;
 
 import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.ProductRequest;
-import org.crochet.payload.response.ProductDetailResponse;
 import org.crochet.payload.response.ProductPaginationResponse;
 import org.crochet.payload.response.ProductResponse;
 
@@ -15,7 +14,7 @@ public interface ProductService {
 
     List<ProductResponse> getLimitedProducts();
 
-    ProductDetailResponse getDetail(String id);
+    ProductResponse getDetail(String id);
 
     void delete(String id);
 }

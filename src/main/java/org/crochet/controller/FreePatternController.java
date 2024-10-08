@@ -9,7 +9,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.crochet.constant.AppConstant;
 import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.FreePatternRequest;
-import org.crochet.payload.response.FreeChartDetailResponse;
 import org.crochet.payload.response.FreePatternResponse;
 import org.crochet.payload.response.PaginatedFreePatternResponse;
 import org.crochet.service.FreePatternService;
@@ -49,9 +48,9 @@ public class FreePatternController {
     @Operation(summary = "Get pattern details by ID")
     @ApiResponse(responseCode = "200", description = "Pattern details retrieved successfully",
             content = @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = FreeChartDetailResponse.class)))
+                    schema = @Schema(implementation = FreePatternResponse.class)))
     @GetMapping("/detail")
-    public ResponseEntity<FreeChartDetailResponse> getDetail(
+    public ResponseEntity<FreePatternResponse> getDetail(
             @Parameter(description = "ID of the pattern to retrieve")
             @RequestParam("id") String id) {
         return ResponseEntity.ok(freePatternService.getDetail(id));

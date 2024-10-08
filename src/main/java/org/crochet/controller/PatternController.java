@@ -9,7 +9,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.crochet.constant.AppConstant;
 import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.PatternRequest;
-import org.crochet.payload.response.PatternDetailResponse;
 import org.crochet.payload.response.PatternPaginationResponse;
 import org.crochet.payload.response.PatternResponse;
 import org.crochet.service.PatternService;
@@ -72,9 +71,9 @@ public class PatternController {
     @Operation(summary = "Get pattern details by ID")
     @ApiResponse(responseCode = "200", description = "Pattern details retrieved successfully",
             content = @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = PatternDetailResponse.class)))
+                    schema = @Schema(implementation = PatternResponse.class)))
     @GetMapping("/detail")
-    public ResponseEntity<PatternDetailResponse> getDetail(
+    public ResponseEntity<PatternResponse> getDetail(
             @Parameter(description = "ID of the pattern to retrieve")
             @RequestParam("id") String id) {
         return ResponseEntity.ok(patternService.getDetail(id));

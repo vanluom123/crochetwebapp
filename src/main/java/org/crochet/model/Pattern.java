@@ -20,7 +20,7 @@ import lombok.experimental.SuperBuilder;
 import org.crochet.enumerator.CurrencyCode;
 import org.hibernate.annotations.BatchSize;
 
-import java.util.Set;
+import java.util.List;
 
 @Getter
 @Setter
@@ -68,7 +68,7 @@ public class Pattern extends BaseEntity {
             @AttributeOverride(name = "fileName", column = @Column(name = "file_name")),
             @AttributeOverride(name = "fileContent", column = @Column(name = "file_content", columnDefinition = "TEXT"))
     })
-    private Set<File> files;
+    private List<File> files;
 
     @BatchSize(size = 10)
     @ElementCollection
@@ -78,5 +78,5 @@ public class Pattern extends BaseEntity {
             @AttributeOverride(name = "fileName", column = @Column(name = "file_name")),
             @AttributeOverride(name = "fileContent", column = @Column(name = "file_content"))
     })
-    private Set<File> images;
+    private List<File> images;
 }
