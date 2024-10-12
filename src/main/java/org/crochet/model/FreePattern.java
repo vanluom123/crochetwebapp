@@ -21,6 +21,7 @@ import org.crochet.enumerator.ChartStatus;
 import org.hibernate.annotations.BatchSize;
 
 import java.util.Set;
+import java.util.List;
 
 @Getter
 @Setter
@@ -76,5 +77,5 @@ public class FreePattern extends BaseEntity {
             @AttributeOverride(name = "fileContent", column = @Column(name = "file_content", columnDefinition = "TEXT"))
 
     })
-    private Set<File> images;
+    private List<File> images;
 }

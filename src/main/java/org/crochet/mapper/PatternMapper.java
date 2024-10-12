@@ -2,7 +2,6 @@ package org.crochet.mapper;
 
 import org.crochet.model.Pattern;
 import org.crochet.payload.request.PatternRequest;
-import org.crochet.payload.response.PatternDetailResponse;
 import org.crochet.payload.response.PatternResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -20,9 +19,8 @@ public interface PatternMapper extends PartialUpdate<Pattern, PatternRequest> {
     PatternMapper INSTANCE = Mappers.getMapper(PatternMapper.class);
 
     @Mapping(target = "isHome", source = "home")
+    @Mapping(target = "currencyCode", source = "currencyCode")
     PatternResponse toResponse(Pattern pattern);
-
-    PatternDetailResponse toPatternDetailResponse(Pattern pattern);
 
     List<PatternResponse> toResponses(Collection<Pattern> patterns);
 }
