@@ -84,4 +84,11 @@ public class User extends BaseEntity {
             fetch = FetchType.LAZY,
             orphanRemoval = true)
     private List<SavingChart> savingCharts;
+
+    @BatchSize(size = 10)
+    @OneToMany(mappedBy = "user",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY,
+            orphanRemoval = true)
+    private List<Collection> collections;
 }

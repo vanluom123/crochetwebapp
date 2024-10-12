@@ -19,3 +19,5 @@ databaseChangeLog:
       file: src/main/resources/db/migration/2024-09-25-add-saved-chart-table.yaml
   - include:
       file: src/main/resources/db/migration/2024-09-28-add-saved-column-free-pattern.yaml
+  - include:
+      file: src/main/resources/db/migration/2024-10-12-create-collection-table.yaml

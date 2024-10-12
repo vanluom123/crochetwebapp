@@ -1,0 +1,74 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1728745441492-1
+      author: pvanluom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_collection
+                  name: id
+                  type: VARCHAR(255)
+              - column:
+                  name: created_by
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: created_date
+                  type: DATETIME
+              - column:
+                  name: last_modified_by
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: last_modified_date
+                  type: DATETIME
+              - column:
+                  constraints:
+                    nullable: false
+                  name: name
+                  type: VARCHAR(255)
+              - column:
+                  name: user_id
+                  type: VARCHAR(255)
+            tableName: collection
+  - changeSet:
+      id: 1728745441492-2
+      author: pvanluom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  name: collection_id
+                  type: VARCHAR(255)
+            tableName: saving_chart
+  - changeSet:
+      id: 1728745441492-3
+      author: pvanluom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: collection
+            constraintName: FK_COLLECTION_ON_USER
+            referencedColumnNames: id
+            referencedTableName: users
+  - changeSet:
+      id: 1728745441492-4
+      author: pvanluom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: collection_id
+            baseTableName: saving_chart
+            constraintName: FK_SAVING_CHART_ON_COLLECTION
+            referencedColumnNames: id
+            referencedTableName: collection
+
