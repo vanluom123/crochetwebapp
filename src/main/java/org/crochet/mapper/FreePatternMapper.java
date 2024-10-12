@@ -2,7 +2,6 @@ package org.crochet.mapper;
 
 import org.crochet.model.FreePattern;
 import org.crochet.payload.request.FreePatternRequest;
-import org.crochet.payload.response.FreeChartDetailResponse;
 import org.crochet.payload.response.FreePatternResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -21,9 +20,6 @@ public interface FreePatternMapper extends PartialUpdate<FreePattern, FreePatter
 
     @Mapping(target = "isHome", source = "home")
     FreePatternResponse toResponse(FreePattern pattern);
-
-    @Mapping(target = "home", source = "home")
-    FreeChartDetailResponse toFreeChartDetailResponse(FreePattern pattern);
 
     List<FreePatternResponse> toResponses(Collection<FreePattern> freePatterns);
 }

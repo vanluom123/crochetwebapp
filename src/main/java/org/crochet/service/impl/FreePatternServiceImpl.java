@@ -10,7 +10,6 @@ import org.crochet.mapper.FreePatternMapper;
 import org.crochet.model.FreePattern;
 import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.FreePatternRequest;
-import org.crochet.payload.response.FreeChartDetailResponse;
 import org.crochet.payload.response.FreePatternResponse;
 import org.crochet.payload.response.PaginatedFreePatternResponse;
 import org.crochet.repository.CategoryRepo;
@@ -78,7 +77,7 @@ public class FreePatternServiceImpl implements FreePatternService {
                     .content(request.getContent())
                     .status(request.getStatus())
                     .files(FileMapper.INSTANCE.toSetEntities(request.getFiles()))
-                    .images(FileMapper.INSTANCE.toSetEntities(request.getImages()))
+                    .images(FileMapper.INSTANCE.toEntities(request.getImages()))
                     .build();
         } else {
             freePattern = freePatternRepo.findById(request.getId()).orElseThrow(
@@ -180,12 +179,12 @@ public class FreePatternServiceImpl implements FreePatternService {
      * @return A {@link FreePatternResponse} containing detailed information about the FreePattern.
      */
     @Override
-    public FreeChartDetailResponse getDetail(String id) {
+    public FreePatternResponse getDetail(String id) {
         var freePattern = freePatternRepo.getDetail(id).orElseThrow(
                 () -> new ResourceNotFoundException(MessageConstant.MSG_FREE_PATTERN_NOT_FOUND,
                         MAP_CODE.get(MessageConstant.MSG_FREE_PATTERN_NOT_FOUND))
         );
-        return FreePatternMapper.INSTANCE.toFreeChartDetailResponse(freePattern);
+        return FreePatternMapper.INSTANCE.toResponse(freePattern);
     }
 
     @Transactional

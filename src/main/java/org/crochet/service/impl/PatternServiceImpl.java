@@ -10,7 +10,6 @@ import org.crochet.mapper.PatternMapper;
 import org.crochet.model.Pattern;
 import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.PatternRequest;
-import org.crochet.payload.response.PatternDetailResponse;
 import org.crochet.payload.response.PatternPaginationResponse;
 import org.crochet.payload.response.PatternResponse;
 import org.crochet.repository.CategoryRepo;
@@ -74,7 +73,7 @@ public class PatternServiceImpl implements PatternService {
                     .link(request.getLink())
                     .content(request.getContent())
                     .files(FileMapper.INSTANCE.toSetEntities(request.getFiles()))
-                    .images(FileMapper.INSTANCE.toSetEntities(request.getImages()))
+                    .images(FileMapper.INSTANCE.toEntities(request.getImages()))
                     .build();
         } else {
             pattern = patternRepo.findById(request.getId()).orElseThrow(
@@ -145,12 +144,12 @@ public class PatternServiceImpl implements PatternService {
      * @return PatternResponse
      */
     @Override
-    public PatternDetailResponse getDetail(String id) {
+    public PatternResponse getDetail(String id) {
         var pattern = patternRepo.getDetail(id).orElseThrow(
                 () -> new ResourceNotFoundException(MessageConstant.MSG_PATTERN_NOT_FOUND,
                         MAP_CODE.get(MessageConstant.MSG_PATTERN_NOT_FOUND))
         );
-        return PatternMapper.INSTANCE.toPatternDetailResponse(pattern);
+        return PatternMapper.INSTANCE.toResponse(pattern);
     }
 
     /**

@@ -2,7 +2,6 @@ package org.crochet.service;
 
 import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.FreePatternRequest;
-import org.crochet.payload.response.FreeChartDetailResponse;
 import org.crochet.payload.response.FreePatternResponse;
 import org.crochet.payload.response.PaginatedFreePatternResponse;
 
@@ -15,7 +14,7 @@ public interface FreePatternService {
 
     List<FreePatternResponse> getLimitedFreePatterns();
 
-    FreeChartDetailResponse getDetail(String id);
+    FreePatternResponse getDetail(String id);
 
     void delete(String id);
 }
