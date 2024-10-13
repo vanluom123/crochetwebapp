@@ -1,0 +1,1587 @@
+{
+    "info": {
+        "name": "Crochet API",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "SavingChart",
+            "item": [
+                {
+                    "name": "Create Saving Chart",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/saving-free-pattern/create?free_pattern_id={{free_pattern_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "saving-free-pattern",
+                                "create"
+                            ],
+                            "query": [
+                                {
+                                    "key": "free_pattern_id",
+                                    "value": "{{free_pattern_id}}"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Delete Saving Chart",
+                    "request": {
+                        "method": "DELETE",
+                        "url": {
+                            "raw": "{{base_url}}/saving-free-pattern/delete/{{id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "saving-free-pattern",
+                                "delete",
+                                "{{id}}"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Pattern",
+            "item": [
+                {
+                    "name": "Create Pattern",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  // Add pattern request body here\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/pattern/create",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "pattern",
+                                "create"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Patterns",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "[\n  // Add filters here\n]"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/pattern/pagination?pageNo=0&pageSize=10&sortBy=id&sortDir=ASC",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "pattern",
+                                "pagination"
+                            ],
+                            "query": [
+                                {
+                                    "key": "pageNo",
+                                    "value": "0"
+                                },
+                                {
+                                    "key": "pageSize",
+                                    "value": "10"
+                                },
+                                {
+                                    "key": "sortBy",
+                                    "value": "id"
+                                },
+                                {
+                                    "key": "sortDir",
+                                    "value": "ASC"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Pattern Detail",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/pattern/detail?id={{pattern_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "pattern",
+                                "detail"
+                            ],
+                            "query": [
+                                {
+                                    "key": "id",
+                                    "value": "{{pattern_id}}"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Delete Pattern",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/pattern/delete?id={{pattern_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "pattern",
+                                "delete"
+                            ],
+                            "query": [
+                                {
+                                    "key": "id",
+                                    "value": "{{pattern_id}}"
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Product",
+            "item": [
+                {
+                    "name": "Create Product",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  // Add product request body here\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/product/create",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "product",
+                                "create"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Products",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "[\n  // Add filters here\n]"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/product/pagination?pageNo=0&pageSize=10&sortBy=id&sortDir=ASC",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "product",
+                                "pagination"
+                            ],
+                            "query": [
+                                {
+                                    "key": "pageNo",
+                                    "value": "0"
+                                },
+                                {
+                                    "key": "pageSize",
+                                    "value": "10"
+                                },
+                                {
+                                    "key": "sortBy",
+                                    "value": "id"
+                                },
+                                {
+                                    "key": "sortDir",
+                                    "value": "ASC"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Product Detail",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/product/detail?id={{product_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "product",
+                                "detail"
+                            ],
+                            "query": [
+                                {
+                                    "key": "id",
+                                    "value": "{{product_id}}"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Delete Product",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/product/delete?id={{product_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "product",
+                                "delete"
+                            ],
+                            "query": [
+                                {
+                                    "key": "id",
+                                    "value": "{{product_id}}"
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "User",
+            "item": [
+                {
+                    "name": "Get Users",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "[\n  // Add filters here\n]"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/users/pagination?pageNo=0&pageSize=10&sortBy=id&sortDir=ASC",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "users",
+                                "pagination"
+                            ],
+                            "query": [
+                                {
+                                    "key": "pageNo",
+                                    "value": "0"
+                                },
+                                {
+                                    "key": "pageSize",
+                                    "value": "10"
+                                },
+                                {
+                                    "key": "sortBy",
+                                    "value": "id"
+                                },
+                                {
+                                    "key": "sortDir",
+                                    "value": "ASC"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Update User",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  // Add user update request body here\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/users/update",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "users",
+                                "update"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get User Detail",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/users/detail?id={{user_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "users",
+                                "detail"
+                            ],
+                            "query": [
+                                {
+                                    "key": "id",
+                                    "value": "{{user_id}}"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Delete User",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/users/delete?id={{user_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "users",
+                                "delete"
+                            ],
+                            "query": [
+                                {
+                                    "key": "id",
+                                    "value": "{{user_id}}"
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Free Pattern",
+            "item": [
+                {
+                    "name": "Create Free Pattern",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"id\": \"string\",\n  \"category_id\": \"string\",\n  \"name\": \"string\",\n  \"description\": \"string\",\n  \"author\": \"string\",\n  \"is_home\": true,\n  \"link\": \"string\",\n  \"content\": \"string\",\n  \"status\": \"SUCCESS\",\n  \"images\": [\n    {\n      \"fileName\": \"string\",\n      \"fileContent\": \"string\"\n    }\n  ],\n  \"files\": [\n    {\n      \"fileName\": \"string\",\n      \"fileContent\": \"string\"\n    }\n  ]\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/free-pattern/create",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "free-pattern",
+                                "create"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Free Pattern Detail",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/free-pattern/detail?id={{free_pattern_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "free-pattern",
+                                "detail"
+                            ],
+                            "query": [
+                                {
+                                    "key": "id",
+                                    "value": "{{free_pattern_id}}"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Delete Free Pattern",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/free-pattern/delete?id={{free_pattern_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "free-pattern",
+                                "delete"
+                            ],
+                            "query": [
+                                {
+                                    "key": "id",
+                                    "value": "{{free_pattern_id}}"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get All Free Patterns",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "[\n  // Add filters here\n]"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/free-pattern/pagination?pageNo=0&pageSize=10&sortBy=id&sortDir=ASC",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "free-pattern",
+                                "pagination"
+                            ],
+                            "query": [
+                                {
+                                    "key": "pageNo",
+                                    "value": "0"
+                                },
+                                {
+                                    "key": "pageSize",
+                                    "value": "10"
+                                },
+                                {
+                                    "key": "sortBy",
+                                    "value": "id"
+                                },
+                                {
+                                    "key": "sortDir",
+                                    "value": "ASC"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get All Saved Patterns By User",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "[\n  // Add filters here\n]"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/free-pattern/getAllSavedPatternByUser?pageNo=0&pageSize=10&sortBy=id&sortDir=ASC",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "free-pattern",
+                                "getAllSavedPatternByUser"
+                            ],
+                            "query": [
+                                {
+                                    "key": "pageNo",
+                                    "value": "0"
+                                },
+                                {
+                                    "key": "pageSize",
+                                    "value": "10"
+                                },
+                                {
+                                    "key": "sortBy",
+                                    "value": "id"
+                                },
+                                {
+                                    "key": "sortDir",
+                                    "value": "ASC"
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Blog Category",
+            "item": [
+                {
+                    "name": "Create Blog Category",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  // Add blog category request body here\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/blog-categories/create",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "blog-categories",
+                                "create"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Update Blog Category",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  // Add blog category update request body here\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/blog-categories/update",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "blog-categories",
+                                "update"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Delete Blog Category",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/blog-categories/delete/{{blog_category_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "blog-categories",
+                                "delete",
+                                "{{blog_category_id}}"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Blog Category Detail",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/blog-categories/detail/{{blog_category_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "blog-categories",
+                                "detail",
+                                "{{blog_category_id}}"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get All Blog Categories",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/blog-categories",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "blog-categories"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Category",
+            "item": [
+                {
+                    "name": "Create Category",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  // Add category creation request body here\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/category/create",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "category",
+                                "create"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Update Category",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  // Add category update request body here\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/category/update",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "category",
+                                "update"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get All Categories",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/category/get-all-categories",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "category",
+                                "get-all-categories"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Category By ID",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/category/getById?id={{category_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "category",
+                                "getById"
+                            ],
+                            "query": [
+                                {
+                                    "key": "id",
+                                    "value": "{{category_id}}"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Delete Category",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/category/delete?id={{category_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "category",
+                                "delete"
+                            ],
+                            "query": [
+                                {
+                                    "key": "id",
+                                    "value": "{{category_id}}"
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Blog",
+            "item": [
+                {
+                    "name": "Create or Update Blog Post",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  // Add blog post request body here\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/blog/create",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "blog",
+                                "create"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Blogs",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "[\n  // Add filters here\n]"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/blog/pagination?pageNo=0&pageSize=10&sortBy=id&sortDir=ASC",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "blog",
+                                "pagination"
+                            ],
+                            "query": [
+                                {
+                                    "key": "pageNo",
+                                    "value": "0"
+                                },
+                                {
+                                    "key": "pageSize",
+                                    "value": "10"
+                                },
+                                {
+                                    "key": "sortBy",
+                                    "value": "id"
+                                },
+                                {
+                                    "key": "sortDir",
+                                    "value": "ASC"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Blog Detail",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/blog/detail?id={{blog_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "blog",
+                                "detail"
+                            ],
+                            "query": [
+                                {
+                                    "key": "id",
+                                    "value": "{{blog_id}}"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Delete Blog Post",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/blog/delete?id={{blog_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "blog",
+                                "delete"
+                            ],
+                            "query": [
+                                {
+                                    "key": "id",
+                                    "value": "{{blog_id}}"
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Setting",
+            "item": [
+                {
+                    "name": "Get Settings",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/setting",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "setting"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Create Setting",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  // Add setting request body here\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/setting/create",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "setting",
+                                "create"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Update Setting",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  // Add setting update request body here\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/setting/update",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "setting",
+                                "update"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Home",
+            "item": [
+                {
+                    "name": "Get Home Page Data",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/home",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "home"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Comment",
+            "item": [
+                {
+                    "name": "Create Comment",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  // Add comment request body here\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/comment/create",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "comment",
+                                "create"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Banner",
+            "item": [
+                {
+                    "name": "Batch Insert or Update Banners",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "[\n  // Add banner request bodies here\n]"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/banner/batchInsertOrUpdate",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "banner",
+                                "batchInsertOrUpdate"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get All Banners",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/banner/getAll",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "banner",
+                                "getAll"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Banner Type",
+            "item": [
+                {
+                    "name": "Create or Update Banner Type",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  // Add banner type request body here\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/banner-type/createOrUpdate",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "banner-type",
+                                "createOrUpdate"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Delete Banner Type",
+                    "request": {
+                        "method": "DELETE",
+                        "url": {
+                            "raw": "{{base_url}}/banner-type/delete/{{banner_type_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "banner-type",
+                                "delete",
+                                "{{banner_type_id}}"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get All Banner Types",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/banner-type/getAll",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "banner-type",
+                                "getAll"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Banner Type By ID",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/banner-type/getById/{{banner_type_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "banner-type",
+                                "getById",
+                                "{{banner_type_id}}"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Auth",
+            "item": [
+                {
+                    "name": "Login",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n \"email\": \"user@example.com\",\n \"password\": \"password123\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/auth/login",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "login"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Register User",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n \"name\": \"John Doe\",\n \"email\": \"johndoe@example.com\",\n \"password\": \"password123\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/auth/signup",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "signup"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Confirm Registration",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/auth/confirm?token={{confirmation_token}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "confirm"
+                            ],
+                            "query": [
+                                {
+                                    "key": "token",
+                                    "value": "{{confirmation_token}}"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Resend Verification Email",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/auth/resendVerificationEmail?email={{user_email}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "resendVerificationEmail"
+                            ],
+                            "query": [
+                                {
+                                    "key": "email",
+                                    "value": "{{user_email}}"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Request Password Reset",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/auth/password-reset-request?email={{user_email}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "password-reset-request"
+                            ],
+                            "query": [
+                                {
+                                    "key": "email",
+                                    "value": "{{user_email}}"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Reset Password",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n \"newPassword\": \"newpassword123\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/auth/reset-password?passwordResetToken={{password_reset_token}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "reset-password"
+                            ],
+                            "query": [
+                                {
+                                    "key": "passwordResetToken",
+                                    "value": "{{password_reset_token}}"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Refresh Token",
+                    "request": {
+                        "method": "POST",
+                        "url": {
+                            "raw": "{{base_url}}/auth/refresh-token?refreshToken={{refresh_token}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "refresh-token"
+                            ],
+                            "query": [
+                                {
+                                    "key": "refreshToken",
+                                    "value": "{{refresh_token}}"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Logout",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/auth/logout",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "logout"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Create or Update Collection",
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"name\": \"My Collection\",\n  \"userId\": \"user123\",\n  \"savingChartIds\": [\"chart1\", \"chart2\"]\n}"
+              },
+              "url": {
+                "raw": "{{base_url}}/api/collections/createOrUpdate",
+                "host": ["{{base_url}}"],
+                "path": ["api", "collections", "createOrUpdate"]
+              }
+            }
+          },
+          {
+            "name": "Get All Collections",
+            "request": {
+              "method": "GET",
+              "url": {
+                "raw": "{{base_url}}/api/collections",
+                "host": ["{{base_url}}"],
+                "path": ["api", "collections"]
+              }
+            }
+          },
+          {
+            "name": "Get Collections by User ID",
+            "request": {
+              "method": "GET",
+              "url": {
+                "raw": "{{base_url}}/api/collections/user/{{userId}}",
+                "host": ["{{base_url}}"],
+                "path": ["api", "collections", "user", "{{userId}}"]
+              }
+            }
+          },
+          {
+            "name": "Get Collection by ID",
+            "request": {
+              "method": "GET",
+              "url": {
+                "raw": "{{base_url}}/api/collections/{{collectionId}}",
+                "host": ["{{base_url}}"],
+                "path": ["api", "collections", "{{collectionId}}"]
+              }
+            }
+          },
+          {
+            "name": "Delete Collection",
+            "request": {
+              "method": "DELETE",
+              "url": {
+                "raw": "{{base_url}}/api/collections/{{collectionId}}",
+                "host": ["{{base_url}}"],
+                "path": ["api", "collections", "{{collectionId}}"]
+              }
+            }
+        }
+    ],
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost:8080"
+        }
+    ]
+}
