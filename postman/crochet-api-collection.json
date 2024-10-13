@@ -76,7 +76,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n  // Add pattern request body here\n}"
+                           "raw": "{\n  \"id\": \"string\",\n  \"category_id\": \"string\",\n  \"name\": \"string\",\n  \"description\": \"string\",\n  \"price\": 0,\n  \"currency_code\": \"USD\",\n  \"is_home\": true,\n  \"link\": \"string\",\n  \"content\": \"string\",\n  \"images\": [\n    {\n      \"fileName\": \"string\",\n      \"fileContent\": \"string\"\n    }\n  ],\n  \"files\": [\n    {\n      \"fileName\": \"string\",\n      \"fileContent\": \"string\"\n    }\n  ]\n}"
                         },
                         "url": {
                             "raw": "{{base_url}}/pattern/create",
@@ -209,7 +209,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n  // Add product request body here\n}"
+"raw": "{\n  \"id\": \"string\",\n  \"category_id\": \"string\",\n  \"name\": \"string\",\n  \"description\": \"string\",\n  \"price\": 0,\n  \"currency_code\": \"USD\",\n  \"is_home\": true,\n  \"link\": \"string\",\n  \"content\": \"string\",\n  \"images\": [\n    {\n      \"fileName\": \"string\",\n      \"fileContent\": \"string\"\n    }\n  ]\n}"
                         },
                         "url": {
                             "raw": "{{base_url}}/product/create",
@@ -653,7 +653,7 @@
             "name": "Blog Category",
             "item": [
                 {
-                    "name": "Create Blog Category",
+                    "name": "Create or Update Blog Category",
                     "request": {
                         "method": "POST",
                         "header": [
@@ -670,7 +670,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n  // Add blog category request body here\n}"
+                            "raw": "{\n  \"id\": \"{{blog_category_id}}\",\n  \"name\": \"Category Name\"\n}"
                         },
                         "url": {
                             "raw": "{{base_url}}/blog-categories/create",
@@ -680,38 +680,6 @@
                             "path": [
                                 "blog-categories",
                                 "create"
-                            ]
-                        }
-                    }
-                },
-                {
-                    "name": "Update Blog Category",
-                    "request": {
-                        "method": "PUT",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{accessToken}}",
-                                "type": "text"
-                            },
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json",
-                                "type": "text"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n  // Add blog category update request body here\n}"
-                        },
-                        "url": {
-                            "raw": "{{base_url}}/blog-categories/update",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "blog-categories",
-                                "update"
                             ]
                         }
                     }
@@ -728,13 +696,12 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{base_url}}/blog-categories/delete/{{blog_category_id}}",
+                            "raw": "{{base_url}}/blog-categories/{{blog_category_id}}",
                             "host": [
                                 "{{base_url}}"
                             ],
                             "path": [
                                 "blog-categories",
-                                "delete",
                                 "{{blog_category_id}}"
                             ]
                         }
@@ -745,13 +712,12 @@
                     "request": {
                         "method": "GET",
                         "url": {
-                            "raw": "{{base_url}}/blog-categories/detail/{{blog_category_id}}",
+                            "raw": "{{base_url}}/blog-categories/{{blog_category_id}}",
                             "host": [
                                 "{{base_url}}"
                             ],
                             "path": [
                                 "blog-categories",
-                                "detail",
                                 "{{blog_category_id}}"
                             ]
                         }
@@ -795,7 +761,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n  // Add category creation request body here\n}"
+			    "raw": "{\n  \"parentIds\": [\n    \"string\"\n  ],\n  \"name\": \"string\"\n}"
                         },
                         "url": {
                             "raw": "{{base_url}}/category/create",
@@ -827,7 +793,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n  // Add category update request body here\n}"
+			    "raw": "{\n  \"id\": \"string\",\n  \"name\": \"string\"\n}"
                         },
                         "url": {
                             "raw": "{{base_url}}/category/update",
@@ -931,7 +897,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n  // Add blog post request body here\n}"
+                            "raw": "{\n  \"id\": \"string\",\n  \"blogCategoryId\": \"string\",\n  \"title\": \"string\",\n  \"content\": \"string\",\n  \"files\": [\n    {\n      \"fileName\": \"string\",\n      \"fileContent\": \"string\"\n    }\n  ],\n  \"is_home\": true\n}"
                         },
                         "url": {
                             "raw": "{{base_url}}/blog/create",
@@ -1074,7 +1040,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n  // Add setting request body here\n}"
+                            "raw": "{\n  \"key\": \"string\",\n  \"value\": \"string\"\n}"
                         },
                         "url": {
                             "raw": "{{base_url}}/setting/create",
@@ -1158,7 +1124,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n  // Add comment request body here\n}"
+                            "raw": "{\n  \"id\": \"string\",\n  \"blogPostId\": \"string\",\n  \"content\": \"string\"\n}"
                         },
                         "url": {
                             "raw": "{{base_url}}/comment/create",
@@ -1195,7 +1161,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "[\n  // Add banner request bodies here\n]"
+                            "raw": "[\n  {\n    \"id\": \"string\",\n    \"bannerTypeId\": \"string\",\n    \"title\": \"string\",\n    \"content\": \"string\",\n    \"url\": \"string\",\n    \"fileName\": \"string\",\n    \"fileContent\": \"string\",\n    \"active\": true,\n    \"textColor\": \"string\"\n  }\n]"
                         },
                         "url": {
                             "raw": "{{base_url}}/banner/batchInsertOrUpdate",
@@ -1243,7 +1209,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n  // Add banner type request body here\n}"
+                            "raw": "{\n  \"id\": \"string\",\n  \"name\": \"string\"\n}"
                         },
                         "url": {
                             "raw": "{{base_url}}/banner-type/createOrUpdate",

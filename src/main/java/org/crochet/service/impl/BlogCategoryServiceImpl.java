@@ -19,25 +19,9 @@ import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
 @Service
 @RequiredArgsConstructor
 public class BlogCategoryServiceImpl implements BlogCategoryService {
+    
     private final BlogCategoryRepo blogCategoryRepo;
 
-    @Transactional
-    @Override
-    public BlogCategoryResponse create(BlogCategoryRequest request) {
-        BlogCategory blogCategory = new BlogCategory();
-        blogCategory.setName(request.getName());
-        blogCategory = blogCategoryRepo.save(blogCategory);
-        return BlogCategoryMapper.INSTANCE.toResponse(blogCategory);
-    }
-
-    @Transactional
-    @Override
-    public BlogCategoryResponse update(BlogCategoryRequest request) {
-        BlogCategory blogCategory = getById(request.getId());
-        blogCategory.setName(request.getName());
-        blogCategory = blogCategoryRepo.save(blogCategory);
-        return BlogCategoryMapper.INSTANCE.toResponse(blogCategory);
-    }
 
     @Override
     public BlogCategoryResponse getDetail(String id) {
@@ -56,6 +40,25 @@ public class BlogCategoryServiceImpl implements BlogCategoryService {
     public void delete(String id) {
         BlogCategory blogCategory = getById(id);
         blogCategoryRepo.delete(blogCategory);
+    }
+
+    @Transactional
+    @Override
+    public BlogCategoryResponse createOrUpdate(BlogCategoryRequest request) {
+        BlogCategory blogCategory;
+        if (request.getId() == null || request.getId().isEmpty()) {
+            // Create new BlogCategory
+            blogCategory = new BlogCategory();
+        } else {
+            // Update existing BlogCategory
+            blogCategory = blogCategoryRepo.findById(request.getId())
+                .orElseThrow(() -> new ResourceNotFoundException(MessageConstant.MSG_BLOG_CATEGORY_NOT_FOUND,
+                    MAP_CODE.get(MessageConstant.MSG_BLOG_CATEGORY_NOT_FOUND)));
+        }
+        
+        blogCategory.setName(request.getName());
+        blogCategory = blogCategoryRepo.save(blogCategory);
+        return BlogCategoryMapper.INSTANCE.toResponse(blogCategory);
     }
 
     private BlogCategory getById(String id) {
