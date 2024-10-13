@@ -1337,7 +1337,46 @@
                                 "login"
                             ]
                         }
-                    }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "// 1. Check that the status code is 200 (OK)",
+                                    "pm.test(\"Status is OK\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "// 2. If the status is OK, extract the token and set it as an environment variable",
+                                    "if (pm.response.code === 200) {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    var data = jsonData.data; // Access the 'data' property",
+                                    "",
+                                    "    // Check if data exists and contains the tokens",
+                                    "    if (data && data.accessToken && data.refreshToken) {",
+                                    "        pm.environment.set(\"accessToken\", data.accessToken);",
+                                    "        console.log(\"Access Token set successfully: \" + data.accessToken);",
+                                    "",
+                                    "        pm.environment.set(\"refreshToken\", data.refreshToken);",
+                                    "        console.log(\"Refresh Token set successfully: \" + data.refreshToken);",
+                                    "    } else {",
+                                    "        console.log(\"Tokens not found in the response data\");",
+                                    "    }",
+                                    "} else {",
+                                    "    console.log(\"Status code is not OK\");",
+                                    "}",
+                                    "",
+                                    "// 3. Additional test for successful login message",
+                                    "pm.test(\"Login successful message\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.message).to.eql(\"Login successful\");",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
                 },
                 {
                     "name": "Register User",
