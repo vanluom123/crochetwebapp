@@ -1513,69 +1513,74 @@
             ]
         },
         {
-            "name": "Create or Update Collection",
-            "request": {
-              "method": "POST",
-              "header": [
+            "name": "Collection",
+            "item": [
                 {
-                  "key": "Content-Type",
-                  "value": "application/json"
+                    "name": "Create or Update Collection",
+                    "request": {
+                      "method": "POST",
+                      "header": [
+                        {
+                          "key": "Content-Type",
+                          "value": "application/json"
+                        }
+                      ],
+                      "body": {
+                        "mode": "raw",
+                        "raw": "{\n  \"name\": \"My Collection\",\n  \"userId\": \"user123\",\n  \"savingChartIds\": [\"chart1\", \"chart2\"]\n}"
+                      },
+                      "url": {
+                        "raw": "{{base_url}}/api/collections/createOrUpdate",
+                        "host": ["{{base_url}}"],
+                        "path": ["api", "collections", "createOrUpdate"]
+                      }
+                    }
+                  },
+                  {
+                    "name": "Get All Collections",
+                    "request": {
+                      "method": "GET",
+                      "url": {
+                        "raw": "{{base_url}}/api/collections",
+                        "host": ["{{base_url}}"],
+                        "path": ["api", "collections"]
+                      }
+                    }
+                  },
+                  {
+                    "name": "Get Collections by User ID",
+                    "request": {
+                      "method": "GET",
+                      "url": {
+                        "raw": "{{base_url}}/api/collections/user/{{userId}}",
+                        "host": ["{{base_url}}"],
+                        "path": ["api", "collections", "user", "{{userId}}"]
+                      }
+                    }
+                  },
+                  {
+                    "name": "Get Collection by ID",
+                    "request": {
+                      "method": "GET",
+                      "url": {
+                        "raw": "{{base_url}}/api/collections/{{collectionId}}",
+                        "host": ["{{base_url}}"],
+                        "path": ["api", "collections", "{{collectionId}}"]
+                      }
+                    }
+                  },
+                  {
+                    "name": "Delete Collection",
+                    "request": {
+                      "method": "DELETE",
+                      "url": {
+                        "raw": "{{base_url}}/api/collections/{{collectionId}}",
+                        "host": ["{{base_url}}"],
+                        "path": ["api", "collections", "{{collectionId}}"]
+                      }
+                    }
                 }
-              ],
-              "body": {
-                "mode": "raw",
-                "raw": "{\n  \"name\": \"My Collection\",\n  \"userId\": \"user123\",\n  \"savingChartIds\": [\"chart1\", \"chart2\"]\n}"
-              },
-              "url": {
-                "raw": "{{base_url}}/api/collections/createOrUpdate",
-                "host": ["{{base_url}}"],
-                "path": ["api", "collections", "createOrUpdate"]
-              }
-            }
-          },
-          {
-            "name": "Get All Collections",
-            "request": {
-              "method": "GET",
-              "url": {
-                "raw": "{{base_url}}/api/collections",
-                "host": ["{{base_url}}"],
-                "path": ["api", "collections"]
-              }
-            }
-          },
-          {
-            "name": "Get Collections by User ID",
-            "request": {
-              "method": "GET",
-              "url": {
-                "raw": "{{base_url}}/api/collections/user/{{userId}}",
-                "host": ["{{base_url}}"],
-                "path": ["api", "collections", "user", "{{userId}}"]
-              }
-            }
-          },
-          {
-            "name": "Get Collection by ID",
-            "request": {
-              "method": "GET",
-              "url": {
-                "raw": "{{base_url}}/api/collections/{{collectionId}}",
-                "host": ["{{base_url}}"],
-                "path": ["api", "collections", "{{collectionId}}"]
-              }
-            }
-          },
-          {
-            "name": "Delete Collection",
-            "request": {
-              "method": "DELETE",
-              "url": {
-                "raw": "{{base_url}}/api/collections/{{collectionId}}",
-                "host": ["{{base_url}}"],
-                "path": ["api", "collections", "{{collectionId}}"]
-              }
-            }
+            ]
         }
     ],
     "variable": [
