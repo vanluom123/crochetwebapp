@@ -1,13 +1,17 @@
 package org.crochet.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
+import org.crochet.constant.MessageConstant;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.model.Collection;
 import org.crochet.model.SavingChart;
+import org.crochet.model.User;
 import org.crochet.payload.request.CollectionRequest;
 import org.crochet.payload.response.CollectionResponse;
 import org.crochet.repository.CollectionRepository;
 import org.crochet.repository.SavingChartRepo;
 import org.crochet.repository.UserRepository;
+import org.crochet.security.UserPrincipal;
 import org.crochet.service.CollectionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +19,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
+
+@Slf4j
 @Service
 public class CollectionServiceImpl implements CollectionService {
 
@@ -32,14 +39,36 @@ public class CollectionServiceImpl implements CollectionService {
 
     @Override
     @Transactional
-    public CollectionResponse saveCollection(CollectionRequest request) {
-        Collection collection = request.getId() != null ? findCollectionById(request.getId()) : new Collection();
+    public CollectionResponse saveCollection(CollectionRequest request, UserPrincipal principal) {
+        if (principal == null) {
+            throw new ResourceNotFoundException(MessageConstant.MSG_USER_LOGIN_REQUIRED,
+                    MAP_CODE.get(MessageConstant.MSG_USER_LOGIN_REQUIRED));
+        }
+
+        User user = userRepository.findById(principal.getId()).get();
+
+        Collection collection;
+        if (request.getId() == null) {
+            collection = new Collection();
+            if (savingChartRepo.existsSavingChartByCollectionNameContains(request.getSavingChartIds(), request.getName())) {
+                log.warn("Chart added to collection");
+                return new CollectionResponse();
+            }
+        } else {
+            collection = collectionRepository.findById(request.getId())
+                    .orElseThrow(() ->
+                            new ResourceNotFoundException("Collection not found"));
+        }
         collection.setName(request.getName());
-        collection.setUser(userRepository.getReferenceById(request.getUserId()));
-        collection.setSavingCharts(savingChartRepo.findAllById(request.getSavingChartIds()));
-        
-        Collection savedCollection = collectionRepository.save(collection);
-        return mapToCollectionResponse(savedCollection);
+        collection.setUser(user);
+        collection = collectionRepository.save(collection);
+        var savingCharts = savingChartRepo.findAllById(request.getSavingChartIds());
+        for (SavingChart savingChart : savingCharts) {
+            savingChart.setCollection(collection);
+        }
+        savingChartRepo.saveAll(savingCharts);
+
+        return mapToCollectionResponse(collection);
     }
 
     @Override
@@ -80,9 +109,6 @@ public class CollectionServiceImpl implements CollectionService {
                 .id(collection.getId())
                 .name(collection.getName())
                 .userId(collection.getUser().getId())
-                .savingChartIds(collection.getSavingCharts().stream()
-                        .map(SavingChart::getId)
-                        .collect(Collectors.toList()))
                 .build();
     }
 }

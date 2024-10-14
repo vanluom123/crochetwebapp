@@ -1,7 +1,5 @@
 package org.crochet.payload.response;
 
-import java.util.List;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,5 +15,4 @@ public class CollectionResponse {
     private String id;
     private String name;
     private String userId;
-    private List<String> savingChartIds;
 }

@@ -2,6 +2,8 @@ package org.crochet.controller;
 
 import org.crochet.payload.request.CollectionRequest;
 import org.crochet.payload.response.CollectionResponse;
+import org.crochet.security.CurrentUser;
+import org.crochet.security.UserPrincipal;
 import org.crochet.service.CollectionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,8 +28,9 @@ public class CollectionController {
     }
 
     @PostMapping("/createOrUpdate")
-    public ResponseEntity<CollectionResponse> createCollection(@RequestBody CollectionRequest request) {
-        CollectionResponse response = collectionService.saveCollection(request);
+    public ResponseEntity<CollectionResponse> createCollection(@RequestBody CollectionRequest request,
+                                                               @CurrentUser UserPrincipal principal) {
+        CollectionResponse response = collectionService.saveCollection(request, principal);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 

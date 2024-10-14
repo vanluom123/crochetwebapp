@@ -38,7 +38,7 @@ public class SavingChartController {
 
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public String deleteSavingChart(@PathVariable String id) {
         savingChartService.deleteChartById(id);
         return "Delete success";

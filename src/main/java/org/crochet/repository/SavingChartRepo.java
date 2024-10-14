@@ -9,24 +9,10 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Repository
 public interface SavingChartRepo extends JpaRepository<SavingChart, String>, JpaSpecificationExecutor<SavingChart> {
-
-    @Transactional
-    @Modifying
-    @Query(value = """
-            INSERT INTO saving_chart (id,
-                                      created_date,
-                                      last_modified_date,
-                                      free_pattern_id,
-                                      user_id)
-            VALUES (uuid(),
-                    current_timestamp,
-                    current_timestamp,
-                    :freePatternId,
-                    :userId)
-            """, nativeQuery = true)
-    void createSavingChart(@Param("freePatternId") String freePatternId, @Param("userId") String userId);
 
     boolean existsByUserIdAndFreePatternId(String userId, String freePatternId);
 
@@ -38,4 +24,12 @@ public interface SavingChartRepo extends JpaRepository<SavingChart, String>, Jpa
             """)
     void deleteByUserIdAndFreePatternId(@Param("userId") String userId,
                                         @Param("freePatternId") String freePatternId);
+
+    @Query("""
+            select (count(s.id) > 0)
+            from SavingChart s
+            left join s.collection c on s.collection.id = c.id
+            where c.name like concat('%', :name, '%') and s.id IN :ids
+            """)
+    boolean existsSavingChartByCollectionNameContains(@Param("ids") List<String> ids, @Param("name") String name);
 }

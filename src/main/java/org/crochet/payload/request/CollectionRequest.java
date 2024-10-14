@@ -14,6 +14,5 @@ import lombok.Setter;
 public class CollectionRequest {
     private String id;
     private String name;
-    private String userId;
     private List<String> savingChartIds;
 }
