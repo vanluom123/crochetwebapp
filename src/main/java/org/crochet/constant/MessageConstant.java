@@ -53,6 +53,7 @@ public class MessageConstant {
     public static final String MSG_BANNER_NOT_FOUND = "Banner not found";
     public static final String MSG_BLOG_CATEGORY_NOT_FOUND = "Blog category not found.";
     public static final String MSG_SETTINGS_NOT_FOUND = "Settings not found";
+    public static final String MSG_FORBIDDEN = "You do not have permission to access this resource";
 
     private MessageConstant() {
     }

@@ -55,6 +55,7 @@ public class MessageCodeConstant {
         MAP_CODE.put(MessageConstant.MSG_BANNER_TYPE_NOT_FOUND, 46);
         MAP_CODE.put(MessageConstant.MSG_BANNER_NOT_FOUND, 47);
         MAP_CODE.put(MessageConstant.ERROR_IMAGE_UPLOAD_FAILED, 48);
+        MAP_CODE.put(MessageConstant.MSG_FORBIDDEN, 49);
     }
 
     private MessageCodeConstant() {

@@ -5,7 +5,6 @@ import org.crochet.constant.MessageConstant;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -40,19 +39,6 @@ public class ApiExceptionHandler {
         log.error(ex.getMessage());
         log.error(ex.toString());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
-    }
-
-    @ExceptionHandler({AccessDeniedException.class})
-    public ResponseEntity<ApiError> handleAccessDeniedException(AccessDeniedException ex) {
-        ApiError error = ApiError.builder()
-                .message(MessageConstant.MSG_NO_PERMISSION)
-                .code(HttpStatus.FORBIDDEN.value())
-                .error(HttpStatus.FORBIDDEN.getReasonPhrase())
-                .messageCode(MAP_CODE.get(MessageConstant.FORBIDDEN))
-                .build();
-        log.error(ex.getMessage());
-        log.error(ex.toString());
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
     }
 
     @ExceptionHandler({BadRequestException.class})
@@ -141,5 +127,18 @@ public class ApiExceptionHandler {
         log.error(ex.getMessage());
         log.error(ex.toString());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(err);
+    }
+
+    @ExceptionHandler({AccessDeniedException.class})
+    public ResponseEntity<ApiError> handleAccessDeniedException(AccessDeniedException ex) {
+        ApiError err = ApiError.builder()
+                .message(ex.getMessage())
+                .code(HttpStatus.FORBIDDEN.value())
+                .error(HttpStatus.FORBIDDEN.getReasonPhrase()) 
+                .messageCode(ex.getMessageCode())
+                .build();
+        log.error(ex.getMessage());
+        log.error(ex.toString());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(err);
     }
 }
