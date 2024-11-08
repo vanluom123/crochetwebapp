@@ -10,7 +10,6 @@ import org.crochet.mapper.PatternMapper;
 import org.crochet.model.Pattern;
 import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.PatternRequest;
-import org.crochet.payload.response.PatternDetailResponse;
 import org.crochet.payload.response.PatternPaginationResponse;
 import org.crochet.payload.response.PatternResponse;
 import org.crochet.repository.CategoryRepo;
@@ -24,6 +23,7 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -73,7 +73,7 @@ public class PatternServiceImpl implements PatternService {
                     .link(request.getLink())
                     .content(request.getContent())
                     .files(FileMapper.INSTANCE.toSetEntities(request.getFiles()))
-                    .images(FileMapper.INSTANCE.toSetEntities(request.getImages()))
+                    .images(FileMapper.INSTANCE.toEntities(request.getImages()))
                     .build();
         } else {
             pattern = patternRepo.findById(request.getId()).orElseThrow(
@@ -98,12 +98,13 @@ public class PatternServiceImpl implements PatternService {
      */
     @Override
     public PatternPaginationResponse getPatterns(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters) {
-        GenericFilter<Pattern> filter = GenericFilter.create(filters);
-        var spec = filter.build();
+        Specification<Pattern> spec = Specification.where(null);
+        if (filters != null && filters.length > 0) {
+            GenericFilter<Pattern> filter = GenericFilter.create(filters);
+            spec = filter.build();
+        }
 
-        Sort sort = Sort.by(sortBy);
-        sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? sort.ascending() : sort.descending();
-
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
         var page = patternRepo.findAll(spec, pageable);
 
@@ -143,12 +144,12 @@ public class PatternServiceImpl implements PatternService {
      * @return PatternResponse
      */
     @Override
-    public PatternDetailResponse getDetail(String id) {
+    public PatternResponse getDetail(String id) {
         var pattern = patternRepo.getDetail(id).orElseThrow(
                 () -> new ResourceNotFoundException(MessageConstant.MSG_PATTERN_NOT_FOUND,
                         MAP_CODE.get(MessageConstant.MSG_PATTERN_NOT_FOUND))
         );
-        return PatternMapper.INSTANCE.toPatternDetailResponse(pattern);
+        return PatternMapper.INSTANCE.toResponse(pattern);
     }
 
     /**

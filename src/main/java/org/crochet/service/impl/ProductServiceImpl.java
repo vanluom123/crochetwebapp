@@ -10,7 +10,6 @@ import org.crochet.mapper.ProductMapper;
 import org.crochet.model.Product;
 import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.ProductRequest;
-import org.crochet.payload.response.ProductDetailResponse;
 import org.crochet.payload.response.ProductPaginationResponse;
 import org.crochet.payload.response.ProductResponse;
 import org.crochet.repository.CategoryRepo;
@@ -25,6 +24,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -102,12 +102,13 @@ public class ProductServiceImpl implements ProductService {
      */
     @Override
     public ProductPaginationResponse getProducts(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters) {
-        GenericFilter<Product> filter = GenericFilter.create(filters);
-        var spec = filter.build();
+        Specification<Product> spec = Specification.where(null);
+        if (filters != null && filters.length > 0) {
+            GenericFilter<Product> filter = GenericFilter.create(filters);
+            spec = filter.build();
+        }
 
-        Sort sort = Sort.by(sortBy);
-        sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? sort.ascending() : sort.descending();
-
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
         Page<Product> menuPage = productRepo.findAll(spec, pageable);
 
@@ -152,12 +153,12 @@ public class ProductServiceImpl implements ProductService {
      * @return A {@link ProductResponse} containing detailed information about the product.
      */
     @Override
-    public ProductDetailResponse getDetail(String id) {
+    public ProductResponse getDetail(String id) {
         var product = productRepo.getDetail(id).orElseThrow(
                 () -> new ResourceNotFoundException(MessageConstant.MSG_PRODUCT_NOT_FOUND,
                         MAP_CODE.get(MessageConstant.MSG_PRODUCT_NOT_FOUND))
         );
-        return ProductMapper.INSTANCE.toProductDetailResponse(product);
+        return ProductMapper.INSTANCE.toResponse(product);
     }
 
     /**

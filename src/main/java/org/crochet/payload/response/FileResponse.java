@@ -12,4 +12,5 @@ import java.io.Serializable;
 public class FileResponse implements Serializable {
     private String fileName;
     private String fileContent;
+    private Integer order;
 }

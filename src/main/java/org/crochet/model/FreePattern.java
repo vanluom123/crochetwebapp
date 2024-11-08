@@ -11,6 +11,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,6 +22,7 @@ import org.crochet.enumerator.ChartStatus;
 import org.hibernate.annotations.BatchSize;
 
 import java.util.Set;
+import java.util.List;
 
 @Getter
 @Setter
@@ -57,24 +59,27 @@ public class FreePattern extends BaseEntity {
     private ChartStatus status;
 
     @BatchSize(size = 10)
+    @OrderBy("order ASC")
     @ElementCollection
     @CollectionTable(name = "free_pattern_file",
             joinColumns = @JoinColumn(name = "free_pattern_id", referencedColumnName = "id", nullable = false))
     @AttributeOverrides({
             @AttributeOverride(name = "fileName", column = @Column(name = "file_name")),
-            @AttributeOverride(name = "fileContent", column = @Column(name = "file_content", columnDefinition = "TEXT"))
+            @AttributeOverride(name = "fileContent", column = @Column(name = "file_content", columnDefinition = "TEXT")),
+            @AttributeOverride(name = "order", column = @Column(name = "display_order"))
 
     })
     private Set<File> files;
 
     @BatchSize(size = 10)
+    @OrderBy("order ASC")
     @ElementCollection
     @CollectionTable(name = "free_pattern_image",
             joinColumns = @JoinColumn(name = "free_pattern_id", referencedColumnName = "id", nullable = false))
     @AttributeOverrides({
             @AttributeOverride(name = "fileName", column = @Column(name = "file_name")),
-            @AttributeOverride(name = "fileContent", column = @Column(name = "file_content", columnDefinition = "TEXT"))
-
+            @AttributeOverride(name = "fileContent", column = @Column(name = "file_content", columnDefinition = "TEXT")),
+            @AttributeOverride(name = "order", column = @Column(name = "display_order"))
     })
-    private Set<File> images;
+    private List<File> images;
 }

@@ -9,9 +9,10 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.crochet.constant.AppConstant;
 import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.FreePatternRequest;
-import org.crochet.payload.response.FreeChartDetailResponse;
 import org.crochet.payload.response.FreePatternResponse;
 import org.crochet.payload.response.PaginatedFreePatternResponse;
+import org.crochet.security.CurrentUser;
+import org.crochet.security.UserPrincipal;
 import org.crochet.service.FreePatternService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,7 +39,7 @@ public class FreePatternController {
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = FreePatternResponse.class)))
     @PostMapping(value = "/create")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @SecurityRequirement(name = "BearerAuth")
     public ResponseEntity<FreePatternResponse> createPattern(
             @RequestBody FreePatternRequest request) {
@@ -49,9 +50,9 @@ public class FreePatternController {
     @Operation(summary = "Get pattern details by ID")
     @ApiResponse(responseCode = "200", description = "Pattern details retrieved successfully",
             content = @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = FreeChartDetailResponse.class)))
+                    schema = @Schema(implementation = FreePatternResponse.class)))
     @GetMapping("/detail")
-    public ResponseEntity<FreeChartDetailResponse> getDetail(
+    public ResponseEntity<FreePatternResponse> getDetail(
             @Parameter(description = "ID of the pattern to retrieve")
             @RequestParam("id") String id) {
         return ResponseEntity.ok(freePatternService.getDetail(id));
@@ -65,12 +66,13 @@ public class FreePatternController {
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = String.class)))
     @DeleteMapping("/delete")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @SecurityRequirement(name = "BearerAuth")
     public ResponseEntity<String> delete(
+            @CurrentUser UserPrincipal currentUser,
             @Parameter(description = "ID of the pattern to delete")
             @RequestParam("id") String id) {
-        freePatternService.delete(id);
+        freePatternService.delete(currentUser, id);
         return ResponseEntity.ok("Pattern deleted successfully");
     }
 
@@ -94,6 +96,32 @@ public class FreePatternController {
             @Parameter(description = "List filters")
             @RequestBody(required = false) Filter[] filters) {
         var response = freePatternService.getAllFreePatterns(pageNo, pageSize, sortBy, sortDir, filters);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Get paginated list of patterns for admin page")
+    @ApiResponse(responseCode = "200", description = "List of patterns",
+            content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = PaginatedFreePatternResponse.class)))
+    @PostMapping("/admin/pagination")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @SecurityRequirement(name = "BearerAuth")
+    public ResponseEntity<PaginatedFreePatternResponse> getAllFreePatternsOnAdminPage(
+            @CurrentUser UserPrincipal currentUser,
+            @Parameter(description = "Page number (default: 0)")
+            @RequestParam(value = "pageNo", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER,
+                    required = false) int pageNo,
+            @Parameter(description = "Page size (default: 10)")
+            @RequestParam(value = "pageSize", defaultValue = AppConstant.DEFAULT_PAGE_SIZE,
+                    required = false) int pageSize,
+            @Parameter(description = "Sort by field (default: id)")
+            @RequestParam(value = "sortBy", defaultValue = AppConstant.DEFAULT_SORT_BY, required = false) String sortBy,
+            @Parameter(description = "Sort direction (default: ASC)")
+            @RequestParam(value = "sortDir", defaultValue = AppConstant.DEFAULT_SORT_DIRECTION,
+                    required = false) String sortDir,
+            @Parameter(description = "List filters")
+            @RequestBody(required = false) Filter[] filters) {
+        var response = freePatternService.getAllFreePatternsOnAdminPage(currentUser, pageNo, pageSize, sortBy, sortDir, filters);
         return ResponseEntity.ok(response);
     }
 }

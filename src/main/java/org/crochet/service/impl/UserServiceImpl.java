@@ -75,15 +75,15 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public UserPaginationResponse getAll(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters) {
-        GenericFilter<User> filter = GenericFilter.create(filters);
-        Specification<User> spec = filter.build();
+        Specification<User> spec = Specification.where(null);
+        if (filters != null && filters.length > 0) {
+            GenericFilter<User> filter = GenericFilter.create(filters);
+            spec = filter.build();
+        }
 
-        Sort sort = Sort.by(sortBy);
-        sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? sort.ascending() : sort.descending();
-
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
         Page<User> page = userRepository.findAll(spec, pageable);
-
         List<UserResponse> users = UserMapper.INSTANCE.toResponses(page.getContent());
 
         return UserPaginationResponse.builder()

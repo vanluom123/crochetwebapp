@@ -2,7 +2,6 @@ package org.crochet.mapper;
 
 import org.crochet.model.Product;
 import org.crochet.payload.request.ProductRequest;
-import org.crochet.payload.response.ProductDetailResponse;
 import org.crochet.payload.response.ProductResponse;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
@@ -23,9 +22,8 @@ public interface ProductMapper {
     ProductMapper INSTANCE = Mappers.getMapper(ProductMapper.class);
 
     @Mapping(target = "isHome", source = "home")
+    @Mapping(target = "currencyCode", source = "currencyCode")
     ProductResponse toResponse(Product product);
-
-    ProductDetailResponse toProductDetailResponse(Product product);
 
     List<ProductResponse> toResponses(Collection<Product> products);
 
