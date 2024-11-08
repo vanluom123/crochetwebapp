@@ -11,6 +11,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -62,22 +63,26 @@ public class Pattern extends BaseEntity {
     private String content;
 
     @BatchSize(size = 10)
+    @OrderBy("order ASC")
     @ElementCollection
     @CollectionTable(name = "pattern_file",
             joinColumns = @JoinColumn(name = "pattern_id", referencedColumnName = "id", nullable = false))
     @AttributeOverrides({
             @AttributeOverride(name = "fileName", column = @Column(name = "file_name")),
-            @AttributeOverride(name = "fileContent", column = @Column(name = "file_content", columnDefinition = "TEXT"))
+            @AttributeOverride(name = "fileContent", column = @Column(name = "file_content", columnDefinition = "TEXT")),
+            @AttributeOverride(name = "order", column = @Column(name = "display_order"))
     })
     private Set<File> files;
 
     @BatchSize(size = 10)
+    @OrderBy("order ASC")
     @ElementCollection
     @CollectionTable(name = "pattern_image",
             joinColumns = @JoinColumn(name = "pattern_id", referencedColumnName = "id", nullable = false))
     @AttributeOverrides({
             @AttributeOverride(name = "fileName", column = @Column(name = "file_name")),
-            @AttributeOverride(name = "fileContent", column = @Column(name = "file_content"))
+            @AttributeOverride(name = "fileContent", column = @Column(name = "file_content")),
+            @AttributeOverride(name = "order", column = @Column(name = "display_order"))
     })
     private List<File> images;
 }
