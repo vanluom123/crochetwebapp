@@ -11,7 +11,9 @@ import java.util.List;
 
 @Data
 @Builder
-@JsonPropertyOrder({"id", "category_id", "name", "description", "author", "is_home", "link", "content", "status", "images", "files"})
+@JsonPropertyOrder({ "id", "category_id", "name",
+        "description", "author", "is_home",
+        "link", "content", "status", "images", "files" })
 public class FreePatternRequest {
     private String id;
     @JsonProperty("category_id")

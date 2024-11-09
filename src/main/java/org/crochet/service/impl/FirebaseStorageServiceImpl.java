@@ -16,10 +16,11 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.stream.IntStream;
 import java.util.stream.StreamSupport;
 
 import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
@@ -49,7 +50,7 @@ public class FirebaseStorageServiceImpl implements FirebaseStorageService {
      */
     public FileResponse uploadFile(MultipartFile imageFile) {
         // Define the path and filename in Firebase Cloud Storage
-        String fileName = UUID.randomUUID().toString().concat(this.getExtension(imageFile.getOriginalFilename()));
+        String fileName = UUID.randomUUID().toString().concat(this.getExtension(Objects.requireNonNull(imageFile.getOriginalFilename())));
         fileName = env + "/" + fileName;
 
         // Upload the image to Firebase Cloud Storage
@@ -67,7 +68,7 @@ public class FirebaseStorageServiceImpl implements FirebaseStorageService {
         var encodeName = URLEncoder.encode(blob.getName(), StandardCharsets.UTF_8);
         String downloadUrl = "https://firebasestorage.googleapis.com/v0/b/%s/o/%s?alt=media";
         var fileContent = String.format(downloadUrl, BUCKET_NAME, encodeName);
-        return new FileResponse(fileName, fileContent);
+        return new FileResponse(fileName, fileContent, 0);
     }
 
     /**
@@ -78,11 +79,13 @@ public class FirebaseStorageServiceImpl implements FirebaseStorageService {
      */
     @Override
     public List<FileResponse> uploadMultipleFiles(MultipartFile[] files) {
-        List<FileResponse> fileNames;
-        fileNames = Stream.of(files)
-                .map(this::tryUploadFile)
-                .toList();
-        return fileNames;
+        return IntStream.range(0, files.length)
+                .mapToObj(i -> {
+                    FileResponse response = tryUploadFile(files[i]);
+                    response.setOrder(i);
+                    return response;
+                })
+                .collect(Collectors.toList());
     }
 
     /**

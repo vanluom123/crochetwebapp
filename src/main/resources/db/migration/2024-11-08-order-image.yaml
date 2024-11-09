@@ -1,0 +1,68 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1731039726710-1
+      author: pvanluom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  name: display_order
+                  type: INT
+            tableName: blog_post_file
+  - changeSet:
+      id: 1731039726710-2
+      author: pvanluom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  name: display_order
+                  type: INT
+            tableName: free_pattern_file
+  - changeSet:
+      id: 1731039726710-3
+      author: pvanluom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  name: display_order
+                  type: INT
+            tableName: free_pattern_image
+  - changeSet:
+      id: 1731039726710-4
+      author: pvanluom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  name: display_order
+                  type: INT
+            tableName: pattern_file
+  - changeSet:
+      id: 1731039726710-5
+      author: pvanluom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  name: display_order
+                  type: INT
+            tableName: pattern_image
+  - changeSet:
+      id: 1731039726710-6
+      author: pvanluom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  name: display_order
+                  type: INT
+            tableName: product_image
+

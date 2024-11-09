@@ -8,4 +8,5 @@ import lombok.Data;
 public class File {
     private String fileName;
     private String fileContent;
+    private Integer order;
 }
