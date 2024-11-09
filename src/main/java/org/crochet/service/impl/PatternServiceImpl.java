@@ -16,10 +16,9 @@ import org.crochet.repository.CategoryRepo;
 import org.crochet.repository.GenericFilter;
 import org.crochet.repository.PatternRepository;
 import org.crochet.repository.SettingsRepo;
+import org.crochet.service.CacheService;
 import org.crochet.service.PatternService;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
+import org.crochet.service.ResilientCacheService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -29,6 +28,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.time.Duration;
 import java.util.List;
 
 import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
@@ -43,6 +43,8 @@ public class PatternServiceImpl implements PatternService {
     private final PatternRepository patternRepo;
     private final CategoryRepo categoryRepo;
     private final SettingsRepo settingsRepo;
+    private final CacheService cacheService;
+    private final ResilientCacheService resilientCacheService;
 
     /**
      * Create or update pattern
@@ -51,12 +53,8 @@ public class PatternServiceImpl implements PatternService {
      */
     @Transactional
     @Override
-    @Caching(
-            evict = {
-                    @CacheEvict(value = "limitedpatterns", allEntries = true)
-            }
-    )
     public PatternResponse createOrUpdate(PatternRequest request) {
+        cacheService.invalidateCache("pattern_*");
         Pattern pattern;
         if (!StringUtils.hasText(request.getId())) {
             var category = categoryRepo.findById(request.getCategoryId()).orElseThrow(
@@ -98,6 +96,14 @@ public class PatternServiceImpl implements PatternService {
      */
     @Override
     public PatternPaginationResponse getPatterns(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters) {
+        String cacheKey = String.format("pattern_pageNo%d_pageSize%d_sortBy%s_sortDir%s", pageNo, pageSize, sortBy, sortDir);
+
+        var cachedResult = resilientCacheService.getCachedResult(cacheKey, PatternPaginationResponse.class);
+        if (cachedResult.isPresent()) {
+            log.debug("Returning cached patterns");
+            return cachedResult.get();
+        }
+
         Specification<Pattern> spec = Specification.where(null);
         if (filters != null && filters.length > 0) {
             GenericFilter<Pattern> filter = GenericFilter.create(filters);
@@ -110,7 +116,7 @@ public class PatternServiceImpl implements PatternService {
 
         List<PatternResponse> responses = PatternMapper.INSTANCE.toResponses(page.getContent());
 
-        return PatternPaginationResponse.builder()
+        var response = PatternPaginationResponse.builder()
                 .contents(responses)
                 .pageNo(page.getNumber())
                 .pageSize(page.getSize())
@@ -118,22 +124,37 @@ public class PatternServiceImpl implements PatternService {
                 .totalPages(page.getTotalPages())
                 .last(page.isLast())
                 .build();
+
+        cacheService.set(cacheKey, response, Duration.ofDays(1));
+
+        return response;
     }
 
+    @SuppressWarnings("unchecked")
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    @Cacheable(value = "limitedpatterns")
     @Override
     public List<PatternResponse> getLimitedPatterns() {
-        log.info("Fetching limited patterns");
+        String cacheKey = "pattern_limited";
+        var response = resilientCacheService.getCachedResult(cacheKey, List.class);
+        if (response.isPresent()) {
+            return response.get();
+        }
+
         var direction = settingsRepo.findByKey("homepage.pattern.direction")
                 .orElse(Sort.Direction.ASC.name());
+
         var orderBy = settingsRepo.findByKey("homepage.pattern.orderBy")
                 .orElse("id");
+
         var limit = settingsRepo.findByKey("homepage.pattern.limit")
                 .orElse(AppConstant.DEFAULT_LIMIT);
+
         Sort sort = Sort.by(Sort.Direction.fromString(direction), orderBy);
         Pageable pageable = PageRequest.of(0, Integer.parseInt(limit), sort);
         var patterns = patternRepo.findLimitedNumPattern(pageable);
+
+        cacheService.set(cacheKey, patterns, Duration.ofDays(1));
+
         return PatternMapper.INSTANCE.toResponses(patterns);
     }
 
@@ -159,12 +180,8 @@ public class PatternServiceImpl implements PatternService {
      */
     @Transactional
     @Override
-    @Caching(
-            evict = {
-                    @CacheEvict(value = "limitedpatterns", allEntries = true)
-            }
-    )
     public void deletePattern(String id) {
+        cacheService.invalidateCache("pattern_*");
         patternRepo.deleteById(id);
     }
 }
