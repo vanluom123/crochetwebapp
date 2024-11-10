@@ -1,0 +1,27 @@
+package org.crochet.config;
+
+import io.github.bucket4j.Bandwidth;
+import io.github.bucket4j.Bucket;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import java.time.Duration;
+
+@Configuration
+public class RateLimitingConfig {
+
+    private static final int MAX_REQUESTS = 10;
+    private static final int REFILL_RATE = 10;
+
+    @Bean
+    public Bucket bucket() {
+        Bandwidth limit = Bandwidth.builder()
+                .capacity(MAX_REQUESTS)
+                .refillGreedy(REFILL_RATE, Duration.ofMinutes(1))
+                .build();
+        return Bucket.builder()
+                .addLimit(limit)
+                .build();
+    }
+}
