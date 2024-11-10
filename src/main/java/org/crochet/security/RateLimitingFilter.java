@@ -18,6 +18,8 @@ import java.io.IOException;
 @Order(1)
 public class RateLimitingFilter extends OncePerRequestFilter {
 
+    private static final int NUM_TOKENS = 3;
+
     private final Bucket bucket;
 
     public RateLimitingFilter(Bucket bucket) {
@@ -29,9 +31,9 @@ public class RateLimitingFilter extends OncePerRequestFilter {
                                     @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain)
             throws ServletException, IOException {
-        if (!bucket.tryConsume(1)) {
+        if (!bucket.tryConsume(NUM_TOKENS)) {
             response.setStatus(HttpStatus.SC_TOO_MANY_REQUESTS);
-            response.getWriter().write("Too many requests");
+            response.getWriter().write("Too many requests, please try again later.");
             return;
         }
         filterChain.doFilter(request, response);
