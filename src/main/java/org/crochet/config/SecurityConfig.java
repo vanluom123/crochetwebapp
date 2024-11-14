@@ -3,12 +3,13 @@ package org.crochet.config;
 import lombok.extern.slf4j.Slf4j;
 import org.crochet.properties.AuthorizeHttpRequestProperties;
 import org.crochet.security.CustomUserDetailsService;
-import org.crochet.security.RestAuthenticationEntryPoint;
 import org.crochet.security.TokenAuthenticationFilter;
 import org.crochet.security.oauth2.CustomOAuth2UserService;
 import org.crochet.security.oauth2.OAuth2AuthenticationFailureHandler;
 import org.crochet.security.oauth2.OAuth2AuthenticationSuccessHandler;
 import org.crochet.security.oauth2.OAuth2CookieRepository;
+import org.crochet.security.RestAuthenticationEntryPoint;
+import org.crochet.security.RestAccessDeniedHandler;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,18 +21,25 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Slf4j
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(
         securedEnabled = true,
-        jsr250Enabled = true,
-        prePostEnabled = true
+        jsr250Enabled = true
 )
 public class SecurityConfig {
     private final CustomUserDetailsService customUserDetailsService;
@@ -75,13 +83,27 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .sessionManagement(sessionManagementCustomizer -> sessionManagementCustomizer.sessionCreationPolicy(
-                        SessionCreationPolicy.STATELESS))
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .sessionManagement(session -> 
+                    session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
-                .exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(
-                        new RestAuthenticationEntryPoint()))
+                .headers(headers -> headers
+                    .frameOptions(HeadersConfigurer.FrameOptionsConfig::deny)
+                    .xssProtection(HeadersConfigurer.XXssConfig::disable)
+                    .contentSecurityPolicy(csp -> 
+                        csp.policyDirectives("default-src 'self'; frame-ancestors 'none';"))
+                    .referrerPolicy(referrer -> 
+                        referrer.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
+                    .permissionsPolicy(permissions -> permissions.policy(
+                        "camera=(), microphone=(), geolocation=(), payment=()"
+                    ))
+                )
+                .exceptionHandling(exceptions -> exceptions
+                    .authenticationEntryPoint(new RestAuthenticationEntryPoint())
+                    .accessDeniedHandler(new RestAccessDeniedHandler())
+                )
                 .authorizeHttpRequests(authReq -> authReq
                         .requestMatchers(authorizeHttpRequestProperties().getAuthenticated()).authenticated()
                         .anyRequest().permitAll())
@@ -91,13 +113,30 @@ public class SecurityConfig {
                                         .authorizationRequestRepository(oAuth2CookieRepository))
                         .redirectionEndpoint(redirectionEndpointCustomizer ->
                                 redirectionEndpointCustomizer.baseUri("/oauth2/callback/*"))
-                        .userInfoEndpoint(userInfoEndpointCustomizer -> userInfoEndpointCustomizer.userService(
-                                customOAuth2UserService))
+                        .userInfoEndpoint(userInfoEndpointCustomizer -> 
+                            userInfoEndpointCustomizer.userService(customOAuth2UserService))
                         .successHandler(oAuth2AuthenticationSuccessHandler)
                         .failureHandler(oAuth2AuthenticationFailureHandler))
                 .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authenticationProvider(authenticationProvider())
                 .build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList(
+            "http://localhost:3000",
+            "https://tieuphuongcrochet.com"
+        ));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L);
+        
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 
     @Bean
