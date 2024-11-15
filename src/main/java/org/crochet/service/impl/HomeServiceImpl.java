@@ -1,6 +1,5 @@
 package org.crochet.service.impl;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.crochet.constant.AppConstant;
 import org.crochet.payload.response.HomeResponse;
@@ -10,6 +9,7 @@ import org.crochet.service.FreePatternService;
 import org.crochet.service.HomeService;
 import org.crochet.service.PatternService;
 import org.crochet.service.ProductService;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +19,6 @@ import java.util.concurrent.Executor;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class HomeServiceImpl implements HomeService {
     private final ProductService productService;
     private final PatternService patternService;
@@ -27,6 +26,20 @@ public class HomeServiceImpl implements HomeService {
     private final BannerService bannerService;
     private final BlogPostService blogService;
     private final Executor crochetTaskExecutor;
+
+    public HomeServiceImpl(ProductService productService,
+                           PatternService patternService,
+                           FreePatternService freePatternService,
+                           BannerService bannerService,
+                           BlogPostService blogService,
+                           @Qualifier(AppConstant.CROCHET_TASK_EXECUTOR) Executor crochetTaskExecutor) {
+        this.productService = productService;
+        this.patternService = patternService;
+        this.freePatternService = freePatternService;
+        this.bannerService = bannerService;
+        this.blogService = blogService;
+        this.crochetTaskExecutor = crochetTaskExecutor;
+    }
 
     /**
      * Fetches all the required data for the home page asynchronously.
