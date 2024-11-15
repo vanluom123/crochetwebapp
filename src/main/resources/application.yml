@@ -49,6 +49,7 @@ app:
 
 authorize:
   http-request:
+    allowedOrigins: ${ALLOWED_ORIGINS}
     authenticated:
       - "/blog/create"
       - "/comment/create"
