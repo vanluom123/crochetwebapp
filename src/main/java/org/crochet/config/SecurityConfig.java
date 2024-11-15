@@ -1,6 +1,8 @@
 package org.crochet.config;
 
 import lombok.extern.slf4j.Slf4j;
+
+import org.crochet.constant.AppConstant;
 import org.crochet.properties.AuthorizeHttpRequestProperties;
 import org.crochet.security.CustomUserDetailsService;
 import org.crochet.security.TokenAuthenticationFilter;
@@ -126,13 +128,12 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList(
-            "http://localhost:3000",
-            "https://tieuphuongcrochet.com"
+            authorizeHttpRequestProperties().getAllowedOrigins()
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
-        configuration.setMaxAge(3600L);
+        configuration.setMaxAge(AppConstant.MAX_AGE_SECS);
         
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
