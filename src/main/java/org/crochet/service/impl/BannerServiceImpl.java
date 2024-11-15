@@ -26,15 +26,15 @@ import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
 @Slf4j
 @Service
 public class BannerServiceImpl implements BannerService {
-    final BannerRepo bannerRepo;
-    final BannerTypeRepo bannerTypeRepo;
-    final CacheService cacheService;
-    final ResilientCacheService resilientCacheService;
+    private final BannerRepo bannerRepo;
+    private final BannerTypeRepo bannerTypeRepo;
+    private final CacheService cacheService;
+    private final ResilientCacheService resilientCacheService;
 
     public BannerServiceImpl(BannerRepo bannerRepo,
-                             BannerTypeRepo bannerTypeRepo,
-                             CacheService cacheService,
-                             ResilientCacheService resilientCacheService) {
+            BannerTypeRepo bannerTypeRepo,
+            CacheService cacheService,
+            ResilientCacheService resilientCacheService) {
         this.bannerRepo = bannerRepo;
         this.bannerTypeRepo = bannerTypeRepo;
         this.cacheService = cacheService;
@@ -45,7 +45,7 @@ public class BannerServiceImpl implements BannerService {
     @Override
     public List<BannerResponse> batchInsertOrUpdate(List<BannerRequest> requests) {
         cacheService.invalidateCache("banner_*");
-        
+
         List<Banner> banners = new ArrayList<>();
         List<Banner> existingBanners = bannerRepo.findAll();
 
@@ -87,11 +87,13 @@ public class BannerServiceImpl implements BannerService {
     @Override
     public List<BannerResponse> getAll() {
         String cacheKey = "banner_all";
-        
-        var cachedResult = resilientCacheService.getCachedResult(cacheKey, List.class);
-        if (cachedResult.isPresent()) {
-            log.debug("Returning cached banners");
-            return cachedResult.get();
+
+        if (cacheService.hasKey(cacheKey)) {
+            var cachedResult = resilientCacheService.getCachedResult(cacheKey, List.class);
+            if (cachedResult.isPresent()) {
+                log.debug("Returning cached banners");
+                return cachedResult.get();
+            }
         }
 
         List<Banner> banners = bannerRepo.findActiveBanners();

@@ -117,17 +117,6 @@ public class FreePatternServiceImpl implements FreePatternService {
             throw new IllegalArgumentException("Sort field cannot be null or empty");
         }
 
-        String cacheKey = String.format("fp_pageNo%d_pageSize%d_sortBy%s_sortDir%s", pageNo, pageSize, sortBy, sortDir);
-        if (cacheService.hasKey(cacheKey)) {
-            log.info("Returning cached response for key: {}", cacheKey);
-            var response = resilientCacheService.getCachedResult(cacheKey, PaginatedFreePatternResponse.class);
-            if (response.isPresent()) {
-                return response.get();
-            }
-        }
-
-        log.info("No cached response found for key: {}", cacheKey);
-
         Specification<FreePattern> spec = Specification.where(null);
         if (filters != null && filters.length > 0) {
             GenericFilter<FreePattern> filter = GenericFilter.create(filters);
@@ -148,7 +137,6 @@ public class FreePatternServiceImpl implements FreePatternService {
                 .last(page.isLast())
                 .build();
 
-        cacheService.set(cacheKey, response, Duration.ofDays(1));
         return response;
     }
 
@@ -171,7 +159,7 @@ public class FreePatternServiceImpl implements FreePatternService {
             String sortBy,
             String sortDir,
             Filter[] filters) {
-    
+
         if (currentUser == null) {
             throw new ResourceNotFoundException(MessageConstant.MSG_USER_NOT_FOUND,
                     MAP_CODE.get(MessageConstant.MSG_USER_NOT_FOUND));
@@ -183,14 +171,6 @@ public class FreePatternServiceImpl implements FreePatternService {
 
         if (sortBy == null || sortBy.isBlank()) {
             throw new IllegalArgumentException("Sort field cannot be null or empty");
-        }
-
-        String cacheKey = String.format("fp_admin_pageNo%d_pageSize%d_sortBy%s_sortDir%s", pageNo, pageSize, sortBy, sortDir);
-        if (cacheService.hasKey(cacheKey)) {
-            var response = cacheService.get(cacheKey, PaginatedFreePatternResponse.class);
-            if (response.isPresent()) {
-                return response.get();
-            }
         }
 
         Specification<FreePattern> spec = Specification.where(null);
@@ -220,8 +200,6 @@ public class FreePatternServiceImpl implements FreePatternService {
                 .last(page.isLast())
                 .build();
 
-        cacheService.set(cacheKey, response, Duration.ofDays(1));
-        
         return response;
     }
 
@@ -236,10 +214,11 @@ public class FreePatternServiceImpl implements FreePatternService {
     @Override
     public List<FreePatternResponse> getLimitedFreePatterns() {
         String cacheKey = "fp_limited";
-        
+
         if (cacheService.hasKey(cacheKey)) {
-            var response = cacheService.get(cacheKey, List.class);
+            var response = resilientCacheService.getCachedResult(cacheKey, List.class);
             if (response.isPresent()) {
+                log.debug("Returning cached free patterns");
                 return response.get();
             }
         }
@@ -269,7 +248,7 @@ public class FreePatternServiceImpl implements FreePatternService {
      *
      * @param id The unique identifier of the FreePattern.
      * @return A {@link FreePatternResponse} containing detailed information about
-     * the FreePattern.
+     *         the FreePattern.
      */
     @Override
     public FreePatternResponse getDetail(String id) {

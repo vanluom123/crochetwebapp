@@ -100,14 +100,6 @@ public class ProductServiceImpl implements ProductService {
      */
     @Override
     public ProductPaginationResponse getProducts(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters) {
-        String cacheKey = String.format("product_pageNo%d_pageSize%d_sortBy%s_sortDir%s", pageNo, pageSize, sortBy, sortDir);
-
-        var cachedResult = resilientCacheService.getCachedResult(cacheKey, ProductPaginationResponse.class);
-        if (cachedResult.isPresent()) {
-            log.debug("Returning cached products");
-            return cachedResult.get();
-        }
-
         Specification<Product> spec = Specification.where(null);
         if (filters != null && filters.length > 0) {
             GenericFilter<Product> filter = GenericFilter.create(filters);
@@ -128,9 +120,7 @@ public class ProductServiceImpl implements ProductService {
                 .totalPages(menuPage.getTotalPages())
                 .last(menuPage.isLast())
                 .build();
-
-        cacheService.set(cacheKey, response, Duration.ofDays(1));
-
+                
         return response;
     }
 
@@ -145,10 +135,12 @@ public class ProductServiceImpl implements ProductService {
     public List<ProductResponse> getLimitedProducts() {
         String cacheKey = "product_limited";
 
-        var cachedResult = resilientCacheService.getCachedResult(cacheKey, List.class);
-        if (cachedResult.isPresent()) {
-            log.debug("Returning cached products");
-            return cachedResult.get();
+        if (cacheService.hasKey(cacheKey)) {
+            var cachedResult = resilientCacheService.getCachedResult(cacheKey, List.class);
+            if (cachedResult.isPresent()) {
+                log.debug("Returning cached products");
+                return cachedResult.get();
+            }
         }
 
         var direction = settingsRepo.findByKey("homepage.product.direction")

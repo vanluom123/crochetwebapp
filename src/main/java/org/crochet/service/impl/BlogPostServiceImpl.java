@@ -40,13 +40,24 @@ import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
  */
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class BlogPostServiceImpl implements BlogPostService {
     private final BlogPostRepository blogPostRepo;
     private final BlogCategoryRepo blogCategoryRepo;
     private final SettingsRepo settingsRepo;
     private final CacheService cacheService;
     private final ResilientCacheService resilientCacheService;
+
+    public BlogPostServiceImpl(BlogPostRepository blogPostRepo,
+                               BlogCategoryRepo blogCategoryRepo,
+                               SettingsRepo settingsRepo,
+                               CacheService cacheService,
+                               ResilientCacheService resilientCacheService) {
+        this.blogPostRepo = blogPostRepo;
+        this.blogCategoryRepo = blogCategoryRepo;
+        this.settingsRepo = settingsRepo;
+        this.cacheService = cacheService;
+        this.resilientCacheService = resilientCacheService;
+    }
 
     /**
      * Creates a new blog post or updates an existing one based on the provided {@link BlogPostRequest}.
@@ -98,14 +109,6 @@ public class BlogPostServiceImpl implements BlogPostService {
      */
     @Override
     public BlogPostPaginationResponse getBlogs(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters) {
-        String cacheKey = String.format("blog_pageNo%d_pageSize%d_sortBy%s_sortDir%s", pageNo, pageSize, sortBy, sortDir);
-
-        var cachedResult = resilientCacheService.getCachedResult(cacheKey, BlogPostPaginationResponse.class);
-        if (cachedResult.isPresent()) {
-            log.debug("Returning cached blog posts");
-            return cachedResult.get();
-        }
-        
         Specification<BlogPost> spec = Specification.where(null);
         if (filters != null && filters.length > 0) {
             GenericFilter<BlogPost> filter = GenericFilter.create(filters);
@@ -125,8 +128,6 @@ public class BlogPostServiceImpl implements BlogPostService {
                 .pageSize(menuPage.getSize())
                 .last(menuPage.isLast())
                 .build();
-
-        cacheService.set(cacheKey, response, Duration.ofDays(1));
 
         return response;
     }
@@ -157,11 +158,13 @@ public class BlogPostServiceImpl implements BlogPostService {
     @Override
     public List<BlogPostResponse> getLimitedBlogPosts() {
         String cacheKey = "blog_limited";
-
-        var cachedResult = resilientCacheService.getCachedResult(cacheKey, List.class);
-        if (cachedResult.isPresent()) {
-            log.debug("Returning cached blog posts");
-            return cachedResult.get();
+        
+        if (cacheService.hasKey(cacheKey)) {
+            var cachedResult = resilientCacheService.getCachedResult(cacheKey, List.class);
+            if (cachedResult.isPresent()) {
+                log.debug("Returning cached blog posts");
+                return cachedResult.get();
+            }
         }
 
         String direction = settingsRepo.findByKey("homepage.blog.direction")

@@ -59,8 +59,7 @@ public class PatternServiceImpl implements PatternService {
         if (!StringUtils.hasText(request.getId())) {
             var category = categoryRepo.findById(request.getCategoryId()).orElseThrow(
                     () -> new ResourceNotFoundException(MessageConstant.MSG_CATEGORY_NOT_FOUND,
-                            MAP_CODE.get(MessageConstant.MSG_CATEGORY_NOT_FOUND))
-            );
+                            MAP_CODE.get(MessageConstant.MSG_CATEGORY_NOT_FOUND)));
             pattern = Pattern.builder()
                     .category(category)
                     .name(request.getName())
@@ -76,8 +75,7 @@ public class PatternServiceImpl implements PatternService {
         } else {
             pattern = patternRepo.findById(request.getId()).orElseThrow(
                     () -> new ResourceNotFoundException(MessageConstant.MSG_PATTERN_NOT_FOUND,
-                            MAP_CODE.get(MessageConstant.MSG_PATTERN_NOT_FOUND))
-            );
+                            MAP_CODE.get(MessageConstant.MSG_PATTERN_NOT_FOUND)));
             pattern = PatternMapper.INSTANCE.partialUpdate(request, pattern);
         }
         pattern = patternRepo.save(pattern);
@@ -95,15 +93,8 @@ public class PatternServiceImpl implements PatternService {
      * @return Pattern is paginated
      */
     @Override
-    public PatternPaginationResponse getPatterns(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters) {
-        String cacheKey = String.format("pattern_pageNo%d_pageSize%d_sortBy%s_sortDir%s", pageNo, pageSize, sortBy, sortDir);
-
-        var cachedResult = resilientCacheService.getCachedResult(cacheKey, PatternPaginationResponse.class);
-        if (cachedResult.isPresent()) {
-            log.debug("Returning cached patterns");
-            return cachedResult.get();
-        }
-
+    public PatternPaginationResponse getPatterns(int pageNo, int pageSize, String sortBy, String sortDir,
+            Filter[] filters) {
         Specification<Pattern> spec = Specification.where(null);
         if (filters != null && filters.length > 0) {
             GenericFilter<Pattern> filter = GenericFilter.create(filters);
@@ -125,8 +116,6 @@ public class PatternServiceImpl implements PatternService {
                 .last(page.isLast())
                 .build();
 
-        cacheService.set(cacheKey, response, Duration.ofDays(1));
-
         return response;
     }
 
@@ -135,9 +124,12 @@ public class PatternServiceImpl implements PatternService {
     @Override
     public List<PatternResponse> getLimitedPatterns() {
         String cacheKey = "pattern_limited";
-        var response = resilientCacheService.getCachedResult(cacheKey, List.class);
-        if (response.isPresent()) {
-            return response.get();
+        if (cacheService.hasKey(cacheKey)) {
+            var response = resilientCacheService.getCachedResult(cacheKey, List.class);
+            if (response.isPresent()) {
+                log.debug("Returning cached patterns");
+                return response.get();
+            }
         }
 
         var direction = settingsRepo.findByKey("homepage.pattern.direction")
@@ -168,8 +160,7 @@ public class PatternServiceImpl implements PatternService {
     public PatternResponse getDetail(String id) {
         var pattern = patternRepo.getDetail(id).orElseThrow(
                 () -> new ResourceNotFoundException(MessageConstant.MSG_PATTERN_NOT_FOUND,
-                        MAP_CODE.get(MessageConstant.MSG_PATTERN_NOT_FOUND))
-        );
+                        MAP_CODE.get(MessageConstant.MSG_PATTERN_NOT_FOUND)));
         return PatternMapper.INSTANCE.toResponse(pattern);
     }
 
