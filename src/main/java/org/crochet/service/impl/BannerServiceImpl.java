@@ -10,14 +10,14 @@ import org.crochet.payload.response.BannerResponse;
 import org.crochet.repository.BannerRepo;
 import org.crochet.repository.BannerTypeRepo;
 import org.crochet.service.BannerService;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
+import org.crochet.service.CacheService;
+import org.crochet.service.ResilientCacheService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,20 +26,26 @@ import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
 @Slf4j
 @Service
 public class BannerServiceImpl implements BannerService {
-    final BannerRepo bannerRepo;
-    final BannerTypeRepo bannerTypeRepo;
+    private final BannerRepo bannerRepo;
+    private final BannerTypeRepo bannerTypeRepo;
+    private final CacheService cacheService;
+    private final ResilientCacheService resilientCacheService;
 
-    public BannerServiceImpl(BannerRepo bannerRepo, BannerTypeRepo bannerTypeRepo) {
+    public BannerServiceImpl(BannerRepo bannerRepo,
+            BannerTypeRepo bannerTypeRepo,
+            CacheService cacheService,
+            ResilientCacheService resilientCacheService) {
         this.bannerRepo = bannerRepo;
         this.bannerTypeRepo = bannerTypeRepo;
+        this.cacheService = cacheService;
+        this.resilientCacheService = resilientCacheService;
     }
 
     @Transactional
     @Override
-    @Caching(
-            evict = {@CacheEvict(value = "activebanners", allEntries = true)}
-    )
     public List<BannerResponse> batchInsertOrUpdate(List<BannerRequest> requests) {
+        cacheService.invalidateCache("banner_*");
+
         List<Banner> banners = new ArrayList<>();
         List<Banner> existingBanners = bannerRepo.findAll();
 
@@ -76,12 +82,25 @@ public class BannerServiceImpl implements BannerService {
         return banners.stream().map(BannerMapper.INSTANCE::toResponse).toList();
     }
 
+    @SuppressWarnings("unchecked")
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    @Cacheable(value = "activebanners")
     @Override
     public List<BannerResponse> getAll() {
-        log.info("Fetching all active banners");
+        String cacheKey = "banner_all";
+
+        if (cacheService.hasKey(cacheKey)) {
+            var cachedResult = resilientCacheService.getCachedResult(cacheKey, List.class);
+            if (cachedResult.isPresent()) {
+                log.debug("Returning cached banners");
+                return cachedResult.get();
+            }
+        }
+
         List<Banner> banners = bannerRepo.findActiveBanners();
-        return BannerMapper.INSTANCE.toResponses(banners);
+        var response = BannerMapper.INSTANCE.toResponses(banners);
+
+        cacheService.set(cacheKey, response, Duration.ofDays(1));
+
+        return response;
     }
 }

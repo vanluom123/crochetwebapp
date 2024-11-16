@@ -8,10 +8,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Repository
-public interface RefreshTokenRepo extends JpaRepository<RefreshToken, UUID> {
+public interface RefreshTokenRepo extends JpaRepository<RefreshToken, String> {
     Optional<RefreshToken> findByToken(String token);
 
     @Query("""

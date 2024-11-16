@@ -17,3 +17,11 @@ databaseChangeLog:
       file: src/main/resources/db/migration/2024-09-04-add-status-for-pattern.yaml
   - include:
       file: src/main/resources/db/migration/2024-11-08-order-image.yaml
+  - include:
+      file: src/main/resources/db/migration/20241108-add-indexes-free-pattern.yaml
+  - include:
+      file: src/main/resources/db/migration/20241108-add-indexes-pattern.yaml
+  - include:
+      file: src/main/resources/db/migration/20241108-add-indexes-product.yaml
+  - include:
+      file: src/main/resources/db/migration/20241109-add-additional-indexes.yaml

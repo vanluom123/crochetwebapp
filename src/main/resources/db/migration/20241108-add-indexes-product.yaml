@@ -1,0 +1,36 @@
+databaseChangeLog:
+  - changeSet:
+      id: 20241108-add-indexes-product
+      author: pvanluom
+      changes:
+        - createIndex:
+            indexName: idx_product_created_date
+            tableName: product
+            columns:
+              - column:
+                  name: created_date
+                  
+        - createIndex:
+            indexName: idx_product_price
+            tableName: product
+            columns:
+              - column:
+                  name: price
+                  
+        - createIndex:
+            indexName: idx_product_category
+            tableName: product
+            columns:
+              - column:
+                  name: category_id
+      
+      rollback:
+        - dropIndex:
+            indexName: idx_product_created_date
+            tableName: product
+        - dropIndex:
+            indexName: idx_product_price
+            tableName: product
+        - dropIndex:
+            indexName: idx_product_category
+            tableName: product 
