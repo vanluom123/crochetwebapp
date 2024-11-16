@@ -16,10 +16,9 @@ import org.crochet.repository.CategoryRepo;
 import org.crochet.repository.GenericFilter;
 import org.crochet.repository.ProductRepository;
 import org.crochet.repository.SettingsRepo;
+import org.crochet.service.CacheService;
 import org.crochet.service.ProductService;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
+import org.crochet.service.ResilientCacheService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -30,6 +29,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.time.Duration;
 import java.util.List;
 
 import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
@@ -44,6 +44,8 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepo;
     private final CategoryRepo categoryRepo;
     private final SettingsRepo settingsRepo;
+    private final CacheService cacheService;
+    private final ResilientCacheService resilientCacheService;
 
     /**
      * Creates a new product or updates an existing one based on the provided {@link ProductRequest}.
@@ -56,12 +58,8 @@ public class ProductServiceImpl implements ProductService {
      */
     @Transactional
     @Override
-    @Caching(
-            evict = {
-                    @CacheEvict(value = "limitedproducts", allEntries = true)
-            }
-    )
     public ProductResponse createOrUpdate(ProductRequest request) {
+        cacheService.invalidateCache("product_*");
         Product product;
         if (!StringUtils.hasText(request.getId())) {
             var category = categoryRepo.findById(request.getCategoryId()).orElseThrow(
@@ -114,7 +112,7 @@ public class ProductServiceImpl implements ProductService {
 
         List<ProductResponse> contents = ProductMapper.INSTANCE.toResponses(menuPage.getContent());
 
-        return ProductPaginationResponse.builder()
+        var response = ProductPaginationResponse.builder()
                 .contents(contents)
                 .pageNo(menuPage.getNumber())
                 .pageSize(menuPage.getSize())
@@ -122,6 +120,8 @@ public class ProductServiceImpl implements ProductService {
                 .totalPages(menuPage.getTotalPages())
                 .last(menuPage.isLast())
                 .build();
+                
+        return response;
     }
 
     /**
@@ -129,21 +129,37 @@ public class ProductServiceImpl implements ProductService {
      *
      * @return A list of {@link ProductResponse} containing limited products.
      */
+    @SuppressWarnings("unchecked")
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    @Cacheable(value = "limitedproducts")
     @Override
     public List<ProductResponse> getLimitedProducts() {
-        log.info("Fetching limited products");
+        String cacheKey = "product_limited";
+
+        if (cacheService.hasKey(cacheKey)) {
+            var cachedResult = resilientCacheService.getCachedResult(cacheKey, List.class);
+            if (cachedResult.isPresent()) {
+                log.debug("Returning cached products");
+                return cachedResult.get();
+            }
+        }
+
         var direction = settingsRepo.findByKey("homepage.product.direction")
                 .orElse(Sort.Direction.ASC.name());
+                
         var orderBy = settingsRepo.findByKey("homepage.product.orderBy")
                 .orElse("id");
+
         var limit = settingsRepo.findByKey("homepage.product.limit")
                 .orElse(AppConstant.DEFAULT_LIMIT);
+
         Sort sort = Sort.by(Sort.Direction.fromString(direction), orderBy);
         Pageable pageable = PageRequest.of(0, Integer.parseInt(limit), sort);
         var products = productRepo.findLimitedNumProduct(pageable);
-        return ProductMapper.INSTANCE.toResponses(products);
+        var response = ProductMapper.INSTANCE.toResponses(products);
+
+        cacheService.set(cacheKey, response, Duration.ofDays(1));
+
+        return response;
     }
 
     /**
@@ -168,12 +184,8 @@ public class ProductServiceImpl implements ProductService {
      */
     @Transactional
     @Override
-    @Caching(
-            evict = {
-                    @CacheEvict(value = "limitedproducts", allEntries = true)
-            }
-    )
     public void delete(String id) {
+        cacheService.invalidateCache("product_*");
         productRepo.deleteById(id);
     }
 }

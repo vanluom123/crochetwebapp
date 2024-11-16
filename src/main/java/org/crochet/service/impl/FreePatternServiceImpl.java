@@ -21,10 +21,9 @@ import org.crochet.repository.GenericFilter;
 import org.crochet.repository.SettingsRepo;
 import org.crochet.repository.UserRepository;
 import org.crochet.security.UserPrincipal;
+import org.crochet.service.CacheService;
 import org.crochet.service.FreePatternService;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
+import org.crochet.service.ResilientCacheService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -35,6 +34,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.time.Duration;
 import java.util.List;
 
 import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
@@ -50,6 +50,8 @@ public class FreePatternServiceImpl implements FreePatternService {
     private final CategoryRepo categoryRepo;
     private final SettingsRepo settingsRepo;
     private final UserRepository userRepo;
+    private final CacheService cacheService;
+    private final ResilientCacheService resilientCacheService;
 
     /**
      * Creates a new FreePattern or updates an existing one based on the provided
@@ -64,10 +66,8 @@ public class FreePatternServiceImpl implements FreePatternService {
      */
     @Transactional
     @Override
-    @Caching(evict = {
-            @CacheEvict(value = "limitedfreepatterns", allEntries = true)
-    })
     public FreePatternResponse createOrUpdate(FreePatternRequest request) {
+        cacheService.invalidateCache("fp_*");
         FreePattern freePattern;
         if (!StringUtils.hasText(request.getId())) {
             var category = categoryRepo.findById(request.getCategoryId()).orElseThrow(
@@ -107,8 +107,8 @@ public class FreePatternServiceImpl implements FreePatternService {
      */
     @Override
     public PaginatedFreePatternResponse getAllFreePatterns(int pageNo, int pageSize, String sortBy, String sortDir,
-                                                           Filter[] filters) {
-        // Validate input parameters
+            Filter[] filters) {
+
         if (pageNo < 0 || pageSize <= 0) {
             throw new IllegalArgumentException("Invalid page number or page size");
         }
@@ -117,36 +117,18 @@ public class FreePatternServiceImpl implements FreePatternService {
             throw new IllegalArgumentException("Sort field cannot be null or empty");
         }
 
-        if (!sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) &&
-                !sortDir.equalsIgnoreCase(Sort.Direction.DESC.name())) {
-            throw new IllegalArgumentException("Invalid sort direction");
-        }
-
         Specification<FreePattern> spec = Specification.where(null);
         if (filters != null && filters.length > 0) {
             GenericFilter<FreePattern> filter = GenericFilter.create(filters);
             spec = filter.build();
         }
 
-        // Construct Sort object
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
-
-        // Create pageable object
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
-
-        // Fetch data
-        Page<FreePattern> page;
-        try {
-            page = freePatternRepo.findAll(spec, pageable);
-        } catch (Exception e) {
-            throw new RuntimeException("Database query failed", e);
-        }
-
-        // Map entity objects to response objects
+        Page<FreePattern> page = freePatternRepo.findAll(spec, pageable);
         List<FreePatternResponse> contents = FreePatternMapper.INSTANCE.toResponses(page.getContent());
 
-        // Build response
-        return PaginatedFreePatternResponse.builder()
+        var response = PaginatedFreePatternResponse.builder()
                 .contents(contents)
                 .pageNo(page.getNumber())
                 .pageSize(page.getSize())
@@ -154,25 +136,41 @@ public class FreePatternServiceImpl implements FreePatternService {
                 .totalPages(page.getTotalPages())
                 .last(page.isLast())
                 .build();
+
+        return response;
     }
 
+    /**
+     * Get all free patterns on admin page
+     *
+     * @param currentUser Current user
+     * @param pageNo      Page number
+     * @param pageSize    Page size
+     * @param sortBy      Sort by
+     * @param sortDir     Sort direction
+     * @param filters     List filters
+     * @return PaginatedFreePatternResponse
+     */
     @SuppressWarnings("OptionalGetWithoutIsPresent")
     @Override
     public PaginatedFreePatternResponse getAllFreePatternsOnAdminPage(UserPrincipal currentUser,
-                                                                      int pageNo,
-                                                                      int pageSize,
-                                                                      String sortBy,
-                                                                      String sortDir,
-                                                                      Filter[] filters) {
-        // Validate user
+            int pageNo,
+            int pageSize,
+            String sortBy,
+            String sortDir,
+            Filter[] filters) {
+
         if (currentUser == null) {
             throw new ResourceNotFoundException(MessageConstant.MSG_USER_NOT_FOUND,
                     MAP_CODE.get(MessageConstant.MSG_USER_NOT_FOUND));
         }
 
-        // Validate pagination params
         if (pageNo < 0 || pageSize <= 0) {
             throw new IllegalArgumentException("Invalid page number or page size");
+        }
+
+        if (sortBy == null || sortBy.isBlank()) {
+            throw new IllegalArgumentException("Sort field cannot be null or empty");
         }
 
         Specification<FreePattern> spec = Specification.where(null);
@@ -181,26 +179,19 @@ public class FreePatternServiceImpl implements FreePatternService {
             spec = filter.build();
         }
 
-        // Get user and check role
         User user = userRepo.findById(currentUser.getId()).get();
 
-        // Check if user has ADMIN role
         boolean isAdmin = user.getRole().equals(RoleType.ADMIN);
-
         if (!isAdmin) {
-            // If not admin, only get patterns created by this user
-            spec = spec.and((root, query, cb) ->
-                    cb.equal(root.get("createdBy"), user.getEmail()));
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("createdBy"), user.getEmail()));
         }
 
-        // Create pageable and fetch data
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
-        Page<FreePattern> page = freePatternRepo.findAll(spec, 
+        Page<FreePattern> page = freePatternRepo.findAll(spec,
                 PageRequest.of(pageNo, pageSize, sort));
 
-        // Map and return response
         List<FreePatternResponse> contents = FreePatternMapper.INSTANCE.toResponses(page.getContent());
-        return PaginatedFreePatternResponse.builder()
+        var response = PaginatedFreePatternResponse.builder()
                 .contents(contents)
                 .pageNo(page.getNumber())
                 .pageSize(page.getSize())
@@ -208,29 +199,47 @@ public class FreePatternServiceImpl implements FreePatternService {
                 .totalPages(page.getTotalPages())
                 .last(page.isLast())
                 .build();
+
+        return response;
     }
 
     /**
      * Retrieves a limited list of FreePatterns.
      *
      * @return A list of {@link FreePatternResponse} objects containing information
-     * about the FreePatterns.
+     *         about the FreePatterns.
      */
+    @SuppressWarnings("unchecked")
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    @Cacheable(value = "limitedfreepatterns")
     @Override
     public List<FreePatternResponse> getLimitedFreePatterns() {
-        log.info("Fetching limited free patterns");
+        String cacheKey = "fp_limited";
+
+        if (cacheService.hasKey(cacheKey)) {
+            var response = resilientCacheService.getCachedResult(cacheKey, List.class);
+            if (response.isPresent()) {
+                log.debug("Returning cached free patterns");
+                return response.get();
+            }
+        }
+
         var direction = settingsRepo.findByKey("homepage.fp.direction")
                 .orElse(Sort.Direction.ASC.name());
+
         var orderBy = settingsRepo.findByKey("homepage.fp.orderBy")
                 .orElse("id");
+
         var limit = settingsRepo.findByKey("homepage.fp.limit")
                 .orElse(AppConstant.DEFAULT_LIMIT);
+
         Sort sort = Sort.by(Sort.Direction.fromString(direction), orderBy);
         Pageable pageable = PageRequest.of(0, Integer.parseInt(limit), sort);
         var freePatterns = freePatternRepo.findLimitedNumFreePattern(pageable);
-        return FreePatternMapper.INSTANCE.toResponses(freePatterns);
+        var response = FreePatternMapper.INSTANCE.toResponses(freePatterns);
+
+        cacheService.set(cacheKey, response, Duration.ofDays(1));
+
+        return response;
     }
 
     /**
@@ -239,7 +248,7 @@ public class FreePatternServiceImpl implements FreePatternService {
      *
      * @param id The unique identifier of the FreePattern.
      * @return A {@link FreePatternResponse} containing detailed information about
-     * the FreePattern.
+     *         the FreePattern.
      */
     @Override
     public FreePatternResponse getDetail(String id) {
@@ -252,14 +261,13 @@ public class FreePatternServiceImpl implements FreePatternService {
     @SuppressWarnings("OptionalGetWithoutIsPresent")
     @Transactional
     @Override
-    @Caching(evict = {
-            @CacheEvict(value = "limitedfreepatterns", allEntries = true)
-    })
     public void delete(UserPrincipal currentUser, String id) {
         if (currentUser == null) {
             throw new ResourceNotFoundException(MessageConstant.MSG_USER_NOT_FOUND,
                     MAP_CODE.get(MessageConstant.MSG_USER_NOT_FOUND));
         }
+
+        cacheService.invalidateCache("fp_*");
 
         var user = userRepo.findById(currentUser.getId()).get();
 

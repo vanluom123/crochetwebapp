@@ -15,12 +15,11 @@ import org.crochet.payload.response.BlogPostPaginationResponse;
 import org.crochet.payload.response.BlogPostResponse;
 import org.crochet.repository.BlogCategoryRepo;
 import org.crochet.repository.BlogPostRepository;
-import org.crochet.repository.SettingsRepo;
 import org.crochet.repository.GenericFilter;
+import org.crochet.repository.SettingsRepo;
 import org.crochet.service.BlogPostService;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
+import org.crochet.service.CacheService;
+import org.crochet.service.ResilientCacheService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -31,6 +30,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.time.Duration;
 import java.util.List;
 
 import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
@@ -40,11 +40,24 @@ import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
  */
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class BlogPostServiceImpl implements BlogPostService {
     private final BlogPostRepository blogPostRepo;
     private final BlogCategoryRepo blogCategoryRepo;
     private final SettingsRepo settingsRepo;
+    private final CacheService cacheService;
+    private final ResilientCacheService resilientCacheService;
+
+    public BlogPostServiceImpl(BlogPostRepository blogPostRepo,
+                               BlogCategoryRepo blogCategoryRepo,
+                               SettingsRepo settingsRepo,
+                               CacheService cacheService,
+                               ResilientCacheService resilientCacheService) {
+        this.blogPostRepo = blogPostRepo;
+        this.blogCategoryRepo = blogCategoryRepo;
+        this.settingsRepo = settingsRepo;
+        this.cacheService = cacheService;
+        this.resilientCacheService = resilientCacheService;
+    }
 
     /**
      * Creates a new blog post or updates an existing one based on the provided {@link BlogPostRequest}.
@@ -56,12 +69,9 @@ public class BlogPostServiceImpl implements BlogPostService {
      */
     @Transactional
     @Override
-    @Caching(
-            evict = {
-                    @CacheEvict(value = "limitedblogs", allEntries = true)
-            }
-    )
     public BlogPostResponse createOrUpdatePost(BlogPostRequest request) {
+        cacheService.invalidateCache("blog_*");
+
         BlogPost blogPost;
         if (!StringUtils.hasText(request.getId())) {
             BlogCategory blogCategory = null;
@@ -110,7 +120,7 @@ public class BlogPostServiceImpl implements BlogPostService {
         Page<BlogPost> menuPage = blogPostRepo.findAll(spec, pageable);
         var contents = BlogPostMapper.INSTANCE.toResponses(menuPage.getContent());
 
-        return BlogPostPaginationResponse.builder()
+        var response = BlogPostPaginationResponse.builder()
                 .contents(contents)
                 .pageNo(menuPage.getNumber())
                 .totalElements(menuPage.getTotalElements())
@@ -118,6 +128,8 @@ public class BlogPostServiceImpl implements BlogPostService {
                 .pageSize(menuPage.getSize())
                 .last(menuPage.isLast())
                 .build();
+
+        return response;
     }
 
     /**
@@ -141,20 +153,35 @@ public class BlogPostServiceImpl implements BlogPostService {
      *
      * @return A list of {@link BlogPostResponse} containing limited blog posts.
      */
+    @SuppressWarnings("unchecked")
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    @Cacheable(value = "limitedblogs")
     @Override
     public List<BlogPostResponse> getLimitedBlogPosts() {
-        log.info("Fetching limited blog posts");
+        String cacheKey = "blog_limited";
+        
+        if (cacheService.hasKey(cacheKey)) {
+            var cachedResult = resilientCacheService.getCachedResult(cacheKey, List.class);
+            if (cachedResult.isPresent()) {
+                log.debug("Returning cached blog posts");
+                return cachedResult.get();
+            }
+        }
+
         String direction = settingsRepo.findByKey("homepage.blog.direction")
                 .orElse(Sort.Direction.ASC.name());
+
         String orderBy = settingsRepo.findByKey("homepage.blog.orderBy")
                 .orElse("id");
+
         String limit = settingsRepo.findByKey("homepage.blog.limit")
                 .orElse(AppConstant.DEFAULT_LIMIT);
+
         Sort sort = Sort.by(Sort.Direction.fromString(direction), orderBy);
         Pageable pageable = PageRequest.of(0, Integer.parseInt(limit), sort);
         var blogPosts = blogPostRepo.findLimitedNumPosts(pageable);
+
+        cacheService.set(cacheKey, blogPosts, Duration.ofDays(1));
+
         return BlogPostMapper.INSTANCE.toResponses(blogPosts);
     }
 
@@ -166,12 +193,8 @@ public class BlogPostServiceImpl implements BlogPostService {
      */
     @Transactional
     @Override
-    @Caching(
-            evict = {
-                    @CacheEvict(value = "limitedblogs", allEntries = true)
-            }
-    )
     public void deletePost(String id) {
+        cacheService.invalidateCache("blog_*");
         var blogPost = getById(id);
         blogPostRepo.delete(blogPost);
     }

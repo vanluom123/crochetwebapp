@@ -1,0 +1,36 @@
+databaseChangeLog:
+  - changeSet:
+      id: 20241108-add-indexes-pattern
+      author: pvanluom
+      changes:
+        - createIndex:
+            indexName: idx_pattern_created_date
+            tableName: pattern
+            columns:
+              - column:
+                  name: created_date
+                  
+        - createIndex:
+            indexName: idx_pattern_price
+            tableName: pattern
+            columns:
+              - column:
+                  name: price
+                  
+        - createIndex:
+            indexName: idx_pattern_category
+            tableName: pattern
+            columns:
+              - column:
+                  name: category_id
+      
+      rollback:
+        - dropIndex:
+            indexName: idx_pattern_created_date
+            tableName: pattern
+        - dropIndex:
+            indexName: idx_pattern_price
+            tableName: pattern
+        - dropIndex:
+            indexName: idx_pattern_category
+            tableName: pattern 
