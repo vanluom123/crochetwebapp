@@ -1,6 +1,7 @@
 package org.crochet.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -36,6 +37,7 @@ public class Category extends BaseEntity {
 
     @BatchSize(size = 10)
     @OneToMany(mappedBy = "parent", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @JsonManagedReference
     private List<Category> children;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
