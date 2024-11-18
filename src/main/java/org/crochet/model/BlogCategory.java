@@ -13,6 +13,8 @@ import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 @Getter
 @Setter
 @Entity
@@ -25,5 +27,6 @@ public class BlogCategory extends BaseEntity {
     private String name;
 
     @OneToMany(mappedBy = "blogCategory", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private List<BlogPost> blogPosts;
 }

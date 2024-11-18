@@ -19,6 +19,9 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.BatchSize;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import java.util.List;
 
 @Getter
@@ -39,6 +42,7 @@ public class BlogPost extends BaseEntity {
     private boolean home;
 
     @OneToMany(mappedBy = "blogPost")
+    @JsonManagedReference
     private List<Comment> comments;
 
     @BatchSize(size = 10)
@@ -55,5 +59,6 @@ public class BlogPost extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "blog_category_id", referencedColumnName = "id")
+    @JsonBackReference
     private BlogCategory blogCategory;
 }

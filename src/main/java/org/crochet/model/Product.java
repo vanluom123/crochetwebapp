@@ -21,6 +21,8 @@ import lombok.experimental.SuperBuilder;
 import org.crochet.enumerator.CurrencyCode;
 import org.hibernate.annotations.BatchSize;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import java.util.List;
 
 @Getter
@@ -48,6 +50,7 @@ public class Product extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", referencedColumnName = "id", nullable = false)
+    @JsonBackReference
     private Category category;
 
     @Column(name = "is_home")
