@@ -13,5 +13,6 @@ import java.util.List;
 public class CategoryResponse implements Serializable {
     private String id;
     private String name;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<CategoryResponse> children;
 }
