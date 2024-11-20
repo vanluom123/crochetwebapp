@@ -14,5 +14,5 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BlogPostPaginationResponse extends PaginationResponse {
-    private List<BlogPostResponse> contents;
+    private List<BlogOnHome> contents;
 }

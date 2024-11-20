@@ -35,17 +35,11 @@ app:
     tokenExpirationMs: 900000 # 15 minutes
     refresh-token-expiration-ms: 86400000 # 1 day
   oauth2:
-    # After successfully authenticating with the OAuth2 Provider,
-    # we'll be generating an auth token for the user and sending the token to the
-    # redirectUri mentioned by the client in the /oauth2/authorize request.
-    # We're not using cookies because they won't work well in mobile clients.
     authorizedRedirectUris:
       - http://localhost:3000/oauth2/redirect
       - https://tieuphuongcrochet.com/oauth2/redirect
       - https://littlecrochet.web.app/oauth2/redirect
       - https://littlecrochet.firebaseapp.com/oauth2/redirect
-      - crochetandroidapp://oauth2/redirect
-      - crochetiosapp://oauth2/redirect
 
 authorize:
   http-request:
@@ -75,27 +69,8 @@ authorize:
 firebase:
   serviceAccountKey: ${SERVICE_ACCOUNT_KEY}
 
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,metrics,prometheus
-  metrics:
-    tags:
-      application: crochet-application
-  prometheus:
-    metrics:
-      export:
-        enabled: true
-
-resilience4j:
-  circuitbreaker:
-    instances:
-      redisCache:
-        registerHealthIndicator: true
-        slidingWindowSize: 10
-        permittedNumberOfCallsInHalfOpenState: 3
-        slidingWindowType: COUNT_BASED
-        minimumNumberOfCalls: 5
-        waitDurationInOpenState: 60s
-        failureRateThreshold: 50
+logging:
+  level:
+    org.crochet: DEBUG
+    org.springframework.web: DEBUG
+    root: INFO

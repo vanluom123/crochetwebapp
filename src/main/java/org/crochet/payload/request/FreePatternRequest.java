@@ -1,7 +1,6 @@
 package org.crochet.payload.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Builder;
 import lombok.Data;
 import org.crochet.enumerator.ChartStatus;
@@ -11,9 +10,6 @@ import java.util.List;
 
 @Data
 @Builder
-@JsonPropertyOrder({ "id", "category_id", "name",
-        "description", "author", "is_home",
-        "link", "content", "status", "images", "files" })
 public class FreePatternRequest {
     private String id;
     @JsonProperty("category_id")

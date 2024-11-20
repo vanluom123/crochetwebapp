@@ -2,6 +2,7 @@ package org.crochet.service;
 
 import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.PatternRequest;
+import org.crochet.payload.response.PatternOnHome;
 import org.crochet.payload.response.PatternPaginationResponse;
 import org.crochet.payload.response.PatternResponse;
 
@@ -12,7 +13,7 @@ public interface PatternService {
 
     PatternPaginationResponse getPatterns(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters);
 
-    List<PatternResponse> getLimitedPatterns();
+    List<PatternOnHome> getLimitedPatterns();
 
     PatternResponse getDetail(String id);
 
