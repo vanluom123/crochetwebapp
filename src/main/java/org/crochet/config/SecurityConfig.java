@@ -98,9 +98,8 @@ public class SecurityConfig {
                         csp.policyDirectives("default-src 'self'; frame-ancestors 'none';"))
                     .referrerPolicy(referrer -> 
                         referrer.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
-                    .permissionsPolicy(permissions -> permissions.policy(
-                        "camera=(), microphone=(), geolocation=(), payment=()"
-                    ))
+                    .permissionsPolicyHeader(permissions -> 
+                        permissions.policy("camera=(), microphone=(), geolocation=(), payment=()")
                 )
                 .exceptionHandling(exceptions -> exceptions
                     .authenticationEntryPoint(new RestAuthenticationEntryPoint())
