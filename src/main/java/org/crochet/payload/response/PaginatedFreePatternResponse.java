@@ -14,5 +14,5 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PaginatedFreePatternResponse extends PaginationResponse {
-    private List<FreePatternResponse> contents;
+    private List<FreePatternOnHome> contents;
 }

@@ -70,12 +70,12 @@ public class SecurityConfig {
 
     @Bean
     @ConfigurationProperties(prefix = "authorize.http-request")
-    public AuthorizeHttpRequestProperties authorizeHttpRequestProperties() {
+    AuthorizeHttpRequestProperties authorizeHttpRequestProperties() {
         return new AuthorizeHttpRequestProperties();
     }
 
     @Bean
-    public AuthenticationProvider authenticationProvider() {
+    AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(customUserDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder);
@@ -83,7 +83,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> 
@@ -98,9 +98,8 @@ public class SecurityConfig {
                         csp.policyDirectives("default-src 'self'; frame-ancestors 'none';"))
                     .referrerPolicy(referrer -> 
                         referrer.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
-                    .permissionsPolicy(permissions -> permissions.policy(
-                        "camera=(), microphone=(), geolocation=(), payment=()"
-                    ))
+                    .permissionsPolicyHeader(permissions -> 
+                        permissions.policy("camera=(), microphone=(), geolocation=(), payment=()"))
                 )
                 .exceptionHandling(exceptions -> exceptions
                     .authenticationEntryPoint(new RestAuthenticationEntryPoint())
@@ -125,7 +124,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
+    CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList(
             authorizeHttpRequestProperties().getAllowedOrigins()
@@ -141,7 +140,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+    AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 }

@@ -7,13 +7,9 @@ spring:
         format_sql: true
     generate-ddl: true
   datasource:
-    url: jdbc:mysql://localhost:3306/testdb
-    username: root
-    password: root
+    url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
   liquibase:
     enabled: false
-
-redis:
-  host: 0.0.0.0
-  port: 6379

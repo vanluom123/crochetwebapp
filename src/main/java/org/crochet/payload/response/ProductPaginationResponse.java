@@ -14,5 +14,5 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProductPaginationResponse extends PaginationResponse {
-    private List<ProductResponse> contents;
+    private List<ProductOnHome> contents;
 }

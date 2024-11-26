@@ -2,6 +2,7 @@ package org.crochet.service;
 
 import org.crochet.payload.request.BlogPostRequest;
 import org.crochet.payload.request.Filter;
+import org.crochet.payload.response.BlogOnHome;
 import org.crochet.payload.response.BlogPostPaginationResponse;
 import org.crochet.payload.response.BlogPostResponse;
 
@@ -14,7 +15,7 @@ public interface BlogPostService {
 
     BlogPostResponse getDetail(String id);
 
-    List<BlogPostResponse> getLimitedBlogPosts();
+    List<BlogOnHome> getLimitedBlogPosts();
 
     void deletePost(String id);
 }

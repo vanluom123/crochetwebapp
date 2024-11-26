@@ -10,9 +10,3 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
   liquibase:
     enabled: false
-
-redis:
-  host: ${REDIS_HOST}
-  port: ${REDIS_PORT}
-  username: default
-  password: ${REDIS_PASSWORD}

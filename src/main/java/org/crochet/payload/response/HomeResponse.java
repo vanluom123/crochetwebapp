@@ -5,17 +5,16 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
 import java.util.List;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class HomeResponse implements Serializable {
-    private List<ProductResponse> products;
-    private List<PatternResponse> patterns;
-    private List<FreePatternResponse> freePatterns;
+public class HomeResponse {
+    private List<ProductOnHome> products;
+    private List<PatternOnHome> patterns;
+    private List<FreePatternOnHome> freePatterns;
     private List<BannerResponse> banners;
-    private List<BlogPostResponse> blogs;
+    private List<BlogOnHome> blogs;
 }

@@ -19,14 +19,14 @@ public class OpenAPIConfig {
     }
 
     @Bean
-    public OpenAPI openAPI() {
+    OpenAPI openAPI() {
         return new OpenAPI().addSecurityItem(new SecurityRequirement().addList("BearerAuth"))
                 .components(new Components().addSecuritySchemes
                         ("BearerAuth", createAPIKeyScheme()))
                 .info(new Info().title("My REST API")
                         .description("Some custom description of API.")
                         .version("1.0").contact(new Contact().name("Crochet")
-                                .email("phanvanluom97bd@gmail.com").url("www.littlecrochet.com"))
+                                .email("thamphuong.crochet@gmail.com").url("https://www.tieuphuongcrochet.com"))
                         .license(new License().name("License of API")
                                 .url("API license URL")));
     }
