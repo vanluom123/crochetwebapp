@@ -28,25 +28,28 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
+import io.github.resilience4j.retry.annotation.Retry;
+
 import java.time.LocalDateTime;
 
 import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
 import static org.crochet.constant.MessageConstant.ACTIVE_NOW;
-import static org.crochet.constant.MessageConstant.MSG_ACCOUNT_ACTIVATION_LINK;
 import static org.crochet.constant.MessageConstant.CONFIRM_YOUR_EMAIL;
+import static org.crochet.constant.MessageConstant.MSG_ACCOUNT_ACTIVATION_LINK;
 import static org.crochet.constant.MessageConstant.MSG_EMAIL_ALREADY_CONFIRMED;
 import static org.crochet.constant.MessageConstant.MSG_EMAIL_NOT_VERIFIED;
-import static org.crochet.constant.MessageConstant.RESET_PASSWORD_LINK;
 import static org.crochet.constant.MessageConstant.MSG_PASSWORD_RESET_TOKEN_EXPIRED;
-import static org.crochet.constant.MessageConstant.REFRESH_TOKEN_NOT_IN_DB;
 import static org.crochet.constant.MessageConstant.MSG_RESEND_SUCCESS;
-import static org.crochet.constant.MessageConstant.RESET_NOTIFICATION;
-import static org.crochet.constant.MessageConstant.RESET_PASSWORD;
-import static org.crochet.constant.MessageConstant.MSG_RESET_PASSWORD_SUCCESS;
 import static org.crochet.constant.MessageConstant.MSG_RESET_PASSWORD_LINK;
+import static org.crochet.constant.MessageConstant.MSG_RESET_PASSWORD_SUCCESS;
 import static org.crochet.constant.MessageConstant.MSG_SUCCESSFUL_CONFIRMATION;
 import static org.crochet.constant.MessageConstant.MSG_TOKEN_EXPIRED;
 import static org.crochet.constant.MessageConstant.MSG_USER_REGISTER_SUCCESS;
+import static org.crochet.constant.MessageConstant.REFRESH_TOKEN_NOT_IN_DB;
+import static org.crochet.constant.MessageConstant.RESET_NOTIFICATION;
+import static org.crochet.constant.MessageConstant.RESET_PASSWORD;
+import static org.crochet.constant.MessageConstant.RESET_PASSWORD_LINK;
 import static org.springframework.util.StringUtils.hasText;
 
 /**
@@ -157,6 +160,8 @@ public class AuthServiceImpl implements AuthService {
      * @throws ResourceNotFoundException User not found
      */
     @Override
+    @RateLimiter(name = "resendEmail", fallbackMethod = "resendVerificationEmailFallback")
+    @Retry(name = "resendEmail")
     public String resendVerificationEmail(String email) {
         // If user don't exist, ResourceNotFoundException will be thrown
         User user = userService.getByEmail(email);
@@ -305,6 +310,7 @@ public class AuthServiceImpl implements AuthService {
      */
     @Transactional
     @Override
+    @RateLimiter(name = "passwordResetRateLimiter", fallbackMethod = "resetPasswordLinkFallback")
     public String resetPasswordLink(String email) {
         // Check user
         User user = userService.getByEmail(email);
@@ -385,5 +391,15 @@ public class AuthServiceImpl implements AuthService {
             tokenBlacklistService.addTokenToBlacklist(token);
             SecurityContextHolder.clearContext();
         }
+    }
+
+    @SuppressWarnings("unused")
+    private String resetPasswordLinkFallback(String email, Throwable t) {
+        return "Request limit exceeded. Please wait for a while before retrying.";
+    }
+
+    @SuppressWarnings("unused")
+    private String resendVerificationEmailFallback(String email, Throwable t) {
+        return "Request limit exceeded. Please wait for a while before retrying.";
     }
 }

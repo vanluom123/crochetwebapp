@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 @EnableJpaAuditing(auditorAwareRef = "auditorProvider")
 public class AuditConfig {
     @Bean
-    public AuditorAware<String> auditorProvider() {
+    AuditorAware<String> auditorProvider() {
         return new AuditorAwareImpl();
     }
 }

@@ -21,7 +21,7 @@ public class FirebaseConfig {
     private String serviceAccountKey;
 
     @Bean
-    public FirebaseApp firebaseApp() throws IOException {
+    FirebaseApp firebaseApp() throws IOException {
         byte[] decodedKey = Base64.getDecoder().decode(serviceAccountKey);
         ByteArrayInputStream is = new ByteArrayInputStream(decodedKey);
 
@@ -33,7 +33,7 @@ public class FirebaseConfig {
     }
 
     @Bean
-    public StorageClient storageClient(FirebaseApp firebaseApp) {
+    StorageClient storageClient(FirebaseApp firebaseApp) {
         return StorageClient.getInstance(firebaseApp);
     }
 }

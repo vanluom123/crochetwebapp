@@ -65,10 +65,14 @@ public class FirebaseStorageServiceImpl implements FirebaseStorageService {
 
         log.info("image name: {}", blob.getName());
 
+        var lastModified = blob.getUpdateTimeOffsetDateTime().toLocalDateTime();
+
         var encodeName = URLEncoder.encode(blob.getName(), StandardCharsets.UTF_8);
+
         String downloadUrl = "https://firebasestorage.googleapis.com/v0/b/%s/o/%s?alt=media";
         var fileContent = String.format(downloadUrl, BUCKET_NAME, encodeName);
-        return new FileResponse(fileName, fileContent, 0);
+
+        return new FileResponse(fileName, fileContent, lastModified);
     }
 
     /**

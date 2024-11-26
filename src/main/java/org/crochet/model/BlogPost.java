@@ -53,7 +53,8 @@ public class BlogPost extends BaseEntity {
     @AttributeOverrides({
             @AttributeOverride(name = "fileName", column = @Column(name = "file_name")),
             @AttributeOverride(name = "fileContent", column = @Column(name = "file_content")),
-            @AttributeOverride(name = "order", column = @Column(name = "display_order"))
+            @AttributeOverride(name = "order", column = @Column(name = "display_order")),
+            @AttributeOverride(name = "lastModified", column = @Column(name = "last_modified", columnDefinition = "datetime default current_timestamp"))
     })
     private List<File> files;
 
