@@ -151,6 +151,19 @@ public class ProductServiceImpl implements ProductService {
     }
 
     /**
+     * Get product ids
+     *
+     * @param pageNo Page number
+     * @param limit  Limit
+     * @return List of product ids
+     */
+    @Override
+    public List<String> getProductIds(int pageNo, int limit) {
+        Pageable pageable = PageRequest.of(pageNo, limit);
+        return productRepo.getProductIds(pageable);
+    }
+
+    /**
      * Retrieves a list of products that are marked as limited.
      *
      * @return A list of {@link ProductResponse} containing limited products.

@@ -6,6 +6,9 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
+import java.util.List;
+
 import org.crochet.constant.AppConstant;
 import org.crochet.payload.request.BlogPostRequest;
 import org.crochet.payload.request.Filter;
@@ -85,5 +88,20 @@ public class BlogController {
     public ResponseEntity<Void> deletePost(@RequestParam String id) {
         blogPostService.deletePost(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Get blog ids")
+    @ApiResponse(responseCode = "200", description = "List of blog ids",
+            content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = List.class)))
+    @GetMapping("/ids")
+    public ResponseEntity<List<String>> getBlogIds(
+            @Parameter(description = "Page number (default: 0)")
+            @RequestParam(value = "pageNo", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER,
+                    required = false) int pageNo,
+            @Parameter(description = "Limit (default: 10)")
+            @RequestParam(value = "limit", defaultValue = AppConstant.DEFAULT_PAGE_SIZE, required = false) int limit) {
+        var response = blogPostService.getBlogIds(pageNo, limit);
+        return ResponseEntity.ok(response);
     }
 }

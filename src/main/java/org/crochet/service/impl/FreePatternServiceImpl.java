@@ -234,6 +234,19 @@ public class FreePatternServiceImpl implements FreePatternService {
     }
 
     /**
+     * Get free pattern ids
+     *
+     * @param pageNo Page number
+     * @param limit  Limit
+     * @return List of free pattern ids
+     */
+    @Override
+    public List<String> getFreePatternIds(int pageNo, int limit) {
+        Pageable pageable = PageRequest.of(pageNo, limit);
+        return freePatternRepo.getFreePatternIds(pageable);
+    }
+
+    /**
      * Retrieves detailed information for a specific FreePattern identified by the
      * given ID.
      *

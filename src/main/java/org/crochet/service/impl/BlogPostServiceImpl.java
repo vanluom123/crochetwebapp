@@ -141,8 +141,21 @@ public class BlogPostServiceImpl implements BlogPostService {
                 .totalElements(menuPage.getTotalElements())
                 .totalPages(menuPage.getTotalPages())
                 .pageSize(menuPage.getSize())
-                .last(menuPage.isLast())
+            .last(menuPage.isLast())
                 .build();
+    }
+
+    /**
+     * Get blog ids
+     *
+     * @param pageNo Page number
+     * @param limit  Limit
+     * @return List of blog ids
+     */
+    @Override
+    public List<String> getBlogIds(int pageNo, int limit) {
+        Pageable pageable = PageRequest.of(pageNo, limit);
+        return blogPostRepo.getBlogIds(pageable);
     }
 
     /**

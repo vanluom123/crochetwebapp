@@ -26,4 +26,6 @@ public interface FreePatternService {
     FreePatternResponse getDetail(String id);
 
     void delete(UserPrincipal currentUser, String id);
+
+    List<String> getFreePatternIds(int pageNo, int limit);
 }

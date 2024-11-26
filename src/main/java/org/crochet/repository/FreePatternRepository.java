@@ -40,4 +40,7 @@ public interface FreePatternRepository extends JpaRepository<FreePattern, String
                   and i.order = 0
             """)
     List<FreePatternOnHome> getFreePatternOnHomeWithIds(@Param("ids") List<String> ids);
+
+    @Query("select f.id from FreePattern f order by f.createdDate desc")
+    List<String> getFreePatternIds(Pageable pageable);
 }

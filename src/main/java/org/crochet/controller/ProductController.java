@@ -6,6 +6,9 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
+import java.util.List;
+
 import org.crochet.constant.AppConstant;
 import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.ProductRequest;
@@ -91,5 +94,20 @@ public class ProductController {
     public ResponseEntity<String> deleteProduct(@RequestParam("id") String id) {
         productService.delete(id);
         return ResponseEntity.ok("Product deleted successfully");
+    }
+
+    @Operation(summary = "Get product ids")
+    @ApiResponse(responseCode = "200", description = "List of product ids",
+            content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = List.class)))
+    @GetMapping("/ids")
+    public ResponseEntity<List<String>> getProductIds(
+            @Parameter(description = "Page number (default: 0)")
+            @RequestParam(value = "pageNo", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER,
+                    required = false) int pageNo,
+            @Parameter(description = "Limit (default: 10)")
+            @RequestParam(value = "limit", defaultValue = AppConstant.DEFAULT_PAGE_SIZE, required = false) int limit) {
+        var response = productService.getProductIds(pageNo, limit);
+        return ResponseEntity.ok(response);
     }
 }

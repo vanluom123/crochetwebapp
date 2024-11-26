@@ -17,5 +17,7 @@ public interface BlogPostService {
 
     List<BlogOnHome> getLimitedBlogPosts();
 
+    List<String> getBlogIds(int pageNo, int limit);
+
     void deletePost(String id);
 }
