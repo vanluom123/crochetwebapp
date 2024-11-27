@@ -50,7 +50,7 @@ public class EmailService implements EmailSender {
             helper.setText(content, true);
             helper.setTo(to);
             helper.setSubject(subject);
-            helper.setFrom("phanvanluom97bd@gmail.com", "Little Crochet");
+            helper.setFrom("thamphuong.crochet@gmail.com", "Little Crochet");
             javaMailSender.send(mimeMessage);
         } catch (MessagingException e) {
             log.error(MSG_FAILED_SEND_EMAIL, e);

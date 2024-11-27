@@ -1,0 +1,75 @@
+databaseChangeLog:
+  - changeSet:
+      id: 20241109-add-additional-indexes
+      author: pvanluom
+      changes:
+        # Pattern indexes
+        - createIndex:
+            indexName: idx_pattern_is_home
+            tableName: pattern
+            columns:
+              - column:
+                  name: is_home
+        - createIndex:
+            indexName: idx_pattern_name
+            tableName: pattern
+            columns:
+              - column:
+                  name: name
+
+        # Product indexes
+        - createIndex:
+            indexName: idx_product_is_home
+            tableName: product
+            columns:
+              - column:
+                  name: is_home
+        - createIndex:
+            indexName: idx_product_name
+            tableName: product
+            columns:
+              - column:
+                  name: name
+
+        # Free Pattern indexes
+        - createIndex:
+            indexName: idx_free_pattern_is_home
+            tableName: free_pattern
+            columns:
+              - column:
+                  name: is_home
+        - createIndex:
+            indexName: idx_free_pattern_name
+            tableName: free_pattern
+            columns:
+              - column:
+                  name: name
+        - createIndex:
+            indexName: idx_free_pattern_author
+            tableName: free_pattern
+            columns:
+              - column:
+                  name: author
+
+      rollback:
+        - dropIndex:
+            indexName: idx_pattern_is_home
+            tableName: pattern
+        - dropIndex:
+            indexName: idx_pattern_name
+            tableName: pattern
+        - dropIndex:
+            indexName: idx_product_is_home
+            tableName: product
+        - dropIndex:
+            indexName: idx_product_name
+            tableName: product
+        - dropIndex:
+            indexName: idx_free_pattern_is_home
+            tableName: free_pattern
+        - dropIndex:
+            indexName: idx_free_pattern_name
+            tableName: free_pattern
+        - dropIndex:
+            indexName: idx_free_pattern_author
+            tableName: free_pattern 

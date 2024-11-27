@@ -1,6 +1,5 @@
 package org.crochet.service;
 
-import org.crochet.exception.IllegalArgumentException;
 import org.crochet.model.Category;
 import org.crochet.payload.request.CategoryCreationRequest;
 import org.crochet.payload.response.CategoryResponse;
@@ -18,7 +17,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.anyList;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;

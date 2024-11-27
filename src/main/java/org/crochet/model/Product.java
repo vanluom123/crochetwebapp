@@ -21,6 +21,8 @@ import lombok.experimental.SuperBuilder;
 import org.crochet.enumerator.CurrencyCode;
 import org.hibernate.annotations.BatchSize;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import java.util.List;
 
 @Getter
@@ -48,6 +50,7 @@ public class Product extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", referencedColumnName = "id", nullable = false)
+    @JsonBackReference
     private Category category;
 
     @Column(name = "is_home")
@@ -67,7 +70,8 @@ public class Product extends BaseEntity {
     @AttributeOverrides({
             @AttributeOverride(name = "fileName", column = @Column(name = "file_name")),
             @AttributeOverride(name = "fileContent", column = @Column(name = "file_content", columnDefinition = "TEXT")),
-            @AttributeOverride(name = "order", column = @Column(name = "display_order"))
+            @AttributeOverride(name = "order", column = @Column(name = "display_order")),
+            @AttributeOverride(name = "lastModified", column = @Column(name = "last_modified", columnDefinition = "datetime default current_timestamp"))
     })
     private List<File> images;
 }

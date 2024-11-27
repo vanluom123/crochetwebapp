@@ -1,26 +1,26 @@
 package org.crochet.service.impl;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.crochet.constant.AppConstant;
 import org.crochet.constant.MessageConstant;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.BlogPostMapper;
 import org.crochet.mapper.FileMapper;
 import org.crochet.model.BlogCategory;
 import org.crochet.model.BlogPost;
+import org.crochet.model.Settings;
 import org.crochet.payload.request.BlogPostRequest;
 import org.crochet.payload.request.Filter;
+import org.crochet.payload.response.BlogOnHome;
 import org.crochet.payload.response.BlogPostPaginationResponse;
 import org.crochet.payload.response.BlogPostResponse;
 import org.crochet.repository.BlogCategoryRepo;
 import org.crochet.repository.BlogPostRepository;
-import org.crochet.repository.SettingsRepo;
 import org.crochet.repository.GenericFilter;
+import org.crochet.repository.SettingsRepo;
 import org.crochet.service.BlogPostService;
+import org.crochet.util.ImageUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -32,6 +32,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
 
@@ -40,51 +43,67 @@ import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
  */
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class BlogPostServiceImpl implements BlogPostService {
     private final BlogPostRepository blogPostRepo;
     private final BlogCategoryRepo blogCategoryRepo;
     private final SettingsRepo settingsRepo;
 
+    public BlogPostServiceImpl(BlogPostRepository blogPostRepo,
+                               BlogCategoryRepo blogCategoryRepo,
+                               SettingsRepo settingsRepo) {
+        this.blogPostRepo = blogPostRepo;
+        this.blogCategoryRepo = blogCategoryRepo;
+        this.settingsRepo = settingsRepo;
+    }
+
     /**
-     * Creates a new blog post or updates an existing one based on the provided {@link BlogPostRequest}.
-     * If the request contains an ID, it updates the existing blog post with the corresponding ID.
+     * Creates a new blog post or updates an existing one based on the provided
+     * {@link BlogPostRequest}.
+     * If the request contains an ID, it updates the existing blog post with the
+     * corresponding ID.
      * If the request does not contain an ID, it creates a new blog post.
      *
-     * @param request The {@link BlogPostRequest} containing information for creating or updating the blog post.
-     * @return A {@link BlogPostResponse} containing detailed information about the created or updated blog post.
+     * @param request The {@link BlogPostRequest} containing information for
+     *                creating or updating the blog post.
+     * @return A {@link BlogPostResponse} containing detailed information about the
+     * created or updated blog post.
      */
+    @CacheEvict("blog_get_limited")
     @Transactional
     @Override
-    @Caching(
-            evict = {
-                    @CacheEvict(value = "limitedblogs", allEntries = true)
-            }
-    )
     public BlogPostResponse createOrUpdatePost(BlogPostRequest request) {
         BlogPost blogPost;
+        var images = ImageUtils.sortFiles(request.getFiles());
+
         if (!StringUtils.hasText(request.getId())) {
             BlogCategory blogCategory = null;
             if (request.getBlogCategoryId() != null) {
                 blogCategory = blogCategoryRepo.findById(request.getBlogCategoryId())
-                        .orElseThrow(
-                                () -> new ResourceNotFoundException(MessageConstant.MSG_BLOG_CATEGORY_NOT_FOUND,
-                                        MAP_CODE.get(MessageConstant.MSG_BLOG_CATEGORY_NOT_FOUND))
-                        );
+                        .orElseThrow(() -> new ResourceNotFoundException(MessageConstant.MSG_BLOG_CATEGORY_NOT_FOUND,
+                                        MAP_CODE.get(MessageConstant.MSG_BLOG_CATEGORY_NOT_FOUND)));
             }
             blogPost = BlogPost.builder()
                     .blogCategory(blogCategory)
                     .title(request.getTitle())
                     .content(request.getContent())
                     .home(request.isHome())
-                    .files(FileMapper.INSTANCE.toEntities(request.getFiles()))
+                    .files(FileMapper.INSTANCE.toEntities(images))
                     .build();
         } else {
             blogPost = getById(request.getId());
-            blogPost = BlogPostMapper.INSTANCE.partialUpdate(request, blogPost);
+            blogPost.setTitle(request.getTitle());
+            blogPost.setContent(request.getContent());
+            blogPost.setHome(request.isHome());
+            blogPost.setFiles(FileMapper.INSTANCE.toEntities(images));
         }
         blogPost = blogPostRepo.save(blogPost);
-        return BlogPostMapper.INSTANCE.toResponse(blogPost);
+        return BlogPostResponse.builder()
+                .id(blogPost.getId())
+                .title(blogPost.getTitle())
+                .content(blogPost.getContent())
+                .isHome(blogPost.isHome())
+                .createdDate(blogPost.getCreatedDate())
+                .build();
     }
 
     /**
@@ -93,12 +112,15 @@ public class BlogPostServiceImpl implements BlogPostService {
      * @param pageNo   The page number to retrieve (0-indexed).
      * @param pageSize The number of blog posts to include in each page.
      * @param sortBy   The attribute by which the blog posts should be sorted.
-     * @param sortDir  The sorting direction, either "ASC" (ascending) or "DESC" (descending).
+     * @param sortDir  The sorting direction, either "ASC" (ascending) or "DESC"
+     *                 (descending).
      * @param filters  The list of filters.
-     * @return A {@link BlogPostPaginationResponse} containing the paginated list of blog posts.
+     * @return A {@link BlogPostPaginationResponse} containing the paginated list of
+     * blog posts.
      */
     @Override
-    public BlogPostPaginationResponse getBlogs(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters) {
+    public BlogPostPaginationResponse getBlogs(int pageNo, int pageSize, String sortBy, String sortDir,
+                                               Filter[] filters) {
         Specification<BlogPost> spec = Specification.where(null);
         if (filters != null && filters.length > 0) {
             GenericFilter<BlogPost> filter = GenericFilter.create(filters);
@@ -108,10 +130,13 @@ public class BlogPostServiceImpl implements BlogPostService {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
         Page<BlogPost> menuPage = blogPostRepo.findAll(spec, pageable);
-        var contents = BlogPostMapper.INSTANCE.toResponses(menuPage.getContent());
+        var blogIds = menuPage.getContent().stream()
+                .map(BlogPost::getId)
+                .toList();
+        var blogOnHomes = blogPostRepo.findBlogOnHomeWithIds(blogIds);
 
         return BlogPostPaginationResponse.builder()
-                .contents(contents)
+                .contents(blogOnHomes)
                 .pageNo(menuPage.getNumber())
                 .totalElements(menuPage.getTotalElements())
                 .totalPages(menuPage.getTotalPages())
@@ -121,18 +146,20 @@ public class BlogPostServiceImpl implements BlogPostService {
     }
 
     /**
-     * Retrieves detailed information for a specific blog post identified by the given ID.
+     * Retrieves detailed information for a specific blog post identified by the
+     * given ID.
      *
      * @param id The unique identifier of the blog post.
-     * @return A {@link BlogPostResponse} containing detailed information about the blog post.
-     * @throws ResourceNotFoundException If the specified blog post ID does not correspond to an existing blog post.
+     * @return A {@link BlogPostResponse} containing detailed information about the
+     * blog post.
+     * @throws ResourceNotFoundException If the specified blog post ID does not
+     *                                   correspond to an existing blog post.
      */
     @Override
     public BlogPostResponse getDetail(String id) {
         var blogPost = blogPostRepo.getDetail(id).orElseThrow(
                 () -> new ResourceNotFoundException(MessageConstant.MSG_BLOG_NOT_FOUND,
-                        MAP_CODE.get(MessageConstant.MSG_BLOG_NOT_FOUND))
-        );
+                        MAP_CODE.get(MessageConstant.MSG_BLOG_NOT_FOUND)));
         return BlogPostMapper.INSTANCE.toResponse(blogPost);
     }
 
@@ -141,36 +168,37 @@ public class BlogPostServiceImpl implements BlogPostService {
      *
      * @return A list of {@link BlogPostResponse} containing limited blog posts.
      */
+    @Cacheable("blog_get_limited")
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    @Cacheable(value = "limitedblogs")
     @Override
-    public List<BlogPostResponse> getLimitedBlogPosts() {
-        log.info("Fetching limited blog posts");
-        String direction = settingsRepo.findByKey("homepage.blog.direction")
-                .orElse(Sort.Direction.ASC.name());
-        String orderBy = settingsRepo.findByKey("homepage.blog.orderBy")
-                .orElse("id");
-        String limit = settingsRepo.findByKey("homepage.blog.limit")
-                .orElse(AppConstant.DEFAULT_LIMIT);
+    public List<BlogOnHome> getLimitedBlogPosts() {
+        List<Settings> settings = settingsRepo.findSettings();
+
+        Map<String, Settings> settingsMap = settings.stream()
+                .collect(Collectors.toMap(Settings::getKey, Function.identity()));
+
+        String direction = settingsMap.get("homepage.blog.direction").getValue();
+
+        String orderBy = settingsMap.get("homepage.blog.orderBy").getValue();
+
+        String limit = settingsMap.get("homepage.blog.limit").getValue();
+
         Sort sort = Sort.by(Sort.Direction.fromString(direction), orderBy);
         Pageable pageable = PageRequest.of(0, Integer.parseInt(limit), sort);
-        var blogPosts = blogPostRepo.findLimitedNumPosts(pageable);
-        return BlogPostMapper.INSTANCE.toResponses(blogPosts);
+
+       return blogPostRepo.findLimitedNumPosts(pageable);
     }
 
     /**
      * Deletes the blog post identified by the given ID.
      *
      * @param id The unique identifier of the blog post to delete.
-     * @throws ResourceNotFoundException If the specified blog post ID does not correspond to an existing blog post.
+     * @throws ResourceNotFoundException If the specified blog post ID does not
+     *                                   correspond to an existing blog post.
      */
+    @CacheEvict("blog_get_limited")
     @Transactional
     @Override
-    @Caching(
-            evict = {
-                    @CacheEvict(value = "limitedblogs", allEntries = true)
-            }
-    )
     public void deletePost(String id) {
         var blogPost = getById(id);
         blogPostRepo.delete(blogPost);
@@ -181,12 +209,12 @@ public class BlogPostServiceImpl implements BlogPostService {
      *
      * @param id The unique identifier of the blog post to retrieve.
      * @return The {@link BlogPost} identified by the given ID.
-     * @throws ResourceNotFoundException If the specified blog post ID does not correspond to an existing blog post.
+     * @throws ResourceNotFoundException If the specified blog post ID does not
+     *                                   correspond to an existing blog post.
      */
     private BlogPost getById(String id) {
         return blogPostRepo.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException(MessageConstant.MSG_BLOG_NOT_FOUND,
-                        MAP_CODE.get(MessageConstant.MSG_BLOG_NOT_FOUND))
-        );
+                        MAP_CODE.get(MessageConstant.MSG_BLOG_NOT_FOUND)));
     }
 }

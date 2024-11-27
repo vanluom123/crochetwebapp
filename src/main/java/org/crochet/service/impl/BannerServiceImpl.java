@@ -12,7 +12,6 @@ import org.crochet.repository.BannerTypeRepo;
 import org.crochet.service.BannerService;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,19 +25,18 @@ import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
 @Slf4j
 @Service
 public class BannerServiceImpl implements BannerService {
-    final BannerRepo bannerRepo;
-    final BannerTypeRepo bannerTypeRepo;
+    private final BannerRepo bannerRepo;
+    private final BannerTypeRepo bannerTypeRepo;
 
-    public BannerServiceImpl(BannerRepo bannerRepo, BannerTypeRepo bannerTypeRepo) {
+    public BannerServiceImpl(BannerRepo bannerRepo,
+            BannerTypeRepo bannerTypeRepo) {
         this.bannerRepo = bannerRepo;
         this.bannerTypeRepo = bannerTypeRepo;
     }
 
+    @CacheEvict(value = "banner_getAll")
     @Transactional
     @Override
-    @Caching(
-            evict = {@CacheEvict(value = "activebanners", allEntries = true)}
-    )
     public List<BannerResponse> batchInsertOrUpdate(List<BannerRequest> requests) {
         List<Banner> banners = new ArrayList<>();
         List<Banner> existingBanners = bannerRepo.findAll();
@@ -76,11 +74,10 @@ public class BannerServiceImpl implements BannerService {
         return banners.stream().map(BannerMapper.INSTANCE::toResponse).toList();
     }
 
+    @Cacheable("banner_getAll")
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    @Cacheable(value = "activebanners")
     @Override
     public List<BannerResponse> getAll() {
-        log.info("Fetching all active banners");
         List<Banner> banners = bannerRepo.findActiveBanners();
         return BannerMapper.INSTANCE.toResponses(banners);
     }

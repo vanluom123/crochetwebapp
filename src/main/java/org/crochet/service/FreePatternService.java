@@ -2,6 +2,7 @@ package org.crochet.service;
 
 import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.FreePatternRequest;
+import org.crochet.payload.response.FreePatternOnHome;
 import org.crochet.payload.response.FreePatternResponse;
 import org.crochet.payload.response.PaginatedFreePatternResponse;
 import org.crochet.security.UserPrincipal;
@@ -20,7 +21,7 @@ public interface FreePatternService {
                                                                String sortDir,
                                                                Filter[] filters);
 
-    List<FreePatternResponse> getLimitedFreePatterns();
+    List<FreePatternOnHome> getLimitedFreePatterns();
 
     FreePatternResponse getDetail(String id);
 
