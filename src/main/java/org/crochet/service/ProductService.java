@@ -18,4 +18,6 @@ public interface ProductService {
     ProductResponse getDetail(String id);
 
     void delete(String id);
+
+    List<String> getProductIds(int pageNo, int limit);
 }

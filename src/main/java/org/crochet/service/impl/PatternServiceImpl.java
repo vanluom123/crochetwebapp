@@ -19,8 +19,6 @@ import org.crochet.repository.PatternRepository;
 import org.crochet.repository.SettingsRepo;
 import org.crochet.service.PatternService;
 import org.crochet.util.ImageUtils;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -30,6 +28,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -53,7 +52,6 @@ public class PatternServiceImpl implements PatternService {
      *
      * @param request PatternRequest
      */
-    @CacheEvict(value = "pattern_limited")
     @Transactional
     @Override
     public PatternResponse createOrUpdate(PatternRequest request) {
@@ -147,11 +145,13 @@ public class PatternServiceImpl implements PatternService {
      *
      * @return List of PatternResponse
      */
-    @Cacheable(value = "pattern_limited")
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Override
     public List<PatternOnHome> getLimitedPatterns() {
         List<Settings> settings = settingsRepo.findSettings();
+        if (settings == null || settings.isEmpty()) {
+            return Collections.emptyList();
+        }
 
         Map<String, Settings> settingsMap = settings.stream()
                 .collect(Collectors.toMap(Settings::getKey, Function.identity()));
@@ -165,6 +165,19 @@ public class PatternServiceImpl implements PatternService {
         Sort sort = Sort.by(Sort.Direction.fromString(direction), orderBy);
         Pageable pageable = PageRequest.of(0, Integer.parseInt(limit), sort);
         return patternRepo.findLimitedNumPattern(pageable);
+    }
+
+    /**
+     * Get pattern ids
+     *
+     * @param pageNo Page number
+     * @param limit  Limit
+     * @return List of pattern ids
+     */
+    @Override
+    public List<String> getPatternIds(int pageNo, int limit) {
+        Pageable pageable = PageRequest.of(pageNo, limit);
+        return patternRepo.getPatternIds(pageable);
     }
 
     /**
@@ -186,7 +199,6 @@ public class PatternServiceImpl implements PatternService {
      *
      * @param id Pattern id
      */
-    @CacheEvict(value = "pattern_limited")
     @Transactional
     @Override
     public void deletePattern(String id) {

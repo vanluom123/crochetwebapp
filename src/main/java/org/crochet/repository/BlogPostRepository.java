@@ -40,4 +40,11 @@ public interface BlogPostRepository extends JpaRepository<BlogPost, String>, Jpa
                 and f.order = 0
             """)
     List<BlogOnHome> findBlogOnHomeWithIds(@Param("ids") List<String> ids);
+
+    @Query("""
+            select p.id
+            from BlogPost p
+            order by p.createdDate desc
+            """)
+    List<String> getBlogIds(Pageable pageable);
 }
