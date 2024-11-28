@@ -138,7 +138,7 @@ public class BlogPostServiceImpl implements BlogPostService {
                 .totalElements(menuPage.getTotalElements())
                 .totalPages(menuPage.getTotalPages())
                 .pageSize(menuPage.getSize())
-            .last(menuPage.isLast())
+                .last(menuPage.isLast())
                 .build();
     }
 
