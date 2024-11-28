@@ -19,8 +19,6 @@ import org.crochet.repository.GenericFilter;
 import org.crochet.repository.SettingsRepo;
 import org.crochet.service.BlogPostService;
 import org.crochet.util.ImageUtils;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -68,7 +66,6 @@ public class BlogPostServiceImpl implements BlogPostService {
      * @return A {@link BlogPostResponse} containing detailed information about the
      * created or updated blog post.
      */
-    @CacheEvict("blog_get_limited")
     @Transactional
     @Override
     public BlogPostResponse createOrUpdatePost(BlogPostRequest request) {
@@ -181,7 +178,6 @@ public class BlogPostServiceImpl implements BlogPostService {
      *
      * @return A list of {@link BlogPostResponse} containing limited blog posts.
      */
-    @Cacheable("blog_get_limited")
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Override
     public List<BlogOnHome> getLimitedBlogPosts() {
@@ -209,7 +205,6 @@ public class BlogPostServiceImpl implements BlogPostService {
      * @throws ResourceNotFoundException If the specified blog post ID does not
      *                                   correspond to an existing blog post.
      */
-    @CacheEvict("blog_get_limited")
     @Transactional
     @Override
     public void deletePost(String id) {

@@ -10,8 +10,6 @@ import org.crochet.payload.response.BannerResponse;
 import org.crochet.repository.BannerRepo;
 import org.crochet.repository.BannerTypeRepo;
 import org.crochet.service.BannerService;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,7 +32,6 @@ public class BannerServiceImpl implements BannerService {
         this.bannerTypeRepo = bannerTypeRepo;
     }
 
-    @CacheEvict(value = "banner_getAll")
     @Transactional
     @Override
     public List<BannerResponse> batchInsertOrUpdate(List<BannerRequest> requests) {
@@ -74,7 +71,6 @@ public class BannerServiceImpl implements BannerService {
         return banners.stream().map(BannerMapper.INSTANCE::toResponse).toList();
     }
 
-    @Cacheable("banner_getAll")
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Override
     public List<BannerResponse> getAll() {

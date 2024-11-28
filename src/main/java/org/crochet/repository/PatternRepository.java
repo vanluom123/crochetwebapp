@@ -41,4 +41,11 @@ public interface PatternRepository extends JpaRepository<Pattern, String>, JpaSp
                 and i.order = 0
             """)
     List<PatternOnHome> findPatternOnHomeWithIds(@Param("patternIds") List<String> ids);
+
+    @Query("""
+            select p.id
+            from Pattern p
+            order by p.createdDate desc
+            """)
+    List<String> getPatternIds(Pageable pageable);
 }
