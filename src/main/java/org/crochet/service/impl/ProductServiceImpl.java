@@ -19,8 +19,6 @@ import org.crochet.repository.ProductRepository;
 import org.crochet.repository.SettingsRepo;
 import org.crochet.service.ProductService;
 import org.crochet.util.ImageUtils;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -31,6 +29,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -61,7 +60,6 @@ public class ProductServiceImpl implements ProductService {
      * @return A {@link ProductResponse} representing the created or updated
      * product.
      */
-    @CacheEvict(value = "product_limited")
     @Transactional
     @Override
     public ProductResponse createOrUpdate(ProductRequest request) {
@@ -151,15 +149,30 @@ public class ProductServiceImpl implements ProductService {
     }
 
     /**
+     * Get product ids
+     *
+     * @param pageNo Page number
+     * @param limit  Limit
+     * @return List of product ids
+     */
+    @Override
+    public List<String> getProductIds(int pageNo, int limit) {
+        Pageable pageable = PageRequest.of(pageNo, limit);
+        return productRepo.getProductIds(pageable);
+    }
+
+    /**
      * Retrieves a list of products that are marked as limited.
      *
      * @return A list of {@link ProductResponse} containing limited products.
      */
-    @Cacheable(value = "product_limited")
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Override
     public List<ProductOnHome> getLimitedProducts() {
         List<Settings> settings = settingsRepo.findSettings();
+        if (settings == null || settings.isEmpty()) {
+            return Collections.emptyList();
+        }
 
         Map<String, Settings> settingsMap = settings.stream()
                 .collect(Collectors.toMap(Settings::getKey, Function.identity()));
@@ -199,7 +212,6 @@ public class ProductServiceImpl implements ProductService {
      */
     @Transactional
     @Override
-    @CacheEvict(value = "product_limited")
     public void delete(String id) {
         productRepo.deleteById(id);
     }

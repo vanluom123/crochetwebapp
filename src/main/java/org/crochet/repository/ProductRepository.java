@@ -41,4 +41,11 @@ public interface ProductRepository extends JpaRepository<Product, String>, JpaSp
                 and i.order = 0
             """)
     List<ProductOnHome> findProductOnHomeWithIds(@Param("ids") List<String> ids);
+
+    @Query("""
+            select p.id
+            from Product p
+            order by p.createdDate desc
+            """)
+    List<String> getProductIds(Pageable pageable);
 }

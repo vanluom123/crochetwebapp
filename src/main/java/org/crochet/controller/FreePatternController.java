@@ -6,6 +6,9 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
+import java.util.List;
+
 import org.crochet.constant.AppConstant;
 import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.FreePatternRequest;
@@ -123,5 +126,15 @@ public class FreePatternController {
             @RequestBody(required = false) Filter[] filters) {
         var response = freePatternService.getAllFreePatternsOnAdminPage(currentUser, pageNo, pageSize, sortBy, sortDir, filters);
         return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Get free pattern ids")
+    @ApiResponse(responseCode = "200", description = "List of free pattern ids",
+            content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = List.class)))
+    @GetMapping("/ids")
+    public ResponseEntity<List<String>> getFreePatternIds(@RequestParam("pageNo") int pageNo,
+                                                          @RequestParam("limit") int limit) {
+        return ResponseEntity.ok(freePatternService.getFreePatternIds(pageNo, limit));
     }
 }

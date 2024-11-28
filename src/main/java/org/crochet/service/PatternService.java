@@ -15,6 +15,8 @@ public interface PatternService {
 
     List<PatternOnHome> getLimitedPatterns();
 
+    List<String> getPatternIds(int pageNo, int limit);
+
     PatternResponse getDetail(String id);
 
     void deletePattern(String id);

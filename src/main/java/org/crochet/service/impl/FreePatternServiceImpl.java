@@ -24,8 +24,6 @@ import org.crochet.repository.UserRepository;
 import org.crochet.security.UserPrincipal;
 import org.crochet.service.FreePatternService;
 import org.crochet.util.ImageUtils;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -36,6 +34,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -66,7 +65,6 @@ public class FreePatternServiceImpl implements FreePatternService {
      *                creating or updating the FreePattern.
      * @return FreePatternResponse
      */
-    @CacheEvict(value = "free_pattern_limited")
     @Transactional
     @Override
     public FreePatternResponse createOrUpdate(FreePatternRequest request) {
@@ -212,11 +210,13 @@ public class FreePatternServiceImpl implements FreePatternService {
      * @return A list of {@link FreePatternResponse} objects containing information
      * about the FreePatterns.
      */
-    @Cacheable(value = "free_pattern_limited")
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Override
     public List<FreePatternOnHome> getLimitedFreePatterns() {
         List<Settings> settings = settingsRepo.findSettings();
+        if (settings == null || settings.isEmpty()) {
+            return Collections.emptyList();
+        }
 
         Map<String, Settings> settingsMap = settings.stream()
                 .collect(Collectors.toMap(Settings::getKey, Function.identity()));
@@ -231,6 +231,19 @@ public class FreePatternServiceImpl implements FreePatternService {
         Pageable pageable = PageRequest.of(0, Integer.parseInt(limit), sort);
 
         return freePatternRepo.findLimitedNumFreePattern(pageable);
+    }
+
+    /**
+     * Get free pattern ids
+     *
+     * @param pageNo Page number
+     * @param limit  Limit
+     * @return List of free pattern ids
+     */
+    @Override
+    public List<String> getFreePatternIds(int pageNo, int limit) {
+        Pageable pageable = PageRequest.of(pageNo, limit);
+        return freePatternRepo.getFreePatternIds(pageable);
     }
 
     /**
@@ -249,7 +262,6 @@ public class FreePatternServiceImpl implements FreePatternService {
         return FreePatternMapper.INSTANCE.toResponse(freePattern);
     }
 
-    @CacheEvict(value = "free_pattern_limited")
     @SuppressWarnings("OptionalGetWithoutIsPresent")
     @Transactional
     @Override
