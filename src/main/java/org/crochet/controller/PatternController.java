@@ -6,6 +6,9 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
+import java.util.List;
+
 import org.crochet.constant.AppConstant;
 import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.PatternRequest;
@@ -94,5 +97,14 @@ public class PatternController {
             @RequestParam("id") String id) {
         patternService.deletePattern(id);
         return ResponseEntity.ok("Pattern deleted successfully");
+    }
+
+    @Operation(summary = "Get pattern ids")
+    @ApiResponse(responseCode = "200", description = "List of pattern ids",
+            content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = List.class)))
+    @GetMapping("/ids")
+    public ResponseEntity<List<String>> getPatternIds(@RequestParam("pageNo") int pageNo, @RequestParam("limit") int limit) {
+        return ResponseEntity.ok(patternService.getPatternIds(pageNo, limit));
     }
 }

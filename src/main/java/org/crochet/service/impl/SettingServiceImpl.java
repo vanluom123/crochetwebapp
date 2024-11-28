@@ -8,8 +8,6 @@ import org.crochet.payload.request.SettingRequest;
 import org.crochet.payload.response.SettingResponse;
 import org.crochet.repository.SettingsRepo;
 import org.crochet.service.SettingService;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,7 +20,6 @@ import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
 public class SettingServiceImpl implements SettingService {
     private final SettingsRepo settingsRepo;
 
-    @CacheEvict("settings")
     @Transactional
     @Override
     public void create(SettingRequest request) {
@@ -33,7 +30,6 @@ public class SettingServiceImpl implements SettingService {
         settingsRepo.save(settings);
     }
 
-    @CachePut("settings")
     @Transactional
     @Override
     public void update(SettingRequest request) {
@@ -44,7 +40,6 @@ public class SettingServiceImpl implements SettingService {
         settingsRepo.save(settings);
     }
 
-    @CacheEvict("settings")
     @Transactional
     @Override
     public void delete(String key) {
