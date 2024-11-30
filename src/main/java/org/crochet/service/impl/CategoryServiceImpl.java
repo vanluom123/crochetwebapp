@@ -9,9 +9,6 @@ import org.crochet.payload.request.CategoryUpdateRequest;
 import org.crochet.payload.response.CategoryResponse;
 import org.crochet.repository.CategoryRepo;
 import org.crochet.service.CategoryService;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,7 +32,6 @@ public class CategoryServiceImpl implements CategoryService {
      * @param request the request object containing the parent IDs and category name
      * @return a list of CategoryResponse objects
      */
-    @CacheEvict(value = "categories")
     @Transactional
     @Override
     public List<CategoryResponse> create(CategoryCreationRequest request) {
@@ -113,7 +109,6 @@ public class CategoryServiceImpl implements CategoryService {
      * @param request the request object containing the category ID and new name
      * @return a CategoryResponse object
      */
-    @CachePut(value = "categories")
     @Transactional
     @Override
     public CategoryResponse update(CategoryUpdateRequest request) {
@@ -151,7 +146,6 @@ public class CategoryServiceImpl implements CategoryService {
      *
      * @return a list of CategoryResponse objects
      */
-    @Cacheable(value = "categories")
     @Override
     public List<CategoryResponse> getAllCategories() {
         var categories = categoryRepo.getCategories();
@@ -193,7 +187,6 @@ public class CategoryServiceImpl implements CategoryService {
      *
      * @param id the category ID
      */
-    @CacheEvict(value = "categories")
     @Transactional
     @Override
     public void delete(String id) {

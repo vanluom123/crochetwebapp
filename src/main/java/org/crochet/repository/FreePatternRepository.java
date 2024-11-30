@@ -44,4 +44,14 @@ public interface FreePatternRepository extends JpaRepository<FreePattern, String
 
     @Query("select f.id from FreePattern f order by f.createdDate desc")
     List<String> getFreePatternIds(Pageable pageable);
+
+    @Query("""
+            select f
+            from FreePattern f
+            join ColFrep colFrep on f.id = colFrep.freePattern.id
+            join Collection c on c.id = colFrep.collection.id
+            join User u on u.id = c.user.id
+            where u.id = ?1 and f.id = ?2
+            """)
+    Optional<FreePattern> findFrepInCollection(String userId, String frepId);
 }
