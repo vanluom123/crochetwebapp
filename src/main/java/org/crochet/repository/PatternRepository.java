@@ -2,6 +2,7 @@ package org.crochet.repository;
 
 import org.crochet.model.Pattern;
 import org.crochet.payload.response.PatternOnHome;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -40,7 +41,7 @@ public interface PatternRepository extends JpaRepository<Pattern, String>, JpaSp
             where p.id in :patternIds
                 and i.order = 0
             """)
-    List<PatternOnHome> findPatternOnHomeWithIds(@Param("patternIds") List<String> ids);
+    Page<PatternOnHome> findPatternOnHomeWithIds(@Param("patternIds") List<String> ids, Pageable pageable);
 
     @Query("""
             select p.id

@@ -2,6 +2,7 @@ package org.crochet.repository;
 
 import org.crochet.model.Product;
 import org.crochet.payload.response.ProductOnHome;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -40,7 +41,7 @@ public interface ProductRepository extends JpaRepository<Product, String>, JpaSp
             where p.id in :ids
                 and i.order = 0
             """)
-    List<ProductOnHome> findProductOnHomeWithIds(@Param("ids") List<String> ids);
+    Page<ProductOnHome> findProductOnHomeWithIds(@Param("ids") List<String> ids, Pageable pageable);
 
     @Query("""
             select p.id
