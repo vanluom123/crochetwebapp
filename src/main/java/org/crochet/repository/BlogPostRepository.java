@@ -2,6 +2,7 @@ package org.crochet.repository;
 
 import org.crochet.model.BlogPost;
 import org.crochet.payload.response.BlogOnHome;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -39,7 +40,7 @@ public interface BlogPostRepository extends JpaRepository<BlogPost, String>, Jpa
             where p.id in :ids
                 and f.order = 0
             """)
-    List<BlogOnHome> findBlogOnHomeWithIds(@Param("ids") List<String> ids);
+    Page<BlogOnHome> findBlogOnHomeWithIds(@Param("ids") List<String> ids, Pageable pageable);
 
     @Query("""
             select p.id

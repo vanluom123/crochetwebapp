@@ -19,7 +19,6 @@ import org.crochet.repository.GenericFilter;
 import org.crochet.repository.SettingsRepo;
 import org.crochet.service.BlogPostService;
 import org.crochet.util.ImageUtils;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -124,21 +123,23 @@ public class BlogPostServiceImpl implements BlogPostService {
             spec = filter.build();
         }
 
-        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
-        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
-        Page<BlogPost> menuPage = blogPostRepo.findAll(spec, pageable);
-        var blogIds = menuPage.getContent().stream()
+        List<BlogPost> blogPosts = blogPostRepo.findAll(spec);
+        var blogIds = blogPosts.stream()
                 .map(BlogPost::getId)
                 .toList();
-        var blogOnHomes = blogPostRepo.findBlogOnHomeWithIds(blogIds);
+
+        Sort.Direction dir = Sort.Direction.fromString(sortDir);
+        Sort sort = Sort.by(dir, sortBy);
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+        var page = blogPostRepo.findBlogOnHomeWithIds(blogIds, pageable);
 
         return BlogPostPaginationResponse.builder()
-                .contents(blogOnHomes)
-                .pageNo(menuPage.getNumber())
-                .totalElements(menuPage.getTotalElements())
-                .totalPages(menuPage.getTotalPages())
-                .pageSize(menuPage.getSize())
-                .last(menuPage.isLast())
+                .contents(page.getContent())
+                .pageNo(page.getNumber())
+                .totalElements(page.getTotalElements())
+                .totalPages(page.getTotalPages())
+                .pageSize(page.getSize())
+                .last(page.isLast())
                 .build();
     }
 
