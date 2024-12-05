@@ -2,6 +2,7 @@ package org.crochet.repository;
 
 import org.crochet.model.FreePattern;
 import org.crochet.payload.response.FreePatternOnHome;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -39,7 +40,7 @@ public interface FreePatternRepository extends JpaRepository<FreePattern, String
             where fp.id in :ids
                   and i.order = 0
             """)
-    List<FreePatternOnHome> getFreePatternOnHomeWithIds(@Param("ids") List<String> ids);
+    Page<FreePatternOnHome> getFreePatternOnHomeWithIds(@Param("ids") List<String> ids, Pageable pageable);
 
     @Query("select f.id from FreePattern f order by f.createdDate desc")
     List<String> getFreePatternIds(Pageable pageable);

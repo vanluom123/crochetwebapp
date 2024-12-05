@@ -24,7 +24,6 @@ import org.crochet.repository.UserRepository;
 import org.crochet.security.UserPrincipal;
 import org.crochet.service.FreePatternService;
 import org.crochet.util.ImageUtils;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -134,15 +133,18 @@ public class FreePatternServiceImpl implements FreePatternService {
             spec = filter.build();
         }
 
-        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
+        var freePatternIds = freePatternRepo.findAll(spec)
+                .stream()
+                .map(FreePattern::getId)
+                .toList();
+
+        Sort.Direction dir = Sort.Direction.fromString(sortDir);
+        Sort sort = Sort.by(dir, sortBy);
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
-        Page<FreePattern> page = freePatternRepo.findAll(spec, pageable);
-        List<FreePattern> freePatterns = page.getContent();
-        List<String> freePatternIds = freePatterns.stream().map(FreePattern::getId).toList();
-        var contents = freePatternRepo.getFreePatternOnHomeWithIds(freePatternIds);
+        var page = freePatternRepo.getFreePatternOnHomeWithIds(freePatternIds, pageable);
 
         return PaginatedFreePatternResponse.builder()
-                .contents(contents)
+                .contents(page.getContent())
                 .pageNo(page.getNumber())
                 .pageSize(page.getSize())
                 .totalElements(page.getTotalElements())
@@ -162,7 +164,6 @@ public class FreePatternServiceImpl implements FreePatternService {
      * @param filters     List filters
      * @return PaginatedFreePatternResponse
      */
-    @SuppressWarnings("OptionalGetWithoutIsPresent")
     @Override
     public PaginatedFreePatternResponse getAllFreePatternsOnAdminPage(UserPrincipal currentUser,
                                                                       int pageNo,
@@ -188,14 +189,18 @@ public class FreePatternServiceImpl implements FreePatternService {
             spec = spec.and((root, query, cb) -> cb.equal(root.get("createdBy"), user.getEmail()));
         }
 
-        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
-        Page<FreePattern> page = freePatternRepo.findAll(spec,
-                PageRequest.of(pageNo, pageSize, sort));
-        List<String> ids = page.getContent().stream().map(FreePattern::getId).toList();
-        List<FreePatternOnHome> contents = freePatternRepo.getFreePatternOnHomeWithIds(ids);
+        var freePatternIds = freePatternRepo.findAll(spec)
+                .stream()
+                .map(FreePattern::getId)
+                .toList();
+
+        Sort.Direction dir = Sort.Direction.fromString(sortDir);
+        Sort sort = Sort.by(dir, sortBy);
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+        var page = freePatternRepo.getFreePatternOnHomeWithIds(freePatternIds, pageable);
 
         return PaginatedFreePatternResponse.builder()
-                .contents(contents)
+                .contents(page.getContent())
                 .pageNo(page.getNumber())
                 .pageSize(page.getSize())
                 .totalElements(page.getTotalElements())

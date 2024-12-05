@@ -19,7 +19,6 @@ import org.crochet.repository.ProductRepository;
 import org.crochet.repository.SettingsRepo;
 import org.crochet.service.ProductService;
 import org.crochet.util.ImageUtils;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -130,16 +129,17 @@ public class ProductServiceImpl implements ProductService {
             spec = filter.build();
         }
 
-        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
-        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
-        Page<Product> menuPage = productRepo.findAll(spec, pageable);
-        var prodIds = menuPage.getContent().stream()
+        var prodIds = productRepo.findAll(spec)
+                .stream()
                 .map(Product::getId)
                 .toList();
-        var productOnHomes = productRepo.findProductOnHomeWithIds(prodIds);
+
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+        var menuPage = productRepo.findProductOnHomeWithIds(prodIds, pageable);
 
         return ProductPaginationResponse.builder()
-                .contents(productOnHomes)
+                .contents(menuPage.getContent())
                 .pageNo(menuPage.getNumber())
                 .pageSize(menuPage.getSize())
                 .totalElements(menuPage.getTotalElements())
