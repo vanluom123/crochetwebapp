@@ -122,16 +122,17 @@ public class PatternServiceImpl implements PatternService {
             spec = filter.build();
         }
 
-        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
-        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
-        var page = patternRepo.findAll(spec, pageable);
-        var patternIds = page.getContent().stream()
+        var patternIds = patternRepo.findAll(spec)
+                .stream()
                 .map(Pattern::getId)
                 .toList();
-        var patternOnHomes = patternRepo.findPatternOnHomeWithIds(patternIds);
+
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+        var page = patternRepo.findPatternOnHomeWithIds(patternIds, pageable);
 
         return PatternPaginationResponse.builder()
-                .contents(patternOnHomes)
+                .contents(page.getContent())
                 .pageNo(page.getNumber())
                 .pageSize(page.getSize())
                 .totalElements(page.getTotalElements())
