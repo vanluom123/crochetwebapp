@@ -12,6 +12,7 @@ import java.util.List;
 import org.crochet.constant.AppConstant;
 import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.FreePatternRequest;
+import org.crochet.payload.response.FreePatternOnHome;
 import org.crochet.payload.response.FreePatternResponse;
 import org.crochet.payload.response.PaginatedFreePatternResponse;
 import org.crochet.security.CurrentUser;
@@ -136,5 +137,14 @@ public class FreePatternController {
     public ResponseEntity<List<String>> getFreePatternIds(@RequestParam("pageNo") int pageNo,
                                                           @RequestParam("limit") int limit) {
         return ResponseEntity.ok(freePatternService.getFreePatternIds(pageNo, limit));
+    }
+
+    @Operation(summary = "Get free pattern by create by")
+    @ApiResponse(responseCode = "200", description = "List of free pattern",
+            content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = List.class)))
+    @GetMapping("/create-by")
+    public ResponseEntity<List<FreePatternOnHome>> getFrepsByCreateBy() {
+        return ResponseEntity.ok(freePatternService.getFrepsByCreateBy());
     }
 }

@@ -24,6 +24,7 @@ import org.crochet.repository.UserRepository;
 import org.crochet.security.UserPrincipal;
 import org.crochet.service.FreePatternService;
 import org.crochet.util.ImageUtils;
+import org.crochet.util.SecurityUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -289,5 +290,15 @@ public class FreePatternServiceImpl implements FreePatternService {
         }
 
         freePatternRepo.delete(freePattern);
+    }
+
+    @Override
+    public List<FreePatternOnHome> getFrepsByCreateBy() {
+        var currentUser = SecurityUtils.getCurrentUser();
+        if (currentUser == null) {
+            throw new ResourceNotFoundException(MessageConstant.MSG_USER_NOT_FOUND,
+                    MAP_CODE.get(MessageConstant.MSG_USER_NOT_FOUND));
+        }
+        return freePatternRepo.getFrepsByCreateBy(currentUser.getEmail());
     }
 }

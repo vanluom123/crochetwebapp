@@ -28,4 +28,6 @@ public interface FreePatternService {
     void delete(UserPrincipal currentUser, String id);
 
     List<String> getFreePatternIds(int pageNo, int limit);
+
+    List<FreePatternOnHome> getFrepsByCreateBy();
 }

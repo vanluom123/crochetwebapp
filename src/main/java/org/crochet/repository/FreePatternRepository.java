@@ -54,4 +54,12 @@ public interface FreePatternRepository extends JpaRepository<FreePattern, String
             where u.id = ?1 and f.id = ?2
             """)
     Optional<FreePattern> findFrepInCollection(String userId, String frepId);
+
+    @Query("""
+            select new org.crochet.payload.response.FreePatternOnHome(fp.id, fp.name, fp.description, fp.author, fp.status, i.fileContent)
+            from FreePattern fp
+            join fp.images i
+            where fp.createdBy = ?1 and i.order = 0
+            """)
+    List<FreePatternOnHome> getFrepsByCreateBy(String email);
 }
