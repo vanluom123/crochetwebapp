@@ -91,9 +91,9 @@ liquibase {
     activities {
         main {
             changelogFile 'src/main/resources/db/changelog/db.changelog-master.yaml'
-            url 'jdbc:mysql://localhost:3306/testdb'
-            username 'root'
-            password 'root'
+            url 'jdbc:' + System.getenv('DB') + '://' + System.getenv('DB_HOST') + ':' + System.getenv('DB_PORT') + '/' + System.getenv('DB_NAME')
+            username System.getenv('DB_USERNAME')
+            password System.getenv('DB_PASSWORD')
         }
     }
     runList = 'main'
