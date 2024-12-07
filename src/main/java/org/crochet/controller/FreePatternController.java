@@ -15,8 +15,6 @@ import org.crochet.payload.request.FreePatternRequest;
 import org.crochet.payload.response.FreePatternOnHome;
 import org.crochet.payload.response.FreePatternResponse;
 import org.crochet.payload.response.PaginatedFreePatternResponse;
-import org.crochet.security.CurrentUser;
-import org.crochet.security.UserPrincipal;
 import org.crochet.service.FreePatternService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -73,10 +71,9 @@ public class FreePatternController {
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @SecurityRequirement(name = "BearerAuth")
     public ResponseEntity<String> delete(
-            @CurrentUser UserPrincipal currentUser,
             @Parameter(description = "ID of the pattern to delete")
             @RequestParam("id") String id) {
-        freePatternService.delete(currentUser, id);
+        freePatternService.delete(id);
         return ResponseEntity.ok("Pattern deleted successfully");
     }
 
@@ -111,7 +108,6 @@ public class FreePatternController {
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @SecurityRequirement(name = "BearerAuth")
     public ResponseEntity<PaginatedFreePatternResponse> getAllFreePatternsOnAdminPage(
-            @CurrentUser UserPrincipal currentUser,
             @Parameter(description = "Page number (default: 0)")
             @RequestParam(value = "pageNo", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER,
                     required = false) int pageNo,
@@ -125,7 +121,7 @@ public class FreePatternController {
                     required = false) String sortDir,
             @Parameter(description = "List filters")
             @RequestBody(required = false) Filter[] filters) {
-        var response = freePatternService.getAllFreePatternsOnAdminPage(currentUser, pageNo, pageSize, sortBy, sortDir, filters);
+        var response = freePatternService.getAllFreePatternsOnAdminPage(pageNo, pageSize, sortBy, sortDir, filters);
         return ResponseEntity.ok(response);
     }
 

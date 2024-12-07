@@ -10,7 +10,6 @@ import org.crochet.mapper.FileMapper;
 import org.crochet.mapper.FreePatternMapper;
 import org.crochet.model.FreePattern;
 import org.crochet.model.Settings;
-import org.crochet.model.User;
 import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.FreePatternRequest;
 import org.crochet.payload.response.FreePatternOnHome;
@@ -20,8 +19,6 @@ import org.crochet.repository.CategoryRepo;
 import org.crochet.repository.FreePatternRepository;
 import org.crochet.repository.GenericFilter;
 import org.crochet.repository.SettingsRepo;
-import org.crochet.repository.UserRepository;
-import org.crochet.security.UserPrincipal;
 import org.crochet.service.FreePatternService;
 import org.crochet.util.ImageUtils;
 import org.crochet.util.SecurityUtils;
@@ -52,7 +49,6 @@ public class FreePatternServiceImpl implements FreePatternService {
     private final FreePatternRepository freePatternRepo;
     private final CategoryRepo categoryRepo;
     private final SettingsRepo settingsRepo;
-    private final UserRepository userRepo;
 
     /**
      * Creates a new FreePattern or updates an existing one based on the provided
@@ -166,12 +162,8 @@ public class FreePatternServiceImpl implements FreePatternService {
      * @return PaginatedFreePatternResponse
      */
     @Override
-    public PaginatedFreePatternResponse getAllFreePatternsOnAdminPage(UserPrincipal currentUser,
-                                                                      int pageNo,
-                                                                      int pageSize,
-                                                                      String sortBy,
-                                                                      String sortDir,
-                                                                      Filter[] filters) {
+    public PaginatedFreePatternResponse getAllFreePatternsOnAdminPage(int pageNo,int pageSize,String sortBy,String sortDir,Filter[] filters) {
+        var currentUser = SecurityUtils.getCurrentUser();
         if (currentUser == null) {
             throw new ResourceNotFoundException(MessageConstant.MSG_USER_NOT_FOUND,
                     MAP_CODE.get(MessageConstant.MSG_USER_NOT_FOUND));
@@ -183,11 +175,9 @@ public class FreePatternServiceImpl implements FreePatternService {
             spec = filter.build();
         }
 
-        User user = userRepo.findById(currentUser.getId()).get();
-
-        boolean isAdmin = user.getRole().equals(RoleType.ADMIN);
+        boolean isAdmin = currentUser.getRole().equals(RoleType.ADMIN);
         if (!isAdmin) {
-            spec = spec.and((root, query, cb) -> cb.equal(root.get("createdBy"), user.getEmail()));
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("createdBy"), currentUser.getEmail()));
         }
 
         var freePatternIds = freePatternRepo.findAll(spec)
@@ -271,19 +261,18 @@ public class FreePatternServiceImpl implements FreePatternService {
     @SuppressWarnings("OptionalGetWithoutIsPresent")
     @Transactional
     @Override
-    public void delete(UserPrincipal currentUser, String id) {
+    public void delete(String id) {
+        var currentUser = SecurityUtils.getCurrentUser();
         if (currentUser == null) {
             throw new ResourceNotFoundException(MessageConstant.MSG_USER_NOT_FOUND,
                     MAP_CODE.get(MessageConstant.MSG_USER_NOT_FOUND));
         }
 
-        var user = userRepo.findById(currentUser.getId()).get();
-
         var freePattern = freePatternRepo.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException(MessageConstant.MSG_FREE_PATTERN_NOT_FOUND,
                         MAP_CODE.get(MessageConstant.MSG_FREE_PATTERN_NOT_FOUND)));
 
-        boolean isAdmin = user.getRole().equals(RoleType.ADMIN);
+        boolean isAdmin = currentUser.getRole().equals(RoleType.ADMIN);
         if (!isAdmin && !freePattern.getCreatedBy().equals(currentUser.getEmail())) {
             throw new AccessDeniedException(MessageConstant.MSG_FORBIDDEN,
                     MAP_CODE.get(MessageConstant.MSG_FORBIDDEN));

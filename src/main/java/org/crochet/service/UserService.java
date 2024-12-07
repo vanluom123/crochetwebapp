@@ -2,6 +2,7 @@ package org.crochet.service;
 
 import org.crochet.model.User;
 import org.crochet.payload.request.Filter;
+import org.crochet.payload.request.ProfileUserUpdateRequest;
 import org.crochet.payload.request.SignUpRequest;
 import org.crochet.payload.request.UserUpdateRequest;
 import org.crochet.payload.response.UserPaginationResponse;
@@ -29,4 +30,6 @@ public interface UserService {
     void verifyEmail(String email);
 
     User checkLogin(String email, String password);
+
+    String updateInfo(ProfileUserUpdateRequest request);
 }

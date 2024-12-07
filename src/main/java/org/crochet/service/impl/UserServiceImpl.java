@@ -8,6 +8,7 @@ import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.UserMapper;
 import org.crochet.model.User;
 import org.crochet.payload.request.Filter;
+import org.crochet.payload.request.ProfileUserUpdateRequest;
 import org.crochet.payload.request.SignUpRequest;
 import org.crochet.payload.request.UserUpdateRequest;
 import org.crochet.payload.response.UserPaginationResponse;
@@ -15,6 +16,7 @@ import org.crochet.payload.response.UserResponse;
 import org.crochet.repository.GenericFilter;
 import org.crochet.repository.UserRepository;
 import org.crochet.service.UserService;
+import org.crochet.util.SecurityUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -37,7 +39,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
 
     public UserServiceImpl(UserRepository userRepository,
-                           PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
@@ -69,9 +71,11 @@ public class UserServiceImpl implements UserService {
      * @param pageNo   The page number to retrieve. Page numbers start from 0.
      * @param pageSize The number of records to retrieve per page.
      * @param sortBy   The field by which to sort the records.
-     * @param sortDir  The direction of the sort. Can be 'ASC' for ascending or 'DESC' for descending.
+     * @param sortDir  The direction of the sort. Can be 'ASC' for ascending or
+     *                 'DESC' for descending.
      * @param filters  The list of filters.
-     * @return A UserPaginationResponse object containing the retrieved records and pagination details.
+     * @return A UserPaginationResponse object containing the retrieved records and
+     *         pagination details.
      */
     @Override
     public UserPaginationResponse getAll(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters) {
@@ -150,6 +154,28 @@ public class UserServiceImpl implements UserService {
                     MAP_CODE.get(MSG_INCORRECT_PASSWORD));
         }
         return user;
+    }
+
+    @Transactional
+    @Override
+    public String updateInfo(ProfileUserUpdateRequest request) {
+        var currentUser = SecurityUtils.getCurrentUser();
+        if (currentUser == null) {
+            throw new ResourceNotFoundException(MessageConstant.MSG_USER_NOT_FOUND,
+                    MAP_CODE.get(MessageConstant.MSG_USER_NOT_FOUND));
+        }
+
+        if (request.getName() != null) {
+            currentUser.setName(request.getName());
+        }
+
+        if (request.getImageUrl() != null) {
+            currentUser.setImageUrl(request.getImageUrl());
+        }
+
+        userRepository.save(currentUser);
+
+        return "Update user info successfully";
     }
 
     private boolean isValidEmail(String email) {

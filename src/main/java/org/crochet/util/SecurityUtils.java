@@ -1,6 +1,7 @@
 package org.crochet.util;
 
-import org.crochet.security.UserPrincipal;
+import org.crochet.model.User;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 public class SecurityUtils {
@@ -8,7 +9,12 @@ public class SecurityUtils {
     private SecurityUtils() {
     }
 
-    public static UserPrincipal getCurrentUser() {
-        return (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    public static User getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated() 
+            || authentication.getPrincipal().equals("anonymousUser")) {
+            return null;
+        }
+        return (User) authentication.getPrincipal();
     }
 }
