@@ -7,6 +7,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import jakarta.persistence.UniqueConstraint;
@@ -84,6 +85,9 @@ public class User extends BaseEntity implements UserDetails, OAuth2User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Collection> collections;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private UserProfile userProfile;
 
     @Transient
     private Map<String, Object> attributes;
