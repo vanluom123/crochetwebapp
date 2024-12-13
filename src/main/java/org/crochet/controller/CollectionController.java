@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import org.crochet.payload.request.CreateCollectionRequest;
 import org.crochet.payload.request.UpdateCollectionRequest;
 import org.crochet.payload.response.CollectionResponse;
 import org.crochet.service.CollectionService;
@@ -41,8 +40,8 @@ public class CollectionController {
                     schema = @Schema(implementation = String.class)))
     @PostMapping(value = "/create")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ResponseEntity<String> create(@RequestBody CreateCollectionRequest request) {
-        var collection = collectionService.createCollection(request);
+    public ResponseEntity<String> create(@RequestParam("name") String name) {
+        var collection = collectionService.createCollection(name);
         return ResponseEntity.status(HttpStatus.CREATED).body(collection);
     }
 

@@ -7,7 +7,6 @@ import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.model.ColFrep;
 import org.crochet.model.Collection;
 import org.crochet.model.FreePattern;
-import org.crochet.payload.request.CreateCollectionRequest;
 import org.crochet.payload.request.UpdateCollectionRequest;
 import org.crochet.payload.response.CollectionResponse;
 import org.crochet.repository.ColFrepRepo;
@@ -69,25 +68,28 @@ public class CollectionServiceImpl implements CollectionService {
     }
 
     /**
-     * Create a collection
+     * Creates a new collection with the specified name for the current user.
      *
-     * @param request create collection request
-     * @return collection
+     * @param name the name of the collection to be created
+     * @return a success message indicating the collection was created successfully
+     * @throws AccessDeniedException if the current user is not authenticated
+     * @throws BadRequestException if a collection with the given name already exists
+     * @throws ResourceNotFoundException if the user associated with the current session cannot be found
      */
     @Override
-    public String createCollection(CreateCollectionRequest request) {
+    public String createCollection(String name) {
         var user = SecurityUtils.getCurrentUser();
         if (user == null) {
             throw new AccessDeniedException(MSG_NOT_AUTHENTICATED,
                     MAP_CODE.get(MSG_NOT_AUTHENTICATED));
         }
 
-        if (collectionRepo.existsCollectionByName(request.getName())) {
+        if (collectionRepo.existsCollectionByName(name)) {
             throw new BadRequestException("Collection name already exists");
         }
 
         Collection collection = new Collection();
-        collection.setName(request.getName());
+        collection.setName(name);
         collection.setUser(userRepository.findById(user.getId())
                 .orElseThrow(() -> new ResourceNotFoundException(MSG_USER_NOT_FOUND,
                         MAP_CODE.get(MSG_USER_NOT_FOUND))));
@@ -183,6 +185,15 @@ public class CollectionServiceImpl implements CollectionService {
                         MAP_CODE.get(MSG_COLLECTION_NOT_FOUND)));
     }
 
+    /**
+     * Deletes a collection with the given id, if the current user has permission
+     * to do so.
+     *
+     * @param collectionId the id of the collection to be deleted
+     * @throws AccessDeniedException if the current user is not authenticated
+     * @throws AccessDeniedException if the current user does not have permission
+     * to modify the collection
+     */
     @Override
     public void deleteCollection(String collectionId) {
         var user = SecurityUtils.getCurrentUser();
