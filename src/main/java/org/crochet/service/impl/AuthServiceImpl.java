@@ -105,7 +105,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public AuthResponse authenticateUser(LoginRequest loginRequest) {
         // Check email and password
-        var user = userService.checkLogin(loginRequest.getEmail(), loginRequest.getPassword());
+        var user = userService.validateUserCredentials(loginRequest.getEmail(), loginRequest.getPassword());
         // Check email verified
         if (!user.isEmailVerified()) {
             throw new EmailVerificationException(MSG_EMAIL_NOT_VERIFIED, MAP_CODE.get(MSG_EMAIL_NOT_VERIFIED));

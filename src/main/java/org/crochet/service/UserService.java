@@ -29,7 +29,7 @@ public interface UserService {
 
     void verifyEmail(String email);
 
-    User checkLogin(String email, String password);
+    User validateUserCredentials(String email, String password);
 
     String updateInfo(ProfileUserUpdateRequest request);
 }

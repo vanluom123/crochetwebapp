@@ -146,7 +146,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User checkLogin(String email, String password) {
+    public User validateUserCredentials(String email, String password) {
         var user = this.getByEmail(email);
         var isMatch = passwordEncoder.matches(password, user.getPassword());
         if (!isMatch) {
