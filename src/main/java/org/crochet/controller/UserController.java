@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.crochet.constant.AppConstant;
 import org.crochet.payload.request.Filter;
-import org.crochet.payload.request.ProfileUserUpdateRequest;
 import org.crochet.payload.request.UserUpdateRequest;
 import org.crochet.payload.response.UserPaginationResponse;
 import org.crochet.payload.response.UserResponse;
@@ -80,13 +79,5 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     public void deleteUser(@RequestParam String id) {
         userService.deleteUser(id);
-    }
-
-    @PutMapping("/update-info")
-    @SecurityRequirement(name = "BearerAuth")
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-    public ResponseEntity<String> updateInfo(@RequestBody ProfileUserUpdateRequest request) {
-        var response = userService.updateInfo(request);
-        return ResponseEntity.ok(response);
     }
 }

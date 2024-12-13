@@ -8,7 +8,6 @@ import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.UserMapper;
 import org.crochet.model.User;
 import org.crochet.payload.request.Filter;
-import org.crochet.payload.request.ProfileUserUpdateRequest;
 import org.crochet.payload.request.SignUpRequest;
 import org.crochet.payload.request.UserUpdateRequest;
 import org.crochet.payload.response.UserPaginationResponse;
@@ -16,7 +15,6 @@ import org.crochet.payload.response.UserResponse;
 import org.crochet.repository.GenericFilter;
 import org.crochet.repository.UserRepository;
 import org.crochet.service.UserService;
-import org.crochet.util.SecurityUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -158,28 +156,6 @@ public class UserServiceImpl implements UserService {
                     MAP_CODE.get(MSG_INCORRECT_PASSWORD));
         }
         return user;
-    }
-
-    @Transactional
-    @Override
-    public String updateInfo(ProfileUserUpdateRequest request) {
-        var currentUser = SecurityUtils.getCurrentUser();
-        if (currentUser == null) {
-            throw new ResourceNotFoundException(MessageConstant.MSG_USER_NOT_FOUND,
-                    MAP_CODE.get(MessageConstant.MSG_USER_NOT_FOUND));
-        }
-
-        if (request.getName() != null) {
-            currentUser.setName(request.getName());
-        }
-
-        if (request.getImageUrl() != null) {
-            currentUser.setImageUrl(request.getImageUrl());
-        }
-
-        userRepository.save(currentUser);
-
-        return "Update user info successfully";
     }
 
     private boolean isValidEmail(String email) {

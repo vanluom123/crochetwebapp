@@ -102,7 +102,7 @@ public class CollectionController {
     @GetMapping("/{collectionId}")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<CollectionResponse> getCollectionById(
-            @Parameter(description = "Collection ID") @PathVariable String collectionId) {
+            @Parameter(description = "Collection ID") @PathVariable("collectionId") String collectionId) {
         var collection = collectionService.getCollectionById(collectionId);
         return ResponseEntity.ok(collection);
     }
@@ -112,7 +112,7 @@ public class CollectionController {
     @DeleteMapping("/delete/{collectionId}")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<Void> deleteCollection(
-            @Parameter(description = "Collection ID") @PathVariable String collectionId) {
+            @Parameter(description = "Collection ID") @PathVariable("collectionId") String collectionId) {
         collectionService.deleteCollection(collectionId);
         return ResponseEntity.noContent().build();
     }
