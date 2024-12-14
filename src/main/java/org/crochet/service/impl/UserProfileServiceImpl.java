@@ -20,6 +20,8 @@ import org.crochet.payload.response.UserProfileResponse;
 import org.crochet.repository.CollectionRepo;
 import org.crochet.repository.CommentRepository;
 import org.crochet.repository.UserProfileRepo;
+import org.crochet.repository.UserRepository;
+
 @RequiredArgsConstructor
 @Service
 public class UserProfileServiceImpl implements UserProfileService {
@@ -27,6 +29,7 @@ public class UserProfileServiceImpl implements UserProfileService {
     private final CollectionRepo colRepo;
     private final CommentRepository commentRepo;
     private final UserProfileRepo userProfileRepo;
+    private final UserRepository userRepo;
 
     @Override
     public UserProfileResponse loadUserProfile() {
@@ -79,14 +82,19 @@ public class UserProfileServiceImpl implements UserProfileService {
         if (userProfile == null) {
             userProfile = new UserProfile();
         }
-        updateUserProfile(userProfile, request);
+        var isUserProfileUpdated = updateUserProfile(userProfile, request);
 
         // Update user info
-        updateUserInfo(user, request);
+        var isUserInfoUpdated = updateUserInfo(user, request);
+        if (isUserInfoUpdated) {
+            user = userRepo.save(user);
+        }
 
         // Save changes
         userProfile.setUser(user);
-        userProfileRepo.save(userProfile);
+        if (isUserProfileUpdated) {
+            userProfile = userProfileRepo.save(userProfile);
+        }
 
         // Create response
         return UserProfileResponse.builder()
@@ -104,27 +112,40 @@ public class UserProfileServiceImpl implements UserProfileService {
                 .build();
     }
 
-    private void updateUserProfile(UserProfile userProfile, UserProfileRequest request) {
+    private boolean updateUserProfile(UserProfile userProfile, UserProfileRequest request) {
+        boolean isUpdated = false;
+
         if (request.getPhone() != null) {
             userProfile.setPhone(request.getPhone());
+            isUpdated = true;
         }
         if (request.getBirthDate() != null) {
             userProfile.setBirthDate(request.getBirthDate());
+            isUpdated = true;
         }
         if (request.getGender() != null) {
             userProfile.setGender(request.getGender());
+            isUpdated = true;
         }
         if (request.getBackgroundImageUrl() != null) {
             userProfile.setBackgroundImageUrl(request.getBackgroundImageUrl());
+            isUpdated = true;
         }
+
+        return isUpdated;
     }
 
-    private void updateUserInfo(User user, UserProfileRequest request) {
+    private boolean updateUserInfo(User user, UserProfileRequest request) {
+        boolean isUpdated = false;
         if (request.getName() != null) {
             user.setName(request.getName());
+            isUpdated = true;
         }
         if (request.getImageUrl() != null) {
             user.setImageUrl(request.getImageUrl());
+            isUpdated = true;
         }
+
+        return isUpdated;
     }
 }
