@@ -120,6 +120,7 @@ public class AuthServiceImpl implements AuthService {
                 .refreshToken(refreshToken.getToken())
                 .role(user.getRole().getValue())
                 .email(user.getEmail())
+                .imageUrl(user.getImageUrl())
                 .build();
     }
 
