@@ -14,4 +14,7 @@ public interface ColFrepRepo extends JpaRepository<ColFrep, String> {
     @Modifying
     @Query("delete from ColFrep c where c.freePattern = ?1")
     void removeByFreePattern(FreePattern freePattern);
+
+    @Query("select count(c.id) from ColFrep c where c.collection.id = ?1")
+    long countByCollectionId(String id);
 }

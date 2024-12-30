@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.crochet.payload.request.UpdateCollectionRequest;
 import org.crochet.payload.response.CollectionResponse;
+import org.crochet.payload.response.FreePatternOnHome;
 
 public interface CollectionService {
     String addFreePatternToCollection(String collectionId, String freePatternId);
@@ -19,4 +20,6 @@ public interface CollectionService {
     CollectionResponse getCollectionById(String collectionId);
 
     void deleteCollection(String collectionId);
+
+    List<FreePatternOnHome> getFreePatternsInCollection(String collectionId);
 }

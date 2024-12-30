@@ -29,3 +29,5 @@ databaseChangeLog:
       file: src/main/resources/db/migration/20241126-add-collection-table.yaml
   - include:
       file: src/main/resources/db/migration/20241213-add-user-profile.yaml
+  - include:
+      file: src/main/resources/db/migration/20241228-add-avatar-column.yaml

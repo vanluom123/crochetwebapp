@@ -1,30 +1,32 @@
 package org.crochet.payload.response;
 
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
-
-import java.util.ArrayList;
-
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class CollectionResponse {
     private String id;
     private String name;
-    private int totalPatterns;
+    private String avatar;
+    private long totalPatterns;
     private List<FreePatternOnHome> freePatterns;
 
-    public CollectionResponse(String id, String name) {
+    public CollectionResponse(String id, String name, String avatar, long totalPatterns) {
         this.id = id;
         this.name = name;
-        this.totalPatterns = 0;
-        this.freePatterns = new ArrayList<>();
+        this.avatar = avatar;
+        this.totalPatterns = totalPatterns;
     }
 }

@@ -1,7 +1,6 @@
 package org.crochet.repository;
 
 import org.crochet.model.Category;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -27,7 +26,6 @@ public interface CategoryRepo extends JpaRepository<Category, String> {
             """)
     boolean existsByNameAndParentIsNotNull(String name);
 
-    @Cacheable("categories")
     @EntityGraph(attributePaths = {"children"})
     @Query("select c from Category c")
     List<Category> getCategories();
@@ -35,7 +33,7 @@ public interface CategoryRepo extends JpaRepository<Category, String> {
     @Query("""
             select c
             from Category c
-            left join fetch c.children
+            join fetch c.children
             where c.id in :ids
             """)
     List<Category> findCategoriesByIds(@Param("ids") String... ids);

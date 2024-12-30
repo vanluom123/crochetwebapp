@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.crochet.payload.request.UpdateCollectionRequest;
 import org.crochet.payload.response.CollectionResponse;
+import org.crochet.payload.response.FreePatternOnHome;
 import org.crochet.service.CollectionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +28,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/collections")
 @SecurityRequirement(name = "BearerAuth")
+@PreAuthorize("hasAnyRole('USER', 'ADMIN')")
 public class CollectionController {
     private final CollectionService collectionService;
 
@@ -39,7 +41,6 @@ public class CollectionController {
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = String.class)))
     @PostMapping(value = "/create")
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<String> create(@RequestParam("name") String name) {
         var collection = collectionService.createCollection(name);
         return ResponseEntity.status(HttpStatus.CREATED).body(collection);
@@ -50,7 +51,6 @@ public class CollectionController {
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = String.class)))
     @PostMapping("/add-pattern")
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<String> addPatternToCollection(
             @Parameter(description = "Collection ID")
             @RequestParam("collection_id") String collectionId,
@@ -65,9 +65,8 @@ public class CollectionController {
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = String.class)))
     @PutMapping("/update/{collectionId}")
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<String> updateCollection(
-            @Parameter(description = "Collection ID") @PathVariable String collectionId,
+            @Parameter(description = "Collection ID") @PathVariable("collectionId") String collectionId,
             @RequestBody UpdateCollectionRequest request) {
         var collection = collectionService.updateCollection(collectionId, request);
         return ResponseEntity.ok(collection);
@@ -76,7 +75,6 @@ public class CollectionController {
     @Operation(summary = "Remove a free pattern from collection")
     @ApiResponse(responseCode = "204", description = "Pattern removed from collection successfully")
     @DeleteMapping("/remove-pattern")
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<Void> removePatternFromCollection(
             @Parameter(description = "Free pattern ID")
             @RequestParam("free_pattern_id") String freePatternId) {
@@ -89,7 +87,6 @@ public class CollectionController {
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = CollectionResponse.class)))
     @GetMapping("/my-collections")
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<List<CollectionResponse>> getUserCollections() {
         var collections = collectionService.getUserCollections();
         return ResponseEntity.ok(collections);
@@ -100,7 +97,6 @@ public class CollectionController {
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = CollectionResponse.class)))
     @GetMapping("/{collectionId}")
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<CollectionResponse> getCollectionById(
             @Parameter(description = "Collection ID") @PathVariable("collectionId") String collectionId) {
         var collection = collectionService.getCollectionById(collectionId);
@@ -110,10 +106,20 @@ public class CollectionController {
     @Operation(summary = "Delete a collection")
     @ApiResponse(responseCode = "204", description = "Collection deleted successfully")
     @DeleteMapping("/delete/{collectionId}")
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<Void> deleteCollection(
             @Parameter(description = "Collection ID") @PathVariable("collectionId") String collectionId) {
         collectionService.deleteCollection(collectionId);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Get all free patterns in a collection")
+    @ApiResponse(responseCode = "200", description = "List of free patterns in collection",
+            content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = CollectionResponse.class)))
+    @GetMapping("/{collectionId}/free-patterns")
+    public ResponseEntity<List<FreePatternOnHome>> getFreePatternsInCollection(
+            @Parameter(description = "Collection ID") @PathVariable("collectionId") String collectionId) {
+        var freePatterns = collectionService.getFreePatternsInCollection(collectionId);
+        return ResponseEntity.ok(freePatterns);
     }
 }

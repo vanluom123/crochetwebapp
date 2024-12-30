@@ -153,16 +153,15 @@ public class FreePatternServiceImpl implements FreePatternService {
     /**
      * Get all free patterns on admin page
      *
-     * @param currentUser Current user
-     * @param pageNo      Page number
-     * @param pageSize    Page size
-     * @param sortBy      Sort by
-     * @param sortDir     Sort direction
-     * @param filters     List filters
+     * @param pageNo   Page number
+     * @param pageSize Page size
+     * @param sortBy   Sort by
+     * @param sortDir  Sort direction
+     * @param filters  List filters
      * @return PaginatedFreePatternResponse
      */
     @Override
-    public PaginatedFreePatternResponse getAllFreePatternsOnAdminPage(int pageNo,int pageSize,String sortBy,String sortDir,Filter[] filters) {
+    public PaginatedFreePatternResponse getAllFreePatternsOnAdminPage(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters) {
         var currentUser = SecurityUtils.getCurrentUser();
         if (currentUser == null) {
             throw new ResourceNotFoundException(MessageConstant.MSG_USER_NOT_FOUND,
@@ -258,7 +257,6 @@ public class FreePatternServiceImpl implements FreePatternService {
         return FreePatternMapper.INSTANCE.toResponse(freePattern);
     }
 
-    @SuppressWarnings("OptionalGetWithoutIsPresent")
     @Transactional
     @Override
     public void delete(String id) {

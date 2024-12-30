@@ -1,0 +1,12 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1735379441656-3
+      author: luomp
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  name: avatar
+                  type: VARCHAR(255)
+            tableName: collection
+

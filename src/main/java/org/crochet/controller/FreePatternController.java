@@ -140,6 +140,8 @@ public class FreePatternController {
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = List.class)))
     @GetMapping("/create-by")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @SecurityRequirement(name = "BearerAuth")
     public ResponseEntity<List<FreePatternOnHome>> getFrepsByCreateBy() {
         return ResponseEntity.ok(freePatternService.getFrepsByCreateBy());
     }

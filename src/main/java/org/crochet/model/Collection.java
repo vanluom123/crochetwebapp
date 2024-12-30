@@ -27,6 +27,9 @@ public class Collection extends BaseEntity {
     @Column(name = "name", nullable = false)
     private String name;
 
+    @Column(name = "avatar")
+    private String avatar;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     @JsonBackReference
@@ -34,4 +37,4 @@ public class Collection extends BaseEntity {
 
     @OneToMany(mappedBy = "collection", cascade = CascadeType.ALL)
     private Set<ColFrep> colfreps = new HashSet<>();
-} 
+}
