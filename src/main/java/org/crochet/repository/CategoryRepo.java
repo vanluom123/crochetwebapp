@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface CategoryRepo extends JpaRepository<Category, String> {
@@ -30,11 +31,19 @@ public interface CategoryRepo extends JpaRepository<Category, String> {
     @Query("select c from Category c")
     List<Category> getCategories();
 
+    @EntityGraph(attributePaths = {"children"})
     @Query("""
             select c
             from Category c
-            join fetch c.children
             where c.id in :ids
             """)
     List<Category> findCategoriesByIds(@Param("ids") String... ids);
+
+    @EntityGraph(attributePaths = {"children"})
+    @Query("""
+            select c
+            from Category c
+            where c.id = :id
+            """)
+    Optional<Category> findCategoryById(@Param("id") String id);
 }

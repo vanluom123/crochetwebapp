@@ -31,6 +31,11 @@ public class UserProfileServiceImpl implements UserProfileService {
     private final UserProfileRepo userProfileRepo;
     private final UserRepository userRepo;
 
+    /**
+     * Load user profile
+     *
+     * @return UserProfileResponse
+     */
     @Override
     public UserProfileResponse loadUserProfile() {
         var user = SecurityUtils.getCurrentUser();
@@ -69,6 +74,12 @@ public class UserProfileServiceImpl implements UserProfileService {
                 .build();
     }
 
+    /**
+     * Update user profile
+     *
+     * @param request UserProfileRequest
+     * @return UserProfileResponse
+     */
     @Override
     public UserProfileResponse updateUserProfile(UserProfileRequest request) {
         var user = SecurityUtils.getCurrentUser();
@@ -112,6 +123,13 @@ public class UserProfileServiceImpl implements UserProfileService {
                 .build();
     }
 
+    /**
+     * Update user profile
+     *
+     * @param userProfile UserProfile
+     * @param request     UserProfileRequest
+     * @return boolean
+     */
     private boolean updateUserProfile(UserProfile userProfile, UserProfileRequest request) {
         boolean isUpdated = false;
 
@@ -135,6 +153,13 @@ public class UserProfileServiceImpl implements UserProfileService {
         return isUpdated;
     }
 
+    /**
+     * Update user info
+     *
+     * @param user    User
+     * @param request UserProfileRequest
+     * @return boolean
+     */
     private boolean updateUserInfo(User user, UserProfileRequest request) {
         boolean isUpdated = false;
         if (request.getName() != null) {

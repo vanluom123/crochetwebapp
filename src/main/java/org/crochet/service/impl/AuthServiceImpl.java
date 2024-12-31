@@ -368,6 +368,13 @@ public class AuthServiceImpl implements AuthService {
         return MSG_RESET_PASSWORD_SUCCESS;
     }
 
+    /**
+     * Refresh token
+     *
+     * @param refreshToken Refresh token
+     * @return TokenResponse
+     * @throws ResourceNotFoundException Refresh token not in database
+     */
     @Override
     public TokenResponse refreshToken(String refreshToken) {
         return refreshTokenService.findByToken(refreshToken)
@@ -385,6 +392,11 @@ public class AuthServiceImpl implements AuthService {
                 );
     }
 
+    /**
+     * Logout
+     *
+     * @param request HttpServletRequest
+     */
     @Override
     public void logout(HttpServletRequest request) {
         var token = TokenUtils.getJwtFromAuthorizationHeader(request);
@@ -394,11 +406,25 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
+    /**
+     * Fallback method for resendVerificationEmail
+     *
+     * @param email Email
+     * @param t     Throwable
+     * @return Fallback message
+     */
     @SuppressWarnings("unused")
     private String resetPasswordLinkFallback(String email, Throwable t) {
         return "Request limit exceeded. Please wait for a while before retrying.";
     }
 
+    /**
+     * Fallback method for resendVerificationEmail
+     *
+     * @param email Email
+     * @param t     Throwable
+     * @return Fallback message
+     */
     @SuppressWarnings("unused")
     private String resendVerificationEmailFallback(String email, Throwable t) {
         return "Request limit exceeded. Please wait for a while before retrying.";

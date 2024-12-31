@@ -9,7 +9,6 @@ import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.FileMapper;
 import org.crochet.mapper.FreePatternMapper;
 import org.crochet.model.FreePattern;
-import org.crochet.model.Settings;
 import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.FreePatternRequest;
 import org.crochet.payload.response.FreePatternOnHome;
@@ -18,10 +17,10 @@ import org.crochet.payload.response.PaginatedFreePatternResponse;
 import org.crochet.repository.CategoryRepo;
 import org.crochet.repository.FreePatternRepository;
 import org.crochet.repository.GenericFilter;
-import org.crochet.repository.SettingsRepo;
 import org.crochet.service.FreePatternService;
 import org.crochet.util.ImageUtils;
 import org.crochet.util.SecurityUtils;
+import org.crochet.util.SettingsUtil;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -33,9 +32,6 @@ import org.springframework.util.StringUtils;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
 
@@ -48,7 +44,7 @@ import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
 public class FreePatternServiceImpl implements FreePatternService {
     private final FreePatternRepository freePatternRepo;
     private final CategoryRepo categoryRepo;
-    private final SettingsRepo settingsRepo;
+    private final SettingsUtil settingsUtil;
 
     /**
      * Creates a new FreePattern or updates an existing one based on the provided
@@ -69,8 +65,8 @@ public class FreePatternServiceImpl implements FreePatternService {
         var sortedFiles = ImageUtils.sortFiles(request.getFiles());
 
         if (!StringUtils.hasText(request.getId())) {
-            var category = categoryRepo.findById(request.getCategoryId()).orElseThrow(
-                    () -> new ResourceNotFoundException(MessageConstant.MSG_CATEGORY_NOT_FOUND,
+            var category = categoryRepo.findCategoryById(request.getCategoryId())
+                    .orElseThrow(() -> new ResourceNotFoundException(MessageConstant.MSG_CATEGORY_NOT_FOUND,
                             MAP_CODE.get(MessageConstant.MSG_CATEGORY_NOT_FOUND)));
 
             freePattern = FreePattern.builder()
@@ -208,13 +204,10 @@ public class FreePatternServiceImpl implements FreePatternService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Override
     public List<FreePatternOnHome> getLimitedFreePatterns() {
-        List<Settings> settings = settingsRepo.findSettings();
-        if (settings == null || settings.isEmpty()) {
+        var settingsMap = settingsUtil.getSettingsMap();
+        if (settingsMap.isEmpty()) {
             return Collections.emptyList();
         }
-
-        Map<String, Settings> settingsMap = settings.stream()
-                .collect(Collectors.toMap(Settings::getKey, Function.identity()));
 
         var direction = settingsMap.get("homepage.fp.direction").getValue();
 
@@ -251,7 +244,7 @@ public class FreePatternServiceImpl implements FreePatternService {
      */
     @Override
     public FreePatternResponse getDetail(String id) {
-        var freePattern = freePatternRepo.getDetail(id).orElseThrow(
+        var freePattern = freePatternRepo.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException(MessageConstant.MSG_FREE_PATTERN_NOT_FOUND,
                         MAP_CODE.get(MessageConstant.MSG_FREE_PATTERN_NOT_FOUND)));
         return FreePatternMapper.INSTANCE.toResponse(freePattern);

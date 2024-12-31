@@ -91,6 +91,13 @@ public class CategoryServiceImpl implements CategoryService {
         return CategoryMapper.INSTANCE.toResponses(savedCategories);
     }
 
+    /**
+     * Recursive method to detect circular references
+     *
+     * @param parent  the parent category
+     * @param request the request object containing the category name
+     * @return true if a circular reference is detected, false otherwise
+     */
     // Recursive method to detect circular references
     private boolean isCircularReference(Category parent, CategoryCreationRequest request) {
         Category current = parent;

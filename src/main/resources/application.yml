@@ -62,8 +62,8 @@ management:
 app:
   auth:
     tokenSecret: ${TOKEN_SECRET}
-    tokenExpirationMs: 900000 # 15 minutes
-    refresh-token-expiration-ms: 86400000 # 1 day
+    tokenExpirationMs: ${TOKEN_EXPIRE} # 1 minutes
+    refresh-token-expiration-ms: ${REFRESH_TOKEN_SECRET} # 10 minutes
   oauth2:
     authorizedRedirectUris:
       - http://localhost:3000/oauth2/redirect
@@ -79,6 +79,9 @@ authorize:
       - "/blog/create"
       - "/comment/create"
       - "/free-pattern/create"
+      - "/free-pattern/delete"
+      - "/free-pattern/create-by"
+      - "/free-pattern/collection/**"
       - "/pattern/create"
       - "/pattern/detail"
       - "/category/create"
@@ -96,17 +99,11 @@ authorize:
       - "/blog-categories/update"
       - "/blog-categories/delete/**"
       - "/setting/**"
+      - "/collections/**"
 
 # Firebase configuration
 firebase:
   serviceAccountKey: ${SERVICE_ACCOUNT_KEY}
-
-# Logging configuration
-logging:
-  level:
-    org.crochet: DEBUG
-    org.springframework.web: DEBUG
-    root: INFO
 
 # Resilience4j configuration
 resilience4j:
