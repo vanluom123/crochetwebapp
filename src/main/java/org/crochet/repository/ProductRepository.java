@@ -19,7 +19,7 @@ public interface ProductRepository extends JpaRepository<Product, String>, JpaSp
     @Query("""
             select new org.crochet.payload.response.ProductOnHome(p.id, p.name, p.description, p.price, p.currencyCode, i.fileContent)
             from Product p
-            join p.images i
+            left join p.images i
             where p.isHome = true
                 and i.order = 0
             """)
@@ -37,7 +37,7 @@ public interface ProductRepository extends JpaRepository<Product, String>, JpaSp
     @Query("""
             select new org.crochet.payload.response.ProductOnHome(p.id, p.name, p.description, p.price, p.currencyCode, i.fileContent)
             from Product p
-            join p.images i
+            left join p.images i
             where p.id in :ids
                 and i.order = 0
             """)

@@ -19,7 +19,7 @@ public interface BlogPostRepository extends JpaRepository<BlogPost, String>, Jpa
     @Query("""
             select new org.crochet.payload.response.BlogOnHome(p.id, p.title, p.content, f.fileContent, p.createdDate)
             from BlogPost p
-            join p.files f
+            left join p.files f
             where p.home = true
                 and f.order = 0
             """)
@@ -36,7 +36,7 @@ public interface BlogPostRepository extends JpaRepository<BlogPost, String>, Jpa
     @Query("""
             select new org.crochet.payload.response.BlogOnHome(p.id, p.title, p.content, f.fileContent, p.createdDate)
             from BlogPost p
-            join p.files f
+            left join p.files f
             where p.id in :ids
                 and f.order = 0
             """)

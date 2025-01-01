@@ -36,12 +36,24 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    /**
+     * Constructor for the UserServiceImpl class.
+     *
+     * @param userRepository   The repository for the User entity.
+     * @param passwordEncoder The password encoder.
+     */
     public UserServiceImpl(UserRepository userRepository,
-                           PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
+    /**
+     * Creates a new user account.
+     *
+     * @param signUpRequest The request object containing the user's details.
+     * @return The created user object.
+     */
     @Override
     public User createUser(SignUpRequest signUpRequest) {
         // Check if the email address is already in use
@@ -69,9 +81,11 @@ public class UserServiceImpl implements UserService {
      * @param pageNo   The page number to retrieve. Page numbers start from 0.
      * @param pageSize The number of records to retrieve per page.
      * @param sortBy   The field by which to sort the records.
-     * @param sortDir  The direction of the sort. Can be 'ASC' for ascending or 'DESC' for descending.
+     * @param sortDir  The direction of the sort. Can be 'ASC' for ascending or
+     *                 'DESC' for descending.
      * @param filters  The list of filters.
-     * @return A UserPaginationResponse object containing the retrieved records and pagination details.
+     * @return A UserPaginationResponse object containing the retrieved records and
+     *         pagination details.
      */
     @Override
     public UserPaginationResponse getAll(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters) {
@@ -96,6 +110,12 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
 
+    /**
+     * Retrieves a user by their ID.
+     *
+     * @param request The request object containing the user's ID.
+     * @return The retrieved user object.
+     */
     @Transactional
     @Override
     public void updateUser(UserUpdateRequest request) {
@@ -111,12 +131,23 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
+    /**
+     * Deletes a user by their ID.
+     *
+     * @param id The ID of the user to delete.
+     */
     @Transactional
     @Override
     public void deleteUser(String id) {
         userRepository.deleteById(id);
     }
 
+    /**
+     * Retrieves a user by their email address.
+     *
+     * @param email The email address of the user to retrieve.
+     * @return The retrieved user object.
+     */
     @Override
     public User getByEmail(String email) {
         return userRepository.findByEmail(email)
@@ -124,6 +155,12 @@ public class UserServiceImpl implements UserService {
                         MAP_CODE.get(MSG_USER_NOT_FOUND_WITH_EMAIL)));
     }
 
+    /**
+     * Retrieves a user by their ID.
+     *
+     * @param id The ID of the user to retrieve.
+     * @return The retrieved user object.
+     */
     @Override
     public UserResponse getDetail(String id) {
         return userRepository.getDetail(id)
@@ -131,18 +168,40 @@ public class UserServiceImpl implements UserService {
                         MAP_CODE.get(MSG_USER_NOT_FOUND_WITH_ID)));
     }
 
+    /**
+     * Updates a user's password.
+     *
+     * @param password The new password.
+     * @param email    The email address of the user.
+     */
     @Override
     public void updatePassword(String password, String email) {
-        userRepository.updatePassword(password, email);
+        var user = getByEmail(email);
+        user.setPassword(passwordEncoder.encode(password));
+        userRepository.save(user);
     }
 
+    /**
+     * Updates a user's email address.
+     *
+     * @param email The new email address.
+     */
     @Override
     public void verifyEmail(String email) {
-        userRepository.verifyEmail(email);
+        var user = getByEmail(email);
+        user.setEmailVerified(true);
+        userRepository.save(user);
     }
 
+    /**
+     * Validates a user's credentials.
+     *
+     * @param email    The email address of the user.
+     * @param password The password of the user.
+     * @return The user object if the credentials are valid.
+     */
     @Override
-    public User checkLogin(String email, String password) {
+    public User validateUserCredentials(String email, String password) {
         var user = this.getByEmail(email);
         var isMatch = passwordEncoder.matches(password, user.getPassword());
         if (!isMatch) {
@@ -152,6 +211,12 @@ public class UserServiceImpl implements UserService {
         return user;
     }
 
+    /**
+     * Checks if an email address is already in use.
+     *
+     * @param email The email address to check.
+     * @return True if the email address is already in use, false otherwise.
+     */
     private boolean isValidEmail(String email) {
         return userRepository.findByEmail(email).isPresent();
     }

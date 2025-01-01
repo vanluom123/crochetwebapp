@@ -18,10 +18,21 @@ import static org.crochet.constant.MessageConstant.MSG_USER_NOT_FOUND_WITH_TOKEN
 public class PasswordResetTokenServiceImpl implements PasswordResetTokenService {
     private final PasswordResetTokenRepository passwordResetTokenRepository;
 
+    /**
+     * Constructor
+     *
+     * @param passwordResetTokenRepository PasswordResetTokenRepository
+     */
     public PasswordResetTokenServiceImpl(PasswordResetTokenRepository passwordResetTokenRepository) {
         this.passwordResetTokenRepository = passwordResetTokenRepository;
     }
 
+    /**
+     * Create or update password reset token
+     *
+     * @param user User
+     * @return PasswordResetToken
+     */
     @Override
     public PasswordResetToken createOrUpdatePasswordResetToken(User user) {
         var passwordResetToken = passwordResetTokenRepository.findByUser(user)
@@ -42,6 +53,12 @@ public class PasswordResetTokenServiceImpl implements PasswordResetTokenService 
         return passwordResetTokenRepository.save(passwordResetToken);
     }
 
+    /**
+     * Get email by token
+     *
+     * @param token String
+     * @return String
+     */
     @Override
     public String getEmailByToken(String token) {
         return passwordResetTokenRepository.findEmailByToken(token)
@@ -51,11 +68,22 @@ public class PasswordResetTokenServiceImpl implements PasswordResetTokenService 
                 );
     }
 
+    /**
+     * Delete password reset token
+     *
+     * @param token PasswordResetToken
+     */
     @Override
     public void deletePasswordToken(PasswordResetToken token) {
         passwordResetTokenRepository.delete(token);
     }
 
+    /**
+     * Get password reset token
+     *
+     * @param token String
+     * @return PasswordResetToken
+     */
     @Override
     public PasswordResetToken getPasswordResetToken(String token) {
         return passwordResetTokenRepository.findByToken(token)

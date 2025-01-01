@@ -10,6 +10,7 @@ import org.crochet.payload.request.LoginRequest;
 import org.crochet.payload.request.PasswordResetRequest;
 import org.crochet.payload.request.SignUpRequest;
 import org.crochet.payload.response.AuthResponse;
+import org.crochet.payload.response.ResponseData;
 import org.crochet.payload.response.TokenResponse;
 import org.crochet.service.AuthService;
 import org.springframework.http.HttpStatus;
@@ -19,7 +20,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/auth")
@@ -109,5 +114,17 @@ public class AuthController {
     public ResponseEntity<String> logout(HttpServletRequest request) {
         authService.logout(request);
         return ResponseEntity.ok("Logout successful");
+    }
+
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get refresh token expired")
+    @ApiResponse(responseCode = "200",
+            description = "Get refresh token expired",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class)))
+    @GetMapping("refresh-token/expired")
+    public ResponseData<LocalDateTime> refreshTokenExpired(@RequestParam("refreshToken") String refreshToken) {
+        var response = authService.getRefreshTokenExpiresAt(refreshToken);
+        return new ResponseData<>("Get refresh token expired success", HttpStatus.OK.value(), response);
     }
 }

@@ -8,8 +8,9 @@ import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SecurityException;
+
+import org.crochet.model.User;
 import org.crochet.properties.AppProperties;
-import org.crochet.security.UserPrincipal;
 import org.crochet.service.JwtTokenService;
 import org.crochet.service.TokenBlacklistService;
 import org.slf4j.Logger;
@@ -57,7 +58,7 @@ public class JwtTokenServiceImpl implements JwtTokenService {
     @Override
     public String createToken(Authentication auth) {
         // Get the UserPrincipal from the Authentication object
-        UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
+        User userPrincipal = (User) auth.getPrincipal();
 
         // Get the current date and time
         Date now = new Date();
@@ -67,7 +68,7 @@ public class JwtTokenServiceImpl implements JwtTokenService {
 
         // Build and sign the JWT token
         return Jwts.builder()
-                .subject(userPrincipal.getUsername()) // Set the subject of the token as the user ID
+                .subject(userPrincipal.getEmail()) // Set the subject of the token as the user ID
                 .issuedAt(new Date()) // Set the issued date as the current date
                 .expiration(expiryDate) // Set the token expiration date
                 .signWith(getKey()) // Sign the token using the key and algorithm
