@@ -105,7 +105,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public AuthResponse authenticateUser(LoginRequest loginRequest) {
         // Check email and password
-        var user = userService.checkLogin(loginRequest.getEmail(), loginRequest.getPassword());
+        var user = userService.validateUserCredentials(loginRequest.getEmail(), loginRequest.getPassword());
         // Check email verified
         if (!user.isEmailVerified()) {
             throw new EmailVerificationException(MSG_EMAIL_NOT_VERIFIED, MAP_CODE.get(MSG_EMAIL_NOT_VERIFIED));
@@ -120,6 +120,7 @@ public class AuthServiceImpl implements AuthService {
                 .refreshToken(refreshToken.getToken())
                 .role(user.getRole().getValue())
                 .email(user.getEmail())
+                .imageUrl(user.getImageUrl())
                 .build();
     }
 
@@ -367,6 +368,13 @@ public class AuthServiceImpl implements AuthService {
         return MSG_RESET_PASSWORD_SUCCESS;
     }
 
+    /**
+     * Refresh token
+     *
+     * @param refreshToken Refresh token
+     * @return TokenResponse
+     * @throws ResourceNotFoundException Refresh token not in database
+     */
     @Override
     public TokenResponse refreshToken(String refreshToken) {
         return refreshTokenService.findByToken(refreshToken)
@@ -384,6 +392,11 @@ public class AuthServiceImpl implements AuthService {
                 );
     }
 
+    /**
+     * Logout
+     *
+     * @param request HttpServletRequest
+     */
     @Override
     public void logout(HttpServletRequest request) {
         var token = TokenUtils.getJwtFromAuthorizationHeader(request);
@@ -393,13 +406,42 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
+    /**
+     * Fallback method for resendVerificationEmail
+     *
+     * @param email Email
+     * @param t     Throwable
+     * @return Fallback message
+     */
     @SuppressWarnings("unused")
     private String resetPasswordLinkFallback(String email, Throwable t) {
         return "Request limit exceeded. Please wait for a while before retrying.";
     }
 
+    /**
+     * Fallback method for resendVerificationEmail
+     *
+     * @param email Email
+     * @param t     Throwable
+     * @return Fallback message
+     */
     @SuppressWarnings("unused")
     private String resendVerificationEmailFallback(String email, Throwable t) {
         return "Request limit exceeded. Please wait for a while before retrying.";
+    }
+
+    /**
+     * Get refresh token expires at
+     *
+     * @param refreshToken Refresh token
+     * @return LocalDateTime
+     * @throws ResourceNotFoundException Refresh token not in database
+     */
+    @Override
+    public LocalDateTime getRefreshTokenExpiresAt(String refreshToken) {
+        var refresh = refreshTokenService.findByToken(refreshToken)
+                .orElseThrow(() -> new ResourceNotFoundException(REFRESH_TOKEN_NOT_IN_DB,
+                        MAP_CODE.get(REFRESH_TOKEN_NOT_IN_DB)));
+        return refresh.getExpiresAt();
     }
 }

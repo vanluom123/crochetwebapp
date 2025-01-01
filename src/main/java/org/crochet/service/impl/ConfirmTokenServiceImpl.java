@@ -17,10 +17,21 @@ import static org.crochet.constant.MessageConstant.MSG_CONFIRM_TOKEN_NOT_FOUND;
 public class ConfirmTokenServiceImpl implements ConfirmTokenService {
     private final ConfirmationTokenRepository confirmationTokenRepository;
 
+    /**
+     * Constructor
+     *
+     * @param confirmationTokenRepository the confirmationTokenRepository
+     */
     public ConfirmTokenServiceImpl(ConfirmationTokenRepository confirmationTokenRepository) {
         this.confirmationTokenRepository = confirmationTokenRepository;
     }
 
+    /**
+     * Create or update a confirmation token
+     *
+     * @param user the user
+     * @return the confirmation token
+     */
     @Override
     public ConfirmationToken createOrUpdate(User user) {
         ConfirmationToken confirmationToken = confirmationTokenRepository
@@ -43,11 +54,23 @@ public class ConfirmTokenServiceImpl implements ConfirmTokenService {
         return confirmationTokenRepository.save(confirmationToken);
     }
 
+    /**
+     * Update the confirmed at time of a token
+     *
+     * @param token    the token
+     * @param dateTime the date time
+     */
     @Override
     public void updateConfirmedAt(String token, LocalDateTime dateTime) {
         confirmationTokenRepository.updateConfirmedAt(token, dateTime);
     }
 
+    /**
+     * Get a token by token string
+     *
+     * @param token the token string
+     * @return the token
+     */
     @Override
     public ConfirmationToken getToken(String token) {
         return confirmationTokenRepository

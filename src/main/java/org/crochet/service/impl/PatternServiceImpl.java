@@ -16,9 +16,9 @@ import org.crochet.payload.response.PatternResponse;
 import org.crochet.repository.CategoryRepo;
 import org.crochet.repository.GenericFilter;
 import org.crochet.repository.PatternRepository;
-import org.crochet.repository.SettingsRepo;
 import org.crochet.service.PatternService;
 import org.crochet.util.ImageUtils;
+import org.crochet.util.SettingsUtil;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -31,8 +31,6 @@ import org.springframework.util.StringUtils;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
 
@@ -45,7 +43,7 @@ import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
 public class PatternServiceImpl implements PatternService {
     private final PatternRepository patternRepo;
     private final CategoryRepo categoryRepo;
-    private final SettingsRepo settingsRepo;
+    private final SettingsUtil settingsUtil;
 
     /**
      * Create or update pattern
@@ -149,13 +147,10 @@ public class PatternServiceImpl implements PatternService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Override
     public List<PatternOnHome> getLimitedPatterns() {
-        List<Settings> settings = settingsRepo.findSettings();
-        if (settings == null || settings.isEmpty()) {
+        Map<String, Settings> settingsMap = settingsUtil.getSettingsMap();
+        if (settingsMap.isEmpty()) {
             return Collections.emptyList();
         }
-
-        Map<String, Settings> settingsMap = settings.stream()
-                .collect(Collectors.toMap(Settings::getKey, Function.identity()));
 
         var direction = settingsMap.get("homepage.pattern.direction").getValue();
 

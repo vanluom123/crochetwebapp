@@ -7,7 +7,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
@@ -18,8 +20,13 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.crochet.enumerator.AuthProvider;
 import org.crochet.enumerator.RoleType;
-
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @Entity
 @Table(name = "users", uniqueConstraints = {
@@ -30,7 +37,7 @@ import java.util.List;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class User extends BaseEntity {
+public class User extends BaseEntity implements UserDetails, OAuth2User {
     @Column(name = "name", nullable = false)
     private String name;
 
@@ -75,4 +82,28 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<RefreshToken> refreshTokens;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Collection> collections;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private UserProfile userProfile;
+
+    @Transient
+    private Map<String, Object> attributes;
+
+    @Override
+    public java.util.Collection<? extends GrantedAuthority> getAuthorities() {
+        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role));
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public Map<String, Object> getAttributes() {
+        return attributes;
+    }
 }

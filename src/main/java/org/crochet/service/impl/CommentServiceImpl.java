@@ -10,9 +10,8 @@ import org.crochet.payload.request.CommentRequest;
 import org.crochet.payload.response.CommentResponse;
 import org.crochet.repository.BlogPostRepository;
 import org.crochet.repository.CommentRepository;
-import org.crochet.repository.UserRepository;
-import org.crochet.security.UserPrincipal;
 import org.crochet.service.CommentService;
+import org.crochet.util.SecurityUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -29,7 +28,6 @@ import static org.crochet.constant.MessageConstant.MSG_USER_NOT_FOUND;
 @RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepo;
-    private final UserRepository userRepo;
     private final BlogPostRepository blogPostRepo;
 
     /**
@@ -44,13 +42,11 @@ public class CommentServiceImpl implements CommentService {
      */
     @Transactional
     @Override
-    public CommentResponse createOrUpdate(UserPrincipal principal, CommentRequest request) {
-        if (principal == null) {
+    public CommentResponse createOrUpdate(CommentRequest request) {
+        User user = SecurityUtils.getCurrentUser();
+        if (user == null) {
             throw new ResourceNotFoundException(MSG_USER_NOT_FOUND, MAP_CODE.get(MSG_USER_NOT_FOUND));
         }
-        User user = userRepo.findById(principal.getId()).orElseThrow(
-                () -> new ResourceNotFoundException(MSG_USER_NOT_FOUND, MAP_CODE.get(MSG_USER_NOT_FOUND))
-        );
 
         var blog = blogPostRepo.findById(request.getBlogPostId()).orElseThrow(
                 () -> new ResourceNotFoundException(MessageConstant.MSG_BLOG_NOT_FOUND,

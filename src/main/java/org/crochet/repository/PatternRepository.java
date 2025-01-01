@@ -19,7 +19,7 @@ public interface PatternRepository extends JpaRepository<Pattern, String>, JpaSp
     @Query("""
             SELECT new org.crochet.payload.response.PatternOnHome(p.id, p.name, p.description, p.price, p.currencyCode, i.fileContent)
             FROM Pattern p
-            JOIN p.images i
+            LEFT JOIN p.images i
             WHERE p.isHome = true
                 AND i.order = 0
             """)
@@ -37,7 +37,7 @@ public interface PatternRepository extends JpaRepository<Pattern, String>, JpaSp
     @Query("""
             select new org.crochet.payload.response.PatternOnHome(p.id, p.name, p.description, p.price, p.currencyCode, i.fileContent)
             from Pattern p
-            join p.images i
+            left join p.images i
             where p.id in :patternIds
                 and i.order = 0
             """)

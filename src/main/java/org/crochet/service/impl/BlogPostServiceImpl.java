@@ -16,9 +16,9 @@ import org.crochet.payload.response.BlogPostResponse;
 import org.crochet.repository.BlogCategoryRepo;
 import org.crochet.repository.BlogPostRepository;
 import org.crochet.repository.GenericFilter;
-import org.crochet.repository.SettingsRepo;
 import org.crochet.service.BlogPostService;
 import org.crochet.util.ImageUtils;
+import org.crochet.util.SettingsUtil;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -30,8 +30,6 @@ import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
 
@@ -43,14 +41,14 @@ import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
 public class BlogPostServiceImpl implements BlogPostService {
     private final BlogPostRepository blogPostRepo;
     private final BlogCategoryRepo blogCategoryRepo;
-    private final SettingsRepo settingsRepo;
+    private final SettingsUtil settingsUtil;
 
     public BlogPostServiceImpl(BlogPostRepository blogPostRepo,
                                BlogCategoryRepo blogCategoryRepo,
-                               SettingsRepo settingsRepo) {
+                               SettingsUtil settingsUtil) {
         this.blogPostRepo = blogPostRepo;
         this.blogCategoryRepo = blogCategoryRepo;
-        this.settingsRepo = settingsRepo;
+        this.settingsUtil = settingsUtil;
     }
 
     /**
@@ -76,7 +74,7 @@ public class BlogPostServiceImpl implements BlogPostService {
             if (request.getBlogCategoryId() != null) {
                 blogCategory = blogCategoryRepo.findById(request.getBlogCategoryId())
                         .orElseThrow(() -> new ResourceNotFoundException(MessageConstant.MSG_BLOG_CATEGORY_NOT_FOUND,
-                                        MAP_CODE.get(MessageConstant.MSG_BLOG_CATEGORY_NOT_FOUND)));
+                                MAP_CODE.get(MessageConstant.MSG_BLOG_CATEGORY_NOT_FOUND)));
             }
             blogPost = BlogPost.builder()
                     .blogCategory(blogCategory)
@@ -182,10 +180,10 @@ public class BlogPostServiceImpl implements BlogPostService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Override
     public List<BlogOnHome> getLimitedBlogPosts() {
-        List<Settings> settings = settingsRepo.findSettings();
-
-        Map<String, Settings> settingsMap = settings.stream()
-                .collect(Collectors.toMap(Settings::getKey, Function.identity()));
+        Map<String, Settings> settingsMap = settingsUtil.getSettingsMap();
+        if (settingsMap.isEmpty()) {
+            return List.of();
+        }
 
         String direction = settingsMap.get("homepage.blog.direction").getValue();
 
@@ -196,7 +194,7 @@ public class BlogPostServiceImpl implements BlogPostService {
         Sort sort = Sort.by(Sort.Direction.fromString(direction), orderBy);
         Pageable pageable = PageRequest.of(0, Integer.parseInt(limit), sort);
 
-       return blogPostRepo.findLimitedNumPosts(pageable);
+        return blogPostRepo.findLimitedNumPosts(pageable);
     }
 
     /**

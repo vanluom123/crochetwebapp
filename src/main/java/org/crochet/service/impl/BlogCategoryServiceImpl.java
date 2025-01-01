@@ -21,6 +21,12 @@ import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
 public class BlogCategoryServiceImpl implements BlogCategoryService {
     private final BlogCategoryRepo blogCategoryRepo;
 
+    /**
+     * Create a new blog category
+     *
+     * @param request the request object
+     * @return the response object
+     */
     @Transactional
     @Override
     public BlogCategoryResponse create(BlogCategoryRequest request) {
@@ -30,6 +36,12 @@ public class BlogCategoryServiceImpl implements BlogCategoryService {
         return BlogCategoryMapper.INSTANCE.toResponse(blogCategory);
     }
 
+    /**
+     * Update a blog category
+     *
+     * @param request the request object
+     * @return the response object
+     */
     @Transactional
     @Override
     public BlogCategoryResponse update(BlogCategoryRequest request) {
@@ -39,18 +51,34 @@ public class BlogCategoryServiceImpl implements BlogCategoryService {
         return BlogCategoryMapper.INSTANCE.toResponse(blogCategory);
     }
 
+    /**
+     * Get a blog category detail
+     *
+     * @param id the blog category id
+     * @return the response object
+     */
     @Override
     public BlogCategoryResponse getDetail(String id) {
         BlogCategory blogCategory = getById(id);
         return BlogCategoryMapper.INSTANCE.toResponse(blogCategory);
     }
 
+    /**
+     * Get all blog categories
+     *
+     * @return the list of blog categories
+     */
     @Override
     public List<BlogCategoryResponse> getAll() {
         List<BlogCategory> blogCategories = blogCategoryRepo.findAll();
         return BlogCategoryMapper.INSTANCE.toResponses(blogCategories);
     }
 
+    /**
+     * Delete a blog category
+     *
+     * @param id the blog category id
+     */
     @Transactional
     @Override
     public void delete(String id) {
@@ -58,6 +86,12 @@ public class BlogCategoryServiceImpl implements BlogCategoryService {
         blogCategoryRepo.delete(blogCategory);
     }
 
+    /**
+     * Get a blog category by id
+     *
+     * @param id the blog category id
+     * @return the blog category
+     */
     private BlogCategory getById(String id) {
         return blogCategoryRepo.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException(MessageConstant.MSG_BLOG_CATEGORY_NOT_FOUND,

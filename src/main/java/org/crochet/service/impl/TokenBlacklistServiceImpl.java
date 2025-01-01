@@ -12,10 +12,20 @@ import java.time.LocalDateTime;
 public class TokenBlacklistServiceImpl implements TokenBlacklistService {
     private final TokenBlacklistRepo tokenBlacklistRepo;
 
+    /**
+     * Constructor
+     *
+     * @param tokenBlacklistRepo TokenBlacklistRepo
+     */
     public TokenBlacklistServiceImpl(TokenBlacklistRepo tokenBlacklistRepo) {
         this.tokenBlacklistRepo = tokenBlacklistRepo;
     }
 
+    /**
+     * Add a token to the blacklist
+     *
+     * @param token String
+     */
     @Transactional
     @Override
     public void addTokenToBlacklist(String token) {
@@ -25,6 +35,12 @@ public class TokenBlacklistServiceImpl implements TokenBlacklistService {
         tokenBlacklistRepo.save(tokenBlacklist);
     }
 
+    /**
+     * Check if a token is blacklisted
+     *
+     * @param token String
+     * @return boolean
+     */
     @Override
     public boolean isTokenBlacklisted(String token) {
         return tokenBlacklistRepo.findByToken(token).isPresent();

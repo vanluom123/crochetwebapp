@@ -57,6 +57,10 @@ public class MessageCodeConstant {
         MAP_CODE.put(MessageConstant.ERROR_IMAGE_UPLOAD_FAILED, 48);
         MAP_CODE.put(MessageConstant.MSG_FORBIDDEN, 49);
         MAP_CODE.put(MessageConstant.MSG_UNAUTHORIZED, 50);
+        MAP_CODE.put(MessageConstant.MSG_COLLECTION_NOT_FOUND, 70);
+        MAP_CODE.put(MessageConstant.MSG_NOT_AUTHENTICATED, 71);
+        MAP_CODE.put(MessageConstant.MSG_NO_PERMISSION_MODIFY_COLLECTION, 72);
+        MAP_CODE.put(MessageConstant.MSG_NO_PERMISSION_VIEW_COLLECTION, 73);
     }
 
     private MessageCodeConstant() {
