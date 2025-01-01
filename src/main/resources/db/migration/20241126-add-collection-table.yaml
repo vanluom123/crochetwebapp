@@ -37,6 +37,11 @@ databaseChangeLog:
               - column:
                   constraints:
                     nullable: false
+                  name: avatar
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
                   name: user_id
                   type: VARCHAR(255)
             tableName: collection

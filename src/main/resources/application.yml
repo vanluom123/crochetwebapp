@@ -62,8 +62,8 @@ management:
 app:
   auth:
     tokenSecret: ${TOKEN_SECRET}
-    tokenExpirationMs: ${TOKEN_EXPIRE} # 1 minutes
-    refresh-token-expiration-ms: ${REFRESH_TOKEN_SECRET} # 10 minutes
+    tokenExpirationMs: 259200000 # 3 days
+    refresh-token-expiration-ms: 604800000 # 1 week
   oauth2:
     authorizedRedirectUris:
       - http://localhost:3000/oauth2/redirect

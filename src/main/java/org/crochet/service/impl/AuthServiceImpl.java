@@ -429,4 +429,19 @@ public class AuthServiceImpl implements AuthService {
     private String resendVerificationEmailFallback(String email, Throwable t) {
         return "Request limit exceeded. Please wait for a while before retrying.";
     }
+
+    /**
+     * Get refresh token expires at
+     *
+     * @param refreshToken Refresh token
+     * @return LocalDateTime
+     * @throws ResourceNotFoundException Refresh token not in database
+     */
+    @Override
+    public LocalDateTime getRefreshTokenExpiresAt(String refreshToken) {
+        var refresh = refreshTokenService.findByToken(refreshToken)
+                .orElseThrow(() -> new ResourceNotFoundException(REFRESH_TOKEN_NOT_IN_DB,
+                        MAP_CODE.get(REFRESH_TOKEN_NOT_IN_DB)));
+        return refresh.getExpiresAt();
+    }
 }

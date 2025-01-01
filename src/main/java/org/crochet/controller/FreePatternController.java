@@ -78,7 +78,7 @@ public class FreePatternController {
             @Parameter(description = "ID of the pattern to delete")
             @RequestParam("id") String id) {
         freePatternService.delete(id);
-        return new ResponseData<>("Free Pattern deleted successfully", HttpStatus.OK.toString(), null);
+        return new ResponseData<>("Free Pattern deleted successfully", HttpStatus.OK.value(), null);
     }
 
     @Operation(summary = "Get paginated list of patterns")
