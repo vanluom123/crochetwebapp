@@ -55,6 +55,10 @@ public class MessageConstant {
     public static final String MSG_SETTINGS_NOT_FOUND = "Settings not found";
     public static final String MSG_FORBIDDEN = "You do not have permission to access this resource";
     public static final String MSG_UNAUTHORIZED = "You are not authorized to access this resource";
+    public static final String MSG_COLLECTION_NOT_FOUND = "Collection not found";
+    public static final String MSG_NOT_AUTHENTICATED = "You are not authenticated";
+    public static final String MSG_NO_PERMISSION_MODIFY_COLLECTION = "You don't have permission to modify this collection";
+    public static final String MSG_NO_PERMISSION_VIEW_COLLECTION = "You don't have permission to view this collection";
 
     private MessageConstant() {
     }

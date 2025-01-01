@@ -27,6 +27,13 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     private final UserRepository userRepository;
     private final AppProperties appProps;
 
+    /**
+     * Constructor for RefreshTokenServiceImpl
+     *
+     * @param refreshTokenRepo RefreshTokenRepo
+     * @param userRepository    UserRepository
+     * @param appProps         AppProperties
+     */
     public RefreshTokenServiceImpl(RefreshTokenRepo refreshTokenRepo,
                                    UserRepository userRepository,
                                    AppProperties appProps) {
@@ -35,6 +42,12 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         this.appProps = appProps;
     }
 
+    /**
+     * Create a refresh token for a user
+     *
+     * @param username String
+     * @return RefreshToken
+     */
     @Transactional
     @Override
     public RefreshToken createRefreshToken(String username) {
@@ -52,11 +65,21 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         return refreshTokenRepo.save(refreshToken);
     }
 
+    /**
+     * Delete a refresh token
+     *
+     * @param token RefreshToken
+     */
     @Override
     public Optional<RefreshToken> findByToken(String token) {
         return refreshTokenRepo.findByToken(token);
     }
 
+    /**
+     * Delete a refresh token
+     *
+     * @param token RefreshToken
+     */
     @Override
     public RefreshToken verifyExpiration(RefreshToken token) {
         if (token.getExpiresAt().isBefore(LocalDateTime.now()) || token.isRevoked()) {
@@ -67,6 +90,11 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         return token;
     }
 
+    /**
+     * Delete a refresh token
+     *
+     * @param token RefreshToken
+     */
     @Override
     public void revokeByToken(String token) {
         var refreshToken = findByToken(token)
@@ -76,6 +104,11 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         refreshTokenRepo.save(refreshToken);
     }
 
+    /**
+     * Delete a refresh token
+     *
+     * @param user User
+     */
     private void revokeRefreshToken(User user) {
         var validRefreshTokens = refreshTokenRepo.findAllValidRefreshTokenByUser(user);
         if (validRefreshTokens.isEmpty()) {

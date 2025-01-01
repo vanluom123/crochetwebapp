@@ -5,11 +5,8 @@ import org.crochet.enumerator.RoleType;
 import org.crochet.exception.OAuth2AuthenticationProcessingException;
 import org.crochet.model.User;
 import org.crochet.repository.UserRepository;
-import org.crochet.security.UserPrincipal;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -17,8 +14,6 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -73,18 +68,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         // Validate the user's provider
         validateUserProvider(oAuth2UserRequest, user);
 
-        // Create a list of GrantedAuthority with a single authority ROLE_USER
-        List<GrantedAuthority> authorities =
-                Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRole()));
+        user.setAttributes(oAuth2User.getAttributes());
 
-        // Create and return the user principal
-        return UserPrincipal.builder()
-                .id(user.getId())
-                .email(user.getEmail())
-                .password(user.getPassword())
-                .authorities(authorities)
-                .attributes(oAuth2User.getAttributes())
-                .build();
+        return user;
     }
 
     /**

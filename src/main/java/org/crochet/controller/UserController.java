@@ -25,8 +25,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/users")
-@SecurityRequirement(name = "BearerAuth")
-@PreAuthorize("hasRole('ADMIN')")
 public class UserController {
     private final UserService userService;
 
@@ -39,6 +37,8 @@ public class UserController {
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = UserPaginationResponse.class)))
     @PostMapping("/pagination")
+    @SecurityRequirement(name = "BearerAuth")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserPaginationResponse> getAll(
             @Parameter(description = "Page number (default: 0)")
             @RequestParam(value = "pageNo", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER,
@@ -58,12 +58,16 @@ public class UserController {
     }
 
     @PutMapping("/update")
+    @SecurityRequirement(name = "BearerAuth")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> updateUser(@RequestBody UserUpdateRequest request) {
         userService.updateUser(request);
         return ResponseEntity.ok("User updated successfully");
     }
 
     @GetMapping("/detail")
+    @SecurityRequirement(name = "BearerAuth")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserResponse> getDetail(@Parameter(description = "User ID")
                                                   @RequestParam String id) {
         var user = userService.getDetail(id);
@@ -71,6 +75,8 @@ public class UserController {
     }
 
     @DeleteMapping("/delete")
+    @SecurityRequirement(name = "BearerAuth")
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteUser(@RequestParam String id) {
         userService.deleteUser(id);
     }

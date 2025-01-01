@@ -25,3 +25,7 @@ databaseChangeLog:
       file: src/main/resources/db/migration/20241108-add-indexes-product.yaml
   - include:
       file: src/main/resources/db/migration/20241109-add-additional-indexes.yaml
+  - include:
+      file: src/main/resources/db/migration/20241126-add-collection-table.yaml
+  - include:
+      file: src/main/resources/db/migration/20241213-add-user-profile.yaml

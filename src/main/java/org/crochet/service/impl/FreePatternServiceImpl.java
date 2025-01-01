@@ -9,8 +9,6 @@ import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.FileMapper;
 import org.crochet.mapper.FreePatternMapper;
 import org.crochet.model.FreePattern;
-import org.crochet.model.Settings;
-import org.crochet.model.User;
 import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.FreePatternRequest;
 import org.crochet.payload.response.FreePatternOnHome;
@@ -19,11 +17,10 @@ import org.crochet.payload.response.PaginatedFreePatternResponse;
 import org.crochet.repository.CategoryRepo;
 import org.crochet.repository.FreePatternRepository;
 import org.crochet.repository.GenericFilter;
-import org.crochet.repository.SettingsRepo;
-import org.crochet.repository.UserRepository;
-import org.crochet.security.UserPrincipal;
 import org.crochet.service.FreePatternService;
 import org.crochet.util.ImageUtils;
+import org.crochet.util.SecurityUtils;
+import org.crochet.util.SettingsUtil;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -35,9 +32,6 @@ import org.springframework.util.StringUtils;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
 
@@ -50,8 +44,7 @@ import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
 public class FreePatternServiceImpl implements FreePatternService {
     private final FreePatternRepository freePatternRepo;
     private final CategoryRepo categoryRepo;
-    private final SettingsRepo settingsRepo;
-    private final UserRepository userRepo;
+    private final SettingsUtil settingsUtil;
 
     /**
      * Creates a new FreePattern or updates an existing one based on the provided
@@ -72,8 +65,8 @@ public class FreePatternServiceImpl implements FreePatternService {
         var sortedFiles = ImageUtils.sortFiles(request.getFiles());
 
         if (!StringUtils.hasText(request.getId())) {
-            var category = categoryRepo.findById(request.getCategoryId()).orElseThrow(
-                    () -> new ResourceNotFoundException(MessageConstant.MSG_CATEGORY_NOT_FOUND,
+            var category = categoryRepo.findCategoryById(request.getCategoryId())
+                    .orElseThrow(() -> new ResourceNotFoundException(MessageConstant.MSG_CATEGORY_NOT_FOUND,
                             MAP_CODE.get(MessageConstant.MSG_CATEGORY_NOT_FOUND)));
 
             freePattern = FreePattern.builder()
@@ -156,21 +149,16 @@ public class FreePatternServiceImpl implements FreePatternService {
     /**
      * Get all free patterns on admin page
      *
-     * @param currentUser Current user
-     * @param pageNo      Page number
-     * @param pageSize    Page size
-     * @param sortBy      Sort by
-     * @param sortDir     Sort direction
-     * @param filters     List filters
+     * @param pageNo   Page number
+     * @param pageSize Page size
+     * @param sortBy   Sort by
+     * @param sortDir  Sort direction
+     * @param filters  List filters
      * @return PaginatedFreePatternResponse
      */
     @Override
-    public PaginatedFreePatternResponse getAllFreePatternsOnAdminPage(UserPrincipal currentUser,
-                                                                      int pageNo,
-                                                                      int pageSize,
-                                                                      String sortBy,
-                                                                      String sortDir,
-                                                                      Filter[] filters) {
+    public PaginatedFreePatternResponse getAllFreePatternsOnAdminPage(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters) {
+        var currentUser = SecurityUtils.getCurrentUser();
         if (currentUser == null) {
             throw new ResourceNotFoundException(MessageConstant.MSG_USER_NOT_FOUND,
                     MAP_CODE.get(MessageConstant.MSG_USER_NOT_FOUND));
@@ -182,11 +170,9 @@ public class FreePatternServiceImpl implements FreePatternService {
             spec = filter.build();
         }
 
-        User user = userRepo.findById(currentUser.getId()).get();
-
-        boolean isAdmin = user.getRole().equals(RoleType.ADMIN);
+        boolean isAdmin = currentUser.getRole().equals(RoleType.ADMIN);
         if (!isAdmin) {
-            spec = spec.and((root, query, cb) -> cb.equal(root.get("createdBy"), user.getEmail()));
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("createdBy"), currentUser.getEmail()));
         }
 
         var freePatternIds = freePatternRepo.findAll(spec)
@@ -218,13 +204,10 @@ public class FreePatternServiceImpl implements FreePatternService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Override
     public List<FreePatternOnHome> getLimitedFreePatterns() {
-        List<Settings> settings = settingsRepo.findSettings();
-        if (settings == null || settings.isEmpty()) {
+        var settingsMap = settingsUtil.getSettingsMap();
+        if (settingsMap.isEmpty()) {
             return Collections.emptyList();
         }
-
-        Map<String, Settings> settingsMap = settings.stream()
-                .collect(Collectors.toMap(Settings::getKey, Function.identity()));
 
         var direction = settingsMap.get("homepage.fp.direction").getValue();
 
@@ -261,33 +244,41 @@ public class FreePatternServiceImpl implements FreePatternService {
      */
     @Override
     public FreePatternResponse getDetail(String id) {
-        var freePattern = freePatternRepo.getDetail(id).orElseThrow(
+        var freePattern = freePatternRepo.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException(MessageConstant.MSG_FREE_PATTERN_NOT_FOUND,
                         MAP_CODE.get(MessageConstant.MSG_FREE_PATTERN_NOT_FOUND)));
         return FreePatternMapper.INSTANCE.toResponse(freePattern);
     }
 
-    @SuppressWarnings("OptionalGetWithoutIsPresent")
     @Transactional
     @Override
-    public void delete(UserPrincipal currentUser, String id) {
+    public void delete(String id) {
+        var currentUser = SecurityUtils.getCurrentUser();
         if (currentUser == null) {
             throw new ResourceNotFoundException(MessageConstant.MSG_USER_NOT_FOUND,
                     MAP_CODE.get(MessageConstant.MSG_USER_NOT_FOUND));
         }
 
-        var user = userRepo.findById(currentUser.getId()).get();
-
         var freePattern = freePatternRepo.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException(MessageConstant.MSG_FREE_PATTERN_NOT_FOUND,
                         MAP_CODE.get(MessageConstant.MSG_FREE_PATTERN_NOT_FOUND)));
 
-        boolean isAdmin = user.getRole().equals(RoleType.ADMIN);
+        boolean isAdmin = currentUser.getRole().equals(RoleType.ADMIN);
         if (!isAdmin && !freePattern.getCreatedBy().equals(currentUser.getEmail())) {
             throw new AccessDeniedException(MessageConstant.MSG_FORBIDDEN,
                     MAP_CODE.get(MessageConstant.MSG_FORBIDDEN));
         }
 
         freePatternRepo.delete(freePattern);
+    }
+
+    @Override
+    public List<FreePatternOnHome> getFrepsByCreateBy() {
+        var currentUser = SecurityUtils.getCurrentUser();
+        if (currentUser == null) {
+            throw new ResourceNotFoundException(MessageConstant.MSG_USER_NOT_FOUND,
+                    MAP_CODE.get(MessageConstant.MSG_USER_NOT_FOUND));
+        }
+        return freePatternRepo.getFrepsByCreateBy(currentUser.getEmail());
     }
 }

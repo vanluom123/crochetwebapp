@@ -26,12 +26,24 @@ public class BannerServiceImpl implements BannerService {
     private final BannerRepo bannerRepo;
     private final BannerTypeRepo bannerTypeRepo;
 
+    /**
+     * Constructor
+     *
+     * @param bannerRepo the banner repository
+     * @param bannerTypeRepo the banner type repository
+     */
     public BannerServiceImpl(BannerRepo bannerRepo,
             BannerTypeRepo bannerTypeRepo) {
         this.bannerRepo = bannerRepo;
         this.bannerTypeRepo = bannerTypeRepo;
     }
 
+    /**
+     * Create or update a banner
+     *
+     * @param requests the request object
+     * @return the response object
+     */
     @Transactional
     @Override
     public List<BannerResponse> batchInsertOrUpdate(List<BannerRequest> requests) {
@@ -71,6 +83,11 @@ public class BannerServiceImpl implements BannerService {
         return banners.stream().map(BannerMapper.INSTANCE::toResponse).toList();
     }
 
+    /**
+     * Get all banners
+     *
+     * @return the list of banners
+     */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Override
     public List<BannerResponse> getAll() {

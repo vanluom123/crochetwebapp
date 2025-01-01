@@ -20,10 +20,21 @@ import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
 public class BannerTypeServiceImpl implements BannerTypeService {
     final BannerTypeRepo bannerTypeRepo;
 
+    /**
+     * Constructor
+     *
+     * @param bannerTypeRepo BannerTypeRepo
+     */
     public BannerTypeServiceImpl(BannerTypeRepo bannerTypeRepo) {
         this.bannerTypeRepo = bannerTypeRepo;
     }
 
+    /**
+     * Create or update banner type
+     *
+     * @param request BannerTypeRequest
+     * @return BannerTypeResponse
+     */
     @Transactional
     @Override
     public BannerTypeResponse createOrUpdate(BannerTypeRequest request) {
@@ -41,17 +52,33 @@ public class BannerTypeServiceImpl implements BannerTypeService {
         return BannerTypeMapper.INSTANCE.toResponse(bannerType);
     }
 
+    /**
+     * Delete banner type
+     *
+     * @param id String
+     */
     @Transactional
     @Override
     public void delete(String id) {
         bannerTypeRepo.deleteById(id);
     }
 
+    /**
+     * Get all banner types
+     *
+     * @return List of BannerTypeResponse
+     */
     @Override
     public List<BannerTypeResponse> getAll() {
         return BannerTypeMapper.INSTANCE.toResponses(bannerTypeRepo.findAll());
     }
 
+    /**
+     * Get banner type by id
+     *
+     * @param id String
+     * @return BannerTypeResponse
+     */
     @Override
     public BannerTypeResponse getById(String id) {
         var banner = bannerTypeRepo.findById(id)

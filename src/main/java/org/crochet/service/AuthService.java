@@ -7,6 +7,8 @@ import org.crochet.payload.request.SignUpRequest;
 import org.crochet.payload.response.AuthResponse;
 import org.crochet.payload.response.TokenResponse;
 
+import java.time.LocalDateTime;
+
 public interface AuthService {
     AuthResponse authenticateUser(LoginRequest loginRequest);
 
@@ -23,4 +25,6 @@ public interface AuthService {
     TokenResponse refreshToken(String refreshToken);
 
     void logout(HttpServletRequest request);
+
+    LocalDateTime getRefreshTokenExpiresAt(String refreshToken);
 }
