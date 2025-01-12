@@ -9,9 +9,11 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.crochet.constant.AppConstant;
 import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.UserUpdateRequest;
+import org.crochet.payload.response.ResponseData;
 import org.crochet.payload.response.UserPaginationResponse;
 import org.crochet.payload.response.UserResponse;
 import org.crochet.service.UserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,7 +23,11 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import static org.crochet.constant.AppConstant.SUCCESS;
 
 @RestController
 @RequestMapping("/users")
@@ -57,12 +63,19 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
     @PutMapping("/update")
     @SecurityRequirement(name = "BearerAuth")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> updateUser(@RequestBody UserUpdateRequest request) {
+    public ResponseData<String> updateUser(@RequestBody UserUpdateRequest request) {
         userService.updateUser(request);
-        return ResponseEntity.ok("User updated successfully");
+        return ResponseData.<String>builder()
+                .success(true)
+                .code(HttpStatus.OK.value())
+                .message(SUCCESS)
+                .data("User updated successfully")
+                .build();
     }
 
     @GetMapping("/detail")
@@ -74,10 +87,18 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
     @DeleteMapping("/delete")
     @SecurityRequirement(name = "BearerAuth")
     @PreAuthorize("hasRole('ADMIN')")
-    public void deleteUser(@RequestParam String id) {
+    public ResponseData<String> deleteUser(@RequestParam String id) {
         userService.deleteUser(id);
+        return ResponseData.<String>builder()
+                .success(true)
+                .code(HttpStatus.OK.value())
+                .message(SUCCESS)
+                .data("User deleted successfully")
+                .build();
     }
 }

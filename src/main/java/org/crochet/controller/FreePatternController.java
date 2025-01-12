@@ -74,11 +74,16 @@ public class FreePatternController {
     @DeleteMapping("/delete")
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @SecurityRequirement(name = "BearerAuth")
-    public ResponseData<Void> delete(
+    public ResponseData<String> delete(
             @Parameter(description = "ID of the pattern to delete")
             @RequestParam("id") String id) {
         freePatternService.delete(id);
-        return new ResponseData<>("Free Pattern deleted successfully", HttpStatus.OK.value(), null);
+        return ResponseData.<String>builder()
+                .success(true)
+                .code(200)
+                .message("Success")
+                .data("Free pattern deleted successfully")
+                .build();
     }
 
     @Operation(summary = "Get paginated list of patterns")
