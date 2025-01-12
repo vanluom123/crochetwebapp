@@ -272,6 +272,23 @@ public class FreePatternServiceImpl implements FreePatternService {
         freePatternRepo.delete(freePattern);
     }
 
+    @Transactional
+    @Override
+    public void deleteAllById(List<String> ids) {
+        var currentUser = SecurityUtils.getCurrentUser();
+        if (currentUser == null) {
+            throw new ResourceNotFoundException(MessageConstant.MSG_USER_NOT_FOUND,
+                    MAP_CODE.get(MessageConstant.MSG_USER_NOT_FOUND));
+        }
+
+        // Delete all free patterns if user is admin. Otherwise, delete only free patterns created by the user
+        if (currentUser.getRole().equals(RoleType.ADMIN)) {
+            freePatternRepo.deleteAllById(ids);
+        } else {
+            freePatternRepo.deleteAllByIdAndCreatedBy(ids, currentUser.getEmail());
+        }
+    }
+
     @Override
     public List<FreePatternOnHome> getFrepsByCreateBy() {
         var currentUser = SecurityUtils.getCurrentUser();

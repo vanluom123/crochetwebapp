@@ -86,6 +86,25 @@ public class FreePatternController {
                 .build();
     }
 
+    @Operation(summary = "Delete free patterns by ids")
+    @ApiResponse(responseCode = "200", description = "Free patterns deleted successfully",
+            content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = ResponseData.class)))
+    @DeleteMapping("/delete-multiple")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @SecurityRequirement(name = "BearerAuth")
+    public ResponseData<String> deleteMultiple(
+            @Parameter(description = "List of pattern ids to delete")
+            @RequestBody List<String> ids) {
+        freePatternService.deleteAllById(ids);
+        return ResponseData.<String>builder()
+                .success(true)
+                .code(200)
+                .message("Success")
+                .data("Free patterns deleted successfully")
+                .build();
+    }
+
     @Operation(summary = "Get paginated list of patterns")
     @ApiResponse(responseCode = "200", description = "List of free patterns",
             content = @Content(mediaType = "application/json",

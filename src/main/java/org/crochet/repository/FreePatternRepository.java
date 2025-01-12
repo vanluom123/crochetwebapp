@@ -1,5 +1,6 @@
 package org.crochet.repository;
 
+import jakarta.validation.constraints.Email;
 import org.crochet.model.FreePattern;
 import org.crochet.payload.response.FreePatternOnHome;
 import org.springframework.data.domain.Page;
@@ -7,9 +8,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -71,4 +74,9 @@ public interface FreePatternRepository extends JpaRepository<FreePattern, String
             where c.user.id = ?1 and c.id = ?2 and i.order = 0
             """)
     List<FreePatternOnHome> getFrepsByCollection(String userId, String collectionId);
+
+    @Transactional
+    @Modifying
+    @Query("delete from FreePattern f where f.id in :ids and f.createdBy = :email")
+    void deleteAllByIdAndCreatedBy(@Param("ids") List<String> ids, @Param("email") @Email String email);
 }
