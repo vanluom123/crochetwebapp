@@ -210,4 +210,15 @@ public class ProductServiceImpl implements ProductService {
     public void delete(String id) {
         productRepo.deleteById(id);
     }
+
+    /**
+     * Deletes multiple products with the specified IDs.
+     *
+     * @param ids The list of unique identifiers of the products to delete.
+     */
+    @Transactional
+    @Override
+    public void deleteMultiple(List<String> ids) {
+        productRepo.deleteMultiple(ids);
+    }
 }
