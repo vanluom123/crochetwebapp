@@ -27,6 +27,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 import static org.crochet.constant.AppConstant.SUCCESS;
 
 @RestController
@@ -99,6 +101,21 @@ public class UserController {
                 .code(HttpStatus.OK.value())
                 .message(SUCCESS)
                 .data("User deleted successfully")
+                .build();
+    }
+
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    @DeleteMapping("/delete-multiple")
+    @SecurityRequirement(name = "BearerAuth")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseData<String> deleteMultipleUsers(@RequestBody List<String> ids) {
+        userService.deleteMultipleUsers(ids);
+        return ResponseData.<String>builder()
+                .success(true)
+                .code(HttpStatus.OK.value())
+                .message(SUCCESS)
+                .data("Users deleted successfully")
                 .build();
     }
 }

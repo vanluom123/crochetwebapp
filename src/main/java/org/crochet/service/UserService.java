@@ -8,6 +8,8 @@ import org.crochet.payload.response.UserPaginationResponse;
 import org.crochet.payload.response.UserResponse;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 public interface UserService {
     User createUser(SignUpRequest signUpRequest);
 
@@ -19,6 +21,8 @@ public interface UserService {
 
     @Transactional
     void deleteUser(String id);
+
+    void deleteMultipleUsers(List<String> ids);
 
     User getByEmail(String email);
 
