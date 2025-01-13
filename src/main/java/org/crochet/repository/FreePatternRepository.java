@@ -21,9 +21,10 @@ import java.util.Optional;
 public interface FreePatternRepository extends JpaRepository<FreePattern, String>, JpaSpecificationExecutor<FreePattern> {
 
     @Query("""
-            select new org.crochet.payload.response.FreePatternOnHome(fp.id, fp.name, fp.description, fp.author, fp.status, i.fileContent)
+            select new org.crochet.payload.response.FreePatternOnHome(fp.id, fp.name, fp.description, fp.author, fp.status, i.fileContent, u.name, u.imageUrl)
             from FreePattern fp
             left join fp.images i
+            join User u on fp.createdBy = u.email
             where fp.isHome = true and i.order = 0
             """)
     List<FreePatternOnHome> findLimitedNumFreePattern(Pageable pageable);
@@ -46,9 +47,10 @@ public interface FreePatternRepository extends JpaRepository<FreePattern, String
     Optional<FreePattern> getDetail(String id);
 
     @Query("""
-            select new org.crochet.payload.response.FreePatternOnHome(fp.id, fp.name, fp.description, fp.author, fp.status, i.fileContent)
+            select new org.crochet.payload.response.FreePatternOnHome(fp.id, fp.name, fp.description, fp.author, fp.status, i.fileContent, u.name, u.imageUrl)
             from FreePattern fp
             left join fp.images i
+            join User u on fp.createdBy = u.email
             where fp.id in :ids
                   and i.order = 0
             """)
@@ -58,12 +60,13 @@ public interface FreePatternRepository extends JpaRepository<FreePattern, String
     List<String> getFreePatternIds(Pageable pageable);
 
     @Query("""
-            select new org.crochet.payload.response.FreePatternOnHome(fp.id, fp.name, fp.description, fp.author, fp.status, i.fileContent)
+            select new org.crochet.payload.response.FreePatternOnHome(fp.id, fp.name, fp.description, fp.author, fp.status, i.fileContent, u.name, u.imageUrl)
             from FreePattern fp
             left join fp.images i
-            where fp.createdBy = ?1 and i.order = 0
+            join User u on fp.createdBy = u.email
+            where u.email = :email and i.order = 0
             """)
-    List<FreePatternOnHome> getFrepsByCreateBy(String email);
+    List<FreePatternOnHome> getFrepsByCreateByWithUser(@Param("email") String email);
 
     @Query("""
             select new org.crochet.payload.response.FreePatternOnHome(fp.id, fp.name, fp.description, fp.author, fp.status, i.fileContent)

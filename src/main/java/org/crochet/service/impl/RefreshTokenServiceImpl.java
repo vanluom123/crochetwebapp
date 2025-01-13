@@ -51,7 +51,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     @Transactional
     @Override
     public RefreshToken createRefreshToken(String username) {
-        var user = userRepository.findByEmail(username)
+        var user = userRepository.findById(username)
                 .orElseThrow(() -> new ResourceNotFoundException(MSG_USER_NOT_FOUND_WITH_EMAIL + username,
                         MAP_CODE.get(MSG_USER_NOT_FOUND_WITH_EMAIL)));
         LocalDateTime now = LocalDateTime.now();

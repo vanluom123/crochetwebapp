@@ -128,31 +128,6 @@ public class FreePatternController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Get paginated list of patterns for admin page")
-    @ApiResponse(responseCode = "200", description = "List of free patterns",
-            content = @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = PaginatedFreePatternResponse.class)))
-    @PostMapping("/admin/pagination")
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-    @SecurityRequirement(name = "BearerAuth")
-    public ResponseEntity<PaginatedFreePatternResponse> getAllFreePatternsOnAdminPage(
-            @Parameter(description = "Page number (default: 0)")
-            @RequestParam(value = "pageNo", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER,
-                    required = false) int pageNo,
-            @Parameter(description = "Page size (default: 10)")
-            @RequestParam(value = "pageSize", defaultValue = AppConstant.DEFAULT_PAGE_SIZE,
-                    required = false) int pageSize,
-            @Parameter(description = "Sort by field (default: id)")
-            @RequestParam(value = "sortBy", defaultValue = AppConstant.DEFAULT_SORT_BY, required = false) String sortBy,
-            @Parameter(description = "Sort direction (default: ASC)")
-            @RequestParam(value = "sortDir", defaultValue = AppConstant.DEFAULT_SORT_DIRECTION,
-                    required = false) String sortDir,
-            @Parameter(description = "List filters")
-            @RequestBody(required = false) Filter[] filters) {
-        var response = freePatternService.getAllFreePatternsOnAdminPage(pageNo, pageSize, sortBy, sortDir, filters);
-        return ResponseEntity.ok(response);
-    }
-
     @Operation(summary = "Get free pattern ids")
     @ApiResponse(responseCode = "200", description = "List of free pattern ids",
             content = @Content(mediaType = "application/json",

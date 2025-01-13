@@ -13,8 +13,6 @@ public interface FreePatternService {
 
     PaginatedFreePatternResponse getAllFreePatterns(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters);
 
-    PaginatedFreePatternResponse getAllFreePatternsOnAdminPage(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters);
-
     List<FreePatternOnHome> getLimitedFreePatterns();
 
     FreePatternResponse getDetail(String id);

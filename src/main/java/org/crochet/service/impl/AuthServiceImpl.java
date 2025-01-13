@@ -111,9 +111,9 @@ public class AuthServiceImpl implements AuthService {
             throw new EmailVerificationException(MSG_EMAIL_NOT_VERIFIED, MAP_CODE.get(MSG_EMAIL_NOT_VERIFIED));
         }
         // Create refresh token
-        var refreshToken = refreshTokenService.createRefreshToken(user.getEmail());
+        var refreshToken = refreshTokenService.createRefreshToken(user.getId());
         // Get access token
-        var accessToken = jwtTokenService.generateToken(user.getEmail());
+        var accessToken = jwtTokenService.generateToken(user.getId());
         // Return the authentication token in an AuthResponse
         return AuthResponse.builder()
                 .accessToken(accessToken)
