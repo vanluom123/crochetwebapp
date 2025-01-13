@@ -16,8 +16,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -48,7 +46,6 @@ public class SecurityConfig {
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
     private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
-    private final PasswordEncoder passwordEncoder;
     private final OAuth2CookieRepository oAuth2CookieRepository;
     private final TokenAuthenticationFilter tokenAuthenticationFilter;
 
@@ -63,7 +60,6 @@ public class SecurityConfig {
         this.customOAuth2UserService = customOAuth2UserService;
         this.oAuth2AuthenticationSuccessHandler = oAuth2AuthenticationSuccessHandler;
         this.oAuth2AuthenticationFailureHandler = oAuth2AuthenticationFailureHandler;
-        this.passwordEncoder = passwordEncoder;
         this.oAuth2CookieRepository = oAuth2CookieRepository;
         this.tokenAuthenticationFilter = tokenAuthenticationFilter;
     }
@@ -72,14 +68,6 @@ public class SecurityConfig {
     @ConfigurationProperties(prefix = "authorize.http-request")
     AuthorizeHttpRequestProperties authorizeHttpRequestProperties() {
         return new AuthorizeHttpRequestProperties();
-    }
-
-    @Bean
-    AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(customUserDetailsService);
-        authProvider.setPasswordEncoder(passwordEncoder);
-        return authProvider;
     }
 
     @Bean
@@ -106,20 +94,20 @@ public class SecurityConfig {
                     .accessDeniedHandler(new RestAccessDeniedHandler())
                 )
                 .authorizeHttpRequests(authReq -> authReq
-                        .requestMatchers(authorizeHttpRequestProperties().getAuthenticated()).authenticated()
-                        .anyRequest().permitAll())
-                .oauth2Login(oauth -> oauth.authorizationEndpoint(authEndpointCustomizer ->
-                                authEndpointCustomizer
-                                        .baseUri("/oauth2/authorize")
-                                        .authorizationRequestRepository(oAuth2CookieRepository))
-                        .redirectionEndpoint(redirectionEndpointCustomizer ->
-                                redirectionEndpointCustomizer.baseUri("/oauth2/callback/*"))
-                        .userInfoEndpoint(userInfoEndpointCustomizer -> 
-                            userInfoEndpointCustomizer.userService(customOAuth2UserService))
-                        .successHandler(oAuth2AuthenticationSuccessHandler)
-                        .failureHandler(oAuth2AuthenticationFailureHandler))
+                    .requestMatchers(authorizeHttpRequestProperties().getAuthenticated()).authenticated()
+                    .anyRequest().permitAll())
+                .oauth2Login(oauth -> oauth
+                    .authorizationEndpoint(auth -> auth
+                        .baseUri("/oauth2/authorize")
+                        .authorizationRequestRepository(oAuth2CookieRepository))
+                    .redirectionEndpoint(redirect -> 
+                        redirect.baseUri("/oauth2/callback/*"))
+                    .userInfoEndpoint(userInfo -> 
+                        userInfo.userService(customOAuth2UserService))
+                    .successHandler(oAuth2AuthenticationSuccessHandler)
+                    .failureHandler(oAuth2AuthenticationFailureHandler))
                 .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .authenticationProvider(authenticationProvider())
+                .userDetailsService(customUserDetailsService)
                 .build();
     }
 
