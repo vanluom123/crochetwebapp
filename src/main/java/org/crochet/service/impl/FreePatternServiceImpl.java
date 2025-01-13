@@ -262,6 +262,6 @@ public class FreePatternServiceImpl implements FreePatternService {
             throw new ResourceNotFoundException(MessageConstant.MSG_USER_NOT_FOUND,
                     MAP_CODE.get(MessageConstant.MSG_USER_NOT_FOUND));
         }
-        return freePatternRepo.getFrepsByCreateByWithUser(currentUser.getEmail());
+        return freePatternRepo.getFrepsByCreateByWithUser(currentUser.getId());
     }
 }

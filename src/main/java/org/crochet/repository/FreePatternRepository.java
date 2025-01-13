@@ -1,6 +1,5 @@
 package org.crochet.repository;
 
-import jakarta.validation.constraints.Email;
 import org.crochet.model.FreePattern;
 import org.crochet.payload.response.FreePatternOnHome;
 import org.springframework.data.domain.Page;
@@ -24,7 +23,7 @@ public interface FreePatternRepository extends JpaRepository<FreePattern, String
             select new org.crochet.payload.response.FreePatternOnHome(fp.id, fp.name, fp.description, fp.author, fp.status, i.fileContent, u.name, u.imageUrl)
             from FreePattern fp
             left join fp.images i
-            join User u on fp.createdBy = u.email
+            join User u on fp.createdBy = u.id
             where fp.isHome = true and i.order = 0
             """)
     List<FreePatternOnHome> findLimitedNumFreePattern(Pageable pageable);
@@ -34,23 +33,24 @@ public interface FreePatternRepository extends JpaRepository<FreePattern, String
             from FreePattern f
             join f.colfreps colFrep
             join colFrep.collection c
-            where c.user.id = ?1 and f.id = ?2
+            where c.user.id = :userId and f.id = :frepId
             """)
-    Optional<FreePattern> findFrepInCollection(String userId, String frepId);
+    Optional<FreePattern> findFrepInCollection(@Param("userId") String userId,
+                                               @Param("frepId") String frepId);
 
     @EntityGraph(attributePaths = {"images", "category"})
     @Query("""
             select f
             from FreePattern f
-            where f.id = ?1
+            where f.id = :id
             """)
-    Optional<FreePattern> getDetail(String id);
+    Optional<FreePattern> getDetail(@Param("id") String id);
 
     @Query("""
             select new org.crochet.payload.response.FreePatternOnHome(fp.id, fp.name, fp.description, fp.author, fp.status, i.fileContent, u.name, u.imageUrl)
             from FreePattern fp
             left join fp.images i
-            join User u on fp.createdBy = u.email
+            join User u on fp.createdBy = u.id
             where fp.id in :ids
                   and i.order = 0
             """)
@@ -63,10 +63,10 @@ public interface FreePatternRepository extends JpaRepository<FreePattern, String
             select new org.crochet.payload.response.FreePatternOnHome(fp.id, fp.name, fp.description, fp.author, fp.status, i.fileContent, u.name, u.imageUrl)
             from FreePattern fp
             left join fp.images i
-            join User u on fp.createdBy = u.email
-            where u.email = :email and i.order = 0
+            join User u on fp.createdBy = u.id
+            where u.id = :userId and i.order = 0
             """)
-    List<FreePatternOnHome> getFrepsByCreateByWithUser(@Param("email") String email);
+    List<FreePatternOnHome> getFrepsByCreateByWithUser(@Param("userId") String userId);
 
     @Query("""
             select new org.crochet.payload.response.FreePatternOnHome(fp.id, fp.name, fp.description, fp.author, fp.status, i.fileContent)
@@ -74,12 +74,14 @@ public interface FreePatternRepository extends JpaRepository<FreePattern, String
             left join fp.images i
             join fp.colfreps colFrep
             join colFrep.collection c
-            where c.user.id = ?1 and c.id = ?2 and i.order = 0
+            where c.user.id = :userId and c.id = :colId and i.order = 0
             """)
-    List<FreePatternOnHome> getFrepsByCollection(String userId, String collectionId);
+    List<FreePatternOnHome> getFrepsByCollection(@Param("userId") String userId,
+                                                 @Param("colId") String collectionId);
 
     @Transactional
     @Modifying
-    @Query("delete from FreePattern f where f.id in :ids and f.createdBy = :email")
-    void deleteAllByIdAndCreatedBy(@Param("ids") List<String> ids, @Param("email") @Email String email);
+    @Query("delete from FreePattern f where f.id in :ids and f.createdBy = :userId")
+    void deleteAllByIdAndCreatedBy(@Param("ids") List<String> ids,
+                                   @Param("userId") String userId);
 }
