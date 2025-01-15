@@ -17,6 +17,9 @@ public interface UserRepository extends JpaRepository<User, String>, JpaSpecific
 
     Optional<User> findByEmail(String email);
 
+    @Query("SELECT CASE WHEN COUNT(u) > 0 THEN true ELSE false END FROM User u WHERE u.id = :userId")
+    boolean existsById(@Param("userId") String userId);
+
     @Query("""
             select new org.crochet.payload.response.UserResponse(
                 u.id,

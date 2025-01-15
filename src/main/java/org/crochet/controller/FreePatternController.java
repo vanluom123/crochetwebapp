@@ -145,7 +145,7 @@ public class FreePatternController {
     @GetMapping("/create-by")
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @SecurityRequirement(name = "BearerAuth")
-    public ResponseEntity<List<FreePatternOnHome>> getFrepsByCreateBy() {
-        return ResponseEntity.ok(freePatternService.getFrepsByCreateBy());
+    public ResponseEntity<List<FreePatternOnHome>> getFrepsByCreateBy(@RequestParam("userId") String userId) {
+        return ResponseEntity.ok(freePatternService.getFrepsByCreateBy(userId));
     }
 }

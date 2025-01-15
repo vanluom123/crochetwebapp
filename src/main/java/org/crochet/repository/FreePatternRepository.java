@@ -20,7 +20,7 @@ import java.util.Optional;
 public interface FreePatternRepository extends JpaRepository<FreePattern, String>, JpaSpecificationExecutor<FreePattern> {
 
     @Query("""
-            select new org.crochet.payload.response.FreePatternOnHome(fp.id, fp.name, fp.description, fp.author, fp.status, i.fileContent, u.name, u.imageUrl)
+            select new org.crochet.payload.response.FreePatternOnHome(fp.id, fp.name, fp.description, fp.author, fp.status, i.fileContent, u.name, u.imageUrl, u.id)
             from FreePattern fp
             left join fp.images i
             join User u on fp.createdBy = u.id
@@ -47,7 +47,7 @@ public interface FreePatternRepository extends JpaRepository<FreePattern, String
     Optional<FreePattern> getDetail(@Param("id") String id);
 
     @Query("""
-            select new org.crochet.payload.response.FreePatternOnHome(fp.id, fp.name, fp.description, fp.author, fp.status, i.fileContent, u.name, u.imageUrl)
+            select new org.crochet.payload.response.FreePatternOnHome(fp.id, fp.name, fp.description, fp.author, fp.status, i.fileContent, u.name, u.imageUrl, u.id)
             from FreePattern fp
             left join fp.images i
             join User u on fp.createdBy = u.id
@@ -60,7 +60,7 @@ public interface FreePatternRepository extends JpaRepository<FreePattern, String
     List<String> getFreePatternIds(Pageable pageable);
 
     @Query("""
-            select new org.crochet.payload.response.FreePatternOnHome(fp.id, fp.name, fp.description, fp.author, fp.status, i.fileContent, u.name, u.imageUrl)
+            select new org.crochet.payload.response.FreePatternOnHome(fp.id, fp.name, fp.description, fp.author, fp.status, i.fileContent, u.name, u.imageUrl, u.id)
             from FreePattern fp
             left join fp.images i
             join User u on fp.createdBy = u.id

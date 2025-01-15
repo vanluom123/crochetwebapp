@@ -15,6 +15,7 @@ public class FreePatternOnHome {
     private String fileContent;
     private String username;
     private String userAvatar;
+    private String userId;
 
     public FreePatternOnHome(String id,
                              String name,

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,8 +33,8 @@ public class UserProfileController {
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = UserProfileResponse.class)))
     @GetMapping
-    public UserProfileResponse loadUserProfile() {
-        return userProfileService.loadUserProfile();
+    public UserProfileResponse loadUserProfile(@RequestParam("userId") String userId) {
+        return userProfileService.loadUserProfile(userId);
     }
 
     @ResponseStatus(HttpStatus.OK)

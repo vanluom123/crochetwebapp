@@ -17,6 +17,7 @@ import org.crochet.payload.response.PaginatedFreePatternResponse;
 import org.crochet.repository.CategoryRepo;
 import org.crochet.repository.FreePatternRepository;
 import org.crochet.repository.GenericFilter;
+import org.crochet.repository.UserRepository;
 import org.crochet.service.FreePatternService;
 import org.crochet.util.ImageUtils;
 import org.crochet.util.SecurityUtils;
@@ -45,6 +46,7 @@ public class FreePatternServiceImpl implements FreePatternService {
     private final FreePatternRepository freePatternRepo;
     private final CategoryRepo categoryRepo;
     private final SettingsUtil settingsUtil;
+    private final UserRepository userRepo;
 
     /**
      * Creates a new FreePattern or updates an existing one based on the provided
@@ -256,12 +258,11 @@ public class FreePatternServiceImpl implements FreePatternService {
      * @return List of FreePatternOnHome
      */
     @Override
-    public List<FreePatternOnHome> getFrepsByCreateBy() {
-        var currentUser = SecurityUtils.getCurrentUser();
-        if (currentUser == null) {
+    public List<FreePatternOnHome> getFrepsByCreateBy(String userId) {
+        if (!userRepo.existsById(userId)) {
             throw new ResourceNotFoundException(MessageConstant.MSG_USER_NOT_FOUND,
                     MAP_CODE.get(MessageConstant.MSG_USER_NOT_FOUND));
         }
-        return freePatternRepo.getFrepsByCreateByWithUser(currentUser.getId());
+        return freePatternRepo.getFrepsByCreateByWithUser(userId);
     }
 }

@@ -23,5 +23,5 @@ public interface FreePatternService {
 
     void deleteAllById(List<String> ids);
 
-    List<FreePatternOnHome> getFrepsByCreateBy();
+    List<FreePatternOnHome> getFrepsByCreateBy(String userId);
 }
