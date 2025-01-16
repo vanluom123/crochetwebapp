@@ -3,6 +3,7 @@ package org.crochet.controller;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.crochet.payload.request.SettingRequest;
+import org.crochet.payload.response.ResponseData;
 import org.crochet.payload.response.SettingResponse;
 import org.crochet.service.SettingService;
 import org.springframework.http.HttpStatus;
@@ -18,34 +19,44 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+import static org.crochet.constant.AppConstant.SUCCESS;
+
 @RestController
 @RequestMapping("/setting")
 @RequiredArgsConstructor
 @SecurityRequirement(name = "BearerAuth")
 @PreAuthorize("hasRole('ADMIN')")
+@ResponseBody
 public class SettingController {
     private final SettingService settingService;
 
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
     @GetMapping
     public List<SettingResponse> getSetting() {
         return settingService.getAll();
     }
 
-    @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     @PostMapping("/create")
-    public String create(@RequestBody SettingRequest request) {
+    public ResponseData<String> create(@RequestBody SettingRequest request) {
         settingService.create(request);
-        return "Create success";
+        return ResponseData.<String>builder()
+                .success(true)
+                .code(HttpStatus.OK.value())
+                .message(SUCCESS)
+                .data("Create success")
+                .build();
     }
 
-    @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     @PutMapping("/update")
-    public String update(@RequestBody SettingRequest request) {
+    public ResponseData<String> update(@RequestBody SettingRequest request) {
         settingService.update(request);
-        return "Update success";
+        return ResponseData.<String>builder()
+                .success(true)
+                .code(HttpStatus.OK.value())
+                .message(SUCCESS)
+                .data("Update success")
+                .build();
     }
 }

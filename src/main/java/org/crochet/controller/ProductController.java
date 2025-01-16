@@ -14,6 +14,7 @@ import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.ProductRequest;
 import org.crochet.payload.response.ProductPaginationResponse;
 import org.crochet.payload.response.ProductResponse;
+import org.crochet.payload.response.ResponseData;
 import org.crochet.service.ProductService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +25,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import static org.crochet.constant.AppConstant.SUCCESS;
 
 @RestController
 @RequestMapping("/product")
@@ -85,15 +90,41 @@ public class ProductController {
         return ResponseEntity.ok(productService.getDetail(id));
     }
 
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Delete a product by ID")
     @ApiResponse(responseCode = "200", description = "Product deleted successfully", content = @Content(mediaType = "application/json"))
     @ApiResponse(responseCode = "404", description = "Product not found", content = @Content(mediaType = "application/json"))
     @DeleteMapping("/delete")
     @PreAuthorize("hasRole('ADMIN')")
     @SecurityRequirement(name = "BearerAuth")
-    public ResponseEntity<String> deleteProduct(@RequestParam("id") String id) {
+    public ResponseData<String> deleteProduct(@RequestParam("id") String id) {
         productService.delete(id);
-        return ResponseEntity.ok("Product deleted successfully");
+        return ResponseData.<String>builder()
+                .success(true)
+                .code(HttpStatus.OK.value())
+                .message(SUCCESS)
+                .data("Product deleted successfully")
+                .build();
+    }
+
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Delete multiple products")
+    @ApiResponse(responseCode = "200", description = "Products deleted successfully",
+            content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = ResponseData.class)))
+    @DeleteMapping("/delete-multiple")
+    @PreAuthorize("hasRole('ADMIN')")
+    @SecurityRequirement(name = "BearerAuth")
+    public ResponseData<String> deleteMultipleProducts(@RequestBody List<String> ids) {
+        productService.deleteMultiple(ids);
+        return ResponseData.<String>builder()
+                .success(true)
+                .code(HttpStatus.OK.value())
+                .message(SUCCESS)
+                .data("Products deleted successfully")
+                .build();
     }
 
     @Operation(summary = "Get product ids")

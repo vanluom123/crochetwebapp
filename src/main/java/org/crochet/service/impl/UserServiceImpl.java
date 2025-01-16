@@ -114,7 +114,6 @@ public class UserServiceImpl implements UserService {
      * Retrieves a user by their ID.
      *
      * @param request The request object containing the user's ID.
-     * @return The retrieved user object.
      */
     @Transactional
     @Override
@@ -140,6 +139,17 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUser(String id) {
         userRepository.deleteById(id);
+    }
+
+    /**
+     * Deletes multiple users by their IDs.
+     *
+     * @param ids The list of IDs of the users to delete.
+     */
+    @Transactional
+    @Override
+    public void deleteMultipleUsers(List<String> ids) {
+        userRepository.deleteMultipleUsers(ids);
     }
 
     /**

@@ -7,10 +7,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
-import org.crochet.exception.ApiError;
+
 import org.crochet.payload.request.CategoryCreationRequest;
 import org.crochet.payload.request.CategoryUpdateRequest;
 import org.crochet.payload.response.CategoryResponse;
+import org.crochet.payload.response.ResponseData;
 import org.crochet.service.CategoryService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -40,13 +43,13 @@ public class CategoryController {
             @ApiResponse(responseCode = "201", description = "Category created",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = CategoryResponse.class))}),
             @ApiResponse(responseCode = "400", description = "Bad request",
-                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))}),
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ResponseData.class))}),
             @ApiResponse(responseCode = "401", description = "Unauthorized",
-                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))}),
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ResponseData.class))}),
             @ApiResponse(responseCode = "403", description = "Forbidden",
-                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))}),
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ResponseData.class))}),
             @ApiResponse(responseCode = "500", description = "Internal server error",
-                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))})
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ResponseData.class))})
     })
     @PreAuthorize("hasRole('ADMIN')")
     @SecurityRequirement(name = "BearerAuth")
@@ -61,13 +64,13 @@ public class CategoryController {
             @ApiResponse(responseCode = "200", description = "Category updated",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = CategoryResponse.class))}),
             @ApiResponse(responseCode = "400", description = "Bad request",
-                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))}),
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ResponseData.class))}),
             @ApiResponse(responseCode = "401", description = "Unauthorized",
-                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))}),
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ResponseData.class))}),
             @ApiResponse(responseCode = "403", description = "Forbidden",
-                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))}),
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ResponseData.class))}),
             @ApiResponse(responseCode = "500", description = "Internal server error",
-                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))})
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ResponseData.class))})
     })
     @PreAuthorize("hasRole('ADMIN')")
     @SecurityRequirement(name = "BearerAuth")
@@ -95,16 +98,23 @@ public class CategoryController {
         return ResponseEntity.ok(response);
     }
 
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Delete category")
     @ApiResponse(responseCode = "200", description = "Category deleted",
             content = {@Content(mediaType = "application/json", schema = @Schema(implementation = String.class))})
     @ApiResponse(responseCode = "400", description = "Bad request",
-            content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))})
+            content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ResponseData.class))})
     @DeleteMapping("/delete")
     @PreAuthorize("hasRole('ADMIN')")
     @SecurityRequirement(name = "BearerAuth")
-    public ResponseEntity<String> delete(@RequestParam String id) {
+    public ResponseData<String> delete(@RequestParam String id) {
         categoryService.delete(id);
-        return ResponseEntity.ok("Category deleted");
+        return ResponseData.<String>builder()
+                .success(true)
+                .code(HttpStatus.OK.value())
+                .message("Success")
+                .data("Category deleted")
+                .build();
     }
 }
