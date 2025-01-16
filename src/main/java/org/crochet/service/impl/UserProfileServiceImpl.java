@@ -21,6 +21,7 @@ import org.crochet.repository.CollectionRepo;
 import org.crochet.repository.CommentRepository;
 import org.crochet.repository.UserProfileRepo;
 import org.crochet.repository.UserRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -78,6 +79,7 @@ public class UserProfileServiceImpl implements UserProfileService {
      * @param request UserProfileRequest
      * @return UserProfileResponse
      */
+    @Transactional
     @Override
     public UserProfileResponse updateUserProfile(UserProfileRequest request) {
         var user = SecurityUtils.getCurrentUser();

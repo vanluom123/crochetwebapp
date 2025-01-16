@@ -154,7 +154,7 @@ public class FreePatternServiceImpl implements FreePatternService {
      * @return A list of {@link FreePatternResponse} objects containing information
      * about the FreePatterns.
      */
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
     @Override
     public List<FreePatternOnHome> getLimitedFreePatterns() {
         var settingsMap = settingsUtil.getSettingsMap();
@@ -195,6 +195,7 @@ public class FreePatternServiceImpl implements FreePatternService {
      * @return A {@link FreePatternResponse} containing detailed information about
      * the FreePattern.
      */
+    @Transactional(readOnly = true)
     @Override
     public FreePatternResponse getDetail(String id) {
         var freePattern = freePatternRepo.findById(id).orElseThrow(

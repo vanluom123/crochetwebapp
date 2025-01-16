@@ -4,7 +4,6 @@ import org.crochet.model.FreePattern;
 import org.crochet.payload.response.FreePatternOnHome;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -37,14 +36,6 @@ public interface FreePatternRepository extends JpaRepository<FreePattern, String
             """)
     Optional<FreePattern> findFrepInCollection(@Param("userId") String userId,
                                                @Param("frepId") String frepId);
-
-    @EntityGraph(attributePaths = {"images", "category"})
-    @Query("""
-            select f
-            from FreePattern f
-            where f.id = :id
-            """)
-    Optional<FreePattern> getDetail(@Param("id") String id);
 
     @Query("""
             select new org.crochet.payload.response.FreePatternOnHome(fp.id, fp.name, fp.description, fp.author, fp.status, i.fileContent, u.name, u.imageUrl, u.id)

@@ -177,7 +177,7 @@ public class BlogPostServiceImpl implements BlogPostService {
      *
      * @return A list of {@link BlogPostResponse} containing limited blog posts.
      */
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
     @Override
     public List<BlogOnHome> getLimitedBlogPosts() {
         Map<String, Settings> settingsMap = settingsUtil.getSettingsMap();

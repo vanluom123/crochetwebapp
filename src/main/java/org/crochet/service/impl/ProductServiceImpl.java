@@ -164,7 +164,7 @@ public class ProductServiceImpl implements ProductService {
      *
      * @return A list of {@link ProductResponse} containing limited products.
      */
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
     @Override
     public List<ProductOnHome> getLimitedProducts() {
         Map<String, Settings> settingsMap = settingsUtil.getSettingsMap();

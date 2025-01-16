@@ -53,7 +53,7 @@ public class CollectionServiceImpl implements CollectionService {
                 .orElseThrow(() -> new ResourceNotFoundException(MSG_COLLECTION_NOT_FOUND,
                         MAP_CODE.get(MSG_COLLECTION_NOT_FOUND)));
 
-        FreePattern freePattern = freePatternRepository.getDetail(freePatternId)
+        FreePattern freePattern = freePatternRepository.findById(freePatternId)
                 .orElseThrow(() -> new ResourceNotFoundException(MSG_FREE_PATTERN_NOT_FOUND,
                         MAP_CODE.get(MSG_FREE_PATTERN_NOT_FOUND)));
 
