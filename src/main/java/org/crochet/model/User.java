@@ -99,7 +99,7 @@ public class User extends BaseEntity implements UserDetails, OAuth2User {
 
     @Override
     public String getUsername() {
-        return email;
+        return this.getId();
     }
 
     @Override

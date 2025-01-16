@@ -1,9 +1,11 @@
 package org.crochet.payload.response;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.crochet.enumerator.ChartStatus;
 
 @Data
+@AllArgsConstructor
 public class FreePatternOnHome {
     private String id;
     private String name;
@@ -11,6 +13,9 @@ public class FreePatternOnHome {
     private String author;
     private ChartStatus status;
     private String fileContent;
+    private String username;
+    private String userAvatar;
+    private String userId;
 
     public FreePatternOnHome(String id,
                              String name,

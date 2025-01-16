@@ -144,7 +144,7 @@ public class PatternServiceImpl implements PatternService {
      *
      * @return List of PatternResponse
      */
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
     @Override
     public List<PatternOnHome> getLimitedPatterns() {
         Map<String, Settings> settingsMap = settingsUtil.getSettingsMap();
@@ -182,9 +182,10 @@ public class PatternServiceImpl implements PatternService {
      * @param id Pattern id
      * @return PatternResponse
      */
+    @Transactional(readOnly = true)
     @Override
     public PatternResponse getDetail(String id) {
-        var pattern = patternRepo.getDetail(id).orElseThrow(
+        var pattern = patternRepo.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException(MessageConstant.MSG_PATTERN_NOT_FOUND,
                         MAP_CODE.get(MessageConstant.MSG_PATTERN_NOT_FOUND)));
         return PatternMapper.INSTANCE.toResponse(pattern);

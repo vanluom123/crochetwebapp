@@ -1,5 +1,6 @@
 package org.crochet.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.crochet.constant.AppConstant;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,6 +9,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
 
+@Slf4j
 @Configuration
 public class AsyncConfig {
 

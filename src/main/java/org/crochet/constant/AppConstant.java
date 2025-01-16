@@ -12,4 +12,6 @@ public class AppConstant {
     public static final int QUEUE_CAPACITY = 100;
     public static final String CROCHET_TASK_EXECUTOR = "crochetTaskExecutor";
     public static final String DEFAULT_LIMIT = "12";
+    public static final String FAILED = "Failed";
+    public static final String SUCCESS = "Success";
 }

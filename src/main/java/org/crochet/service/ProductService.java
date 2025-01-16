@@ -20,4 +20,6 @@ public interface ProductService {
     void delete(String id);
 
     List<String> getProductIds(int pageNo, int limit);
+
+    void deleteMultiple(List<String> ids);
 }

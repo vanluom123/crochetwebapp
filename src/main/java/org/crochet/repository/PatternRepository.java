@@ -11,7 +11,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface PatternRepository extends JpaRepository<Pattern, String>, JpaSpecificationExecutor<Pattern> {
@@ -24,15 +23,6 @@ public interface PatternRepository extends JpaRepository<Pattern, String>, JpaSp
                 AND i.order = 0
             """)
     List<PatternOnHome> findLimitedNumPattern(Pageable pageable);
-
-    @Query("""
-            SELECT p
-            FROM Pattern p
-            LEFT JOIN FETCH p.files
-            LEFT JOIN FETCH p.images
-            WHERE p.id = ?1
-            """)
-    Optional<Pattern> getDetail(String id);
 
     @Query("""
             select new org.crochet.payload.response.PatternOnHome(p.id, p.name, p.description, p.price, p.currencyCode, i.fileContent)
