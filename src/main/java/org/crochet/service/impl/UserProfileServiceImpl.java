@@ -21,6 +21,7 @@ import org.crochet.repository.CollectionRepo;
 import org.crochet.repository.CommentRepository;
 import org.crochet.repository.UserProfileRepo;
 import org.crochet.repository.UserRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -37,12 +38,10 @@ public class UserProfileServiceImpl implements UserProfileService {
      * @return UserProfileResponse
      */
     @Override
-    public UserProfileResponse loadUserProfile() {
-        var user = SecurityUtils.getCurrentUser();
-        if (user == null) {
-            throw new ResourceNotFoundException(MessageConstant.MSG_USER_NOT_FOUND,
-                    MAP_CODE.get(MessageConstant.MSG_USER_NOT_FOUND));
-        }
+    public UserProfileResponse loadUserProfile(String userId) {
+        var user = userRepo.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException(MessageConstant.MSG_USER_NOT_FOUND,
+                        MAP_CODE.get(MessageConstant.MSG_USER_NOT_FOUND)));
 
         // Get collections by user id
         var collections = colRepo.getCollectionsByUserId(user.getId());
@@ -80,6 +79,7 @@ public class UserProfileServiceImpl implements UserProfileService {
      * @param request UserProfileRequest
      * @return UserProfileResponse
      */
+    @Transactional
     @Override
     public UserProfileResponse updateUserProfile(UserProfileRequest request) {
         var user = SecurityUtils.getCurrentUser();

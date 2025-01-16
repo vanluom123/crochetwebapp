@@ -45,15 +45,21 @@ public class AuthController {
         return ResponseEntity.ok(authResponse);
     }
 
+    @ResponseBody
+    @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Register user")
     @ApiResponse(responseCode = "201",
             description = "Registration successful",
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class)))
     @PostMapping("/signup")
-    public ResponseEntity<String> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
-        String response = authService.registerUser(signUpRequest);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(response);
+    public ResponseData<String> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
+        var response = authService.registerUser(signUpRequest);
+        return ResponseData.<String>builder()
+                .success(true)
+                .code(201)
+                .message("Success")
+                .data(response)
+                .build();
     }
 
     @Operation(summary = "Confirm user registration")
@@ -65,35 +71,56 @@ public class AuthController {
         return ResponseEntity.ok(authService.confirmToken(token));
     }
 
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Resend email verification")
     @ApiResponse(responseCode = "200",
             description = "Email verification resent successfully",
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class)))
     @GetMapping("/resendVerificationEmail")
-    public ResponseEntity<String> resendVerificationEmail(@RequestParam("email") String email) {
+    public ResponseData<String> resendVerificationEmail(@RequestParam("email") String email) {
         String response = authService.resendVerificationEmail(email);
-        return ResponseEntity.ok(response);
+        return ResponseData.<String>builder()
+                .success(true)
+                .code(200)
+                .message("Success")
+                .data(response)
+                .build();
     }
 
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Request password reset link")
     @ApiResponse(responseCode = "200",
             description = "Password reset link sent successfully",
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class)))
     @GetMapping("/password-reset-request")
-    public ResponseEntity<String> resetPasswordRequest(@RequestParam("email") String email) {
+    public ResponseData<String> resetPasswordRequest(@RequestParam("email") String email) {
         var response = authService.resetPasswordLink(email);
-        return ResponseEntity.ok(response);
+        return ResponseData.<String>builder()
+                .success(true)
+                .code(200)
+                .message("Success")
+                .data(response)
+                .build();
     }
 
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Reset password")
     @ApiResponse(responseCode = "200",
             description = "Password reset successful",
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class)))
     @PostMapping("/reset-password")
-    public ResponseEntity<String> resetPassword(@RequestParam("passwordResetToken") String passwordResetToken,
-                                                @RequestBody PasswordResetRequest passwordResetRequest) {
+    public ResponseData<String> resetPassword(@RequestParam("passwordResetToken") String passwordResetToken,
+                                              @RequestBody PasswordResetRequest passwordResetRequest) {
         var response = authService.resetPassword(passwordResetToken, passwordResetRequest);
-        return ResponseEntity.ok(response);
+        return ResponseData.<String>builder()
+                .success(true)
+                .code(200)
+                .message("Success")
+                .data(response)
+                .build();
     }
 
     @Operation(summary = "Refresh access token")
@@ -106,14 +133,21 @@ public class AuthController {
         return ResponseEntity.ok(tokenResponse);
     }
 
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Logout")
     @ApiResponse(responseCode = "200",
             description = "Logout successful",
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class)))
     @GetMapping("/logout")
-    public ResponseEntity<String> logout(HttpServletRequest request) {
+    public ResponseData<String> logout(HttpServletRequest request) {
         authService.logout(request);
-        return ResponseEntity.ok("Logout successful");
+        return ResponseData.<String>builder()
+                .success(true)
+                .code(200)
+                .message("Success")
+                .data("Logged out successfully")
+                .build();
     }
 
     @ResponseBody
@@ -125,6 +159,11 @@ public class AuthController {
     @GetMapping("refresh-token/expired")
     public ResponseData<LocalDateTime> refreshTokenExpired(@RequestParam("refreshToken") String refreshToken) {
         var response = authService.getRefreshTokenExpiresAt(refreshToken);
-        return new ResponseData<>("Get refresh token expired success", HttpStatus.OK.value(), response);
+        return ResponseData.<LocalDateTime>builder()
+                .success(true)
+                .code(200)
+                .message("Success")
+                .data(response)
+                .build();
     }
 }

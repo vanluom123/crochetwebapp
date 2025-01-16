@@ -29,18 +29,17 @@ public class CustomUserDetailsService implements UserDetailsService {
         this.userRepository = userRepository;
     }
 
-
     /**
-     * Loads user details based on the provided email.
+     * Load the user by ID from the UserRepository.
      *
-     * @param email The email of the user.
-     * @return The UserDetails object representing the user.
-     * @throws UsernameNotFoundException If the user is not found for the given email.
+     * @param username The ID of the user.
+     * @return The user details.
+     * @throws UsernameNotFoundException If the user is not found.
      */
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        // Retrieve the user by email from the UserRepository
-        User user = userRepository.findByEmail(email)
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        // Retrieve the user by ID from the UserRepository
+        User user = userRepository.findById(username)
                 .orElseThrow(() -> new ResourceNotFoundException(MSG_USER_LOGIN_REQUIRED,
                         MAP_CODE.get(MSG_USER_LOGIN_REQUIRED)));
 

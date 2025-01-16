@@ -68,7 +68,7 @@ public class JwtTokenServiceImpl implements JwtTokenService {
 
         // Build and sign the JWT token
         return Jwts.builder()
-                .subject(userPrincipal.getEmail()) // Set the subject of the token as the user ID
+                .subject(userPrincipal.getId()) // Set the subject of the token as the user ID
                 .issuedAt(new Date()) // Set the issued date as the current date
                 .expiration(expiryDate) // Set the token expiration date
                 .signWith(getKey()) // Sign the token using the key and algorithm
