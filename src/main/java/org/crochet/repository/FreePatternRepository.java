@@ -60,6 +60,17 @@ public interface FreePatternRepository extends JpaRepository<FreePattern, String
     List<FreePatternOnHome> getFrepsByCreateByWithUser(@Param("userId") String userId);
 
     @Query("""
+            select new org.crochet.payload.response.FreePatternOnHome(fp.id, fp.name, fp.description, fp.author, fp.status, i.fileContent, u.name, u.imageUrl, u.id)
+            from FreePattern fp
+            left join fp.images i
+            join User u on fp.createdBy = u.id
+            where u.id = :userId
+                  and fp.id in :ids
+                  and i.order = 0
+            """)
+    Page<FreePatternOnHome> getByUserAndIds(@Param("userId") String userId, @Param("ids") List<String> ids, Pageable pageable);
+
+    @Query("""
             select new org.crochet.payload.response.FreePatternOnHome(fp.id, fp.name, fp.description, fp.author, fp.status, i.fileContent)
             from FreePattern fp
             left join fp.images i
