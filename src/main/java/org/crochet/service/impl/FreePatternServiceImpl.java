@@ -149,6 +149,47 @@ public class FreePatternServiceImpl implements FreePatternService {
     }
 
     /**
+     * Retrieves a paginated and sorted list of free patterns associated with a specific user,
+     * optionally filtered by specified criteria.
+     *
+     * @param pageNo    the page number to retrieve (zero-based)
+     * @param pageSize  the number of items per page
+     * @param sortBy    the attribute to sort the results by
+     * @param sortDir   the direction to sort the results (e.g., "asc" or "desc")
+     * @param filters   an array of filter conditions to apply to the query, can be null or empty
+     * @param userId    the ID of the user whose free patterns are to be retrieved
+     * @return a {@link PaginatedFreePatternResponse} containing the paginated and filtered list of free patterns
+     */
+    @Transactional(readOnly = true)
+    @Override
+    public PaginatedFreePatternResponse getAllByUser(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters, String userId) {
+        Specification<FreePattern> spec = Specification.where(null);
+        if (filters != null && filters.length > 0) {
+            GenericFilter<FreePattern> filter = GenericFilter.create(filters);
+            spec = filter.build();
+        }
+
+        var freePatternIds = freePatternRepo.findAll(spec)
+                .stream()
+                .map(FreePattern::getId)
+                .toList();
+
+        Sort.Direction dir = Sort.Direction.fromString(sortDir);
+        Sort sort = Sort.by(dir, sortBy);
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+        var page = freePatternRepo.getByUserAndIds(userId, freePatternIds, pageable);
+
+        return PaginatedFreePatternResponse.builder()
+                .contents(page.getContent())
+                .pageNo(page.getNumber())
+                .pageSize(page.getSize())
+                .totalElements(page.getTotalElements())
+                .totalPages(page.getTotalPages())
+                .last(page.isLast())
+                .build();
+    }
+
+    /**
      * Retrieves a limited list of FreePatterns.
      *
      * @return A list of {@link FreePatternResponse} objects containing information
