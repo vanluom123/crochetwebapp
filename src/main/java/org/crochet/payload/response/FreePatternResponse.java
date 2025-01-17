@@ -25,6 +25,9 @@ public class FreePatternResponse {
     private String link;
     private String content;
     private ChartStatus status;
+    private String userId;
+    private String username;
+    private String userAvatar;
     private List<FileResponse> images;
     private List<FileResponse> files;
     private CategoryResponse category;

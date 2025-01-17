@@ -6,8 +6,8 @@ import org.crochet.constant.MessageConstant;
 import org.crochet.enumerator.RoleType;
 import org.crochet.exception.AccessDeniedException;
 import org.crochet.exception.ResourceNotFoundException;
+import org.crochet.mapper.CategoryMapper;
 import org.crochet.mapper.FileMapper;
-import org.crochet.mapper.FreePatternMapper;
 import org.crochet.model.FreePattern;
 import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.FreePatternRequest;
@@ -198,10 +198,31 @@ public class FreePatternServiceImpl implements FreePatternService {
     @Transactional(readOnly = true)
     @Override
     public FreePatternResponse getDetail(String id) {
-        var freePattern = freePatternRepo.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException(MessageConstant.MSG_FREE_PATTERN_NOT_FOUND,
+        var frep = freePatternRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(MessageConstant.MSG_FREE_PATTERN_NOT_FOUND,
                         MAP_CODE.get(MessageConstant.MSG_FREE_PATTERN_NOT_FOUND)));
-        return FreePatternMapper.INSTANCE.toResponse(freePattern);
+        var user = userRepo.findById(frep.getCreatedBy())
+                .orElseThrow(() -> new ResourceNotFoundException(MessageConstant.MSG_USER_NOT_FOUND,
+                        MAP_CODE.get(MessageConstant.MSG_USER_NOT_FOUND)));
+        var images = FileMapper.INSTANCE.toResponses(frep.getImages());
+        var files = FileMapper.INSTANCE.toResponses(frep.getFiles());
+        var category = CategoryMapper.INSTANCE.toResponse(frep.getCategory());
+        return FreePatternResponse.builder()
+                .id(frep.getId())
+                .name(frep.getName())
+                .description(frep.getDescription())
+                .author(frep.getAuthor())
+                .isHome(frep.isHome())
+                .link(frep.getLink())
+                .content(frep.getContent())
+                .status(frep.getStatus())
+                .userId(user.getId())
+                .username(user.getUsername())
+                .userAvatar(user.getImageUrl())
+                .images(images)
+                .files(files)
+                .category(category)
+                .build();
     }
 
     /**
