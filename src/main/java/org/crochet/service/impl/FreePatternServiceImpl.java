@@ -31,6 +31,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -122,20 +123,8 @@ public class FreePatternServiceImpl implements FreePatternService {
      */
     @Override
     public PaginatedFreePatternResponse getAllFreePatterns(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters) {
-        Specification<FreePattern> spec = Specification.where(null);
-        if (filters != null && filters.length > 0) {
-            GenericFilter<FreePattern> filter = GenericFilter.create(filters);
-            spec = filter.build();
-        }
-
-        var freePatternIds = freePatternRepo.findAll(spec)
-                .stream()
-                .map(FreePattern::getId)
-                .toList();
-
-        Sort.Direction dir = Sort.Direction.fromString(sortDir);
-        Sort sort = Sort.by(dir, sortBy);
-        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+        List<String> freePatternIds = new ArrayList<>();
+        var pageable = preparePageableAndFilter(pageNo, pageSize, sortBy, sortDir, filters, freePatternIds);
         var page = freePatternRepo.getFreePatternOnHomeWithIds(freePatternIds, pageable);
 
         return PaginatedFreePatternResponse.builder()
@@ -163,20 +152,8 @@ public class FreePatternServiceImpl implements FreePatternService {
     @Transactional(readOnly = true)
     @Override
     public PaginatedFreePatternResponse getAllByUser(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters, String userId) {
-        Specification<FreePattern> spec = Specification.where(null);
-        if (filters != null && filters.length > 0) {
-            GenericFilter<FreePattern> filter = GenericFilter.create(filters);
-            spec = filter.build();
-        }
-
-        var freePatternIds = freePatternRepo.findAll(spec)
-                .stream()
-                .map(FreePattern::getId)
-                .toList();
-
-        Sort.Direction dir = Sort.Direction.fromString(sortDir);
-        Sort sort = Sort.by(dir, sortBy);
-        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+        List<String> freePatternIds = new ArrayList<>();
+        var pageable = preparePageableAndFilter(pageNo, pageSize, sortBy, sortDir, filters, freePatternIds);
         var page = freePatternRepo.getByUserAndIds(userId, freePatternIds, pageable);
 
         return PaginatedFreePatternResponse.builder()
@@ -327,5 +304,37 @@ public class FreePatternServiceImpl implements FreePatternService {
                     MAP_CODE.get(MessageConstant.MSG_USER_NOT_FOUND));
         }
         return freePatternRepo.getFrepsByCreateByWithUser(userId);
+    }
+
+    /**
+     * Prepares a Pageable object based on the given pagination and sorting parameters,
+     * and applies filters to identify matching records. The filtered IDs are added
+     * to the provided list of freePatternIds.
+     *
+     * @param pageNo the page number to retrieve, zero-based index
+     * @param pageSize the number of records per page
+     * @param sortBy the property name to sort by
+     * @param sortDir the direction of sorting, either "asc" for ascending or "desc" for descending
+     * @param filters an array of filters to apply to the query
+     * @param freePatternIds a reference to a list where the filtered IDs will be collected
+     * @return a Pageable object configured with the specified page, size, and sort properties
+     */
+    private Pageable preparePageableAndFilter(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters, List<String> freePatternIds) {
+        Specification<FreePattern> spec = Specification.where(null);
+        if (filters != null && filters.length > 0) {
+            GenericFilter<FreePattern> filter = GenericFilter.create(filters);
+            spec = filter.build();
+        }
+
+        List<String> ids = freePatternRepo.findAll(spec)
+                .stream()
+                .map(FreePattern::getId)
+                .toList();
+
+        freePatternIds.addAll(ids);
+
+        Sort.Direction dir = Sort.Direction.fromString(sortDir);
+        Sort sort = Sort.by(dir, sortBy);
+        return PageRequest.of(pageNo, pageSize, sort);
     }
 }
