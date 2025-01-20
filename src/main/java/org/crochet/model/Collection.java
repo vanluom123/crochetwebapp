@@ -31,10 +31,15 @@ public class Collection extends BaseEntity {
     private String avatar;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "user_id",
+            referencedColumnName = "id",
+            nullable = false)
     @JsonBackReference
     private User user;
 
-    @OneToMany(mappedBy = "collection", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "collection",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY)
     private Set<ColFrep> colfreps = new HashSet<>();
 }

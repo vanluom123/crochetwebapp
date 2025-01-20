@@ -28,6 +28,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public abstract class AuditTable {
     @CreatedBy
+    @Column(name = "create_by", length = 50)
     private String createdBy;
 
     @CreatedDate
@@ -37,6 +38,7 @@ public abstract class AuditTable {
     private LocalDateTime createdDate;
 
     @LastModifiedBy
+    @Column(name = "last_modified_by", length = 50)
     private String lastModifiedBy;
 
     @LastModifiedDate
