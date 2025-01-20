@@ -28,7 +28,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public abstract class AuditTable {
     @CreatedBy
-    @Column(name = "create_by", length = 50)
+    @Column(name = "created_by", length = 50)
     private String createdBy;
 
     @CreatedDate
