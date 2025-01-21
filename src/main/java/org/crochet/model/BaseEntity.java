@@ -1,10 +1,10 @@
 package org.crochet.model;
 
+import com.github.f4b6a3.tsid.Tsid;
 import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.PrePersist;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,7 +19,11 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 public class BaseEntity extends AuditTable {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id", nullable = false, updatable = false, unique = true)
+    @Column(name = "id", nullable = false, unique = true, length = 50)
     private String id;
+
+    @PrePersist
+    public void init() {
+        this.id = Tsid.fast().toString();
+    }
 }

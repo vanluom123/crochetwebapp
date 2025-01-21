@@ -66,6 +66,8 @@ dependencies {
 
     implementation 'org.apache.commons:commons-pool2:2.12.0'
 
+    implementation 'com.github.f4b6a3:tsid-creator:5.2.6'
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test:6.3.0'
     testImplementation 'org.mockito:mockito-core:5.11.0'
