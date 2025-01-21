@@ -1,6 +1,7 @@
 package org.crochet.payload.request;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,7 +16,7 @@ public class UserProfileRequest {
     private String name;
     private String imageUrl;
     private String phone;
-    private LocalDate birthDate;
+    private LocalDateTime birthDate;
     private String gender;
     private String backgroundImageUrl;
 }
