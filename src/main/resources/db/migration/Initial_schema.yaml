@@ -1,0 +1,1220 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1737452201277-1
+      author: luomp
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: PRIMARY
+                  name: id
+                  type: VARCHAR(50)
+              - column:
+                  name: created_by
+                  type: VARCHAR(50)
+              - column:
+                  name: created_date
+                  type: datetime
+              - column:
+                  name: last_modified_by
+                  type: VARCHAR(50)
+              - column:
+                  name: last_modified_date
+                  type: datetime
+              - column:
+                  name: title
+                  type: VARCHAR(255)
+              - column:
+                  name: content
+                  type: CLOB
+              - column:
+                  name: url
+                  type: VARCHAR(255)
+              - column:
+                  name: active
+                  type: TINYINT(1)
+              - column:
+                  name: file_name
+                  type: VARCHAR(255)
+              - column:
+                  name: file_content
+                  type: VARCHAR(255)
+              - column:
+                  name: text_color
+                  type: VARCHAR(255)
+              - column:
+                  name: banner_type_id
+                  type: VARCHAR(50)
+            tableName: banner
+  - changeSet:
+      id: 1737452201277-2
+      author: luomp
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  name: created_by
+                  type: VARCHAR(50)
+              - column:
+                  name: created_date
+                  type: datetime
+              - column:
+                  name: last_modified_by
+                  type: VARCHAR(50)
+              - column:
+                  name: last_modified_date
+                  type: datetime
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: PRIMARY
+                  name: id
+                  type: VARCHAR(50)
+            tableName: banner_type
+  - changeSet:
+      id: 1737452201277-3
+      author: luomp
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  name: created_by
+                  type: VARCHAR(50)
+              - column:
+                  name: created_date
+                  type: datetime
+              - column:
+                  name: last_modified_by
+                  type: VARCHAR(50)
+              - column:
+                  name: last_modified_date
+                  type: datetime
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: PRIMARY
+                  name: id
+                  type: VARCHAR(50)
+            tableName: blog_category
+  - changeSet:
+      id: 1737452201277-4
+      author: luomp
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  name: created_by
+                  type: VARCHAR(50)
+              - column:
+                  name: created_date
+                  type: datetime
+              - column:
+                  name: last_modified_by
+                  type: VARCHAR(50)
+              - column:
+                  name: last_modified_date
+                  type: datetime
+              - column:
+                  name: title
+                  type: VARCHAR(255)
+              - column:
+                  name: content
+                  type: CLOB
+              - column:
+                  name: home
+                  type: TINYINT(1)
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: PRIMARY
+                  name: id
+                  type: VARCHAR(50)
+              - column:
+                  name: blog_category_id
+                  type: VARCHAR(50)
+            tableName: blog_post
+  - changeSet:
+      id: 1737452201277-5
+      author: luomp
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  name: blog_post_id
+                  type: VARCHAR(50)
+              - column:
+                  name: file_name
+                  type: VARCHAR(255)
+              - column:
+                  name: file_content
+                  type: VARCHAR(255)
+              - column:
+                  name: display_order
+                  type: INT
+              - column:
+                  name: last_modified
+                  type: datetime
+            tableName: blog_post_file
+  - changeSet:
+      id: 1737452201277-6
+      author: luomp
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  name: created_by
+                  type: VARCHAR(50)
+              - column:
+                  name: created_date
+                  type: datetime
+              - column:
+                  name: last_modified_by
+                  type: VARCHAR(50)
+              - column:
+                  name: last_modified_date
+                  type: datetime
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+              - column:
+                  name: parent_id
+                  type: VARCHAR(50)
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: PRIMARY
+                  name: id
+                  type: VARCHAR(50)
+            tableName: category
+  - changeSet:
+      id: 1737452201277-7
+      author: luomp
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: PRIMARY
+                  name: id
+                  type: VARCHAR(50)
+              - column:
+                  name: created_by
+                  type: VARCHAR(50)
+              - column:
+                  name: created_date
+                  type: datetime
+              - column:
+                  name: last_modified_by
+                  type: VARCHAR(50)
+              - column:
+                  name: last_modified_date
+                  type: datetime
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+              - column:
+                  name: avatar
+                  type: VARCHAR(255)
+              - column:
+                  name: user_id
+                  type: VARCHAR(50)
+            tableName: collection
+  - changeSet:
+      id: 1737452201277-8
+      author: luomp
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: PRIMARY
+                  name: id
+                  type: VARCHAR(50)
+              - column:
+                  name: created_by
+                  type: VARCHAR(50)
+              - column:
+                  name: created_date
+                  type: datetime
+              - column:
+                  name: last_modified_by
+                  type: VARCHAR(50)
+              - column:
+                  name: last_modified_date
+                  type: datetime
+              - column:
+                  name: collection_id
+                  type: VARCHAR(50)
+              - column:
+                  name: free_pattern_id
+                  type: VARCHAR(50)
+            tableName: collection_free_pattern
+  - changeSet:
+      id: 1737452201277-9
+      author: luomp
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: PRIMARY
+                  name: id
+                  type: VARCHAR(50)
+              - column:
+                  name: created_by
+                  type: VARCHAR(50)
+              - column:
+                  name: created_date
+                  type: datetime
+              - column:
+                  name: last_modified_by
+                  type: VARCHAR(50)
+              - column:
+                  name: last_modified_date
+                  type: datetime
+              - column:
+                  name: post_id
+                  type: VARCHAR(50)
+              - column:
+                  name: user_id
+                  type: VARCHAR(50)
+              - column:
+                  name: content
+                  type: CLOB
+            tableName: comment
+  - changeSet:
+      id: 1737452201277-10
+      author: luomp
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: PRIMARY
+                  name: id
+                  type: VARCHAR(50)
+              - column:
+                  name: created_by
+                  type: VARCHAR(50)
+              - column:
+                  name: created_date
+                  type: datetime
+              - column:
+                  name: last_modified_by
+                  type: VARCHAR(50)
+              - column:
+                  name: last_modified_date
+                  type: datetime
+              - column:
+                  name: token
+                  type: VARCHAR(255)
+              - column:
+                  name: expires_at
+                  type: datetime
+              - column:
+                  name: confirmed_at
+                  type: datetime
+              - column:
+                  name: user_id
+                  type: VARCHAR(50)
+            tableName: confirmation_token
+  - changeSet:
+      id: 1737452201277-11
+      author: luomp
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  name: created_by
+                  type: VARCHAR(50)
+              - column:
+                  name: created_date
+                  type: datetime
+              - column:
+                  name: last_modified_by
+                  type: VARCHAR(50)
+              - column:
+                  name: last_modified_date
+                  type: datetime
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+              - column:
+                  name: description
+                  type: CLOB
+              - column:
+                  name: author
+                  type: VARCHAR(255)
+              - column:
+                  name: is_home
+                  type: TINYINT(1)
+              - column:
+                  name: link
+                  type: VARCHAR(255)
+              - column:
+                  name: content
+                  type: CLOB
+              - column:
+                  name: status
+                  type: VARCHAR(25)
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: PRIMARY
+                  name: id
+                  type: VARCHAR(50)
+              - column:
+                  name: category_id
+                  type: VARCHAR(50)
+            tableName: free_pattern
+  - changeSet:
+      id: 1737452201277-12
+      author: luomp
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  name: free_pattern_id
+                  type: VARCHAR(50)
+              - column:
+                  name: file_name
+                  type: VARCHAR(255)
+              - column:
+                  name: file_content
+                  type: VARCHAR(255)
+              - column:
+                  name: display_order
+                  type: INT
+              - column:
+                  name: last_modified
+                  type: datetime
+            tableName: free_pattern_file
+  - changeSet:
+      id: 1737452201277-13
+      author: luomp
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  name: file_name
+                  type: VARCHAR(255)
+              - column:
+                  name: file_content
+                  type: VARCHAR(255)
+              - column:
+                  name: display_order
+                  type: INT
+              - column:
+                  name: last_modified
+                  type: datetime
+              - column:
+                  name: free_pattern_id
+                  type: VARCHAR(50)
+            tableName: free_pattern_image
+  - changeSet:
+      id: 1737452201277-14
+      author: luomp
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: PRIMARY
+                  name: id
+                  type: VARCHAR(50)
+              - column:
+                  name: created_by
+                  type: VARCHAR(50)
+              - column:
+                  name: created_date
+                  type: datetime
+              - column:
+                  name: last_modified_by
+                  type: VARCHAR(50)
+              - column:
+                  name: last_modified_date
+                  type: datetime
+              - column:
+                  name: token
+                  type: VARCHAR(255)
+              - column:
+                  name: expires_at
+                  type: datetime
+              - column:
+                  name: user_id
+                  type: VARCHAR(50)
+            tableName: password_reset_token
+  - changeSet:
+      id: 1737452201277-15
+      author: luomp
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: PRIMARY
+                  name: id
+                  type: VARCHAR(50)
+              - column:
+                  name: created_by
+                  type: VARCHAR(50)
+              - column:
+                  name: created_date
+                  type: datetime
+              - column:
+                  name: last_modified_by
+                  type: VARCHAR(50)
+              - column:
+                  name: last_modified_date
+                  type: datetime
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+              - column:
+                  name: description
+                  type: CLOB
+              - column:
+                  name: price
+                  type: DOUBLE
+              - column:
+                  name: currency_code
+                  type: VARCHAR(20)
+              - column:
+                  name: category_id
+                  type: VARCHAR(50)
+              - column:
+                  name: is_home
+                  type: TINYINT(1)
+              - column:
+                  name: link
+                  type: VARCHAR(255)
+              - column:
+                  name: content
+                  type: CLOB
+            tableName: pattern
+  - changeSet:
+      id: 1737452201277-16
+      author: luomp
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  name: pattern_id
+                  type: VARCHAR(50)
+              - column:
+                  name: file_name
+                  type: VARCHAR(255)
+              - column:
+                  name: file_content
+                  type: VARCHAR(255)
+              - column:
+                  name: display_order
+                  type: INT
+              - column:
+                  name: last_modified
+                  type: datetime
+            tableName: pattern_file
+  - changeSet:
+      id: 1737452201277-17
+      author: luomp
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  name: pattern_id
+                  type: VARCHAR(50)
+              - column:
+                  name: file_name
+                  type: VARCHAR(255)
+              - column:
+                  name: file_content
+                  type: VARCHAR(255)
+              - column:
+                  name: display_order
+                  type: INT
+              - column:
+                  name: last_modified
+                  type: datetime
+            tableName: pattern_image
+  - changeSet:
+      id: 1737452201277-18
+      author: luomp
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  name: created_by
+                  type: VARCHAR(50)
+              - column:
+                  name: created_date
+                  type: datetime
+              - column:
+                  name: last_modified_by
+                  type: VARCHAR(50)
+              - column:
+                  name: last_modified_date
+                  type: datetime
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+              - column:
+                  name: description
+                  type: CLOB
+              - column:
+                  name: price
+                  type: DOUBLE
+              - column:
+                  name: currency_code
+                  type: VARCHAR(20)
+              - column:
+                  name: is_home
+                  type: TINYINT(1)
+              - column:
+                  name: link
+                  type: VARCHAR(255)
+              - column:
+                  name: content
+                  type: CLOB
+              - column:
+                  name: category_id
+                  type: VARCHAR(50)
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: PRIMARY
+                  name: id
+                  type: VARCHAR(50)
+            tableName: product
+  - changeSet:
+      id: 1737452201277-19
+      author: luomp
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  name: product_id
+                  type: VARCHAR(255)
+              - column:
+                  name: file_name
+                  type: VARCHAR(255)
+              - column:
+                  name: file_content
+                  type: VARCHAR(255)
+              - column:
+                  name: display_order
+                  type: INT
+              - column:
+                  name: last_modified
+                  type: datetime
+            tableName: product_image
+  - changeSet:
+      id: 1737452201277-20
+      author: luomp
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: PRIMARY
+                  name: id
+                  type: VARCHAR(50)
+              - column:
+                  name: created_by
+                  type: VARCHAR(50)
+              - column:
+                  name: created_date
+                  type: datetime
+              - column:
+                  name: last_modified_by
+                  type: VARCHAR(50)
+              - column:
+                  name: last_modified_date
+                  type: datetime
+              - column:
+                  name: token
+                  type: VARCHAR(255)
+              - column:
+                  name: expires_at
+                  type: datetime
+              - column:
+                  name: revoked
+                  type: TINYINT(1)
+              - column:
+                  name: user_id
+                  type: VARCHAR(50)
+            tableName: refresh_token
+  - changeSet:
+      id: 1737452201277-21
+      author: luomp
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: PRIMARY
+                  name: setting_key
+                  type: VARCHAR(255)
+              - column:
+                  name: value
+                  type: VARCHAR(255)
+            tableName: settings
+  - changeSet:
+      id: 1737452201277-22
+      author: luomp
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: PRIMARY
+                  name: id
+                  type: VARCHAR(50)
+              - column:
+                  name: created_by
+                  type: VARCHAR(50)
+              - column:
+                  name: created_date
+                  type: datetime
+              - column:
+                  name: last_modified_by
+                  type: VARCHAR(50)
+              - column:
+                  name: last_modified_date
+                  type: datetime
+              - column:
+                  name: token
+                  type: VARCHAR(255)
+              - column:
+                  name: blacklisted_at
+                  type: datetime
+            tableName: token_blacklist
+  - changeSet:
+      id: 1737452201277-23
+      author: luomp
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  name: created_by
+                  type: VARCHAR(50)
+              - column:
+                  name: created_date
+                  type: datetime
+              - column:
+                  name: last_modified_by
+                  type: VARCHAR(50)
+              - column:
+                  name: last_modified_date
+                  type: datetime
+              - column:
+                  name: phone
+                  type: VARCHAR(20)
+              - column:
+                  name: birth_date
+                  type: CLOB
+              - column:
+                  name: gender
+                  type: VARCHAR(10)
+              - column:
+                  name: background_image_url
+                  type: VARCHAR(255)
+              - column:
+                  name: user_id
+                  type: VARCHAR(50)
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: PRIMARY
+                  name: id
+                  type: VARCHAR(50)
+            tableName: user_profile
+  - changeSet:
+      id: 1737452201277-24
+      author: luomp
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  name: created_by
+                  type: VARCHAR(50)
+              - column:
+                  name: created_date
+                  type: datetime
+              - column:
+                  name: last_modified_by
+                  type: VARCHAR(50)
+              - column:
+                  name: last_modified_date
+                  type: datetime
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+              - column:
+                  name: email
+                  type: VARCHAR(255)
+              - column:
+                  name: image_url
+                  type: VARCHAR(255)
+              - column:
+                  name: email_verified
+                  type: TINYINT(1)
+              - column:
+                  name: password
+                  type: VARCHAR(255)
+              - column:
+                  name: provider
+                  type: VARCHAR(25)
+              - column:
+                  name: provider_id
+                  type: VARCHAR(255)
+              - column:
+                  name: verification_code
+                  type: VARCHAR(255)
+              - column:
+                  name: roles
+                  type: VARCHAR(10)
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: PRIMARY
+                  name: id
+                  type: VARCHAR(50)
+            tableName: users
+  - changeSet:
+      id: 1737452201277-46
+      author: luomp
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: banner_type_id
+            baseTableName: banner
+            constraintName: fk_banner_banner_type_id
+            onDelete: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: banner_type
+        - createIndex:
+            columns:
+              - column:
+                  name: banner_type_id
+            indexName: fk_banner_banner_type_id
+            tableName: banner
+  - changeSet:
+      id: 1737452201277-47
+      author: luomp
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: blog_category_id
+            baseTableName: blog_post
+            constraintName: fk_blog_post_blog_category_id
+            onDelete: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: blog_category
+        - createIndex:
+            columns:
+              - column:
+                  name: blog_category_id
+            indexName: fk_blog_post_blog_category_id
+            tableName: blog_post
+  - changeSet:
+      id: 1737452201277-48
+      author: luomp
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: blog_post_id
+            baseTableName: blog_post_file
+            constraintName: fk_blog_post_file_blog_post_id
+            onDelete: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: blog_post
+        - createIndex:
+            columns:
+              - column:
+                  name: blog_post_id
+            indexName: fk_blog_post_file_blog_post_id
+            tableName: blog_post_file
+  - changeSet:
+      id: 1737452201277-49
+      author: luomp
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: parent_id
+            baseTableName: category
+            constraintName: fk_category_category_id
+            onDelete: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: category
+        - createIndex:
+            columns:
+              - column:
+                  name: parent_id
+            indexName: fk_category_category_id
+            tableName: category
+  - changeSet:
+      id: 1737452201277-50
+      author: luomp
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: collection_id
+            baseTableName: collection_free_pattern
+            constraintName: fk_collection_free_pattern_collection_id
+            onDelete: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: collection
+        - createIndex:
+            columns:
+              - column:
+                  name: collection_id
+            indexName: fk_collection_free_pattern_collection_id
+            tableName: collection_free_pattern
+  - changeSet:
+      id: 1737452201277-51
+      author: luomp
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: free_pattern_id
+            baseTableName: collection_free_pattern
+            constraintName: fk_collection_free_pattern_free_pattern_id
+            onDelete: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: free_pattern
+        - createIndex:
+            columns:
+              - column:
+                  name: free_pattern_id
+            indexName: fk_collection_free_pattern_free_pattern_id
+            tableName: collection_free_pattern
+  - changeSet:
+      id: 1737452201277-52
+      author: luomp
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: collection
+            constraintName: fk_collection_users_id
+            onDelete: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: users
+        - createIndex:
+            columns:
+              - column:
+                  name: user_id
+            indexName: fk_collection_users_id
+            tableName: collection
+  - changeSet:
+      id: 1737452201277-53
+      author: luomp
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: post_id
+            baseTableName: comment
+            constraintName: fk_comment_blog_post_id
+            onDelete: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: blog_post
+        - createIndex:
+            columns:
+              - column:
+                  name: post_id
+            indexName: fk_comment_blog_post_id
+            tableName: comment
+  - changeSet:
+      id: 1737452201277-54
+      author: luomp
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: comment
+            constraintName: fk_comment_users_id
+            onDelete: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: users
+        - createIndex:
+            columns:
+              - column:
+                  name: user_id
+            indexName: fk_comment_users_id
+            tableName: comment
+  - changeSet:
+      id: 1737452201277-55
+      author: luomp
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: confirmation_token
+            constraintName: fk_confirmation_token_users_id
+            onDelete: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: users
+        - createIndex:
+            columns:
+              - column:
+                  name: user_id
+            indexName: fk_confirmation_token_users_id
+            tableName: confirmation_token
+  - changeSet:
+      id: 1737452201277-56
+      author: luomp
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: category_id
+            baseTableName: free_pattern
+            constraintName: fk_free_pattern_category_id
+            onDelete: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: category
+        - createIndex:
+            columns:
+              - column:
+                  name: category_id
+            indexName: fk_free_pattern_category_id
+            tableName: free_pattern
+  - changeSet:
+      id: 1737452201277-57
+      author: luomp
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: free_pattern_id
+            baseTableName: free_pattern_file
+            constraintName: fk_free_pattern_file_free_pattern_id
+            onDelete: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: free_pattern
+        - createIndex:
+            columns:
+              - column:
+                  name: free_pattern_id
+            indexName: fk_free_pattern_file_free_pattern_id
+            tableName: free_pattern_file
+  - changeSet:
+      id: 1737452201277-58
+      author: luomp
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: free_pattern_id
+            baseTableName: free_pattern_image
+            constraintName: fk_free_pattern_image_free_pattern_id
+            onDelete: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: free_pattern
+        - createIndex:
+            columns:
+              - column:
+                  name: free_pattern_id
+            indexName: fk_free_pattern_image_free_pattern_id
+            tableName: free_pattern_image
+  - changeSet:
+      id: 1737452201277-59
+      author: luomp
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: password_reset_token
+            constraintName: fk_password_reset_token_users_id
+            onDelete: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: users
+        - createIndex:
+            columns:
+              - column:
+                  name: user_id
+            indexName: fk_password_reset_token_users_id
+            tableName: password_reset_token
+  - changeSet:
+      id: 1737452201277-60
+      author: luomp
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: category_id
+            baseTableName: pattern
+            constraintName: fk_pattern_category_id
+            onDelete: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: category
+        - createIndex:
+            columns:
+              - column:
+                  name: category_id
+            indexName: fk_pattern_category_id
+            tableName: pattern
+  - changeSet:
+      id: 1737452201277-61
+      author: luomp
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: pattern_id
+            baseTableName: pattern_file
+            constraintName: fk_pattern_file_pattern_id
+            onDelete: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: pattern
+        - createIndex:
+            columns:
+              - column:
+                  name: pattern_id
+            indexName: fk_pattern_file_pattern_id
+            tableName: pattern_file
+  - changeSet:
+      id: 1737452201277-62
+      author: luomp
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: pattern_id
+            baseTableName: pattern_image
+            constraintName: fk_pattern_image_pattern_id
+            onDelete: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: pattern
+        - createIndex:
+            columns:
+              - column:
+                  name: pattern_id
+            indexName: fk_pattern_image_pattern_id
+            tableName: pattern_image
+  - changeSet:
+      id: 1737452201277-63
+      author: luomp
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: category_id
+            baseTableName: product
+            constraintName: fk_product_category_id
+            onDelete: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: category
+        - createIndex:
+            columns:
+              - column:
+                  name: category_id
+            indexName: fk_product_category_id
+            tableName: product
+  - changeSet:
+      id: 1737452201277-64
+      author: luomp
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: product_id
+            baseTableName: product_image
+            constraintName: fk_product_image_product_id
+            onDelete: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: product
+        - createIndex:
+            columns:
+              - column:
+                  name: product_id
+            indexName: fk_product_image_product_id
+            tableName: product_image
+  - changeSet:
+      id: 1737452201277-65
+      author: luomp
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: refresh_token
+            constraintName: fk_refresh_token_user_id
+            onDelete: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: users
+        - createIndex:
+            columns:
+              - column:
+                  name: user_id
+            indexName: fk_refresh_token_user_id
+            tableName: refresh_token
+  - changeSet:
+      id: 1737452201277-66
+      author: luomp
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: user_profile
+            constraintName: fk_user_profile_user_id
+            onDelete: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: users
+        - createIndex:
+            columns:
+              - column:
+                  name: user_id
+            indexName: fk_user_profile_user_id
+            tableName: user_profile
+
