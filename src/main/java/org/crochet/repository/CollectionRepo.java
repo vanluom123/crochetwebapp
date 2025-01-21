@@ -19,7 +19,7 @@ public interface CollectionRepo extends JpaRepository<Collection, String> {
             LEFT JOIN User u ON u.id = c.user.id
             LEFT JOIN ColFrep cf ON cf.collection.id = c.id
             WHERE u.id = :userId
-            GROUP BY c.id, c.name
+            GROUP BY c.id, c.name, c.avatar
             """)
     List<CollectionResponse> getCollectionsByUserId(@Param("userId") String userId);
 
@@ -29,7 +29,7 @@ public interface CollectionRepo extends JpaRepository<Collection, String> {
             LEFT JOIN User u ON u.id = c.user.id
             LEFT JOIN ColFrep cf ON cf.collection.id = c.id
             WHERE c.id = :cid AND u.id = :userId
-            GROUP BY c.id, c.name
+            GROUP BY c.id, c.name, c.avatar
             """)
     Optional<CollectionResponse> getCollectionByUserId(@Param("cid") String cid, @Param("userId") String userId);
 

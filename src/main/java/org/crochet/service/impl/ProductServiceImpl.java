@@ -193,6 +193,7 @@ public class ProductServiceImpl implements ProductService {
      * product.
      */
     @Override
+    @Transactional(readOnly = true)
     public ProductResponse getDetail(String id) {
         var product = productRepo.getDetail(id).orElseThrow(
                 () -> new ResourceNotFoundException(MessageConstant.MSG_PRODUCT_NOT_FOUND,
