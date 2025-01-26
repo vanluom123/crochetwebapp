@@ -33,7 +33,7 @@ public interface FreePatternRepository extends JpaRepository<FreePattern, String
             where
               f.id = :id
             """)
-    Optional<FreePattern> findById(String id);
+    Optional<FreePattern> findFrepById(String id);
 
     @Query("""
             select

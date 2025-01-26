@@ -211,7 +211,7 @@ public class FreePatternServiceImpl implements FreePatternService {
     @Transactional(readOnly = true)
     @Override
     public FreePatternResponse getDetail(String id) {
-        var frep = freePatternRepo.findById(id)
+        var frep = freePatternRepo.findFrepById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(MessageConstant.MSG_FREE_PATTERN_NOT_FOUND,
                         MAP_CODE.get(MessageConstant.MSG_FREE_PATTERN_NOT_FOUND)));
         var user = userRepo.findById(frep.getCreatedBy())
