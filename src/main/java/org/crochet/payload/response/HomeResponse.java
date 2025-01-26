@@ -14,7 +14,7 @@ import java.util.List;
 public class HomeResponse {
     private List<ProductOnHome> products;
     private List<PatternOnHome> patterns;
-    private List<FreePatternOnHome> freePatterns;
+    private List<FreePatternResponse> freePatterns;
     private List<BannerResponse> banners;
     private List<BlogOnHome> blogs;
 }

@@ -9,7 +9,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.crochet.constant.AppConstant;
 import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.FreePatternRequest;
-import org.crochet.payload.response.FreePatternOnHome;
 import org.crochet.payload.response.FreePatternResponse;
 import org.crochet.payload.response.PaginatedFreePatternResponse;
 import org.crochet.payload.response.ResponseData;
@@ -145,7 +144,7 @@ public class FreePatternController {
     @GetMapping("/create-by")
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @SecurityRequirement(name = "BearerAuth")
-    public ResponseEntity<List<FreePatternOnHome>> getFrepsByCreateBy(@RequestParam("userId") String userId) {
+    public ResponseEntity<List<FreePatternResponse>> getFrepsByCreateBy(@RequestParam("userId") String userId) {
         return ResponseEntity.ok(freePatternService.getFrepsByCreateBy(userId));
     }
 }

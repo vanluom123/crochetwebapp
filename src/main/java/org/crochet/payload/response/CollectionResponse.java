@@ -1,14 +1,13 @@
 package org.crochet.payload.response;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -21,7 +20,7 @@ public class CollectionResponse {
     private String name;
     private String avatar;
     private long totalPatterns;
-    private List<FreePatternOnHome> freePatterns;
+    private List<FreePatternResponse> freePatterns;
 
     public CollectionResponse(String id, String name, String avatar, long totalPatterns) {
         this.id = id;
