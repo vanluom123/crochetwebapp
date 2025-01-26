@@ -15,6 +15,7 @@ import org.crochet.payload.response.FreePatternOnHome;
 import org.crochet.payload.response.FreePatternResponse;
 import org.crochet.payload.response.PaginatedFreePatternResponse;
 import org.crochet.repository.CategoryRepo;
+import org.crochet.repository.FreePatternRepoCustom;
 import org.crochet.repository.FreePatternRepository;
 import org.crochet.repository.GenericFilter;
 import org.crochet.repository.UserRepository;
@@ -48,6 +49,7 @@ public class FreePatternServiceImpl implements FreePatternService {
     private final CategoryRepo categoryRepo;
     private final SettingsUtil settingsUtil;
     private final UserRepository userRepo;
+    private final FreePatternRepoCustom freePatternRepoCustom;
 
     /**
      * Creates a new FreePattern or updates an existing one based on the provided
@@ -88,15 +90,17 @@ public class FreePatternServiceImpl implements FreePatternService {
             freePattern = freePatternRepo.findById(request.getId()).orElseThrow(
                     () -> new ResourceNotFoundException(MessageConstant.MSG_FREE_PATTERN_NOT_FOUND,
                             MAP_CODE.get(MessageConstant.MSG_FREE_PATTERN_NOT_FOUND)));
-            freePattern.setName(request.getName());
-            freePattern.setDescription(request.getDescription());
-            freePattern.setAuthor(request.getAuthor());
-            freePattern.setHome(request.isHome());
-            freePattern.setLink(request.getLink());
-            freePattern.setContent(request.getContent());
-            freePattern.setStatus(request.getStatus());
-            freePattern.setFiles(FileMapper.INSTANCE.toSetEntities(sortedFiles));
-            freePattern.setImages(FileMapper.INSTANCE.toEntities(sortedImages));
+            freePattern = freePattern.toBuilder()
+                    .name(request.getName())
+                    .description(request.getDescription())
+                    .author(request.getAuthor())
+                    .isHome(request.isHome())
+                    .link(request.getLink())
+                    .content(request.getContent())
+                    .status(request.getStatus())
+                    .files(FileMapper.INSTANCE.toSetEntities(sortedFiles))
+                    .images(FileMapper.INSTANCE.toEntities(sortedImages))
+                    .build();
         }
         freePatternRepo.save(freePattern);
         return FreePatternResponse.builder()
@@ -141,12 +145,12 @@ public class FreePatternServiceImpl implements FreePatternService {
      * Retrieves a paginated and sorted list of free patterns associated with a specific user,
      * optionally filtered by specified criteria.
      *
-     * @param pageNo    the page number to retrieve (zero-based)
-     * @param pageSize  the number of items per page
-     * @param sortBy    the attribute to sort the results by
-     * @param sortDir   the direction to sort the results (e.g., "asc" or "desc")
-     * @param filters   an array of filter conditions to apply to the query, can be null or empty
-     * @param userId    the ID of the user whose free patterns are to be retrieved
+     * @param pageNo   the page number to retrieve (zero-based)
+     * @param pageSize the number of items per page
+     * @param sortBy   the attribute to sort the results by
+     * @param sortDir  the direction to sort the results (e.g., "asc" or "desc")
+     * @param filters  an array of filter conditions to apply to the query, can be null or empty
+     * @param userId   the ID of the user whose free patterns are to be retrieved
      * @return a {@link PaginatedFreePatternResponse} containing the paginated and filtered list of free patterns
      */
     @Transactional(readOnly = true)
@@ -311,11 +315,11 @@ public class FreePatternServiceImpl implements FreePatternService {
      * and applies filters to identify matching records. The filtered IDs are added
      * to the provided list of freePatternIds.
      *
-     * @param pageNo the page number to retrieve, zero-based index
-     * @param pageSize the number of records per page
-     * @param sortBy the property name to sort by
-     * @param sortDir the direction of sorting, either "asc" for ascending or "desc" for descending
-     * @param filters an array of filters to apply to the query
+     * @param pageNo         the page number to retrieve, zero-based index
+     * @param pageSize       the number of records per page
+     * @param sortBy         the property name to sort by
+     * @param sortDir        the direction of sorting, either "asc" for ascending or "desc" for descending
+     * @param filters        an array of filters to apply to the query
      * @param freePatternIds a reference to a list where the filtered IDs will be collected
      * @return a Pageable object configured with the specified page, size, and sort properties
      */
@@ -326,10 +330,7 @@ public class FreePatternServiceImpl implements FreePatternService {
             spec = filter.build();
         }
 
-        List<String> ids = freePatternRepo.findAll(spec)
-                .stream()
-                .map(FreePattern::getId)
-                .toList();
+        List<String> ids = freePatternRepoCustom.findAllIds(spec);
 
         freePatternIds.addAll(ids);
 
