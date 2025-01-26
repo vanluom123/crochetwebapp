@@ -13,11 +13,7 @@ import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.FreePatternRequest;
 import org.crochet.payload.response.FreePatternResponse;
 import org.crochet.payload.response.PaginatedFreePatternResponse;
-import org.crochet.repository.CategoryRepo;
-import org.crochet.repository.FreePatternRepoCustom;
-import org.crochet.repository.FreePatternRepository;
-import org.crochet.repository.GenericFilter;
-import org.crochet.repository.UserRepository;
+import org.crochet.repository.*;
 import org.crochet.service.FreePatternService;
 import org.crochet.util.ImageUtils;
 import org.crochet.util.SecurityUtils;
@@ -59,11 +55,10 @@ public class FreePatternServiceImpl implements FreePatternService {
      *
      * @param request The {@link FreePatternRequest} containing information for
      *                creating or updating the FreePattern.
-     * @return FreePatternResponse
      */
     @Transactional
     @Override
-    public FreePatternResponse createOrUpdate(FreePatternRequest request) {
+    public void createOrUpdate(FreePatternRequest request) {
         FreePattern freePattern;
         var sortedImages = ImageUtils.sortFiles(request.getImages());
         var sortedFiles = ImageUtils.sortFiles(request.getFiles());
@@ -102,16 +97,6 @@ public class FreePatternServiceImpl implements FreePatternService {
                     .build();
         }
         freePatternRepo.save(freePattern);
-        return FreePatternResponse.builder()
-                .id(freePattern.getId())
-                .name(freePattern.getName())
-                .description(freePattern.getDescription())
-                .author(freePattern.getAuthor())
-                .isHome(freePattern.isHome())
-                .link(freePattern.getLink())
-                .content(freePattern.getContent())
-                .status(freePattern.getStatus())
-                .build();
     }
 
     /**

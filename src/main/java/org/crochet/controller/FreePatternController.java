@@ -16,15 +16,7 @@ import org.crochet.service.FreePatternService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -37,6 +29,8 @@ public class FreePatternController {
         this.freePatternService = freePatternService;
     }
 
+    @ResponseBody
+    @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create a free pattern")
     @ApiResponse(responseCode = "201", description = "Free Pattern created successfully",
             content = @Content(mediaType = "application/json",
@@ -44,10 +38,14 @@ public class FreePatternController {
     @PostMapping(value = "/create")
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @SecurityRequirement(name = "BearerAuth")
-    public ResponseEntity<FreePatternResponse> createPattern(
-            @RequestBody FreePatternRequest request) {
-        var result = freePatternService.createOrUpdate(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(result);
+    public ResponseData<String> createPattern(@RequestBody FreePatternRequest request) {
+        freePatternService.createOrUpdate(request);
+        return ResponseData.<String>builder()
+                .success(true)
+                .code(201)
+                .message("Success")
+                .data("Created success")
+                .build();
     }
 
     @Operation(summary = "Get pattern details by ID")

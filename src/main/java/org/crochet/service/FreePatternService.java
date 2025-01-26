@@ -8,7 +8,7 @@ import org.crochet.payload.response.PaginatedFreePatternResponse;
 import java.util.List;
 
 public interface FreePatternService {
-    FreePatternResponse createOrUpdate(FreePatternRequest request);
+    void createOrUpdate(FreePatternRequest request);
 
     PaginatedFreePatternResponse getAllFreePatterns(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters);
 
