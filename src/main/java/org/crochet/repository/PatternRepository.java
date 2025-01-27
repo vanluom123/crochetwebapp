@@ -1,7 +1,7 @@
 package org.crochet.repository;
 
 import org.crochet.model.Pattern;
-import org.crochet.payload.response.PatternOnHome;
+import org.crochet.payload.response.PatternResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,32 +11,81 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface PatternRepository extends JpaRepository<Pattern, String>, JpaSpecificationExecutor<Pattern> {
 
     @Query("""
-            SELECT new org.crochet.payload.response.PatternOnHome(p.id, p.name, p.description, p.price, p.currencyCode, i.fileContent)
-            FROM Pattern p
-            LEFT JOIN p.images i
-            WHERE p.isHome = true
-                AND i.order = 0
+            SELECT
+              p
+            FROM
+              Pattern p
+              JOIN FETCH p.category
+            WHERE
+              p.id =:id
             """)
-    List<PatternOnHome> findLimitedNumPattern(Pageable pageable);
+    Optional<Pattern> findPatternById(String id);
 
     @Query("""
-            select new org.crochet.payload.response.PatternOnHome(p.id, p.name, p.description, p.price, p.currencyCode, i.fileContent)
-            from Pattern p
-            left join p.images i
-            where p.id in :patternIds
-                and i.order = 0
+            SELECT
+              new org.crochet.payload.response.PatternResponse (
+                p.id,
+                p.name,
+                p.description,
+                p.price,
+                p.currencyCode,
+                i.fileContent
+              )
+            FROM
+              Pattern p
+              JOIN p.images i WITH i.order = 0
+            WHERE
+              p.isHome = TRUE
             """)
-    Page<PatternOnHome> findPatternOnHomeWithIds(@Param("patternIds") List<String> ids, Pageable pageable);
+    List<PatternResponse> findLimitedNumPattern(Pageable pageable);
 
     @Query("""
-            select p.id
-            from Pattern p
-            order by p.createdDate desc
+            SELECT
+              new org.crochet.payload.response.PatternResponse (
+                p.id,
+                p.name,
+                p.description,
+                p.price,
+                p.currencyCode,
+                i.fileContent
+              )
+            FROM
+              Pattern p
+              JOIN p.images i WITH i.order = 0
+            WHERE
+              p.id IN :patternIds
+            """)
+    Page<PatternResponse> findPatternOnHomeWithIds(@Param("patternIds") List<String> ids, Pageable pageable);
+
+    @Query("""
+            SELECT
+              new org.crochet.payload.response.PatternResponse (
+                p.id,
+                p.name,
+                p.description,
+                p.price,
+                p.currencyCode,
+                i.fileContent
+              )
+            FROM
+              Pattern p
+              JOIN p.images i WITH i.order = 0
+            """)
+    Page<PatternResponse> findPatternWithPageable(Pageable pageable);
+
+    @Query("""
+            SELECT
+              p.id
+            FROM
+              Pattern p
+            ORDER BY
+              p.createdDate DESC
             """)
     List<String> getPatternIds(Pageable pageable);
 }

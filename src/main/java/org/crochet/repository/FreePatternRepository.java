@@ -25,19 +25,19 @@ public interface FreePatternRepository extends JpaRepository<FreePattern, String
         JpaSpecificationExecutor<FreePattern> {
 
     @Query("""
-            select
+            SELECT
               f
-            from
+            FROM
               FreePattern f
-              join fetch f.category
-            where
-              f.id = :id
+              JOIN FETCH f.category
+            WHERE
+              f.id =:id
             """)
     Optional<FreePattern> findFrepById(String id);
 
     @Query("""
-            select
-              new org.crochet.payload.response.FreePatternResponse(
+            SELECT
+              new org.crochet.payload.response.FreePatternResponse (
                 fp.id,
                 fp.name,
                 fp.description,
@@ -48,31 +48,32 @@ public interface FreePatternRepository extends JpaRepository<FreePattern, String
                 u.imageUrl,
                 u.id
               )
-            from
+            FROM
               FreePattern fp
-              join fp.images i with i.order = 0
-              join User u on fp.createdBy = u.id
-            where
-              fp.isHome = true
+              JOIN fp.images i WITH i.order = 0
+              JOIN User u ON fp.createdBy = u.id
+            WHERE
+              fp.isHome = TRUE
             """)
     List<FreePatternResponse> findLimitedNumFreePattern(Pageable pageable);
 
     @Query("""
-            select
+            SELECT
               f
-            from
+            FROM
               FreePattern f
-              join f.colfreps colFrep
-              join colFrep.collection c
-            where
-              c.user.id = : userId
-              and f.id = : frepId
+              JOIN f.colfreps colFrep
+              JOIN colFrep.collection c
+            WHERE
+              c.user.id =:userId
+              AND f.id =:frepId
             """)
     Optional<FreePattern> findFrepInCollection(@Param("userId") String userId,
                                                @Param("frepId") String frepId);
 
     @Query(value = """
-            select new org.crochet.payload.response.FreePatternResponse(
+            SELECT
+              new org.crochet.payload.response.FreePatternResponse (
                 fp.id,
                 fp.name,
                 fp.description,
@@ -82,13 +83,15 @@ public interface FreePatternRepository extends JpaRepository<FreePattern, String
                 u.name,
                 u.imageUrl,
                 u.id
-            )
-            from
-                FreePattern fp
-                join User u on fp.createdBy = u.id
-                join fp.images i with i.order = 0
-            where
-                fp.id in :ids
+              )
+            FROM
+              FreePattern fp
+              JOIN User u ON fp.createdBy = u.id
+              JOIN fp.images i
+            WITH
+              i.order = 0
+            WHERE
+              fp.id IN :ids
             """)
     @QueryHints(value = {
             @QueryHint(name = HINT_FETCH_SIZE, value = "50"),
@@ -97,7 +100,8 @@ public interface FreePatternRepository extends JpaRepository<FreePattern, String
     Page<FreePatternResponse> getFrepByIds(@Param("ids") List<String> ids, Pageable pageable);
 
     @Query(value = """
-            select new org.crochet.payload.response.FreePatternResponse(
+            SELECT
+              new org.crochet.payload.response.FreePatternResponse (
                 fp.id,
                 fp.name,
                 fp.description,
@@ -107,11 +111,13 @@ public interface FreePatternRepository extends JpaRepository<FreePattern, String
                 u.name,
                 u.imageUrl,
                 u.id
-            )
-            from
-                FreePattern fp
-                join User u on fp.createdBy = u.id
-                join fp.images i with i.order = 0
+              )
+            FROM
+              FreePattern fp
+              JOIN User u ON fp.createdBy = u.id
+              JOIN fp.images i
+            WITH
+              i.order = 0
             """)
     @QueryHints(value = {
             @QueryHint(name = HINT_FETCH_SIZE, value = "50"),
@@ -123,8 +129,8 @@ public interface FreePatternRepository extends JpaRepository<FreePattern, String
     List<String> getFreePatternIds(Pageable pageable);
 
     @Query("""
-            select
-              new org.crochet.payload.response.FreePatternResponse(
+            SELECT
+              new org.crochet.payload.response.FreePatternResponse (
                 fp.id,
                 fp.name,
                 fp.description,
@@ -135,17 +141,18 @@ public interface FreePatternRepository extends JpaRepository<FreePattern, String
                 u.imageUrl,
                 u.id
               )
-            from
+            FROM
               FreePattern fp
-              join User u on fp.createdBy = u.id
-              join fp.images i with i.order = 0
-            where
-              u.id = : userId
+              JOIN User u ON fp.createdBy = u.id
+              JOIN fp.images i WITH i.order = 0
+            WHERE
+              u.id =:userId
             """)
     List<FreePatternResponse> getFrepsByCreateByWithUser(@Param("userId") String userId);
 
     @Query("""
-            select new org.crochet.payload.response.FreePatternResponse(
+            SELECT
+              new org.crochet.payload.response.FreePatternResponse (
                 fp.id,
                 fp.name,
                 fp.description,
@@ -155,32 +162,36 @@ public interface FreePatternRepository extends JpaRepository<FreePattern, String
                 u.name,
                 u.imageUrl,
                 u.id
-            )
-            from
-                FreePattern fp
-                join User u on fp.createdBy = u.id
-                join fp.images i with i.order = 0
-            where
-                u.id = :userId
-                and fp.id in :ids
+              )
+            FROM
+              FreePattern fp
+              JOIN User u ON fp.createdBy = u.id
+              JOIN fp.images i WITH i.order = 0
+            WHERE
+              u.id =:userId
+              AND fp.id IN :ids
             """)
     Page<FreePatternResponse> getByUserAndIds(@Param("userId") String userId, @Param("ids") List<String> ids,
                                               Pageable pageable);
 
     @Query("""
-            select
-              new org.crochet.payload.response.FreePatternResponse(
-                fp.id, fp.name, fp.description, fp.author,
-                fp.status, i.fileContent
+            SELECT
+              new org.crochet.payload.response.FreePatternResponse (
+                fp.id,
+                fp.name,
+                fp.description,
+                fp.author,
+                fp.status,
+                i.fileContent
               )
-            from
+            FROM
               FreePattern fp
-              join fp.images i with i.order = 0
-              join fp.colfreps colFrep
-              join colFrep.collection c
-            where
-              c.user.id = : userId
-              and c.id = : colId
+              JOIN fp.images i WITH i.order = 0
+              JOIN fp.colfreps colFrep
+              JOIN colFrep.collection c
+            WHERE
+              c.user.id =:userId
+              AND c.id =:colId
             """)
     List<FreePatternResponse> getFrepsByCollection(@Param("userId") String userId,
                                                    @Param("colId") String collectionId);
@@ -188,11 +199,10 @@ public interface FreePatternRepository extends JpaRepository<FreePattern, String
     @Transactional
     @Modifying
     @Query("""
-            delete from
-              FreePattern f
-            where
-              f.id in : ids
-              and f.createdBy = : userId
+            DELETE FROM FreePattern f
+            WHERE
+              f.id IN :ids
+              AND f.createdBy =:userId
             """)
     void deleteAllByIdAndCreatedBy(
             @Param("ids") List<String> ids,

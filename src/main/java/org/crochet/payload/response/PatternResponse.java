@@ -29,4 +29,19 @@ public class PatternResponse {
     private List<FileResponse> images;
     private List<FileResponse> files;
     private CategoryResponse category;
+    private String fileContent;
+
+    public PatternResponse(String id,
+                           String name,
+                           String description,
+                           double price,
+                           CurrencyCode currencyCode,
+                           String fileContent) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.price = price;
+        this.currencyCode = currencyCode;
+        this.fileContent = fileContent;
+    }
 }
