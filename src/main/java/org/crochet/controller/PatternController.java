@@ -6,14 +6,12 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-
-import java.util.List;
-
 import org.crochet.constant.AppConstant;
 import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.PatternRequest;
 import org.crochet.payload.response.PatternPaginationResponse;
 import org.crochet.payload.response.PatternResponse;
+import org.crochet.payload.response.ResponseData;
 import org.crochet.service.PatternService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +22,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/pattern")
@@ -35,6 +37,8 @@ public class PatternController {
         this.patternService = patternService;
     }
 
+    @ResponseBody
+    @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create a pattern")
     @ApiResponse(responseCode = "201", description = "Pattern created successfully",
             content = @Content(mediaType = "application/json",
@@ -42,10 +46,15 @@ public class PatternController {
     @PostMapping(value = "/create")
     @PreAuthorize("hasRole('ADMIN')")
     @SecurityRequirement(name = "BearerAuth")
-    public ResponseEntity<PatternResponse> createPattern(
+    public ResponseData<String> createPattern(
             @RequestBody PatternRequest request) {
-        var result = patternService.createOrUpdate(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(result);
+        patternService.createOrUpdate(request);
+        return ResponseData.<String>builder()
+                .success(true)
+                .code(201)
+                .message("Success")
+                .data("Created success")
+                .build();
     }
 
     @Operation(summary = "Get paginated list of patterns")

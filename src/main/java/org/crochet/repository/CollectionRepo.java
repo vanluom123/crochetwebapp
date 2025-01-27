@@ -14,32 +14,49 @@ import java.util.Optional;
 public interface CollectionRepo extends JpaRepository<Collection, String> {
 
     @Query("""
-            SELECT new org.crochet.payload.response.CollectionResponse(c.id, c.name, c.avatar, COUNT(cf.id))
-            FROM Collection c
-            LEFT JOIN User u ON u.id = c.user.id
-            LEFT JOIN ColFrep cf ON cf.collection.id = c.id
-            WHERE u.id = :userId
-            GROUP BY c.id, c.name, c.avatar
+            SELECT
+              new org.crochet.payload.response.CollectionResponse (c.id, c.name, c.avatar, COUNT(cf.id))
+            FROM
+              Collection c
+              LEFT JOIN User u ON u.id = c.user.id
+              LEFT JOIN ColFrep cf ON cf.collection.id = c.id
+            WHERE
+              u.id =:userId
+            GROUP BY
+              c.id,
+              c.name,
+              c.avatar
             """)
     List<CollectionResponse> getCollectionsByUserId(@Param("userId") String userId);
 
     @Query("""
-            SELECT new org.crochet.payload.response.CollectionResponse(c.id, c.name, c.avatar, COUNT(cf.id))
-            FROM Collection c
-            LEFT JOIN User u ON u.id = c.user.id
-            LEFT JOIN ColFrep cf ON cf.collection.id = c.id
-            WHERE c.id = :cid AND u.id = :userId
-            GROUP BY c.id, c.name, c.avatar
+            SELECT
+              new org.crochet.payload.response.CollectionResponse (c.id, c.name, c.avatar, COUNT(cf.id))
+            FROM
+              Collection c
+              LEFT JOIN User u ON u.id = c.user.id
+              LEFT JOIN ColFrep cf ON cf.collection.id = c.id
+            WHERE
+              c.id =:cid
+              AND u.id =:userId
+            GROUP BY
+              c.id,
+              c.name,
+              c.avatar
             """)
     Optional<CollectionResponse> getCollectionByUserId(@Param("cid") String cid, @Param("userId") String userId);
 
     @Query("""
-            SELECT c
-            FROM Collection c
-            LEFT JOIN FETCH c.colfreps cf
-            LEFT JOIN FETCH cf.freePattern fp
-            LEFT JOIN FETCH fp.images
-            WHERE c.id = :cid AND c.user.id = :userId
+            SELECT
+              c
+            FROM
+              Collection c
+              LEFT JOIN FETCH c.colfreps cf
+              LEFT JOIN FETCH cf.freePattern fp
+              LEFT JOIN FETCH fp.images
+            WHERE
+              c.id =:cid
+              AND c.user.id =:userId
             """)
     Optional<Collection> findCollectionByUserId(@Param("cid") String cid, @Param("userId") String userId);
 

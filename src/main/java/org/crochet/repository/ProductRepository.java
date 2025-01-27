@@ -1,7 +1,7 @@
 package org.crochet.repository;
 
 import org.crochet.model.Product;
-import org.crochet.payload.response.ProductOnHome;
+import org.crochet.payload.response.ProductResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,36 +18,85 @@ import java.util.Optional;
 public interface ProductRepository extends JpaRepository<Product, String>, JpaSpecificationExecutor<Product> {
 
     @Query("""
-            select new org.crochet.payload.response.ProductOnHome(p.id, p.name, p.description, p.price, p.currencyCode, i.fileContent)
-            from Product p
-            left join p.images i
-            where p.isHome = true
-                and i.order = 0
+            SELECT
+              new org.crochet.payload.response.ProductResponse (
+                p.id,
+                p.name,
+                p.description,
+                p.price,
+                p.currencyCode,
+                i.fileContent
+              )
+            FROM
+              Product p
+              JOIN p.images i
+            WITH
+              i.order = 0
+            WHERE
+              p.isHome = TRUE
             """)
-    List<ProductOnHome> findLimitedNumProduct(Pageable pageable);
+    List<ProductResponse> findLimitedNumProduct(Pageable pageable);
 
 
     @Query("""
-            select p
-            from Product p
-            left join fetch p.images
-            where p.id = ?1
+            SELECT
+              p
+            FROM
+              Product p
+              LEFT JOIN
+            FETCH p.images
+            JOIN
+            FETCH p.category
+            WHERE
+              p.id = :id
             """)
-    Optional<Product> getDetail(String id);
+    Optional<Product> findProductById(@Param("id") String id);
 
     @Query("""
-            select new org.crochet.payload.response.ProductOnHome(p.id, p.name, p.description, p.price, p.currencyCode, i.fileContent)
-            from Product p
-            left join p.images i
-            where p.id in :ids
-                and i.order = 0
+            SELECT
+              new org.crochet.payload.response.ProductResponse (
+                p.id,
+                p.name,
+                p.description,
+                p.price,
+                p.currencyCode,
+                i.fileContent
+              )
+            FROM
+              Product p
+              JOIN p.images i
+            WITH
+              i.order = 0
+            WHERE
+              p.id IN :ids
             """)
-    Page<ProductOnHome> findProductOnHomeWithIds(@Param("ids") List<String> ids, Pageable pageable);
+    Page<ProductResponse> findProductWithIds(@Param("ids") List<String> ids, Pageable pageable);
 
     @Query("""
-            select p.id
-            from Product p
-            order by p.createdDate desc
+            SELECT
+              new org.crochet.payload.response.ProductResponse (
+                p.id,
+                p.name,
+                p.description,
+                p.price,
+                p.currencyCode,
+                i.fileContent
+              )
+            FROM
+              Product p
+              JOIN p.images i
+            WITH
+              i.order = 0
+            """)
+    Page<ProductResponse> findProductWithPageable(Pageable pageable);
+
+    @Query("""
+            SELECT
+              p.id
+            FROM
+              Product p
+            ORDER BY
+              p.createdDate DESC
             """)
     List<String> getProductIds(Pageable pageable);
 

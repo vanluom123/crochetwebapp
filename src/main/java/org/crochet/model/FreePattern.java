@@ -32,7 +32,7 @@ import java.util.Set;
 @Setter
 @Entity
 @Table(name = "free_pattern")
-@SuperBuilder
+@SuperBuilder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class FreePattern extends BaseEntity {

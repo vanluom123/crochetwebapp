@@ -21,34 +21,17 @@ import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
 public class BlogCategoryServiceImpl implements BlogCategoryService {
     private final BlogCategoryRepo blogCategoryRepo;
 
-    /**
-     * Create a new blog category
-     *
-     * @param request the request object
-     * @return the response object
-     */
     @Transactional
     @Override
-    public BlogCategoryResponse create(BlogCategoryRequest request) {
-        BlogCategory blogCategory = new BlogCategory();
+    public void createOrUpdate(BlogCategoryRequest request) {
+        BlogCategory blogCategory;
+        if (!request.getId().isEmpty()) {
+            blogCategory = getById(request.getId());
+        } else {
+            blogCategory = new BlogCategory();
+        }
         blogCategory.setName(request.getName());
-        blogCategory = blogCategoryRepo.save(blogCategory);
-        return BlogCategoryMapper.INSTANCE.toResponse(blogCategory);
-    }
-
-    /**
-     * Update a blog category
-     *
-     * @param request the request object
-     * @return the response object
-     */
-    @Transactional
-    @Override
-    public BlogCategoryResponse update(BlogCategoryRequest request) {
-        BlogCategory blogCategory = getById(request.getId());
-        blogCategory.setName(request.getName());
-        blogCategory = blogCategoryRepo.save(blogCategory);
-        return BlogCategoryMapper.INSTANCE.toResponse(blogCategory);
+        blogCategoryRepo.save(blogCategory);
     }
 
     /**

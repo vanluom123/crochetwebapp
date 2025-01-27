@@ -6,14 +6,12 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-
-import java.util.List;
-
 import org.crochet.constant.AppConstant;
 import org.crochet.payload.request.BlogPostRequest;
 import org.crochet.payload.request.Filter;
 import org.crochet.payload.response.BlogPostPaginationResponse;
 import org.crochet.payload.response.BlogPostResponse;
+import org.crochet.payload.response.ResponseData;
 import org.crochet.service.BlogPostService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +22,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/blog")
@@ -35,16 +37,23 @@ public class BlogController {
         this.blogPostService = blogPostService;
     }
 
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Create or update a blog post")
     @ApiResponse(responseCode = "201", description = "Blog post created or updated successfully",
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = String.class)))
     @PostMapping(value = "/create")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @SecurityRequirement(name = "BearerAuth")
-    public ResponseEntity<BlogPostResponse> createOrUpdatePost(@RequestBody BlogPostRequest request) {
-        var result = blogPostService.createOrUpdatePost(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(result);
+    public ResponseData<String> createOrUpdatePost(@RequestBody BlogPostRequest request) {
+        blogPostService.createOrUpdatePost(request);
+        return ResponseData.<String>builder()
+                .success(true)
+                .code(201)
+                .message("Success")
+                .data("Created or updated successfully")
+                .build();
     }
 
     @Operation(summary = "Get paginated list of blog posts")
