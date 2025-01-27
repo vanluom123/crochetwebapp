@@ -29,7 +29,7 @@ import java.util.List;
 @Setter
 @Entity
 @Table(name = "product")
-@SuperBuilder
+@SuperBuilder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class Product extends BaseEntity {

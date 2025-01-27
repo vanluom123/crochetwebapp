@@ -9,7 +9,7 @@ import org.crochet.payload.response.ProductResponse;
 import java.util.List;
 
 public interface ProductService {
-    ProductResponse createOrUpdate(ProductRequest request);
+    void createOrUpdate(ProductRequest request);
 
     ProductPaginationResponse getProducts(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters);
 

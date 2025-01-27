@@ -54,12 +54,10 @@ public class ProductServiceImpl implements ProductService {
      *
      * @param request The {@link ProductRequest} containing information for creating
      *                or updating the product.
-     * @return A {@link ProductResponse} representing the created or updated
-     * product.
      */
     @Transactional
     @Override
-    public ProductResponse createOrUpdate(ProductRequest request) {
+    public void createOrUpdate(ProductRequest request) {
         Product product;
         var images = ImageUtils.sortFiles(request.getImages());
 
@@ -83,27 +81,17 @@ public class ProductServiceImpl implements ProductService {
             product = productRepo.findById(request.getId())
                     .orElseThrow(() -> new ResourceNotFoundException(MessageConstant.MSG_PRODUCT_NOT_FOUND,
                             MAP_CODE.get(MessageConstant.MSG_PRODUCT_NOT_FOUND)));
-
-            product.setName(request.getName());
-            product.setDescription(request.getDescription());
-            product.setPrice(request.getPrice());
-            product.setCurrencyCode(request.getCurrencyCode());
-            product.setHome(request.isHome());
-            product.setContent(request.getContent());
-            product.setLink(request.getLink());
-            product.setImages(FileMapper.INSTANCE.toEntities(images));
+            product = product.toBuilder()
+                    .name(request.getName())
+                    .description(request.getDescription())
+                    .price(request.getPrice())
+                    .currencyCode(request.getCurrencyCode())
+                    .isHome(request.isHome())
+                    .link(request.getLink())
+                    .images(FileMapper.INSTANCE.toEntities(images))
+                    .build();
         }
-        product = productRepo.save(product);
-        return ProductResponse.builder()
-                .id(product.getId())
-                .name(product.getName())
-                .description(product.getDescription())
-                .price(product.getPrice())
-                .currencyCode(product.getCurrencyCode())
-                .isHome(product.isHome())
-                .link(product.getLink())
-                .content(product.getContent())
-                .build();
+        productRepo.save(product);
     }
 
     /**
