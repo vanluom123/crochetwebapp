@@ -49,38 +49,39 @@ public class HomeServiceImpl implements HomeService {
     @Async(AppConstant.CROCHET_TASK_EXECUTOR)
     @Override
     public CompletableFuture<HomeResponse> getHomesAsync() {
-        var prodFuture = CompletableFuture.supplyAsync(productService::getLimitedProducts, crochetTaskExecutor);
-        var patternFuture = CompletableFuture.supplyAsync(patternService::getLimitedPatterns, crochetTaskExecutor);
-        var freePatternFuture = CompletableFuture.supplyAsync(freePatternService::getLimitedFreePatterns, crochetTaskExecutor);
-        var bannerFuture = CompletableFuture.supplyAsync(bannerService::getAll, crochetTaskExecutor);
-        var blogFuture = CompletableFuture.supplyAsync(blogService::getLimitedBlogPosts, crochetTaskExecutor);
+        var prodFuture = CompletableFuture.supplyAsync(productService::getLimitedProducts, crochetTaskExecutor)
+                .exceptionally(ex -> {
+                    log.error("Failed to fetch products", ex);
+                    return Collections.emptyList();
+                });
+        var patternFuture = CompletableFuture.supplyAsync(patternService::getLimitedPatterns, crochetTaskExecutor)
+                .exceptionally(ex -> {
+                    log.error("Failed to fetch patterns", ex);
+                    return Collections.emptyList();
+                });
+        var freePatternFuture = CompletableFuture.supplyAsync(freePatternService::getLimitedFreePatterns, crochetTaskExecutor)
+                .exceptionally(ex -> {
+                    log.error("Failed to fetch free pattern", ex);
+                    return Collections.emptyList();
+                });
+        var bannerFuture = CompletableFuture.supplyAsync(bannerService::getAll, crochetTaskExecutor)
+                .exceptionally(ex -> {
+                    log.error("Failed to fetch banners", ex);
+                    return Collections.emptyList();
+                });
+        var blogFuture = CompletableFuture.supplyAsync(blogService::getLimitedBlogPosts, crochetTaskExecutor)
+                .exceptionally(ex -> {
+                    log.error("Failed to fetch blogs", ex);
+                    return Collections.emptyList();
+                });
 
         return CompletableFuture.allOf(prodFuture, patternFuture, freePatternFuture, bannerFuture, blogFuture)
-                .thenApply(v -> HomeResponse.builder()
+                .thenCompose(v -> CompletableFuture.supplyAsync(() -> HomeResponse.builder()
                         .products(prodFuture.join())
                         .patterns(patternFuture.join())
                         .freePatterns(freePatternFuture.join())
                         .banners(bannerFuture.join())
                         .blogs(blogFuture.join())
-                        .build())
-                .exceptionally(this::handleException);
-    }
-
-    /**
-     * Handles the exception occurred while fetching home data.
-     *
-     * @param ex the exception occurred
-     * @return a default HomeResponse
-     */
-    private HomeResponse handleException(Throwable ex) {
-        // Log the exception and return a default value
-        log.error("Error occurred while fetching home data: ", ex);
-        return HomeResponse.builder()
-                .products(Collections.emptyList())
-                .patterns(Collections.emptyList())
-                .freePatterns(Collections.emptyList())
-                .banners(Collections.emptyList())
-                .blogs(Collections.emptyList())
-                .build();
+                        .build(), crochetTaskExecutor));
     }
 }

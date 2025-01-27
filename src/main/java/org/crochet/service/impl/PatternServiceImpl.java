@@ -10,7 +10,6 @@ import org.crochet.model.Pattern;
 import org.crochet.model.Settings;
 import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.PatternRequest;
-import org.crochet.payload.response.PatternOnHome;
 import org.crochet.payload.response.PatternPaginationResponse;
 import org.crochet.payload.response.PatternResponse;
 import org.crochet.repository.CategoryRepo;
@@ -19,10 +18,10 @@ import org.crochet.repository.PatternRepository;
 import org.crochet.service.PatternService;
 import org.crochet.util.ImageUtils;
 import org.crochet.util.SettingsUtil;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,7 +51,7 @@ public class PatternServiceImpl implements PatternService {
      */
     @Transactional
     @Override
-    public PatternResponse createOrUpdate(PatternRequest request) {
+    public void createOrUpdate(PatternRequest request) {
         Pattern pattern;
         var images = ImageUtils.sortFiles(request.getImages());
         var files = ImageUtils.sortFiles(request.getFiles());
@@ -77,28 +76,20 @@ public class PatternServiceImpl implements PatternService {
             pattern = patternRepo.findById(request.getId()).orElseThrow(
                     () -> new ResourceNotFoundException(MessageConstant.MSG_PATTERN_NOT_FOUND,
                             MAP_CODE.get(MessageConstant.MSG_PATTERN_NOT_FOUND)));
-            pattern.setName(request.getName());
-            pattern.setDescription(request.getDescription());
-            pattern.setPrice(request.getPrice());
-            pattern.setCurrencyCode(request.getCurrencyCode());
-            pattern.setLink(request.getLink());
-            pattern.setHome(request.isHome());
-            pattern.setContent(request.getContent());
-            pattern.setFiles(FileMapper.INSTANCE.toSetEntities(files));
-            pattern.setImages(FileMapper.INSTANCE.toEntities(images));
+            pattern = pattern.toBuilder()
+                    .name(request.getName())
+                    .description(request.getDescription())
+                    .price(request.getPrice())
+                    .currencyCode(request.getCurrencyCode())
+                    .isHome(request.isHome())
+                    .link(request.getLink())
+                    .content(request.getContent())
+                    .files(FileMapper.INSTANCE.toSetEntities(files))
+                    .images(FileMapper.INSTANCE.toEntities(images))
+                    .build();
         }
 
-        pattern = patternRepo.save(pattern);
-
-        return PatternResponse.builder()
-                .id(pattern.getId())
-                .name(pattern.getName())
-                .price(pattern.getPrice())
-                .description(pattern.getDescription())
-                .currencyCode(pattern.getCurrencyCode())
-                .link(pattern.getLink())
-                .content(pattern.getContent())
-                .build();
+        patternRepo.save(pattern);
     }
 
     /**
@@ -114,20 +105,25 @@ public class PatternServiceImpl implements PatternService {
     @Override
     public PatternPaginationResponse getPatterns(int pageNo, int pageSize, String sortBy, String sortDir,
                                                  Filter[] filters) {
-        Specification<Pattern> spec = Specification.where(null);
+        List<String> patternIds = Collections.emptyList();
+
         if (filters != null && filters.length > 0) {
             GenericFilter<Pattern> filter = GenericFilter.create(filters);
-            spec = filter.build();
+            var spec = filter.build();
+            patternIds = patternRepo.findAll(spec)
+                    .stream()
+                    .map(Pattern::getId)
+                    .toList();
         }
-
-        var patternIds = patternRepo.findAll(spec)
-                .stream()
-                .map(Pattern::getId)
-                .toList();
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
-        var page = patternRepo.findPatternOnHomeWithIds(patternIds, pageable);
+        Page<PatternResponse> page;
+        if (patternIds.isEmpty()) {
+            page = patternRepo.findPatternWithPageable(pageable);
+        } else {
+            page = patternRepo.findPatternOnHomeWithIds(patternIds, pageable);
+        }
 
         return PatternPaginationResponse.builder()
                 .contents(page.getContent())
@@ -146,7 +142,7 @@ public class PatternServiceImpl implements PatternService {
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
     @Override
-    public List<PatternOnHome> getLimitedPatterns() {
+    public List<PatternResponse> getLimitedPatterns() {
         Map<String, Settings> settingsMap = settingsUtil.getSettingsMap();
         if (settingsMap.isEmpty()) {
             return Collections.emptyList();
@@ -185,7 +181,7 @@ public class PatternServiceImpl implements PatternService {
     @Transactional(readOnly = true)
     @Override
     public PatternResponse getDetail(String id) {
-        var pattern = patternRepo.findById(id).orElseThrow(
+        var pattern = patternRepo.findPatternById(id).orElseThrow(
                 () -> new ResourceNotFoundException(MessageConstant.MSG_PATTERN_NOT_FOUND,
                         MAP_CODE.get(MessageConstant.MSG_PATTERN_NOT_FOUND)));
         return PatternMapper.INSTANCE.toResponse(pattern);

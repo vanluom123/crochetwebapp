@@ -10,7 +10,6 @@ import org.crochet.model.BlogPost;
 import org.crochet.model.Settings;
 import org.crochet.payload.request.BlogPostRequest;
 import org.crochet.payload.request.Filter;
-import org.crochet.payload.response.BlogOnHome;
 import org.crochet.payload.response.BlogPostPaginationResponse;
 import org.crochet.payload.response.BlogPostResponse;
 import org.crochet.repository.BlogCategoryRepo;
@@ -60,12 +59,10 @@ public class BlogPostServiceImpl implements BlogPostService {
      *
      * @param request The {@link BlogPostRequest} containing information for
      *                creating or updating the blog post.
-     * @return A {@link BlogPostResponse} containing detailed information about the
-     * created or updated blog post.
      */
     @Transactional
     @Override
-    public BlogPostResponse createOrUpdatePost(BlogPostRequest request) {
+    public void createOrUpdatePost(BlogPostRequest request) {
         BlogPost blogPost;
         var images = ImageUtils.sortFiles(request.getFiles());
 
@@ -85,19 +82,14 @@ public class BlogPostServiceImpl implements BlogPostService {
                     .build();
         } else {
             blogPost = getById(request.getId());
-            blogPost.setTitle(request.getTitle());
-            blogPost.setContent(request.getContent());
-            blogPost.setHome(request.isHome());
-            blogPost.setFiles(FileMapper.INSTANCE.toEntities(images));
+            blogPost = blogPost.toBuilder()
+                    .title(request.getTitle())
+                    .content(request.getContent())
+                    .home(request.isHome())
+                    .files(FileMapper.INSTANCE.toEntities(images))
+                    .build();
         }
-        blogPost = blogPostRepo.save(blogPost);
-        return BlogPostResponse.builder()
-                .id(blogPost.getId())
-                .title(blogPost.getTitle())
-                .content(blogPost.getContent())
-                .isHome(blogPost.isHome())
-                .createdDate(blogPost.getCreatedDate())
-                .build();
+        blogPostRepo.save(blogPost);
     }
 
     /**
@@ -179,7 +171,7 @@ public class BlogPostServiceImpl implements BlogPostService {
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
     @Override
-    public List<BlogOnHome> getLimitedBlogPosts() {
+    public List<BlogPostResponse> getLimitedBlogPosts() {
         Map<String, Settings> settingsMap = settingsUtil.getSettingsMap();
         if (settingsMap.isEmpty()) {
             return List.of();

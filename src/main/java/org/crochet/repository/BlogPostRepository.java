@@ -1,7 +1,7 @@
 package org.crochet.repository;
 
 import org.crochet.model.BlogPost;
-import org.crochet.payload.response.BlogOnHome;
+import org.crochet.payload.response.BlogPostResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,35 +17,57 @@ import java.util.Optional;
 public interface BlogPostRepository extends JpaRepository<BlogPost, String>, JpaSpecificationExecutor<BlogPost> {
 
     @Query("""
-            select new org.crochet.payload.response.BlogOnHome(p.id, p.title, p.content, f.fileContent, p.createdDate)
-            from BlogPost p
-            left join p.files f
-            where p.home = true
-                and f.order = 0
+            SELECT
+              new org.crochet.payload.response.BlogPostResponse (
+                p.id,
+                p.title,
+                p.content,
+                f.fileContent,
+                p.createdDate
+              )
+            FROM
+              BlogPost p
+              JOIN p.files f WITH f.order = 0
+            WHERE
+              p.home = TRUE
             """)
-    List<BlogOnHome> findLimitedNumPosts(Pageable pageable);
+    List<BlogPostResponse> findLimitedNumPosts(Pageable pageable);
 
     @Query("""
-            select p
-            from BlogPost p
-            left join fetch p.files
-            where p.id = ?1
+            SELECT
+              p
+            FROM
+              BlogPost p
+              LEFT JOIN FETCH p.files
+            WHERE
+              p.id = :id
             """)
-    Optional<BlogPost> getDetail(String id);
+    Optional<BlogPost> getDetail(@Param("id") String id);
 
     @Query("""
-            select new org.crochet.payload.response.BlogOnHome(p.id, p.title, p.content, f.fileContent, p.createdDate)
-            from BlogPost p
-            left join p.files f
-            where p.id in :ids
-                and f.order = 0
+            SELECT
+              new org.crochet.payload.response.BlogPostResponse (
+                p.id,
+                p.title,
+                p.content,
+                f.fileContent,
+                p.createdDate
+              )
+            FROM
+              BlogPost p
+              JOIN p.files f WITH f.order = 0
+            WHERE
+              p.id IN :ids
             """)
-    Page<BlogOnHome> findBlogOnHomeWithIds(@Param("ids") List<String> ids, Pageable pageable);
+    Page<BlogPostResponse> findBlogOnHomeWithIds(@Param("ids") List<String> ids, Pageable pageable);
 
     @Query("""
-            select p.id
-            from BlogPost p
-            order by p.createdDate desc
+            SELECT
+              p.id
+            FROM
+              BlogPost p
+            ORDER BY
+              p.createdDate DESC
             """)
     List<String> getBlogIds(Pageable pageable);
 }

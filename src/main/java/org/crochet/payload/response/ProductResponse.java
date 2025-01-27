@@ -28,4 +28,19 @@ public class ProductResponse {
     private String content;
     private List<FileResponse> images;
     private CategoryResponse category;
+    private String fileContent;
+
+    public ProductResponse(String id,
+                           String name,
+                           String description,
+                           double price,
+                           CurrencyCode currencyCode,
+                           String fileContent) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.price = price;
+        this.currencyCode = currencyCode;
+        this.fileContent = fileContent;
+    }
 }

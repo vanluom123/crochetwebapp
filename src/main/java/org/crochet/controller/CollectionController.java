@@ -9,7 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.crochet.payload.request.UpdateCollectionRequest;
 import org.crochet.payload.response.CollectionResponse;
-import org.crochet.payload.response.FreePatternOnHome;
+import org.crochet.payload.response.FreePatternResponse;
 import org.crochet.payload.response.ResponseData;
 import org.crochet.service.CollectionService;
 import org.springframework.http.HttpStatus;
@@ -157,7 +157,7 @@ public class CollectionController {
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = CollectionResponse.class)))
     @GetMapping("/{collectionId}/free-patterns")
-    public ResponseEntity<List<FreePatternOnHome>> getFreePatternsInCollection(
+    public ResponseEntity<List<FreePatternResponse>> getFreePatternsInCollection(
             @Parameter(description = "Collection ID") @PathVariable("collectionId") String collectionId) {
         var freePatterns = collectionService.getFreePatternsInCollection(collectionId);
         return ResponseEntity.ok(freePatterns);

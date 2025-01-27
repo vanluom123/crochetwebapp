@@ -31,4 +31,39 @@ public class FreePatternResponse {
     private List<FileResponse> images;
     private List<FileResponse> files;
     private CategoryResponse category;
+    private String fileContent;
+
+    public FreePatternResponse(String id,
+                               String name,
+                               String description,
+                               String author,
+                               ChartStatus status,
+                               String fileContent,
+                               String username,
+                               String userAvatar,
+                               String userId) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.author = author;
+        this.status = status;
+        this.fileContent = fileContent;
+        this.userId = userId;
+        this.username = username;
+        this.userAvatar = userAvatar;
+    }
+
+    public FreePatternResponse(String id,
+                               String name,
+                               String description,
+                               String author,
+                               ChartStatus status,
+                               String fileContent) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.author = author;
+        this.status = status;
+        this.fileContent = fileContent;
+    }
 }

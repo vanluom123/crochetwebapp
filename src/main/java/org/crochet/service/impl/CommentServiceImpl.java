@@ -35,7 +35,6 @@ public class CommentServiceImpl implements CommentService {
      * If the request contains an ID, it updates the existing comment with the corresponding ID.
      * If the request does not contain an ID, it creates a new comment.
      *
-     * @param principal The {@link UserPrincipal} containing information about the authenticated user.
      * @param request   The {@link CommentRequest} containing information for creating or updating the comment.
      * @return The {@link CommentResponse} containing information about the created or updated comment.
      * @throws ResourceNotFoundException If an existing comment is to be updated, and the specified ID is not found.
