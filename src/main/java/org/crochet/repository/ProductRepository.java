@@ -48,9 +48,9 @@ public interface ProductRepository extends JpaRepository<Product, String>, JpaSp
             JOIN
             FETCH p.category
             WHERE
-              p.id = ? 1
+              p.id = :id
             """)
-    Optional<Product> findProductById(String id);
+    Optional<Product> findProductById(@Param("id") String id);
 
     @Query("""
             SELECT
@@ -68,7 +68,7 @@ public interface ProductRepository extends JpaRepository<Product, String>, JpaSp
             WITH
               i.order = 0
             WHERE
-              p.id IN:ids
+              p.id IN :ids
             """)
     Page<ProductResponse> findProductWithIds(@Param("ids") List<String> ids, Pageable pageable);
 

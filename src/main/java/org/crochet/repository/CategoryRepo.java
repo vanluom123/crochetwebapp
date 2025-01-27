@@ -14,18 +14,26 @@ import java.util.Optional;
 public interface CategoryRepo extends JpaRepository<Category, String> {
 
     @Query("""
-            select (count(c.id) > 0)
-            from Category c
-            where c.name = ?1 and c.parent is null
+            SELECT
+              (count(c.id) > 0)
+            FROM
+              Category c
+            WHERE
+              c.name = :name
+              AND c.parent IS NULL
             """)
-    boolean existsByNameAndParentIsNull(String name);
+    boolean existsByNameAndParentIsNull(@Param("name") String name);
 
     @Query("""
-            select (count(c.id) > 0)
-            from Category c
-            where c.name = ?1 and c.parent is not null
+            SELECT
+              (count(c.id) > 0)
+            FROM
+              Category c
+            WHERE
+              c.name = :name
+              AND c.parent IS NOT NULL
             """)
-    boolean existsByNameAndParentIsNotNull(String name);
+    boolean existsByNameAndParentIsNotNull(@Param("name") String name);
 
     @EntityGraph(attributePaths = {"children"})
     @Query("select c from Category c")
@@ -33,17 +41,23 @@ public interface CategoryRepo extends JpaRepository<Category, String> {
 
     @EntityGraph(attributePaths = {"children"})
     @Query("""
-            select c
-            from Category c
-            where c.id in :ids
+            SELECT
+              c
+            FROM
+              Category c
+            WHERE
+              c.id IN :ids
             """)
     List<Category> findCategoriesByIds(@Param("ids") String... ids);
 
     @EntityGraph(attributePaths = {"children"})
     @Query("""
-            select c
-            from Category c
-            where c.id = :id
+            SELECT
+              c
+            FROM
+              Category c
+            WHERE
+              c.id = :id
             """)
     Optional<Category> findCategoryById(@Param("id") String id);
 }

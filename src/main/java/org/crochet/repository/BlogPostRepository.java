@@ -42,7 +42,7 @@ public interface BlogPostRepository extends JpaRepository<BlogPost, String>, Jpa
             WHERE
               p.id = :id
             """)
-    Optional<BlogPost> getDetail(String id);
+    Optional<BlogPost> getDetail(@Param("id") String id);
 
     @Query("""
             SELECT
