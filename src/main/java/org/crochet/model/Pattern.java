@@ -28,7 +28,7 @@ import java.util.Set;
 @Setter
 @Entity
 @Table(name = "pattern")
-@SuperBuilder
+@SuperBuilder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class Pattern extends BaseEntity {

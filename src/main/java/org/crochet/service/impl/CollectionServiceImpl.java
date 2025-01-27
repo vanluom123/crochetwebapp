@@ -9,7 +9,7 @@ import org.crochet.model.Collection;
 import org.crochet.model.FreePattern;
 import org.crochet.payload.request.UpdateCollectionRequest;
 import org.crochet.payload.response.CollectionResponse;
-import org.crochet.payload.response.FreePatternOnHome;
+import org.crochet.payload.response.FreePatternResponse;
 import org.crochet.repository.ColFrepRepo;
 import org.crochet.repository.CollectionRepo;
 import org.crochet.repository.FreePatternRepository;
@@ -192,7 +192,7 @@ public class CollectionServiceImpl implements CollectionService {
         var freps = col.getColfreps().stream()
                 .map(colFrep -> {
                     var frep = colFrep.getFreePattern();
-                    return new FreePatternOnHome(frep.getId(),
+                    return new FreePatternResponse(frep.getId(),
                             frep.getName(),
                             frep.getDescription(),
                             frep.getAuthor(),
@@ -239,7 +239,7 @@ public class CollectionServiceImpl implements CollectionService {
      * @return list of free patterns
      */
     @Override
-    public List<FreePatternOnHome> getFreePatternsInCollection(String collectionId) {
+    public List<FreePatternResponse> getFreePatternsInCollection(String collectionId) {
         var user = SecurityUtils.getCurrentUser();
         if (user == null) {
             throw new ResourceNotFoundException(MSG_USER_NOT_FOUND,

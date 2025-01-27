@@ -26,4 +26,17 @@ public class BlogPostResponse {
     private List<FileResponse> files;
     @JsonFormat(pattern = AppConstant.DATE_PATTERN)
     private LocalDateTime createdDate;
+    private String fileContent;
+
+    public BlogPostResponse(String id,
+                      String title,
+                      String content,
+                      String fileContent,
+                      LocalDateTime createdDate) {
+        this.id = id;
+        this.title = title;
+        this.content = content;
+        this.fileContent = fileContent;
+        this.createdDate = createdDate;
+    }
 }

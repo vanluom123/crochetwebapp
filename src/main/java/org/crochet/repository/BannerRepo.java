@@ -8,9 +8,13 @@ import java.util.List;
 
 public interface BannerRepo extends JpaRepository<Banner, String> {
     @Query("""
-                select b from Banner b
-                join fetch b.bannerType
-                where b.active = true
+            SELECT
+              b
+            FROM
+              Banner b
+              JOIN FETCH b.bannerType
+            WHERE
+              b.active = TRUE
             """)
     List<Banner> findActiveBanners();
 }

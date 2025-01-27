@@ -28,7 +28,7 @@ import java.util.List;
 @Setter
 @Entity
 @Table(name = "blog_post")
-@SuperBuilder
+@SuperBuilder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class BlogPost extends BaseEntity {
