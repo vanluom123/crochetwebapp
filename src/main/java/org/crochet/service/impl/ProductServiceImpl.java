@@ -10,7 +10,6 @@ import org.crochet.model.Product;
 import org.crochet.model.Settings;
 import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.ProductRequest;
-import org.crochet.payload.response.ProductOnHome;
 import org.crochet.payload.response.ProductPaginationResponse;
 import org.crochet.payload.response.ProductResponse;
 import org.crochet.repository.CategoryRepo;
@@ -19,10 +18,10 @@ import org.crochet.repository.ProductRepository;
 import org.crochet.service.ProductService;
 import org.crochet.util.ImageUtils;
 import org.crochet.util.SettingsUtil;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -109,20 +108,25 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductPaginationResponse getProducts(int pageNo, int pageSize, String sortBy, String sortDir,
                                                  Filter[] filters) {
-        Specification<Product> spec = Specification.where(null);
+        List<String> prodIds = Collections.emptyList();
+
         if (filters != null && filters.length > 0) {
             GenericFilter<Product> filter = GenericFilter.create(filters);
-            spec = filter.build();
+            var spec = filter.build();
+            prodIds = productRepo.findAll(spec)
+                    .stream()
+                    .map(Product::getId)
+                    .toList();
         }
-
-        var prodIds = productRepo.findAll(spec)
-                .stream()
-                .map(Product::getId)
-                .toList();
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
-        var menuPage = productRepo.findProductOnHomeWithIds(prodIds, pageable);
+        Page<ProductResponse> menuPage;
+        if (prodIds.isEmpty()) {
+            menuPage = productRepo.findProductWithPageable(pageable);
+        } else {
+            menuPage = productRepo.findProductWithIds(prodIds, pageable);
+        }
 
         return ProductPaginationResponse.builder()
                 .contents(menuPage.getContent())
@@ -154,7 +158,7 @@ public class ProductServiceImpl implements ProductService {
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
     @Override
-    public List<ProductOnHome> getLimitedProducts() {
+    public List<ProductResponse> getLimitedProducts() {
         Map<String, Settings> settingsMap = settingsUtil.getSettingsMap();
         if (settingsMap.isEmpty()) {
             return Collections.emptyList();
@@ -183,7 +187,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional(readOnly = true)
     public ProductResponse getDetail(String id) {
-        var product = productRepo.getDetail(id).orElseThrow(
+        var product = productRepo.findProductById(id).orElseThrow(
                 () -> new ResourceNotFoundException(MessageConstant.MSG_PRODUCT_NOT_FOUND,
                         MAP_CODE.get(MessageConstant.MSG_PRODUCT_NOT_FOUND)));
         return ProductMapper.INSTANCE.toResponse(product);
