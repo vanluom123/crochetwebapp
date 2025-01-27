@@ -16,5 +16,5 @@ public class HomeResponse {
     private List<PatternResponse> patterns;
     private List<FreePatternResponse> freePatterns;
     private List<BannerResponse> banners;
-    private List<BlogOnHome> blogs;
+    private List<BlogPostResponse> blogs;
 }
