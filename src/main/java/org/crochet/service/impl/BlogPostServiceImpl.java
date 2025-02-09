@@ -64,7 +64,6 @@ public class BlogPostServiceImpl implements BlogPostService {
     @Override
     public void createOrUpdatePost(BlogPostRequest request) {
         BlogPost blogPost;
-        var images = ImageUtils.sortFiles(request.getFiles());
 
         if (!StringUtils.hasText(request.getId())) {
             BlogCategory blogCategory = null;
@@ -73,6 +72,7 @@ public class BlogPostServiceImpl implements BlogPostService {
                         .orElseThrow(() -> new ResourceNotFoundException(MessageConstant.MSG_BLOG_CATEGORY_NOT_FOUND,
                                 MAP_CODE.get(MessageConstant.MSG_BLOG_CATEGORY_NOT_FOUND)));
             }
+            var images = ImageUtils.sortFiles(request.getFiles());
             blogPost = BlogPost.builder()
                     .blogCategory(blogCategory)
                     .title(request.getTitle())
@@ -82,12 +82,7 @@ public class BlogPostServiceImpl implements BlogPostService {
                     .build();
         } else {
             blogPost = getById(request.getId());
-            blogPost = blogPost.toBuilder()
-                    .title(request.getTitle())
-                    .content(request.getContent())
-                    .home(request.isHome())
-                    .files(FileMapper.INSTANCE.toEntities(images))
-                    .build();
+            blogPost = BlogPostMapper.INSTANCE.partialUpdate(request, blogPost);
         }
         blogPostRepo.save(blogPost);
     }
