@@ -53,13 +53,13 @@ public class PatternServiceImpl implements PatternService {
     @Override
     public void createOrUpdate(PatternRequest request) {
         Pattern pattern;
-        var images = ImageUtils.sortFiles(request.getImages());
-        var files = ImageUtils.sortFiles(request.getFiles());
 
         if (!StringUtils.hasText(request.getId())) {
             var category = categoryRepo.findById(request.getCategoryId()).orElseThrow(
                     () -> new ResourceNotFoundException(MessageConstant.MSG_CATEGORY_NOT_FOUND,
                             MAP_CODE.get(MessageConstant.MSG_CATEGORY_NOT_FOUND)));
+            var images = ImageUtils.sortFiles(request.getImages());
+            var files = ImageUtils.sortFiles(request.getFiles());
             pattern = Pattern.builder()
                     .category(category)
                     .name(request.getName())
@@ -76,17 +76,7 @@ public class PatternServiceImpl implements PatternService {
             pattern = patternRepo.findById(request.getId()).orElseThrow(
                     () -> new ResourceNotFoundException(MessageConstant.MSG_PATTERN_NOT_FOUND,
                             MAP_CODE.get(MessageConstant.MSG_PATTERN_NOT_FOUND)));
-            pattern = pattern.toBuilder()
-                    .name(request.getName())
-                    .description(request.getDescription())
-                    .price(request.getPrice())
-                    .currencyCode(request.getCurrencyCode())
-                    .isHome(request.isHome())
-                    .link(request.getLink())
-                    .content(request.getContent())
-                    .files(FileMapper.INSTANCE.toSetEntities(files))
-                    .images(FileMapper.INSTANCE.toEntities(images))
-                    .build();
+            pattern = PatternMapper.INSTANCE.partialUpdate(request, pattern);
         }
 
         patternRepo.save(pattern);

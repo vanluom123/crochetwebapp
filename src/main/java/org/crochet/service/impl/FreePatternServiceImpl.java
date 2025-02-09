@@ -8,6 +8,7 @@ import org.crochet.exception.AccessDeniedException;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.CategoryMapper;
 import org.crochet.mapper.FileMapper;
+import org.crochet.mapper.FreePatternMapper;
 import org.crochet.model.FreePattern;
 import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.FreePatternRequest;
@@ -60,14 +61,12 @@ public class FreePatternServiceImpl implements FreePatternService {
     @Override
     public void createOrUpdate(FreePatternRequest request) {
         FreePattern freePattern;
-        var sortedImages = ImageUtils.sortFiles(request.getImages());
-        var sortedFiles = ImageUtils.sortFiles(request.getFiles());
-
         if (!StringUtils.hasText(request.getId())) {
             var category = categoryRepo.findCategoryById(request.getCategoryId())
                     .orElseThrow(() -> new ResourceNotFoundException(MessageConstant.MSG_CATEGORY_NOT_FOUND,
                             MAP_CODE.get(MessageConstant.MSG_CATEGORY_NOT_FOUND)));
-
+            var sortedImages = ImageUtils.sortFiles(request.getImages());
+            var sortedFiles = ImageUtils.sortFiles(request.getFiles());
             freePattern = FreePattern.builder()
                     .category(category)
                     .name(request.getName())
@@ -84,17 +83,7 @@ public class FreePatternServiceImpl implements FreePatternService {
             freePattern = freePatternRepo.findById(request.getId()).orElseThrow(
                     () -> new ResourceNotFoundException(MessageConstant.MSG_FREE_PATTERN_NOT_FOUND,
                             MAP_CODE.get(MessageConstant.MSG_FREE_PATTERN_NOT_FOUND)));
-            freePattern = freePattern.toBuilder()
-                    .name(request.getName())
-                    .description(request.getDescription())
-                    .author(request.getAuthor())
-                    .isHome(request.isHome())
-                    .link(request.getLink())
-                    .content(request.getContent())
-                    .status(request.getStatus())
-                    .files(FileMapper.INSTANCE.toSetEntities(sortedFiles))
-                    .images(FileMapper.INSTANCE.toEntities(sortedImages))
-                    .build();
+            freePattern = FreePatternMapper.INSTANCE.update(request, freePattern);
         }
         freePatternRepo.save(freePattern);
     }

@@ -58,13 +58,12 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void createOrUpdate(ProductRequest request) {
         Product product;
-        var images = ImageUtils.sortFiles(request.getImages());
-
         if (!StringUtils.hasText(request.getId())) {
             var category = categoryRepo.findById(request.getCategoryId()).orElseThrow(
                     () -> new ResourceNotFoundException(MessageConstant.MSG_CATEGORY_NOT_FOUND,
                             MAP_CODE.get(MessageConstant.MSG_CATEGORY_NOT_FOUND)));
 
+            var images = ImageUtils.sortFiles(request.getImages());
             product = Product.builder()
                     .category(category)
                     .name(request.getName())
@@ -80,15 +79,7 @@ public class ProductServiceImpl implements ProductService {
             product = productRepo.findById(request.getId())
                     .orElseThrow(() -> new ResourceNotFoundException(MessageConstant.MSG_PRODUCT_NOT_FOUND,
                             MAP_CODE.get(MessageConstant.MSG_PRODUCT_NOT_FOUND)));
-            product = product.toBuilder()
-                    .name(request.getName())
-                    .description(request.getDescription())
-                    .price(request.getPrice())
-                    .currencyCode(request.getCurrencyCode())
-                    .isHome(request.isHome())
-                    .link(request.getLink())
-                    .images(FileMapper.INSTANCE.toEntities(images))
-                    .build();
+            product = ProductMapper.INSTANCE.update(request, product);
         }
         productRepo.save(product);
     }

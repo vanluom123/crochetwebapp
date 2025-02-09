@@ -51,7 +51,7 @@ public class CategoryController {
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ResponseData.class))})
     })
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @SecurityRequirement(name = "BearerAuth")
     @PostMapping("/create")
     public ResponseEntity<List<CategoryResponse>> create(@Valid @RequestBody CategoryCreationRequest request) {
@@ -72,7 +72,7 @@ public class CategoryController {
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ResponseData.class))})
     })
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @SecurityRequirement(name = "BearerAuth")
     @PutMapping("/update")
     public ResponseEntity<CategoryResponse> update(@Valid @RequestBody CategoryUpdateRequest request) {
@@ -106,7 +106,7 @@ public class CategoryController {
     @ApiResponse(responseCode = "400", description = "Bad request",
             content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ResponseData.class))})
     @DeleteMapping("/delete")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @SecurityRequirement(name = "BearerAuth")
     public ResponseData<String> delete(@RequestParam String id) {
         categoryService.delete(id);
