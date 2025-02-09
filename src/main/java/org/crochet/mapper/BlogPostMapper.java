@@ -3,6 +3,7 @@ package org.crochet.mapper;
 import org.crochet.model.BlogPost;
 import org.crochet.payload.request.BlogPostRequest;
 import org.crochet.payload.response.BlogPostResponse;
+import org.crochet.util.ImageUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
@@ -28,5 +29,26 @@ public interface BlogPostMapper extends PartialUpdate<BlogPost, BlogPostRequest>
                         .map(this::toResponse)
                         .toList())
                 .orElse(null);
+    }
+
+    @Override
+    default BlogPost partialUpdate(BlogPostRequest request, BlogPost post) {
+        if (post == null) {
+            return null;
+        }
+        if (request.getTitle() != null) {
+            post.setTitle(request.getTitle());
+        }
+        if (request.getContent() != null) {
+            post.setContent(request.getContent());
+        }
+        if (request.isHome() != post.isHome()) {
+            post.setHome(request.isHome());
+        }
+        if (request.getFiles() != null) {
+            var sortedFiles = ImageUtils.sortFiles(request.getFiles());
+            post.setFiles(FileMapper.INSTANCE.toEntities(sortedFiles));
+        }
+        return post;
     }
 }
