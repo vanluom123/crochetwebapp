@@ -8,7 +8,6 @@ import org.crochet.model.ColFrep;
 import org.crochet.model.Collection;
 import org.crochet.model.FreePattern;
 import org.crochet.payload.response.CollectionResponse;
-import org.crochet.payload.response.FreePatternResponse;
 import org.crochet.repository.ColFrepRepo;
 import org.crochet.repository.CollectionRepo;
 import org.crochet.repository.FreePatternRepository;
@@ -139,27 +138,9 @@ public class CollectionServiceImpl implements CollectionService {
      */
     @Override
     public CollectionResponse getCollectionById(String collectionId) {
-        var col = collectionRepo.findColById(collectionId)
+        return collectionRepo.getColById(collectionId)
                 .orElseThrow(() -> new ResourceNotFoundException(MSG_COLLECTION_NOT_FOUND,
                         MAP_CODE.get(MSG_COLLECTION_NOT_FOUND)));
-
-        var freps = col.getColfreps().stream()
-                .map(colFrep -> {
-                    var frep = colFrep.getFreePattern();
-                    return new FreePatternResponse(frep.getId(),
-                            frep.getName(),
-                            frep.getDescription(),
-                            frep.getAuthor(),
-                            frep.getStatus(),
-                            frep.getImages().getFirst().getFileContent());
-                })
-                .toList();
-
-        return new CollectionResponse(col.getId(),
-                col.getName(),
-                col.getAvatar(),
-                col.getColfreps().size(),
-                freps);
     }
 
     @Override
