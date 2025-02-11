@@ -10,13 +10,21 @@ import org.crochet.constant.AppConstant;
 import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.FreePatternRequest;
 import org.crochet.payload.response.FreePatternResponse;
-import org.crochet.payload.response.PaginatedFreePatternResponse;
+import org.crochet.payload.response.PaginationResponse;
 import org.crochet.payload.response.ResponseData;
 import org.crochet.service.FreePatternService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -105,18 +113,18 @@ public class FreePatternController {
     @Operation(summary = "Get paginated list of patterns")
     @ApiResponse(responseCode = "200", description = "List of free patterns",
             content = @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = PaginatedFreePatternResponse.class)))
+                    schema = @Schema(implementation = PaginationResponse.class)))
     @PostMapping("/pagination")
-    public ResponseEntity<PaginatedFreePatternResponse> getAllFreePatterns(
+    public ResponseEntity<PaginationResponse<FreePatternResponse>> getAllFreePatterns(
             @Parameter(description = "Page number (default: 0)")
             @RequestParam(value = "pageNo", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER,
                     required = false) int pageNo,
-            @Parameter(description = "Page size (default: 10)")
+            @Parameter(description = "Page size (default: 48)")
             @RequestParam(value = "pageSize", defaultValue = AppConstant.DEFAULT_PAGE_SIZE,
                     required = false) int pageSize,
-            @Parameter(description = "Sort by field (default: id)")
+            @Parameter(description = "Sort by field (default: createdDate)")
             @RequestParam(value = "sortBy", defaultValue = AppConstant.DEFAULT_SORT_BY, required = false) String sortBy,
-            @Parameter(description = "Sort direction (default: ASC)")
+            @Parameter(description = "Sort direction (default: DESC)")
             @RequestParam(value = "sortDir", defaultValue = AppConstant.DEFAULT_SORT_DIRECTION,
                     required = false) String sortDir,
             @Parameter(description = "List filters")

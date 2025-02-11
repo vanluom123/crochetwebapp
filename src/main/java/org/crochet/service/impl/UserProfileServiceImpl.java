@@ -44,7 +44,7 @@ public class UserProfileServiceImpl implements UserProfileService {
                         MAP_CODE.get(MessageConstant.MSG_USER_NOT_FOUND)));
 
         // Get collections by user id
-        var collections = colRepo.getCollectionsByUserId(user.getId());
+        var collections = colRepo.getAllByUserId(user.getId());
 
         // Get recent comments by user id
         List<CommentResponse> recentComments = commentRepo.getRecentCommentsByUserId(user.getId());
@@ -52,8 +52,7 @@ public class UserProfileServiceImpl implements UserProfileService {
         // Get user profile
         var userProfile = user.getUserProfile();
         if (userProfile == null) {
-            userProfile = UserProfile.builder()
-                    .build();
+            userProfile = new UserProfile();
         }
 
         return UserProfileResponse.builder()

@@ -5,12 +5,13 @@ import org.crochet.enumerator.AuthProvider;
 import org.crochet.enumerator.RoleType;
 import org.crochet.exception.BadRequestException;
 import org.crochet.exception.ResourceNotFoundException;
+import org.crochet.mapper.PaginationMapper;
 import org.crochet.mapper.UserMapper;
 import org.crochet.model.User;
 import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.SignUpRequest;
 import org.crochet.payload.request.UserUpdateRequest;
-import org.crochet.payload.response.UserPaginationResponse;
+import org.crochet.payload.response.PaginationResponse;
 import org.crochet.payload.response.UserResponse;
 import org.crochet.repository.GenericFilter;
 import org.crochet.repository.UserRepository;
@@ -39,11 +40,11 @@ public class UserServiceImpl implements UserService {
     /**
      * Constructor for the UserServiceImpl class.
      *
-     * @param userRepository   The repository for the User entity.
+     * @param userRepository  The repository for the User entity.
      * @param passwordEncoder The password encoder.
      */
     public UserServiceImpl(UserRepository userRepository,
-            PasswordEncoder passwordEncoder) {
+                           PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
@@ -85,10 +86,10 @@ public class UserServiceImpl implements UserService {
      *                 'DESC' for descending.
      * @param filters  The list of filters.
      * @return A UserPaginationResponse object containing the retrieved records and
-     *         pagination details.
+     * pagination details.
      */
     @Override
-    public UserPaginationResponse getAll(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters) {
+    public PaginationResponse<UserResponse> getAll(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters) {
         Specification<User> spec = Specification.where(null);
         if (filters != null && filters.length > 0) {
             GenericFilter<User> filter = GenericFilter.create(filters);
@@ -99,15 +100,7 @@ public class UserServiceImpl implements UserService {
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
         Page<User> page = userRepository.findAll(spec, pageable);
         List<UserResponse> users = UserMapper.INSTANCE.toResponses(page.getContent());
-
-        return UserPaginationResponse.builder()
-                .contents(users)
-                .pageNo(pageNo)
-                .totalElements(page.getTotalElements())
-                .totalPages(page.getTotalPages())
-                .pageSize(page.getSize())
-                .last(page.isLast())
-                .build();
+        return PaginationMapper.getInstance().toPagination(page, users);
     }
 
     /**

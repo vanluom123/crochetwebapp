@@ -5,13 +5,14 @@ import org.crochet.constant.MessageConstant;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.BlogPostMapper;
 import org.crochet.mapper.FileMapper;
+import org.crochet.mapper.PaginationMapper;
 import org.crochet.model.BlogCategory;
 import org.crochet.model.BlogPost;
 import org.crochet.model.Settings;
 import org.crochet.payload.request.BlogPostRequest;
 import org.crochet.payload.request.Filter;
-import org.crochet.payload.response.BlogPostPaginationResponse;
 import org.crochet.payload.response.BlogPostResponse;
+import org.crochet.payload.response.PaginationResponse;
 import org.crochet.repository.BlogCategoryRepo;
 import org.crochet.repository.BlogPostRepository;
 import org.crochet.repository.GenericFilter;
@@ -96,12 +97,12 @@ public class BlogPostServiceImpl implements BlogPostService {
      * @param sortDir  The sorting direction, either "ASC" (ascending) or "DESC"
      *                 (descending).
      * @param filters  The list of filters.
-     * @return A {@link BlogPostPaginationResponse} containing the paginated list of
+     * @return A {@link org.crochet.payload.response.PaginationResponse} containing the paginated list of
      * blog posts.
      */
     @Override
-    public BlogPostPaginationResponse getBlogs(int pageNo, int pageSize, String sortBy, String sortDir,
-                                               Filter[] filters) {
+    public PaginationResponse<BlogPostResponse> getBlogs(int pageNo, int pageSize, String sortBy, String sortDir,
+                                       Filter[] filters) {
         Specification<BlogPost> spec = Specification.where(null);
         if (filters != null && filters.length > 0) {
             GenericFilter<BlogPost> filter = GenericFilter.create(filters);
@@ -118,14 +119,7 @@ public class BlogPostServiceImpl implements BlogPostService {
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
         var page = blogPostRepo.findBlogOnHomeWithIds(blogIds, pageable);
 
-        return BlogPostPaginationResponse.builder()
-                .contents(page.getContent())
-                .pageNo(page.getNumber())
-                .totalElements(page.getTotalElements())
-                .totalPages(page.getTotalPages())
-                .pageSize(page.getSize())
-                .last(page.isLast())
-                .build();
+        return PaginationMapper.getInstance().toPagination(page);
     }
 
     /**
