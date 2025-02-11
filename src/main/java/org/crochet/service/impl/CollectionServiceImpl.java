@@ -24,6 +24,7 @@ import static org.crochet.constant.MessageConstant.MSG_COLLECTION_NOT_FOUND;
 import static org.crochet.constant.MessageConstant.MSG_FREE_PATTERN_NOT_FOUND;
 import static org.crochet.constant.MessageConstant.MSG_NO_PERMISSION_DELETE_COLLECTION;
 import static org.crochet.constant.MessageConstant.MSG_NO_PERMISSION_MODIFY_COLLECTION;
+import static org.crochet.constant.MessageConstant.MSG_NO_PERMISSION_REMOVE_FREE_PATTERN_FROM_COLLECTION;
 import static org.crochet.constant.MessageConstant.MSG_USER_NOT_FOUND;
 
 @Service
@@ -128,6 +129,18 @@ public class CollectionServiceImpl implements CollectionService {
      */
     @Override
     public void removeFreePatternFromCollection(String freePatternId) {
+        var user = SecurityUtils.getCurrentUser();
+        if (user == null) {
+            throw new ResourceNotFoundException(MSG_USER_NOT_FOUND,
+                    MAP_CODE.get(MSG_USER_NOT_FOUND));
+        }
+        var freePattern = freePatternRepository.findFrepById(freePatternId)
+                .orElseThrow(() -> new ResourceNotFoundException(MSG_FREE_PATTERN_NOT_FOUND,
+                        MAP_CODE.get(MSG_FREE_PATTERN_NOT_FOUND)));
+        if (!Objects.equals(freePattern.getCreatedBy(), user.getId())) {
+            throw new AccessDeniedException(MSG_NO_PERMISSION_REMOVE_FREE_PATTERN_FROM_COLLECTION,
+                    MAP_CODE.get(MSG_NO_PERMISSION_REMOVE_FREE_PATTERN_FROM_COLLECTION));
+        }
         colFrepRepo.removeByFreePattern(freePatternId);
     }
 

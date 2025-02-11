@@ -62,6 +62,7 @@ public class MessageCodeConstant {
         MAP_CODE.put(MessageConstant.MSG_NO_PERMISSION_MODIFY_COLLECTION, 72);
         MAP_CODE.put(MessageConstant.MSG_NO_PERMISSION_VIEW_COLLECTION, 73);
         MAP_CODE.put(MessageConstant.MSG_NO_PERMISSION_DELETE_COLLECTION, 74);
+        MAP_CODE.put(MessageConstant.MSG_NO_PERMISSION_REMOVE_FREE_PATTERN_FROM_COLLECTION, 75);
     }
 
     private MessageCodeConstant() {

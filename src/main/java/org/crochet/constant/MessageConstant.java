@@ -60,6 +60,7 @@ public class MessageConstant {
     public static final String MSG_NO_PERMISSION_MODIFY_COLLECTION = "You don't have permission to modify this collection";
     public static final String MSG_NO_PERMISSION_VIEW_COLLECTION = "You don't have permission to view this collection";
     public static final String MSG_NO_PERMISSION_DELETE_COLLECTION = "You don't have permission to delete this collection";
+    public static final String MSG_NO_PERMISSION_REMOVE_FREE_PATTERN_FROM_COLLECTION = "You don't have permission to remove free pattern from collection";
 
     private MessageConstant() {
     }
