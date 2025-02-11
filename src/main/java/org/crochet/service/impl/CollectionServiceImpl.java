@@ -22,6 +22,7 @@ import java.util.Objects;
 import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
 import static org.crochet.constant.MessageConstant.MSG_COLLECTION_NOT_FOUND;
 import static org.crochet.constant.MessageConstant.MSG_FREE_PATTERN_NOT_FOUND;
+import static org.crochet.constant.MessageConstant.MSG_NO_PERMISSION_DELETE_COLLECTION;
 import static org.crochet.constant.MessageConstant.MSG_NO_PERMISSION_MODIFY_COLLECTION;
 import static org.crochet.constant.MessageConstant.MSG_USER_NOT_FOUND;
 
@@ -165,12 +166,12 @@ public class CollectionServiceImpl implements CollectionService {
         }
 
         var col = collectionRepo.findColById(collectionId)
-                .orElseThrow(() -> new AccessDeniedException(MSG_NO_PERMISSION_MODIFY_COLLECTION,
-                        MAP_CODE.get(MSG_NO_PERMISSION_MODIFY_COLLECTION)));
+                .orElseThrow(() -> new ResourceNotFoundException(MSG_COLLECTION_NOT_FOUND,
+                        MAP_CODE.get(MSG_COLLECTION_NOT_FOUND)));
 
         if (!Objects.equals(col.getUser().getId(), user.getId())) {
-            throw new AccessDeniedException(MSG_NO_PERMISSION_MODIFY_COLLECTION,
-                    MAP_CODE.get(MSG_NO_PERMISSION_MODIFY_COLLECTION));
+            throw new AccessDeniedException(MSG_NO_PERMISSION_DELETE_COLLECTION,
+                    MAP_CODE.get(MSG_NO_PERMISSION_DELETE_COLLECTION));
         }
 
         collectionRepo.delete(col);

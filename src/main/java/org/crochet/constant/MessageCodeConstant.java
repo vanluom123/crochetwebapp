@@ -61,6 +61,7 @@ public class MessageCodeConstant {
         MAP_CODE.put(MessageConstant.MSG_NOT_AUTHENTICATED, 71);
         MAP_CODE.put(MessageConstant.MSG_NO_PERMISSION_MODIFY_COLLECTION, 72);
         MAP_CODE.put(MessageConstant.MSG_NO_PERMISSION_VIEW_COLLECTION, 73);
+        MAP_CODE.put(MessageConstant.MSG_NO_PERMISSION_DELETE_COLLECTION, 74);
     }
 
     private MessageCodeConstant() {
