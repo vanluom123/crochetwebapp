@@ -1,5 +1,6 @@
 package org.crochet.payload.request;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
@@ -21,6 +22,7 @@ public class FreePatternRequest {
     private boolean isHome;
     private String link;
     private String content;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private ChartStatus status;
     private List<FileResponse> images;
     private List<FileResponse> files;

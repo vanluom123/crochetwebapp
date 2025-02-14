@@ -9,11 +9,13 @@ import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.CategoryMapper;
 import org.crochet.mapper.FileMapper;
 import org.crochet.mapper.FreePatternMapper;
+import org.crochet.mapper.PaginationMapper;
 import org.crochet.model.FreePattern;
 import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.FreePatternRequest;
+import org.crochet.payload.request.PaginationRequest;
 import org.crochet.payload.response.FreePatternResponse;
-import org.crochet.payload.response.PaginatedFreePatternResponse;
+import org.crochet.payload.response.PaginationResponse;
 import org.crochet.repository.CategoryRepo;
 import org.crochet.repository.FreePatternRepoCustom;
 import org.crochet.repository.FreePatternRepository;
@@ -80,7 +82,7 @@ public class FreePatternServiceImpl implements FreePatternService {
                     .link(request.getLink())
                     .content(request.getContent())
                     .status(request.getStatus())
-                    .files(FileMapper.INSTANCE.toSetEntities(sortedFiles))
+                    .files(FileMapper.INSTANCE.toEntities(sortedFiles))
                     .images(FileMapper.INSTANCE.toEntities(sortedImages))
                     .build();
         } else {
@@ -104,7 +106,7 @@ public class FreePatternServiceImpl implements FreePatternService {
      */
     @Transactional(readOnly = true)
     @Override
-    public PaginatedFreePatternResponse getAllFreePatterns(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters) {
+    public PaginationResponse<FreePatternResponse> getAllFreePatterns(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters) {
         List<String> freePatternIds = new ArrayList<>();
         var pageable = preparePageableAndFilter(pageNo, pageSize, sortBy, sortDir, filters, freePatternIds);
 
@@ -115,14 +117,7 @@ public class FreePatternServiceImpl implements FreePatternService {
             page = freePatternRepo.getFrepByIds(freePatternIds, pageable);
         }
 
-        return PaginatedFreePatternResponse.builder()
-                .contents(page.getContent())
-                .pageNo(page.getNumber())
-                .pageSize(page.getSize())
-                .totalElements(page.getTotalElements())
-                .totalPages(page.getTotalPages())
-                .last(page.isLast())
-                .build();
+        return PaginationMapper.getInstance().toPagination(page);
     }
 
     /**
@@ -135,28 +130,15 @@ public class FreePatternServiceImpl implements FreePatternService {
      * @param sortDir  the direction to sort the results (e.g., "asc" or "desc")
      * @param filters  an array of filter conditions to apply to the query, can be null or empty
      * @param userId   the ID of the user whose free patterns are to be retrieved
-     * @return a {@link PaginatedFreePatternResponse} containing the paginated and filtered list of free patterns
+     * @return a {@link PaginationResponse} containing the paginated and filtered list of free patterns
      */
     @Transactional(readOnly = true)
     @Override
-    public PaginatedFreePatternResponse getAllByUser(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters, String userId) {
+    public PaginationResponse<FreePatternResponse> getAllByUser(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters, String userId) {
         List<String> freePatternIds = new ArrayList<>();
         var pageable = preparePageableAndFilter(pageNo, pageSize, sortBy, sortDir, filters, freePatternIds);
-        Page<FreePatternResponse> page;
-        if(freePatternIds.isEmpty()) {
-            page = freePatternRepo.getByUserWithPageable(userId, pageable);
-        } else {
-            page = freePatternRepo.getByUserAndIds(userId, freePatternIds, pageable);
-        }
-
-        return PaginatedFreePatternResponse.builder()
-                .contents(page.getContent())
-                .pageNo(page.getNumber())
-                .pageSize(page.getSize())
-                .totalElements(page.getTotalElements())
-                .totalPages(page.getTotalPages())
-                .last(page.isLast())
-                .build();
+        var page = freePatternRepo.getByUserAndIds(userId, freePatternIds, pageable);
+        return PaginationMapper.getInstance().toPagination(page);
     }
 
     /**
@@ -283,6 +265,35 @@ public class FreePatternServiceImpl implements FreePatternService {
         } else {
             freePatternRepo.deleteAllByIdAndCreatedBy(ids, currentUser.getEmail());
         }
+    }
+
+    /**
+     * Get free patterns by create by
+     *
+     * @return List of FreePatternOnHome
+     */
+    @Override
+    public List<FreePatternResponse> getFrepsByCreateBy(String userId) {
+        if (!userRepo.existsById(userId)) {
+            throw new ResourceNotFoundException(MessageConstant.MSG_USER_NOT_FOUND,
+                    MAP_CODE.get(MessageConstant.MSG_USER_NOT_FOUND));
+        }
+        return freePatternRepo.getFrepsByCreateByWithUser(userId);
+    }
+
+    /**
+     * Get free patterns by collection id
+     *
+     * @param collectionId      String
+     * @param paginationRequest PaginationRequest
+     * @return PaginationResponse
+     */
+    @Override
+    public PaginationResponse<FreePatternResponse> getFrepsByCollectionId(String collectionId,
+                                                                          PaginationRequest paginationRequest) {
+        var pageable = paginationRequest.getPageable();
+        var frepResponse = freePatternRepo.getFrepsByCollection(collectionId, pageable);
+        return PaginationMapper.getInstance().toPagination(frepResponse);
     }
 
     /**

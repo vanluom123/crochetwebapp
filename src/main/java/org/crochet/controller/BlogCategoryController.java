@@ -14,11 +14,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+
+import static org.crochet.constant.AppConstant.SUCCESS;
 
 @RestController
 @RequestMapping("/blog-categories")
@@ -36,23 +39,31 @@ public class BlogCategoryController {
         return ResponseData.<String>builder()
                 .success(true)
                 .code(HttpStatus.OK.value())
-                .message("Create or update success")
+                .message(SUCCESS)
                 .data("Create or update success")
                 .build();
     }
 
-    @DeleteMapping("/delete/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping("/delete")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @SecurityRequirement(name = "BearerAuth")
-    public void deleteBlogCategory(@PathVariable String id) {
+    public ResponseData<String> delete(@RequestParam("id") String id) {
         blogCategoryService.delete(id);
+        return new ResponseData<>(
+                true,
+                200,
+                SUCCESS,
+                "Deleted",
+                null
+        );
     }
 
-    @GetMapping("/detail/{id}")
+    @GetMapping("/{id}")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public BlogCategoryResponse getDetail(@PathVariable String id) {
+    public BlogCategoryResponse getDetail(@PathVariable("id") String id) {
         return blogCategoryService.getDetail(id);
     }
 
