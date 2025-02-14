@@ -23,7 +23,6 @@ import org.crochet.service.TokenBlacklistService;
 import org.crochet.service.UserService;
 import org.crochet.util.TokenUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -61,7 +60,6 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordResetTokenService passwordResetTokenService;
     private final UserService userService;
     private final EmailSender emailSender;
-    private final PasswordEncoder passwordEncoder;
     private final RefreshTokenService refreshTokenService;
     private final JwtTokenService jwtTokenService;
     private final TokenBlacklistService tokenBlacklistService;
@@ -73,7 +71,6 @@ public class AuthServiceImpl implements AuthService {
      * @param passwordResetTokenService PasswordResetTokenService
      * @param userService               UserService
      * @param emailSender               EmailSender
-     * @param passwordEncoder           PasswordEncoder
      * @param refreshTokenService       RefreshTokenService
      * @param jwtTokenService           JwtTokenService
      * @param tokenBlacklistService     TokenBlacklistService
@@ -82,7 +79,6 @@ public class AuthServiceImpl implements AuthService {
                            PasswordResetTokenService passwordResetTokenService,
                            UserService userService,
                            EmailSender emailSender,
-                           PasswordEncoder passwordEncoder,
                            RefreshTokenService refreshTokenService,
                            JwtTokenService jwtTokenService,
                            TokenBlacklistService tokenBlacklistService) {
@@ -90,7 +86,6 @@ public class AuthServiceImpl implements AuthService {
         this.passwordResetTokenService = passwordResetTokenService;
         this.userService = userService;
         this.emailSender = emailSender;
-        this.passwordEncoder = passwordEncoder;
         this.refreshTokenService = refreshTokenService;
         this.jwtTokenService = jwtTokenService;
         this.tokenBlacklistService = tokenBlacklistService;
@@ -357,11 +352,8 @@ public class AuthServiceImpl implements AuthService {
         // Get email by token
         String email = passwordResetTokenService.getEmailByToken(token);
 
-        // Update new password for user
-        var newPassword = passwordEncoder.encode(passwordResetRequest.getNewPassword());
-
         // Update user
-        userService.updatePassword(newPassword, email);
+        userService.updatePassword(passwordResetRequest.getNewPassword(), email);
 
         // Delete password reset token
         passwordResetTokenService.deletePasswordToken(passwordResetToken);
