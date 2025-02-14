@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: ${env:dev}
+    active: ${ENV:dev}
 
   security:
     oauth2:

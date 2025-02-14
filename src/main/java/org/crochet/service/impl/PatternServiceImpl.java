@@ -5,12 +5,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.crochet.constant.MessageConstant;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.FileMapper;
+import org.crochet.mapper.PaginationMapper;
 import org.crochet.mapper.PatternMapper;
 import org.crochet.model.Pattern;
 import org.crochet.model.Settings;
 import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.PatternRequest;
-import org.crochet.payload.response.PatternPaginationResponse;
+import org.crochet.payload.response.PaginationResponse;
 import org.crochet.payload.response.PatternResponse;
 import org.crochet.repository.CategoryRepo;
 import org.crochet.repository.GenericFilter;
@@ -93,8 +94,8 @@ public class PatternServiceImpl implements PatternService {
      * @return Pattern is paginated
      */
     @Override
-    public PatternPaginationResponse getPatterns(int pageNo, int pageSize, String sortBy, String sortDir,
-                                                 Filter[] filters) {
+    public PaginationResponse<PatternResponse> getPatterns(int pageNo, int pageSize, String sortBy, String sortDir,
+                                                           Filter[] filters) {
         List<String> patternIds = Collections.emptyList();
 
         if (filters != null && filters.length > 0) {
@@ -115,14 +116,7 @@ public class PatternServiceImpl implements PatternService {
             page = patternRepo.findPatternOnHomeWithIds(patternIds, pageable);
         }
 
-        return PatternPaginationResponse.builder()
-                .contents(page.getContent())
-                .pageNo(page.getNumber())
-                .pageSize(page.getSize())
-                .totalElements(page.getTotalElements())
-                .totalPages(page.getTotalPages())
-                .last(page.isLast())
-                .build();
+        return PaginationMapper.getInstance().toPagination(page);
     }
 
     /**

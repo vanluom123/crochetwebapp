@@ -77,7 +77,7 @@ public class AuthController {
     @ApiResponse(responseCode = "200",
             description = "Email verification resent successfully",
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class)))
-    @GetMapping("/resendVerificationEmail")
+    @GetMapping("/resend-verification-email")
     public ResponseData<String> resendVerificationEmail(@RequestParam("email") String email) {
         String response = authService.resendVerificationEmail(email);
         return ResponseData.<String>builder()

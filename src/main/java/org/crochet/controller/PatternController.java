@@ -9,7 +9,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.crochet.constant.AppConstant;
 import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.PatternRequest;
-import org.crochet.payload.response.PatternPaginationResponse;
+import org.crochet.payload.response.PaginationResponse;
 import org.crochet.payload.response.PatternResponse;
 import org.crochet.payload.response.ResponseData;
 import org.crochet.service.PatternService;
@@ -60,18 +60,18 @@ public class PatternController {
     @Operation(summary = "Get paginated list of patterns")
     @ApiResponse(responseCode = "200", description = "List of patterns",
             content = @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = PatternPaginationResponse.class)))
+                    schema = @Schema(implementation = PaginationResponse.class)))
     @PostMapping("/pagination")
-    public ResponseEntity<PatternPaginationResponse> getPatterns(
+    public ResponseEntity<PaginationResponse<PatternResponse>> getPatterns(
             @Parameter(description = "Page number (default: 0)")
             @RequestParam(value = "pageNo", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER,
                     required = false) int pageNo,
-            @Parameter(description = "Page size (default: 10)")
+            @Parameter(description = "Page size (default: 48)")
             @RequestParam(value = "pageSize", defaultValue = AppConstant.DEFAULT_PAGE_SIZE,
                     required = false) int pageSize,
-            @Parameter(description = "Sort by field (default: id)")
+            @Parameter(description = "Sort by field (default: createdDate)")
             @RequestParam(value = "sortBy", defaultValue = AppConstant.DEFAULT_SORT_BY, required = false) String sortBy,
-            @Parameter(description = "Sort direction (default: ASC)")
+            @Parameter(description = "Sort direction (default: DESC)")
             @RequestParam(value = "sortDir", defaultValue = AppConstant.DEFAULT_SORT_DIRECTION,
                     required = false) String sortDir,
             @Parameter(description = "List filters")

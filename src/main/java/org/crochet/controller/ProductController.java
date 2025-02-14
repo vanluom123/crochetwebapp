@@ -9,14 +9,22 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.crochet.constant.AppConstant;
 import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.ProductRequest;
-import org.crochet.payload.response.ProductPaginationResponse;
+import org.crochet.payload.response.PaginationResponse;
 import org.crochet.payload.response.ProductResponse;
 import org.crochet.payload.response.ResponseData;
 import org.crochet.service.ProductService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -54,10 +62,10 @@ public class ProductController {
     @Operation(summary = "Get a list of products")
     @ApiResponse(responseCode = "200", description = "List of products",
             content = @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = ProductPaginationResponse.class)))
+                    schema = @Schema(implementation = PaginationResponse.class)))
     @ApiResponse(responseCode = "400", description = "Invalid input")
     @PostMapping("/pagination")
-    public ResponseEntity<ProductPaginationResponse> getProducts(
+    public ResponseEntity<PaginationResponse<ProductResponse>> getProducts(
             @Parameter(description = "Page number")
             @RequestParam(value = "pageNo", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER,
                     required = false) int pageNo,
@@ -100,7 +108,7 @@ public class ProductController {
                 .success(true)
                 .code(HttpStatus.OK.value())
                 .message(SUCCESS)
-                .data("Product deleted successfully")
+                .data("Product deleted")
                 .build();
     }
 
@@ -119,7 +127,7 @@ public class ProductController {
                 .success(true)
                 .code(HttpStatus.OK.value())
                 .message(SUCCESS)
-                .data("Products deleted successfully")
+                .data("Products deleted")
                 .build();
     }
 
