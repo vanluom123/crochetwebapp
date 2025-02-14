@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.crochet.enumerator.ChartStatus;
+import org.crochet.enums.ChartStatus;
 
 import java.util.List;
 
@@ -21,7 +21,7 @@ public class FreePatternResponse {
     private String description;
     private String author;
     @JsonProperty("is_home")
-    private boolean isHome;
+    private Boolean isHome;
     private String link;
     private String content;
     private ChartStatus status;

@@ -1,6 +1,7 @@
 package org.crochet.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.crochet.enums.ResultCode;
 import org.crochet.exception.IllegalArgumentException;
 import org.crochet.mapper.CategoryMapper;
 import org.crochet.model.Category;
@@ -9,22 +10,18 @@ import org.crochet.payload.request.CategoryUpdateRequest;
 import org.crochet.payload.response.CategoryResponse;
 import org.crochet.repository.CategoryRepo;
 import org.crochet.service.CategoryService;
+import org.crochet.service.PermissionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
-import static org.crochet.constant.MessageConstant.ERROR_CHILD_CATEGORY_EXISTS;
-import static org.crochet.constant.MessageConstant.ERROR_PARENT_CATEGORY_EXISTS;
-import static org.crochet.constant.MessageConstant.MSG_CATEGORY_NOT_FOUND;
-import static org.crochet.constant.MessageConstant.MSG_DUPLICATE_CATEGORY_NAME_UNDER_PROVIDED_PARENTS;
-
 @Service
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepo categoryRepo;
+    private final PermissionService permissionService;
 
     /**
      * Create a new category or multiple categories
@@ -39,8 +36,10 @@ public class CategoryServiceImpl implements CategoryService {
 
         // Check if the category already exists as a root (parent) category
         if (categoryRepo.existsByNameAndParentIsNull(name)) {
-            throw new IllegalArgumentException(ERROR_PARENT_CATEGORY_EXISTS,
-                    MAP_CODE.get(ERROR_PARENT_CATEGORY_EXISTS));
+            throw new IllegalArgumentException(
+                    ResultCode.ERROR_PARENT_CATEGORY_EXISTS.message(),
+                    ResultCode.ERROR_PARENT_CATEGORY_EXISTS.code()
+            );
         }
 
         // Fetch parent categories based on the provided parent IDs
@@ -51,8 +50,10 @@ public class CategoryServiceImpl implements CategoryService {
         if (parents.isEmpty()) {
             // If no parents are provided, create a root category
             if (categoryRepo.existsByNameAndParentIsNotNull(name)) {
-                throw new IllegalArgumentException(ERROR_CHILD_CATEGORY_EXISTS,
-                        MAP_CODE.get(ERROR_CHILD_CATEGORY_EXISTS));
+                throw new IllegalArgumentException(
+                        ResultCode.ERROR_CHILD_CATEGORY_EXISTS.message(),
+                        ResultCode.ERROR_CHILD_CATEGORY_EXISTS.code()
+                );
             }
             Category category = new Category();
             category.setName(name);
@@ -80,8 +81,10 @@ public class CategoryServiceImpl implements CategoryService {
 
         // If no children were created, throw an error
         if (children.isEmpty()) {
-            throw new IllegalArgumentException(MSG_DUPLICATE_CATEGORY_NAME_UNDER_PROVIDED_PARENTS,
-                    MAP_CODE.get(MSG_DUPLICATE_CATEGORY_NAME_UNDER_PROVIDED_PARENTS));
+            throw new IllegalArgumentException(
+                    ResultCode.MSG_DUPLICATE_CATEGORY_NAME_UNDER_PROVIDED_PARENTS.message(),
+                    ResultCode.MSG_DUPLICATE_CATEGORY_NAME_UNDER_PROVIDED_PARENTS.code()
+            );
         }
 
         // Save all new categories to the database
@@ -122,20 +125,26 @@ public class CategoryServiceImpl implements CategoryService {
         // Find the existing category by ID
         Category category = findById(request.getId());
 
+        permissionService.checkUserPermission(category, "update");
+
         // Extract the new name from the request
         String newName = request.getName();
 
         // Check if the new name already exists as a parent category
         if (categoryRepo.existsByNameAndParentIsNull(newName)) {
-            throw new IllegalArgumentException(ERROR_PARENT_CATEGORY_EXISTS,
-                    MAP_CODE.get(ERROR_PARENT_CATEGORY_EXISTS));
+            throw new IllegalArgumentException(
+                    ResultCode.ERROR_PARENT_CATEGORY_EXISTS.message(),
+                    ResultCode.ERROR_PARENT_CATEGORY_EXISTS.code()
+            );
         }
 
         // Check if the new name already exists as a child category under this category's parent
         if (category.getParent() != null && category.getParent().getChildren().stream()
                 .anyMatch(c -> c.getName().equals(newName) && !c.getId().equals(request.getId()))) {
-            throw new IllegalArgumentException(ERROR_CHILD_CATEGORY_EXISTS,
-                    MAP_CODE.get(ERROR_CHILD_CATEGORY_EXISTS));
+            throw new IllegalArgumentException(
+                    ResultCode.ERROR_CHILD_CATEGORY_EXISTS.message(),
+                    ResultCode.ERROR_CHILD_CATEGORY_EXISTS.code()
+            );
         }
 
         // Update the category's name
@@ -169,6 +178,7 @@ public class CategoryServiceImpl implements CategoryService {
      * @return a CategoryResponse object
      */
     @Override
+    @Transactional
     public CategoryResponse getById(String id) {
         var category = findById(id);
         return CategoryMapper.INSTANCE.toResponse(category);
@@ -180,13 +190,13 @@ public class CategoryServiceImpl implements CategoryService {
      * @param id the parent category ID
      * @return a list of CategoryResponse objects
      */
-    private Category findById(String id) {
-        var categories = categoryRepo.findCategoriesByIds(id);
-        if (categories.isEmpty()) {
-            throw new IllegalArgumentException(MSG_CATEGORY_NOT_FOUND,
-                    MAP_CODE.get(MSG_CATEGORY_NOT_FOUND));
-        }
-        return categories.get(0);
+    @Override
+    public Category findById(String id) {
+        return categoryRepo.findCategoryById(id)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        ResultCode.MSG_CATEGORY_NOT_FOUND.message(),
+                        ResultCode.MSG_CATEGORY_NOT_FOUND.code()
+                ));
     }
 
     /**
@@ -198,6 +208,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public void delete(String id) {
         var category = findById(id);
+        permissionService.checkUserPermission(category, "delete");
         categoryRepo.delete(category);
     }
 }

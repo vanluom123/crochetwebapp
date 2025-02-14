@@ -3,19 +3,21 @@ package org.crochet.service.impl;
 import com.turkraft.springfilter.converter.FilterSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.crochet.constant.MessageConstant;
+import org.crochet.enums.ResultCode;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.FileMapper;
+import org.crochet.mapper.PaginationMapper;
 import org.crochet.mapper.PatternMapper;
 import org.crochet.model.Pattern;
 import org.crochet.model.Settings;
 import org.crochet.payload.request.PatternRequest;
-import org.crochet.payload.response.PatternPaginationResponse;
+import org.crochet.payload.response.PaginationResponse;
 import org.crochet.payload.response.PatternResponse;
-import org.crochet.repository.CategoryRepo;
 import org.crochet.repository.PatternRepository;
 import org.crochet.repository.PatternSpecifications;
+import org.crochet.service.CategoryService;
 import org.crochet.service.PatternService;
+import org.crochet.service.PermissionService;
 import org.crochet.util.ImageUtils;
 import org.crochet.util.ObjectUtils;
 import org.crochet.util.SettingsUtil;
@@ -27,13 +29,10 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-
-import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
 
 /**
  * PatternServiceImpl class
@@ -43,8 +42,9 @@ import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
 @RequiredArgsConstructor
 public class PatternServiceImpl implements PatternService {
     private final PatternRepository patternRepo;
-    private final CategoryRepo categoryRepo;
     private final SettingsUtil settingsUtil;
+    private final PermissionService permissionService;
+    private final CategoryService categoryService;
 
     /**
      * Create or update pattern
@@ -55,11 +55,8 @@ public class PatternServiceImpl implements PatternService {
     @Override
     public void createOrUpdate(PatternRequest request) {
         Pattern pattern;
-
-        if (!StringUtils.hasText(request.getId())) {
-            var category = categoryRepo.findById(request.getCategoryId()).orElseThrow(
-                    () -> new ResourceNotFoundException(MessageConstant.MSG_CATEGORY_NOT_FOUND,
-                            MAP_CODE.get(MessageConstant.MSG_CATEGORY_NOT_FOUND)));
+        if (!ObjectUtils.hasText(request.getId())) {
+            var category = categoryService.findById(request.getCategoryId());
             var images = ImageUtils.sortFiles(request.getImages());
             var files = ImageUtils.sortFiles(request.getFiles());
             pattern = Pattern.builder()
@@ -71,13 +68,12 @@ public class PatternServiceImpl implements PatternService {
                     .isHome(request.isHome())
                     .link(request.getLink())
                     .content(request.getContent())
-                    .files(FileMapper.INSTANCE.toSetEntities(files))
+                    .files(FileMapper.INSTANCE.toEntities(files))
                     .images(FileMapper.INSTANCE.toEntities(images))
                     .build();
         } else {
-            pattern = patternRepo.findById(request.getId()).orElseThrow(
-                    () -> new ResourceNotFoundException(MessageConstant.MSG_PATTERN_NOT_FOUND,
-                            MAP_CODE.get(MessageConstant.MSG_PATTERN_NOT_FOUND)));
+            pattern = findById(request.getId());
+            permissionService.checkUserPermission(pattern, "update");
             pattern = PatternMapper.INSTANCE.partialUpdate(request, pattern);
         }
 
@@ -87,8 +83,8 @@ public class PatternServiceImpl implements PatternService {
     /**
      * Get patterns
      *
-     * @param pageNo     Page number
-     * @param pageSize   The size of page
+     * @param offset     Page number
+     * @param limit      The size of page
      * @param sortBy     Sort by
      * @param sortDir    Sort directory
      * @param categoryId The list of filters
@@ -97,10 +93,10 @@ public class PatternServiceImpl implements PatternService {
      */
     @SuppressWarnings("ConstantValue")
     @Override
-    public PatternPaginationResponse getPatterns(int pageNo, int pageSize, String sortBy, String sortDir,
-                                                 String categoryId, Specification<Pattern> spec) {
+    public PaginationResponse<PatternResponse> getPatterns(int offset, int limit, String sortBy, String sortDir,
+                                                           String categoryId, Specification<Pattern> spec) {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
-        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+        Pageable pageable = PageRequest.of(offset, limit, sort);
         Page<PatternResponse> page;
         var filter = ((FilterSpecification<Pattern>) spec).getFilter();
         var hasCategory = ObjectUtils.hasText(categoryId);
@@ -117,14 +113,7 @@ public class PatternServiceImpl implements PatternService {
             page = patternRepo.findPatternWithPageable(pageable);
 
         }
-        return PatternPaginationResponse.builder()
-                .contents(page.getContent())
-                .pageNo(page.getNumber())
-                .pageSize(page.getSize())
-                .totalElements(page.getTotalElements())
-                .totalPages(page.getTotalPages())
-                .last(page.isLast())
-                .build();
+        return PaginationMapper.getInstance().toPagination(page);
     }
 
     /**
@@ -139,13 +128,9 @@ public class PatternServiceImpl implements PatternService {
         if (settingsMap.isEmpty()) {
             return Collections.emptyList();
         }
-
         var direction = settingsMap.get("homepage.pattern.direction").getValue();
-
         var orderBy = settingsMap.get("homepage.pattern.orderBy").getValue();
-
         var limit = settingsMap.get("homepage.pattern.limit").getValue();
-
         Sort sort = Sort.by(Sort.Direction.fromString(direction), orderBy);
         Pageable pageable = PageRequest.of(0, Integer.parseInt(limit), sort);
         return patternRepo.findLimitedNumPattern(pageable);
@@ -154,13 +139,13 @@ public class PatternServiceImpl implements PatternService {
     /**
      * Get pattern ids
      *
-     * @param pageNo Page number
+     * @param offset Page number
      * @param limit  Limit
      * @return List of pattern ids
      */
     @Override
-    public List<String> getPatternIds(int pageNo, int limit) {
-        Pageable pageable = PageRequest.of(pageNo, limit);
+    public List<String> getPatternIds(int offset, int limit) {
+        Pageable pageable = PageRequest.of(offset, limit);
         return patternRepo.getPatternIds(pageable);
     }
 
@@ -174,9 +159,20 @@ public class PatternServiceImpl implements PatternService {
     @Override
     public PatternResponse getDetail(String id) {
         var pattern = patternRepo.findPatternById(id).orElseThrow(
-                () -> new ResourceNotFoundException(MessageConstant.MSG_PATTERN_NOT_FOUND,
-                        MAP_CODE.get(MessageConstant.MSG_PATTERN_NOT_FOUND)));
+                () -> new ResourceNotFoundException(
+                        ResultCode.MSG_PATTERN_NOT_FOUND.message(),
+                        ResultCode.MSG_PATTERN_NOT_FOUND.code()
+                ));
         return PatternMapper.INSTANCE.toResponse(pattern);
+    }
+
+    @Override
+    public Pattern findById(String id) {
+        return patternRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        ResultCode.MSG_PATTERN_NOT_FOUND.message(),
+                        ResultCode.MSG_PATTERN_NOT_FOUND.code()
+                ));
     }
 
     /**

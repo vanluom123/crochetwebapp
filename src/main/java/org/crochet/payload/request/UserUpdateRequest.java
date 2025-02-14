@@ -1,7 +1,7 @@
 package org.crochet.payload.request;
 
 import lombok.Data;
-import org.crochet.enumerator.RoleType;
+import org.crochet.enums.RoleType;
 
 @Data
 public class UserUpdateRequest {
