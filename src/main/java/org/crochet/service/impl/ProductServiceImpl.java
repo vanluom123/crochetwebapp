@@ -5,12 +5,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.crochet.constant.MessageConstant;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.FileMapper;
+import org.crochet.mapper.PaginationMapper;
 import org.crochet.mapper.ProductMapper;
 import org.crochet.model.Product;
 import org.crochet.model.Settings;
 import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.ProductRequest;
-import org.crochet.payload.response.ProductPaginationResponse;
+import org.crochet.payload.response.PaginationResponse;
 import org.crochet.payload.response.ProductResponse;
 import org.crochet.repository.CategoryRepo;
 import org.crochet.repository.GenericFilter;
@@ -93,12 +94,12 @@ public class ProductServiceImpl implements ProductService {
      * @param sortDir  The sorting direction, either "ASC" (ascending) or "DESC"
      *                 (descending).
      * @param filters  The list of filters.
-     * @return A {@link ProductPaginationResponse} containing the paginated list of
+     * @return A {@link org.crochet.payload.response.PaginationResponse} containing the paginated list of
      * products.
      */
     @Override
-    public ProductPaginationResponse getProducts(int pageNo, int pageSize, String sortBy, String sortDir,
-                                                 Filter[] filters) {
+    public PaginationResponse<ProductResponse> getProducts(int pageNo, int pageSize, String sortBy, String sortDir,
+                                                           Filter[] filters) {
         List<String> prodIds = Collections.emptyList();
 
         if (filters != null && filters.length > 0) {
@@ -119,14 +120,7 @@ public class ProductServiceImpl implements ProductService {
             menuPage = productRepo.findProductWithIds(prodIds, pageable);
         }
 
-        return ProductPaginationResponse.builder()
-                .contents(menuPage.getContent())
-                .pageNo(menuPage.getNumber())
-                .pageSize(menuPage.getSize())
-                .totalElements(menuPage.getTotalElements())
-                .totalPages(menuPage.getTotalPages())
-                .last(menuPage.isLast())
-                .build();
+        return PaginationMapper.getInstance().toPagination(menuPage);
     }
 
     /**

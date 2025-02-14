@@ -9,10 +9,12 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.crochet.constant.AppConstant;
 import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.UserUpdateRequest;
-import org.crochet.payload.response.PaginatedFreePatternResponse;
+import org.crochet.payload.response.CollectionResponse;
+import org.crochet.payload.response.FreePatternResponse;
+import org.crochet.payload.response.PaginationResponse;
 import org.crochet.payload.response.ResponseData;
-import org.crochet.payload.response.UserPaginationResponse;
 import org.crochet.payload.response.UserResponse;
+import org.crochet.service.CollectionService;
 import org.crochet.service.FreePatternService;
 import org.crochet.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -39,20 +41,24 @@ import static org.crochet.constant.AppConstant.SUCCESS;
 public class UserController {
     private final UserService userService;
     private final FreePatternService freePatternService;
+    private final CollectionService collectionService;
 
-    public UserController(UserService userService, FreePatternService freePatternService) {
+    public UserController(UserService userService,
+                          FreePatternService freePatternService,
+                          CollectionService collectionService) {
         this.userService = userService;
         this.freePatternService = freePatternService;
+        this.collectionService = collectionService;
     }
 
     @Operation(summary = "Get paginated list of users")
     @ApiResponse(responseCode = "200", description = "List of users",
             content = @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = UserPaginationResponse.class)))
+                    schema = @Schema(implementation = PaginationResponse.class)))
     @PostMapping("/pagination")
     @SecurityRequirement(name = "BearerAuth")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<UserPaginationResponse> getAll(
+    public ResponseEntity<PaginationResponse<UserResponse>> getAll(
             @Parameter(description = "Page number (default: 0)")
             @RequestParam(value = "pageNo", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER,
                     required = false) int pageNo,
@@ -74,7 +80,7 @@ public class UserController {
             description = "Allows users and admins to fetch paginated free patterns associated with a specific user.")
     @ApiResponse(responseCode = "200", description = "Paginated free patterns retrieved successfully",
             content = @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = PaginatedFreePatternResponse.class)))
+                    schema = @Schema(implementation = PaginationResponse.class)))
     @ApiResponse(responseCode = "400", description = "Invalid input provided",
             content = @Content(mediaType = "application/json"))
     @ApiResponse(responseCode = "403", description = "Unauthorized access",
@@ -86,16 +92,16 @@ public class UserController {
     @PostMapping("/{userId}/free-pattern")
     @SecurityRequirement(name = "BearerAuth")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public PaginatedFreePatternResponse getFreePatternByUser(
+    public PaginationResponse<FreePatternResponse> getFreePatternByUser(
             @Parameter(description = "Page number (default: 0)")
             @RequestParam(value = "pageNo", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER,
                     required = false) int pageNo,
-            @Parameter(description = "Page size (default: 10)")
+            @Parameter(description = "Page size (default: 48)")
             @RequestParam(value = "pageSize", defaultValue = AppConstant.DEFAULT_PAGE_SIZE,
                     required = false) int pageSize,
-            @Parameter(description = "Sort by field (default: id)")
+            @Parameter(description = "Sort by field (default: createdDate)")
             @RequestParam(value = "sortBy", defaultValue = AppConstant.DEFAULT_SORT_BY, required = false) String sortBy,
-            @Parameter(description = "Sort direction (default: ASC)")
+            @Parameter(description = "Sort direction (default: DESC)")
             @RequestParam(value = "sortDir", defaultValue = AppConstant.DEFAULT_SORT_DIRECTION,
                     required = false) String sortDir,
             @Parameter(description = "The list of filters")
@@ -181,5 +187,21 @@ public class UserController {
                 .message(SUCCESS)
                 .data("Users deleted successfully")
                 .build();
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    @GetMapping("/{userId}/collections")
+    @SecurityRequirement(name = "BearerAuth")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    public ResponseData<List<CollectionResponse>> getCollections(@PathVariable("userId") String userId) {
+        var res = collectionService.getAllByUserId(userId);
+        return new ResponseData<>(
+                true,
+                HttpStatus.OK.value(),
+                SUCCESS,
+                res,
+                null
+        );
     }
 }
