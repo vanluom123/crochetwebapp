@@ -18,13 +18,14 @@ public class ImageUtils {
         if (files == null || files.isEmpty()) {
             return null;
         }
-        List<T> sortedFiles = files.stream()
+        return files.stream()
                 .filter(f -> f.getLastModified() != null)
                 .sorted(Comparator.comparing(FileResponse::getLastModified))
+                .peek(f -> f.setOrder(files.stream()
+                        .filter(file -> file.getLastModified() != null)
+                        .sorted(Comparator.comparing(FileResponse::getLastModified))
+                        .toList()
+                        .indexOf(f)))
                 .toList();
-        for (int idx = 0; idx < sortedFiles.size(); idx++) {
-            sortedFiles.get(idx).setOrder(idx);
-        }
-        return sortedFiles;
     }
 }

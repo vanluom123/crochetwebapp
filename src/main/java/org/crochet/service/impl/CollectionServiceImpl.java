@@ -60,7 +60,7 @@ public class CollectionServiceImpl implements CollectionService {
         if (count == 1) {
             var images = freePattern.getImages();
             if (!images.isEmpty()) {
-                collection.setAvatar(images.getFirst().getFileContent());
+                collection.setAvatar(images.get(0).getFileContent());
             } else {
                 collection.setAvatar(null);
             }
