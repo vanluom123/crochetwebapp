@@ -210,7 +210,7 @@ public class FreePatternServiceImpl implements FreePatternService {
                 .content(frep.getContent())
                 .status(frep.getStatus())
                 .userId(user.getId())
-                .username(user.getUsername())
+                .username(user.getName())
                 .userAvatar(user.getImageUrl())
                 .images(images)
                 .files(files)
