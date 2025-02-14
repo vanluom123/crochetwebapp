@@ -1,9 +1,12 @@
 package org.crochet.controller;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import org.crochet.enums.ResultCode;
 import org.crochet.payload.request.BannerTypeRequest;
 import org.crochet.payload.response.BannerTypeResponse;
+import org.crochet.payload.response.ResponseData;
 import org.crochet.service.BannerTypeService;
+import org.crochet.util.ResponseUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -12,14 +15,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/bannerType")
+@RequestMapping("/api/v1/banner-types")
 @PreAuthorize("hasRole('ADMIN')")
 @SecurityRequirement(name = "BearerAuth")
 public class BannerTypeController {
@@ -29,30 +31,31 @@ public class BannerTypeController {
         this.bannerTypeService = bannerTypeService;
     }
 
-    @ResponseBody
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping("/createOrUpdate")
-    public BannerTypeResponse createOrUpdate(@RequestBody BannerTypeRequest request) {
-        return bannerTypeService.createOrUpdate(request);
+    @PostMapping
+    public ResponseData<BannerTypeResponse> createOrUpdate(@RequestBody BannerTypeRequest request) {
+        var res = bannerTypeService.createOrUpdate(request);
+        return ResponseUtil.success(res);
     }
 
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @DeleteMapping("/delete/{id}")
-    public void delete(@PathVariable String id) {
+    @ResponseStatus(HttpStatus.OK)
+    @DeleteMapping("/{id}")
+    public ResponseData<String> delete(@PathVariable("id") String id) {
         bannerTypeService.delete(id);
-    }
-
-    @ResponseBody
-    @ResponseStatus(HttpStatus.OK)
-    @GetMapping("/getAll")
-    public List<BannerTypeResponse> getAll() {
-        return bannerTypeService.getAll();
+        return ResponseUtil.success(ResultCode.MSG_DELETE_SUCCESS.message());
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
-    @GetMapping("/getById/{id}")
-    public BannerTypeResponse getById(@PathVariable String id) {
-        return bannerTypeService.getById(id);
+    @GetMapping
+    public ResponseData<List<BannerTypeResponse>> getAll() {
+        var res = bannerTypeService.getAll();
+        return ResponseUtil.success(res);
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping("/{id}")
+    public ResponseData<BannerTypeResponse> getById(@PathVariable("id") String id) {
+        var res = bannerTypeService.getById(id);
+        return ResponseUtil.success(res);
     }
 }

@@ -1,4 +1,4 @@
-package org.crochet.enumerator;
+package org.crochet.enums;
 
 public enum FilterOperation {
     EQUAL,
@@ -9,5 +9,9 @@ public enum FilterOperation {
     LESS_THAN_OR_EQUAL,
     LIKE,
     IN,
-    BETWEEN
+    BETWEEN,
+    IS_NULL,
+    IS_NOT_NULL,
+    STARTS_WITH,
+    ENDS_WITH
 }

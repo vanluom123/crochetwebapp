@@ -163,4 +163,5 @@ gradle-app.setting
 *.hprof
 
 # Ignore environment file
+.env
 .env.*

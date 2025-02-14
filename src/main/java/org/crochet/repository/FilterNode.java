@@ -3,7 +3,7 @@ package org.crochet.repository;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.crochet.enumerator.FilterLogic;
+import org.crochet.enums.FilterLogic;
 
 import java.util.ArrayList;
 import java.util.List;

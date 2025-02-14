@@ -4,6 +4,7 @@ import jakarta.persistence.criteria.JoinType;
 import org.crochet.model.Product;
 import org.springframework.data.jpa.domain.Specification;
 
+@SuppressWarnings({"DataFlowIssue", "unused"})
 public class ProductSpecifications {
 
     public static Specification<Product> fetchJoin() {

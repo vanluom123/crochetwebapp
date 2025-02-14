@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.crochet.enumerator.FilterOperation;
+import org.crochet.enums.FilterOperation;
 
 @Getter
 @Setter

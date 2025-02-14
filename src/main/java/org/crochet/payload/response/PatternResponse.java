@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.crochet.enumerator.CurrencyCode;
+import org.crochet.enums.CurrencyCode;
 
 import java.util.List;
 
@@ -23,7 +23,7 @@ public class PatternResponse {
     @JsonProperty("currency_code")
     private CurrencyCode currencyCode;
     @JsonProperty("is_home")
-    private boolean isHome;
+    private Boolean isHome;
     private String link;
     private String content;
     private List<FileResponse> images;

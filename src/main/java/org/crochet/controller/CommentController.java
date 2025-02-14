@@ -7,17 +7,19 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.crochet.payload.request.CommentRequest;
 import org.crochet.payload.response.CommentResponse;
+import org.crochet.payload.response.ResponseData;
 import org.crochet.service.CommentService;
+import org.crochet.util.ResponseUtil;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/comment")
+@RequestMapping("/api/v1/comments")
 public class CommentController {
     private final CommentService commentService;
 
@@ -29,12 +31,13 @@ public class CommentController {
     @ApiResponse(responseCode = "201", description = "Comment created successfully",
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = String.class)))
-    @PostMapping("/create")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping
+    @PreAuthorize("isAuthenticated()")
     @SecurityRequirement(name = "BearerAuth")
-    public ResponseEntity<CommentResponse> createComment(
+    public ResponseData<CommentResponse> createComment(
             @RequestBody CommentRequest request) {
         var response = commentService.createOrUpdate(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseUtil.success(response);
     }
 }

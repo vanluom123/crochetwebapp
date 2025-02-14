@@ -21,11 +21,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import org.crochet.enumerator.ChartStatus;
+import org.crochet.enums.ChartStatus;
 import org.hibernate.annotations.BatchSize;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -86,9 +85,9 @@ public class FreePattern extends BaseEntity {
             @AttributeOverride(name = "order", column = @Column(name = "display_order")),
             @AttributeOverride(name = "lastModified", column = @Column(name = "last_modified", columnDefinition = "datetime default current_timestamp"))
     })
-    private List<File> images;
+    private Set<File> images;
 
-    @OneToMany(mappedBy = "freePattern", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "freePattern", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private Set<ColFrep> colfreps = new HashSet<>();
 }
