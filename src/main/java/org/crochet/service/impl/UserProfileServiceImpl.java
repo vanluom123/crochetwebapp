@@ -1,16 +1,7 @@
 package org.crochet.service.impl;
 
-import org.crochet.service.UserProfileService;
-import org.crochet.util.SecurityUtils;
-import org.springframework.stereotype.Service;
-
 import lombok.RequiredArgsConstructor;
-
-import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
-
-import java.util.List;
-
-import org.crochet.constant.MessageConstant;
+import org.crochet.enums.ResultCode;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.model.User;
 import org.crochet.model.UserProfile;
@@ -21,7 +12,12 @@ import org.crochet.repository.CollectionRepo;
 import org.crochet.repository.CommentRepository;
 import org.crochet.repository.UserProfileRepo;
 import org.crochet.repository.UserRepository;
+import org.crochet.service.UserProfileService;
+import org.crochet.util.SecurityUtils;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -40,11 +36,11 @@ public class UserProfileServiceImpl implements UserProfileService {
     @Override
     public UserProfileResponse loadUserProfile(String userId) {
         var user = userRepo.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException(MessageConstant.MSG_USER_NOT_FOUND,
-                        MAP_CODE.get(MessageConstant.MSG_USER_NOT_FOUND)));
+                .orElseThrow(() -> new ResourceNotFoundException(ResultCode.MSG_USER_NOT_FOUND.message(),
+                        ResultCode.MSG_USER_NOT_FOUND.code()));
 
         // Get collections by user id
-        var collections = colRepo.getCollectionsByUserId(user.getId());
+        var collections = colRepo.getAllByUserId(user.getId());
 
         // Get recent comments by user id
         List<CommentResponse> recentComments = commentRepo.getRecentCommentsByUserId(user.getId());
@@ -52,8 +48,7 @@ public class UserProfileServiceImpl implements UserProfileService {
         // Get user profile
         var userProfile = user.getUserProfile();
         if (userProfile == null) {
-            userProfile = UserProfile.builder()
-                    .build();
+            userProfile = new UserProfile();
         }
 
         return UserProfileResponse.builder()
@@ -84,8 +79,8 @@ public class UserProfileServiceImpl implements UserProfileService {
     public UserProfileResponse updateUserProfile(UserProfileRequest request) {
         var user = SecurityUtils.getCurrentUser();
         if (user == null) {
-            throw new ResourceNotFoundException(MessageConstant.MSG_USER_NOT_FOUND,
-                    MAP_CODE.get(MessageConstant.MSG_USER_NOT_FOUND));
+            throw new ResourceNotFoundException(ResultCode.MSG_USER_NOT_FOUND.message(),
+                    ResultCode.MSG_USER_NOT_FOUND.code());
         }
 
         // Update profile info

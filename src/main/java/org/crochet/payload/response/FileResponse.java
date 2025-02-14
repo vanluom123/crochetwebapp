@@ -14,7 +14,7 @@ public class FileResponse {
     private String fileContent;
     private Integer order;
     @JsonFormat(pattern = AppConstant.DATE_PATTERN)
-    private LocalDateTime lastModified;
+    private LocalDateTime lastModified = LocalDateTime.now();
 
     public FileResponse(String fileName, String fileContent) {
         this(fileName, fileContent, 0);

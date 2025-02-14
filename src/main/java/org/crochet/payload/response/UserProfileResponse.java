@@ -1,20 +1,18 @@
 package org.crochet.payload.response;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
-import org.crochet.constant.AppConstant;
-import org.crochet.enumerator.AuthProvider;
-import org.crochet.enumerator.RoleType;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.crochet.constant.AppConstant;
+import org.crochet.enums.AuthProvider;
+import org.crochet.enums.RoleType;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -28,7 +26,7 @@ public class UserProfileResponse {
     private String email;
     private String imageUrl;
     private AuthProvider provider;
-    private boolean emailVerified;
+    private Boolean emailVerified;
     private RoleType role;
     
     // Profile info

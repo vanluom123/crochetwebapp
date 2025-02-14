@@ -1,5 +1,6 @@
 package org.crochet.mapper;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.crochet.model.Pattern;
 import org.crochet.payload.request.PatternRequest;
 import org.crochet.payload.response.PatternResponse;
@@ -49,13 +50,13 @@ public interface PatternMapper extends PartialUpdate<Pattern, PatternRequest> {
         if (req.getContent() != null) {
             pattern.setContent(req.getContent());
         }
-        if (req.getImages() != null && !req.getImages().isEmpty()) {
+        if (ObjectUtils.isNotEmpty(req.getImages())) {
             var sortedImages = ImageUtils.sortFiles(req.getImages());
             pattern.setImages(FileMapper.INSTANCE.toEntities(sortedImages));
         }
-        if (req.getFiles() != null && !req.getFiles().isEmpty()) {
+        if (ObjectUtils.isNotEmpty(req.getFiles())) {
             var sortedFiles = ImageUtils.sortFiles(req.getFiles());
-            pattern.setFiles(FileMapper.INSTANCE.toSetEntities(sortedFiles));
+            pattern.setFiles(FileMapper.INSTANCE.toEntities(sortedFiles));
         }
         return pattern;
     }
