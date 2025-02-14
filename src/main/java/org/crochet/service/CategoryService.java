@@ -1,5 +1,6 @@
 package org.crochet.service;
 
+import org.crochet.model.Category;
 import org.crochet.payload.request.CategoryCreationRequest;
 import org.crochet.payload.request.CategoryUpdateRequest;
 import org.crochet.payload.response.CategoryResponse;
@@ -14,6 +15,8 @@ public interface CategoryService {
     List<CategoryResponse> getAllCategories();
 
     CategoryResponse getById(String id);
+
+    Category findById(String id);
 
     void delete(String id);
 }

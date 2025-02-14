@@ -1,7 +1,7 @@
 package org.crochet.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.crochet.constant.MessageConstant;
+import org.crochet.enums.ResultCode;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.CommentMapper;
 import org.crochet.model.Comment;
@@ -11,15 +11,13 @@ import org.crochet.payload.response.CommentResponse;
 import org.crochet.repository.BlogPostRepository;
 import org.crochet.repository.CommentRepository;
 import org.crochet.service.CommentService;
+import org.crochet.util.ObjectUtils;
 import org.crochet.util.SecurityUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 
-import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
-import static org.crochet.constant.MessageConstant.MSG_USER_NOT_FOUND;
 
 /**
  * CommentServiceImpl class
@@ -35,7 +33,7 @@ public class CommentServiceImpl implements CommentService {
      * If the request contains an ID, it updates the existing comment with the corresponding ID.
      * If the request does not contain an ID, it creates a new comment.
      *
-     * @param request   The {@link CommentRequest} containing information for creating or updating the comment.
+     * @param request The {@link CommentRequest} containing information for creating or updating the comment.
      * @return The {@link CommentResponse} containing information about the created or updated comment.
      * @throws ResourceNotFoundException If an existing comment is to be updated, and the specified ID is not found.
      */
@@ -44,25 +42,32 @@ public class CommentServiceImpl implements CommentService {
     public CommentResponse createOrUpdate(CommentRequest request) {
         User user = SecurityUtils.getCurrentUser();
         if (user == null) {
-            throw new ResourceNotFoundException(MSG_USER_NOT_FOUND, MAP_CODE.get(MSG_USER_NOT_FOUND));
+            throw new ResourceNotFoundException(
+                    ResultCode.MSG_USER_LOGIN_REQUIRED.message(),
+                    ResultCode.MSG_USER_LOGIN_REQUIRED.code()
+            );
         }
 
         var blog = blogPostRepo.findById(request.getBlogPostId()).orElseThrow(
-                () -> new ResourceNotFoundException(MessageConstant.MSG_BLOG_NOT_FOUND,
-                        MAP_CODE.get(MessageConstant.MSG_BLOG_NOT_FOUND))
+                () -> new ResourceNotFoundException(
+                        ResultCode.MSG_BLOG_NOT_FOUND.message(),
+                        ResultCode.MSG_BLOG_NOT_FOUND.code()
+                )
         );
 
         var id = request.getId();
         Comment comment;
-        if (!StringUtils.hasText(id)) {
+        if (!ObjectUtils.hasText(id)) {
             comment = Comment.builder()
                     .blogPost(blog)
                     .user(user)
                     .build();
         } else {
             comment = commentRepo.findById(id).orElseThrow(
-                    () -> new ResourceNotFoundException(MessageConstant.MSG_COMMENT_NOT_FOUND,
-                            MAP_CODE.get(MessageConstant.MSG_COMMENT_NOT_FOUND))
+                    () -> new ResourceNotFoundException(
+                            ResultCode.MSG_COMMENT_NOT_FOUND.message(),
+                            ResultCode.MSG_COMMENT_NOT_FOUND.code()
+                    )
             );
         }
         comment.setContent(request.getContent());

@@ -1,5 +1,6 @@
 package org.crochet.mapper;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.crochet.model.BlogPost;
 import org.crochet.payload.request.BlogPostRequest;
 import org.crochet.payload.response.BlogPostResponse;
@@ -45,7 +46,7 @@ public interface BlogPostMapper extends PartialUpdate<BlogPost, BlogPostRequest>
         if (request.isHome() != post.isHome()) {
             post.setHome(request.isHome());
         }
-        if (request.getFiles() != null) {
+        if (ObjectUtils.isNotEmpty(request.getFiles())) {
             var sortedFiles = ImageUtils.sortFiles(request.getFiles());
             post.setFiles(FileMapper.INSTANCE.toEntities(sortedFiles));
         }

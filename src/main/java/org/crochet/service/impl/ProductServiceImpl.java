@@ -3,18 +3,19 @@ package org.crochet.service.impl;
 import com.turkraft.springfilter.converter.FilterSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.crochet.constant.MessageConstant;
+import org.crochet.enums.ResultCode;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.FileMapper;
+import org.crochet.mapper.PaginationMapper;
 import org.crochet.mapper.ProductMapper;
 import org.crochet.model.Product;
 import org.crochet.model.Settings;
 import org.crochet.payload.request.ProductRequest;
-import org.crochet.payload.response.ProductPaginationResponse;
+import org.crochet.payload.response.PaginationResponse;
 import org.crochet.payload.response.ProductResponse;
-import org.crochet.repository.CategoryRepo;
 import org.crochet.repository.ProductRepository;
 import org.crochet.repository.ProductSpecifications;
+import org.crochet.service.CategoryService;
 import org.crochet.service.ProductService;
 import org.crochet.util.ImageUtils;
 import org.crochet.util.ObjectUtils;
@@ -27,13 +28,10 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-
-import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
 
 /**
  * ProductServiceImpl class
@@ -43,7 +41,7 @@ import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepo;
-    private final CategoryRepo categoryRepo;
+    private final CategoryService categoryService;
     private final SettingsUtil settingsUtil;
 
     /**
@@ -60,11 +58,8 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void createOrUpdate(ProductRequest request) {
         Product product;
-        if (!StringUtils.hasText(request.getId())) {
-            var category = categoryRepo.findById(request.getCategoryId()).orElseThrow(
-                    () -> new ResourceNotFoundException(MessageConstant.MSG_CATEGORY_NOT_FOUND,
-                            MAP_CODE.get(MessageConstant.MSG_CATEGORY_NOT_FOUND)));
-
+        if (!ObjectUtils.hasText(request.getId())) {
+            var category = categoryService.findById(request.getCategoryId());
             var images = ImageUtils.sortFiles(request.getImages());
             product = Product.builder()
                     .category(category)
@@ -78,9 +73,7 @@ public class ProductServiceImpl implements ProductService {
                     .images(FileMapper.INSTANCE.toEntities(images))
                     .build();
         } else {
-            product = productRepo.findById(request.getId())
-                    .orElseThrow(() -> new ResourceNotFoundException(MessageConstant.MSG_PRODUCT_NOT_FOUND,
-                            MAP_CODE.get(MessageConstant.MSG_PRODUCT_NOT_FOUND)));
+            product = findById(request.getId());
             product = ProductMapper.INSTANCE.update(request, product);
         }
         productRepo.save(product);
@@ -89,23 +82,22 @@ public class ProductServiceImpl implements ProductService {
     /**
      * Retrieves a paginated list of products based on the provided parameters.
      *
-     * @param pageNo     The page number to retrieve (0-indexed).
-     * @param pageSize   The number of products to include in each page.
+     * @param offset     The page number to retrieve (0-indexed).
+     * @param limit      The number of products to include in each page.
      * @param sortBy     The attribute by which the products should be sorted.
      * @param sortDir    The sorting direction, either "ASC" (ascending) or "DESC"
-     *                   (descending).
-     * @param categoryId
-     * @param spec       The list of filters.
-     * @return A {@link ProductPaginationResponse} containing the paginated list of
+     *                (descending).
+     * @param categoryId Category id
+     * @param spec       Specification
+     * @return A {@link org.crochet.payload.response.PaginationResponse} containing the paginated list of
      * products.
      */
     @SuppressWarnings("ConstantValue")
     @Override
-    public ProductPaginationResponse getProducts(int pageNo, int pageSize, String sortBy, String sortDir,
-                                                 String categoryId, Specification<Product> spec) {
-
+    public PaginationResponse<ProductResponse> getProducts(int offset, int limit, String sortBy, String sortDir,
+                                                           String categoryId, Specification<Product> spec) {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
-        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+        Pageable pageable = PageRequest.of(offset, limit, sort);
         Page<ProductResponse> menuPage;
         var filter = ((FilterSpecification<Product>) spec).getFilter();
         var hasCategory = ObjectUtils.hasText(categoryId);
@@ -121,26 +113,19 @@ public class ProductServiceImpl implements ProductService {
         } else {
             menuPage = productRepo.findProductWithPageable(pageable);
         }
-        return ProductPaginationResponse.builder()
-                .contents(menuPage.getContent())
-                .pageNo(menuPage.getNumber())
-                .pageSize(menuPage.getSize())
-                .totalElements(menuPage.getTotalElements())
-                .totalPages(menuPage.getTotalPages())
-                .last(menuPage.isLast())
-                .build();
+        return PaginationMapper.getInstance().toPagination(menuPage);
     }
 
     /**
      * Get product ids
      *
-     * @param pageNo Page number
+     * @param offset Page number
      * @param limit  Limit
      * @return List of product ids
      */
     @Override
-    public List<String> getProductIds(int pageNo, int limit) {
-        Pageable pageable = PageRequest.of(pageNo, limit);
+    public List<String> getProductIds(int offset, int limit) {
+        Pageable pageable = PageRequest.of(offset, limit);
         return productRepo.getProductIds(pageable);
     }
 
@@ -156,16 +141,11 @@ public class ProductServiceImpl implements ProductService {
         if (settingsMap.isEmpty()) {
             return Collections.emptyList();
         }
-
         var direction = settingsMap.get("homepage.product.direction").getValue();
-
         var orderBy = settingsMap.get("homepage.product.orderBy").getValue();
-
         var limit = settingsMap.get("homepage.product.limit").getValue();
-
         Sort sort = Sort.by(Sort.Direction.fromString(direction), orderBy);
         Pageable pageable = PageRequest.of(0, Integer.parseInt(limit), sort);
-
         return productRepo.findLimitedNumProduct(pageable);
     }
 
@@ -180,10 +160,17 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional(readOnly = true)
     public ProductResponse getDetail(String id) {
-        var product = productRepo.findProductById(id).orElseThrow(
-                () -> new ResourceNotFoundException(MessageConstant.MSG_PRODUCT_NOT_FOUND,
-                        MAP_CODE.get(MessageConstant.MSG_PRODUCT_NOT_FOUND)));
+        var product = findById(id);
         return ProductMapper.INSTANCE.toResponse(product);
+    }
+
+    @Override
+    public Product findById(String id) {
+        return productRepo.findProductById(id).orElseThrow(
+                () -> new ResourceNotFoundException(
+                        ResultCode.MSG_PRODUCT_NOT_FOUND.message(),
+                        ResultCode.MSG_PRODUCT_NOT_FOUND.code()
+                ));
     }
 
     /**

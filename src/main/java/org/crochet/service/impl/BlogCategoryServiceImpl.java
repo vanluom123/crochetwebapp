@@ -1,7 +1,7 @@
 package org.crochet.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.crochet.constant.MessageConstant;
+import org.crochet.enums.ResultCode;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.BlogCategoryMapper;
 import org.crochet.model.BlogCategory;
@@ -9,26 +9,28 @@ import org.crochet.payload.request.BlogCategoryRequest;
 import org.crochet.payload.response.BlogCategoryResponse;
 import org.crochet.repository.BlogCategoryRepo;
 import org.crochet.service.BlogCategoryService;
+import org.crochet.service.PermissionService;
+import org.crochet.util.ObjectUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
-
 @Service
 @RequiredArgsConstructor
 public class BlogCategoryServiceImpl implements BlogCategoryService {
     private final BlogCategoryRepo blogCategoryRepo;
+    private final PermissionService permissionService;
 
     @Transactional
     @Override
     public void createOrUpdate(BlogCategoryRequest request) {
         BlogCategory blogCategory;
-        if (!request.getId().isEmpty()) {
-            blogCategory = getById(request.getId());
-        } else {
+        if (!ObjectUtils.hasText(request.getId())) {
             blogCategory = new BlogCategory();
+        } else {
+            blogCategory = getById(request.getId());
+            permissionService.checkUserPermission(blogCategory, "update");
         }
         blogCategory.setName(request.getName());
         blogCategoryRepo.save(blogCategory);
@@ -66,6 +68,7 @@ public class BlogCategoryServiceImpl implements BlogCategoryService {
     @Override
     public void delete(String id) {
         BlogCategory blogCategory = getById(id);
+        permissionService.checkUserPermission(blogCategory, "delete");
         blogCategoryRepo.delete(blogCategory);
     }
 
@@ -75,10 +78,13 @@ public class BlogCategoryServiceImpl implements BlogCategoryService {
      * @param id the blog category id
      * @return the blog category
      */
-    private BlogCategory getById(String id) {
+    @Override
+    public BlogCategory getById(String id) {
         return blogCategoryRepo.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException(MessageConstant.MSG_BLOG_CATEGORY_NOT_FOUND,
-                        MAP_CODE.get(MessageConstant.MSG_BLOG_CATEGORY_NOT_FOUND))
+                () -> new ResourceNotFoundException(
+                        ResultCode.MSG_BLOG_CATEGORY_NOT_FOUND.message(),
+                        ResultCode.MSG_BLOG_CATEGORY_NOT_FOUND.code()
+                )
         );
     }
 }

@@ -1,7 +1,10 @@
 package org.crochet.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.AttributeOverrides;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -19,10 +22,7 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.BatchSize;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-
-import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -41,9 +41,9 @@ public class BlogPost extends BaseEntity {
     @Column(name = "home", columnDefinition = "BOOLEAN DEFAULT FALSE")
     private boolean home;
 
-    @OneToMany(mappedBy = "blogPost")
+    @OneToMany(mappedBy = "blogPost", cascade = CascadeType.ALL)
     @JsonManagedReference
-    private List<Comment> comments;
+    private Set<Comment> comments;
 
     @BatchSize(size = 10)
     @OrderBy("order ASC")
@@ -56,7 +56,7 @@ public class BlogPost extends BaseEntity {
             @AttributeOverride(name = "order", column = @Column(name = "display_order")),
             @AttributeOverride(name = "lastModified", column = @Column(name = "last_modified", columnDefinition = "datetime default current_timestamp"))
     })
-    private List<File> files;
+    private Set<File> files;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "blog_category_id", referencedColumnName = "id")
