@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.4.1'
+    id 'org.springframework.boot' version '3.4.3'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'org.liquibase.gradle' version '2.2.1'
 }
@@ -12,7 +12,7 @@ version = loadVersion().getVersion()
 description = 'crochet'
 
 java {
-    sourceCompatibility = '17'
+    sourceCompatibility = '21'
 }
 
 configurations {
@@ -51,6 +51,8 @@ dependencies {
     implementation 'org.liquibase:liquibase-core:4.30.0'
     implementation 'com.h2database:h2:2.2.224'
     implementation 'org.postgresql:postgresql:42.7.4'
+    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.4'
+    testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.4'
 
     compileOnly 'org.projectlombok:lombok:1.18.36'
     annotationProcessor 'org.projectlombok:lombok:1.18.36'
@@ -64,9 +66,7 @@ dependencies {
 
     implementation 'com.google.firebase:firebase-admin:9.4.1'
 
-    implementation 'org.apache.commons:commons-pool2:2.12.0'
-
-    implementation 'com.github.f4b6a3:tsid-creator:5.2.6'
+    implementation 'io.hypersistence:hypersistence-utils-hibernate-63:3.9.2'
 
 // https://mvnrepository.com/artifact/com.turkraft.springfilter/jpa
     implementation 'com.turkraft.springfilter:jpa:3.1.9'

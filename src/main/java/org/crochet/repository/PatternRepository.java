@@ -25,7 +25,7 @@ public interface PatternRepository extends JpaRepository<Pattern, String>, JpaSp
             WHERE
               p.id =:id
             """)
-    Optional<Pattern> findPatternById(String id);
+    Optional<Pattern> findPatternById(@Param("id") String id);
 
     @Query("""
             SELECT

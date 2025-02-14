@@ -2,7 +2,6 @@ package org.crochet.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -17,7 +16,7 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.BatchSize;
 
-import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -36,20 +35,16 @@ public class Category extends BaseEntity {
     private Category parent;
 
     @BatchSize(size = 10)
-    @OneToMany(mappedBy = "parent",
-            cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @OneToMany(mappedBy = "parent")
     @JsonManagedReference
-    private List<Category> children;
+    private Set<Category> children;
 
-    @OneToMany(mappedBy = "category",
-            cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    private List<Product> products;
+    @OneToMany(mappedBy = "category")
+    private Set<Product> products;
 
-    @OneToMany(mappedBy = "category",
-            cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    private List<Pattern> patterns;
+    @OneToMany(mappedBy = "category")
+    private Set<Pattern> patterns;
 
-    @OneToMany(mappedBy = "category",
-            cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    private List<FreePattern> freePatterns;
+    @OneToMany(mappedBy = "category")
+    private Set<FreePattern> freePatterns;
 }

@@ -18,15 +18,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import org.crochet.enumerator.AuthProvider;
-import org.crochet.enumerator.RoleType;
+import org.crochet.enums.AuthProvider;
+import org.crochet.enums.RoleType;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Entity
 @Table(name = "users", uniqueConstraints = {
@@ -72,19 +73,19 @@ public class User extends BaseEntity implements UserDetails, OAuth2User {
     private RoleType role = RoleType.USER;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<ConfirmationToken> confirmationTokens;
+    private Set<ConfirmationToken> confirmationTokens;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<PasswordResetToken> passwordResetTokens;
+    private Set<PasswordResetToken> passwordResetTokens;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Comment> comments;
+    private Set<Comment> comments;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<RefreshToken> refreshTokens;
+    private Set<RefreshToken> refreshTokens;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Collection> collections;
+    private Set<Collection> collections;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private UserProfile userProfile;

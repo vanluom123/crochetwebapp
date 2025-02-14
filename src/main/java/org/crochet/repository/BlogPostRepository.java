@@ -23,11 +23,15 @@ public interface BlogPostRepository extends JpaRepository<BlogPost, String>, Jpa
                 p.title,
                 p.content,
                 f.fileContent,
-                p.createdDate
+                p.createdDate,
+                u.id,
+                u.name,
+                u.imageUrl
               )
             FROM
               BlogPost p
               JOIN p.files f WITH f.order = 0
+              JOIN User u on u.id = p.createdBy
             WHERE
               p.home = TRUE
             """)
@@ -51,15 +55,19 @@ public interface BlogPostRepository extends JpaRepository<BlogPost, String>, Jpa
                 p.title,
                 p.content,
                 f.fileContent,
-                p.createdDate
+                p.createdDate,
+                u.id,
+                u.name,
+                u.imageUrl
               )
             FROM
               BlogPost p
               JOIN p.files f WITH f.order = 0
+              JOIN User u on u.id = p.createdBy
             WHERE
               p.id IN :ids
             """)
-    Page<BlogPostResponse> findPostByIds(@Param("ids") List<String> ids, Pageable pageable);
+    Page<BlogPostResponse> findPostWithIds(@Param("ids") List<String> ids, Pageable pageable);
 
     @Query("""
             SELECT
@@ -68,11 +76,15 @@ public interface BlogPostRepository extends JpaRepository<BlogPost, String>, Jpa
                 p.title,
                 p.content,
                 f.fileContent,
-                p.createdDate
+                p.createdDate,
+                u.id,
+                u.name,
+                u.imageUrl
               )
             FROM
               BlogPost p
               JOIN p.files f WITH f.order = 0
+              JOIN User u on u.id = p.createdBy
             """)
     Page<BlogPostResponse> findPostWithPageable(Pageable pageable);
 

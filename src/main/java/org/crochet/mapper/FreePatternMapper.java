@@ -1,5 +1,6 @@
 package org.crochet.mapper;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.crochet.model.FreePattern;
 import org.crochet.payload.request.FreePatternRequest;
 import org.crochet.payload.response.FreePatternResponse;
@@ -49,13 +50,13 @@ public interface FreePatternMapper {
         if (req.getStatus() != null) {
             freePattern.setStatus(req.getStatus());
         }
-        if (req.getImages() != null && !req.getImages().isEmpty()) {
+        if (ObjectUtils.isNotEmpty(req.getImages())) {
             var sortedImages = ImageUtils.sortFiles(req.getImages());
             freePattern.setImages(FileMapper.INSTANCE.toEntities(sortedImages));
         }
-        if (req.getFiles() != null && !req.getFiles().isEmpty()) {
+        if (ObjectUtils.isNotEmpty(req.getFiles())) {
             var sortedFiles = ImageUtils.sortFiles(req.getFiles());
-            freePattern.setFiles(FileMapper.INSTANCE.toSetEntities(sortedFiles));
+            freePattern.setFiles(FileMapper.INSTANCE.toEntities(sortedFiles));
         }
         return freePattern;
     }
