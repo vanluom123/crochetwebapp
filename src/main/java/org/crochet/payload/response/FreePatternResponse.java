@@ -21,7 +21,7 @@ public class FreePatternResponse {
     private String description;
     private String author;
     @JsonProperty("is_home")
-    private boolean isHome;
+    private Boolean isHome;
     private String link;
     private String content;
     private ChartStatus status;

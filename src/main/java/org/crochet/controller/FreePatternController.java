@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.crochet.constant.AppConstant;
+import org.crochet.constant.MessageConstant;
 import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.FreePatternRequest;
 import org.crochet.payload.response.FreePatternResponse;
@@ -14,22 +15,23 @@ import org.crochet.payload.response.PaginationResponse;
 import org.crochet.payload.response.ResponseData;
 import org.crochet.service.FreePatternService;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+import static org.crochet.constant.AppConstant.SUCCESS;
+
 @RestController
-@RequestMapping("/free-pattern")
+@RequestMapping("/api/v1/free-pattern")
 public class FreePatternController {
     private final FreePatternService freePatternService;
 
@@ -37,22 +39,20 @@ public class FreePatternController {
         this.freePatternService = freePatternService;
     }
 
-    @ResponseBody
-    @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create a free pattern")
     @ApiResponse(responseCode = "201", description = "Free Pattern created successfully",
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = FreePatternResponse.class)))
-    @PostMapping(value = "/create")
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping("/create")
+    @PreAuthorize("isAuthenticated()")
     @SecurityRequirement(name = "BearerAuth")
     public ResponseData<String> createPattern(@RequestBody FreePatternRequest request) {
         freePatternService.createOrUpdate(request);
         return ResponseData.<String>builder()
                 .success(true)
-                .code(201)
-                .message("Success")
-                .data("Created success")
+                .code(HttpStatus.CREATED.value())
+                .message(MessageConstant.MSG_CREATE_OR_UPDATE_SUCCESS)
                 .build();
     }
 
@@ -60,24 +60,27 @@ public class FreePatternController {
     @ApiResponse(responseCode = "200", description = "Free Pattern details retrieved successfully",
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = FreePatternResponse.class)))
-    @GetMapping("/detail")
-    public ResponseEntity<FreePatternResponse> getDetail(
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping("/{id}")
+    public ResponseData<FreePatternResponse> getDetail(
             @Parameter(description = "ID of the pattern to retrieve")
-            @RequestParam("id") String id) {
-        return ResponseEntity.ok(freePatternService.getDetail(id));
+            @PathVariable("id") String id) {
+        var response = freePatternService.getDetail(id);
+        return ResponseData.<FreePatternResponse>builder()
+                .success(true)
+                .code(HttpStatus.OK.value())
+                .message(SUCCESS)
+                .data(response)
+                .build();
     }
 
-    @ResponseBody
-    @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Delete a free pattern")
     @ApiResponse(responseCode = "200", description = "Free pattern deleted successfully",
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = String.class)))
-    @ApiResponse(responseCode = "404", description = "Pattern not found",
-            content = @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = String.class)))
-    @DeleteMapping("/delete")
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @ResponseStatus(HttpStatus.OK)
+    @DeleteMapping
+    @PreAuthorize("isAuthenticated()")
     @SecurityRequirement(name = "BearerAuth")
     public ResponseData<String> delete(
             @Parameter(description = "ID of the pattern to delete")
@@ -85,9 +88,8 @@ public class FreePatternController {
         freePatternService.delete(id);
         return ResponseData.<String>builder()
                 .success(true)
-                .code(200)
-                .message("Success")
-                .data("Free pattern deleted successfully")
+                .code(HttpStatus.OK.value())
+                .message("Delete pattern successfully")
                 .build();
     }
 
@@ -96,7 +98,7 @@ public class FreePatternController {
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = ResponseData.class)))
     @DeleteMapping("/delete-multiple")
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @PreAuthorize("isAuthenticated()")
     @SecurityRequirement(name = "BearerAuth")
     public ResponseData<String> deleteMultiple(
             @Parameter(description = "List of pattern ids to delete")
@@ -104,9 +106,8 @@ public class FreePatternController {
         freePatternService.deleteAllById(ids);
         return ResponseData.<String>builder()
                 .success(true)
-                .code(200)
-                .message("Success")
-                .data("Free patterns deleted successfully")
+                .code(HttpStatus.OK.value())
+                .message("Delete patterns successfully")
                 .build();
     }
 
@@ -114,14 +115,15 @@ public class FreePatternController {
     @ApiResponse(responseCode = "200", description = "List of free patterns",
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = PaginationResponse.class)))
-    @PostMapping("/pagination")
-    public ResponseEntity<PaginationResponse<FreePatternResponse>> getAllFreePatterns(
+    @ResponseStatus(HttpStatus.OK)
+    @PostMapping
+    public ResponseData<PaginationResponse<FreePatternResponse>> getAllFreePatterns(
             @Parameter(description = "Page number (default: 0)")
-            @RequestParam(value = "pageNo", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER,
-                    required = false) int pageNo,
+            @RequestParam(value = "offset", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER,
+                    required = false) int offset,
             @Parameter(description = "Page size (default: 48)")
-            @RequestParam(value = "pageSize", defaultValue = AppConstant.DEFAULT_PAGE_SIZE,
-                    required = false) int pageSize,
+            @RequestParam(value = "limit", defaultValue = AppConstant.DEFAULT_PAGE_SIZE,
+                    required = false) int limit,
             @Parameter(description = "Sort by field (default: createdDate)")
             @RequestParam(value = "sortBy", defaultValue = AppConstant.DEFAULT_SORT_BY, required = false) String sortBy,
             @Parameter(description = "Sort direction (default: DESC)")
@@ -129,28 +131,29 @@ public class FreePatternController {
                     required = false) String sortDir,
             @Parameter(description = "List filters")
             @RequestBody(required = false) Filter[] filters) {
-        var response = freePatternService.getAllFreePatterns(pageNo, pageSize, sortBy, sortDir, filters);
-        return ResponseEntity.ok(response);
+        var response = freePatternService.getAllFreePatterns(offset, limit, sortBy, sortDir, filters);
+        return ResponseData.<PaginationResponse<FreePatternResponse>>builder()
+                .success(true)
+                .code(HttpStatus.OK.value())
+                .message(SUCCESS)
+                .data(response)
+                .build();
     }
 
     @Operation(summary = "Get free pattern ids")
     @ApiResponse(responseCode = "200", description = "List of free pattern ids",
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = List.class)))
+    @ResponseStatus(HttpStatus.OK)
     @GetMapping("/ids")
-    public ResponseEntity<List<String>> getFreePatternIds(@RequestParam("pageNo") int pageNo,
-                                                          @RequestParam("limit") int limit) {
-        return ResponseEntity.ok(freePatternService.getFreePatternIds(pageNo, limit));
-    }
-
-    @Operation(summary = "Get free pattern by create by")
-    @ApiResponse(responseCode = "200", description = "List of free pattern",
-            content = @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = List.class)))
-    @GetMapping("/create-by")
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-    @SecurityRequirement(name = "BearerAuth")
-    public ResponseEntity<List<FreePatternResponse>> getFrepsByCreateBy(@RequestParam("userId") String userId) {
-        return ResponseEntity.ok(freePatternService.getFrepsByCreateBy(userId));
+    public ResponseData<List<String>> getFreePatternIds(@RequestParam("offset") int offset,
+                                                        @RequestParam("limit") int limit) {
+        var res = freePatternService.getFreePatternIds(offset, limit);
+        return ResponseData.<List<String>>builder()
+                .success(true)
+                .code(HttpStatus.OK.value())
+                .message(SUCCESS)
+                .data(res)
+                .build();
     }
 }

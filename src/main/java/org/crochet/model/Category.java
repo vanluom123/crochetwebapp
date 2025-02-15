@@ -18,7 +18,8 @@ import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-import java.util.List;
+
+import java.util.Set;
 
 @Getter
 @Setter
@@ -40,14 +41,14 @@ public class Category extends BaseEntity {
     @BatchSize(size = 10)
     @OneToMany(mappedBy = "parent", cascade = CascadeType.REMOVE, orphanRemoval = true)
     @JsonManagedReference
-    private List<Category> children;
+    private Set<Category> children;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
-    private List<Product> products;
+    private Set<Product> products;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
-    private List<Pattern> patterns;
+    private Set<Pattern> patterns;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
-    private List<FreePattern> freePatterns;
+    private Set<FreePattern> freePatterns;
 }

@@ -13,7 +13,6 @@ import java.util.Optional;
 
 @Repository
 public interface CollectionRepo extends JpaRepository<Collection, String> {
-
     @Query("""
             SELECT
               new org.crochet.payload.response.CollectionResponse (c.id, c.name, c.avatar, COUNT(cf.id))

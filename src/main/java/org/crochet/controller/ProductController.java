@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.crochet.constant.AppConstant;
+import org.crochet.constant.MessageConstant;
 import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.ProductRequest;
 import org.crochet.payload.response.PaginationResponse;
@@ -14,15 +15,14 @@ import org.crochet.payload.response.ProductResponse;
 import org.crochet.payload.response.ResponseData;
 import org.crochet.service.ProductService;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -31,7 +31,7 @@ import java.util.List;
 import static org.crochet.constant.AppConstant.SUCCESS;
 
 @RestController
-@RequestMapping("/product")
+@RequestMapping("/api/v1/products")
 public class ProductController {
     private final ProductService productService;
 
@@ -39,14 +39,12 @@ public class ProductController {
         this.productService = productService;
     }
 
-    @ResponseBody
-    @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create a new product")
     @ApiResponse(responseCode = "201", description = "Product created successfully",
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = ProductResponse.class)))
-    @ApiResponse(responseCode = "400", description = "Invalid input")
-    @PostMapping(value = "/create")
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping("/create")
     @PreAuthorize("hasRole('ADMIN')")
     @SecurityRequirement(name = "BearerAuth")
     public ResponseData<String> createProduct(@RequestBody ProductRequest request) {
@@ -54,8 +52,7 @@ public class ProductController {
         return ResponseData.<String>builder()
                 .success(true)
                 .code(HttpStatus.CREATED.value())
-                .message(SUCCESS)
-                .data("Product created successfully")
+                .message(MessageConstant.MSG_CREATE_OR_UPDATE_SUCCESS)
                 .build();
     }
 
@@ -63,15 +60,15 @@ public class ProductController {
     @ApiResponse(responseCode = "200", description = "List of products",
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = PaginationResponse.class)))
-    @ApiResponse(responseCode = "400", description = "Invalid input")
-    @PostMapping("/pagination")
-    public ResponseEntity<PaginationResponse<ProductResponse>> getProducts(
+    @ResponseStatus(HttpStatus.OK)
+    @PostMapping
+    public ResponseData<PaginationResponse<ProductResponse>> getProducts(
             @Parameter(description = "Page number")
-            @RequestParam(value = "pageNo", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER,
-                    required = false) int pageNo,
+            @RequestParam(value = "offset", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER,
+                    required = false) int offset,
             @Parameter(description = "Page size")
-            @RequestParam(value = "pageSize", defaultValue = AppConstant.DEFAULT_PAGE_SIZE,
-                    required = false) int pageSize,
+            @RequestParam(value = "limit", defaultValue = AppConstant.DEFAULT_PAGE_SIZE,
+                    required = false) int limit,
             @Parameter(description = "Sort by field")
             @RequestParam(value = "sortBy", defaultValue = AppConstant.DEFAULT_SORT_BY, required = false) String sortBy,
             @Parameter(description = "Sort direction")
@@ -79,8 +76,13 @@ public class ProductController {
                     required = false) String sortDir,
             @Parameter(description = "The list of filters")
             @RequestBody(required = false) Filter[] filters) {
-        var response = productService.getProducts(pageNo, pageSize, sortBy, sortDir, filters);
-        return ResponseEntity.ok(response);
+        var response = productService.getProducts(offset, limit, sortBy, sortDir, filters);
+        return ResponseData.<PaginationResponse<ProductResponse>>builder()
+                .success(true)
+                .code(HttpStatus.OK.value())
+                .message(SUCCESS)
+                .data(response)
+                .build();
     }
 
     @Operation(summary = "Get product details by ID")
@@ -88,18 +90,24 @@ public class ProductController {
             description = "Product details retrieved successfully",
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = ProductResponse.class)))
-    @ApiResponse(responseCode = "404", description = "Product not found")
-    @GetMapping("/detail")
-    public ResponseEntity<ProductResponse> getProductDetail(@RequestParam("id") String id) {
-        return ResponseEntity.ok(productService.getDetail(id));
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping("/{id}")
+    public ResponseData<ProductResponse> getProductDetail(@PathVariable("id") String id) {
+        var res = productService.getDetail(id);
+        return ResponseData.<ProductResponse>builder()
+                .success(true)
+                .code(HttpStatus.OK.value())
+                .message(SUCCESS)
+                .data(res)
+                .build();
     }
 
-    @ResponseBody
-    @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Delete a product by ID")
-    @ApiResponse(responseCode = "200", description = "Product deleted successfully", content = @Content(mediaType = "application/json"))
-    @ApiResponse(responseCode = "404", description = "Product not found", content = @Content(mediaType = "application/json"))
-    @DeleteMapping("/delete")
+    @ApiResponse(responseCode = "200",
+            description = "Product deleted successfully",
+            content = @Content(mediaType = "application/json"))
+    @ResponseStatus(HttpStatus.OK)
+    @DeleteMapping
     @PreAuthorize("hasRole('ADMIN')")
     @SecurityRequirement(name = "BearerAuth")
     public ResponseData<String> deleteProduct(@RequestParam("id") String id) {
@@ -107,17 +115,15 @@ public class ProductController {
         return ResponseData.<String>builder()
                 .success(true)
                 .code(HttpStatus.OK.value())
-                .message(SUCCESS)
-                .data("Product deleted")
+                .message(MessageConstant.MSG_DELETE_SUCCESS)
                 .build();
     }
 
-    @ResponseBody
-    @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Delete multiple products")
-    @ApiResponse(responseCode = "200", description = "Products deleted successfully",
-            content = @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = ResponseData.class)))
+    @ApiResponse(responseCode = "200",
+            description = "Products deleted successfully",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseData.class)))
+    @ResponseStatus(HttpStatus.OK)
     @DeleteMapping("/delete-multiple")
     @PreAuthorize("hasRole('ADMIN')")
     @SecurityRequirement(name = "BearerAuth")
@@ -126,8 +132,7 @@ public class ProductController {
         return ResponseData.<String>builder()
                 .success(true)
                 .code(HttpStatus.OK.value())
-                .message(SUCCESS)
-                .data("Products deleted")
+                .message(MessageConstant.MSG_DELETE_SUCCESS)
                 .build();
     }
 
@@ -136,13 +141,18 @@ public class ProductController {
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = List.class)))
     @GetMapping("/ids")
-    public ResponseEntity<List<String>> getProductIds(
+    public ResponseData<List<String>> getProductIds(
             @Parameter(description = "Page number (default: 0)")
-            @RequestParam(value = "pageNo", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER,
-                    required = false) int pageNo,
-            @Parameter(description = "Limit (default: 10)")
+            @RequestParam(value = "offset", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER,
+                    required = false) int offset,
+            @Parameter(description = "Limit (default: 48)")
             @RequestParam(value = "limit", defaultValue = AppConstant.DEFAULT_PAGE_SIZE, required = false) int limit) {
-        var response = productService.getProductIds(pageNo, limit);
-        return ResponseEntity.ok(response);
+        var response = productService.getProductIds(offset, limit);
+        return ResponseData.<List<String>>builder()
+                .success(true)
+                .code(HttpStatus.OK.value())
+                .message(SUCCESS)
+                .data(response)
+                .build();
     }
 }

@@ -10,11 +10,11 @@ import java.util.List;
 public interface PatternService {
     void createOrUpdate(PatternRequest request);
 
-    PaginationResponse<PatternResponse> getPatterns(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters);
+    PaginationResponse<PatternResponse> getPatterns(int offset, int limit, String sortBy, String sortDir, Filter[] filters);
 
     List<PatternResponse> getLimitedPatterns();
 
-    List<String> getPatternIds(int pageNo, int limit);
+    List<String> getPatternIds(int offset, int limit);
 
     PatternResponse getDetail(String id);
 

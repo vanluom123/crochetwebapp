@@ -70,7 +70,7 @@ public class PatternServiceImpl implements PatternService {
                     .isHome(request.isHome())
                     .link(request.getLink())
                     .content(request.getContent())
-                    .files(FileMapper.INSTANCE.toSetEntities(files))
+                    .files(FileMapper.INSTANCE.toEntities(files))
                     .images(FileMapper.INSTANCE.toEntities(images))
                     .build();
         } else {
@@ -86,16 +86,16 @@ public class PatternServiceImpl implements PatternService {
     /**
      * Get patterns
      *
-     * @param pageNo   Page number
-     * @param pageSize The size of page
-     * @param sortBy   Sort by
-     * @param sortDir  Sort directory
-     * @param filters  The list of filters
+     * @param offset  Page number
+     * @param limit   The size of page
+     * @param sortBy  Sort by
+     * @param sortDir Sort directory
+     * @param filters The list of filters
      * @return Pattern is paginated
      */
     @Override
-    public PaginationResponse<PatternResponse> getPatterns(int pageNo, int pageSize, String sortBy, String sortDir,
-                                                           Filter[] filters) {
+    public PaginationResponse<PatternResponse> getPatterns(int offset, int limit, String sortBy, String sortDir,
+                                                 Filter[] filters) {
         List<String> patternIds = Collections.emptyList();
 
         if (filters != null && filters.length > 0) {
@@ -108,7 +108,7 @@ public class PatternServiceImpl implements PatternService {
         }
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
-        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+        Pageable pageable = PageRequest.of(offset, limit, sort);
         Page<PatternResponse> page;
         if (patternIds.isEmpty()) {
             page = patternRepo.findPatternWithPageable(pageable);
@@ -146,13 +146,13 @@ public class PatternServiceImpl implements PatternService {
     /**
      * Get pattern ids
      *
-     * @param pageNo Page number
+     * @param offset Page number
      * @param limit  Limit
      * @return List of pattern ids
      */
     @Override
-    public List<String> getPatternIds(int pageNo, int limit) {
-        Pageable pageable = PageRequest.of(pageNo, limit);
+    public List<String> getPatternIds(int offset, int limit) {
+        Pageable pageable = PageRequest.of(offset, limit);
         return patternRepo.getPatternIds(pageable);
     }
 

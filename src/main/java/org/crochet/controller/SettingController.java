@@ -19,10 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-import static org.crochet.constant.AppConstant.SUCCESS;
-
 @RestController
-@RequestMapping("/setting")
+@RequestMapping("/api/v1/settings")
 @RequiredArgsConstructor
 @SecurityRequirement(name = "BearerAuth")
 @PreAuthorize("hasRole('ADMIN')")
@@ -42,9 +40,8 @@ public class SettingController {
         settingService.create(request);
         return ResponseData.<String>builder()
                 .success(true)
-                .code(HttpStatus.OK.value())
-                .message(SUCCESS)
-                .data("Create success")
+                .code(HttpStatus.CREATED.value())
+                .message("Create success")
                 .build();
     }
 
@@ -52,11 +49,10 @@ public class SettingController {
     @PutMapping("/update")
     public ResponseData<String> update(@RequestBody SettingRequest request) {
         settingService.update(request);
-        return ResponseData.<String>builder()
-                .success(true)
-                .code(HttpStatus.OK.value())
-                .message(SUCCESS)
-                .data("Update success")
-                .build();
+        return new ResponseData<>(true,
+                HttpStatus.OK.value(),
+                "Update success",
+                null,
+                null);
     }
 }

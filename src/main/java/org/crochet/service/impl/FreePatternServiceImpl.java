@@ -82,7 +82,7 @@ public class FreePatternServiceImpl implements FreePatternService {
                     .link(request.getLink())
                     .content(request.getContent())
                     .status(request.getStatus())
-                    .files(FileMapper.INSTANCE.toSetEntities(sortedFiles))
+                    .files(FileMapper.INSTANCE.toEntities(sortedFiles))
                     .images(FileMapper.INSTANCE.toEntities(sortedImages))
                     .build();
         } else {
@@ -97,18 +97,18 @@ public class FreePatternServiceImpl implements FreePatternService {
     /**
      * Get all free patterns with filter
      *
-     * @param pageNo   Page number
-     * @param pageSize Page size
-     * @param sortBy   Sort by
-     * @param sortDir  Sort direction
-     * @param filters  List Filters
+     * @param offset  Page number
+     * @param limit   Page size
+     * @param sortBy  Sort by
+     * @param sortDir Sort direction
+     * @param filters List Filters
      * @return PaginatedFreePatternResponse
      */
     @Transactional(readOnly = true)
     @Override
-    public PaginationResponse<FreePatternResponse> getAllFreePatterns(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters) {
+    public PaginationResponse<FreePatternResponse> getAllFreePatterns(int offset, int limit, String sortBy, String sortDir, Filter[] filters) {
         List<String> freePatternIds = new ArrayList<>();
-        var pageable = preparePageableAndFilter(pageNo, pageSize, sortBy, sortDir, filters, freePatternIds);
+        var pageable = preparePageableAndFilter(offset, limit, sortBy, sortDir, filters, freePatternIds);
 
         Page<FreePatternResponse> page;
         if (freePatternIds.isEmpty()) {
@@ -124,20 +124,30 @@ public class FreePatternServiceImpl implements FreePatternService {
      * Retrieves a paginated and sorted list of free patterns associated with a specific user,
      * optionally filtered by specified criteria.
      *
-     * @param pageNo   the page number to retrieve (zero-based)
-     * @param pageSize the number of items per page
-     * @param sortBy   the attribute to sort the results by
-     * @param sortDir  the direction to sort the results (e.g., "asc" or "desc")
-     * @param filters  an array of filter conditions to apply to the query, can be null or empty
-     * @param userId   the ID of the user whose free patterns are to be retrieved
+     * @param offset  the page number to retrieve (zero-based)
+     * @param limit   the number of items per page
+     * @param sortBy  the attribute to sort the results by
+     * @param sortDir the direction to sort the results (e.g., "asc" or "desc")
+     * @param filters an array of filter conditions to apply to the query, can be null or empty
+     * @param userId  the ID of the user whose free patterns are to be retrieved
      * @return a {@link PaginationResponse} containing the paginated and filtered list of free patterns
      */
     @Transactional(readOnly = true)
     @Override
-    public PaginationResponse<FreePatternResponse> getAllByUser(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters, String userId) {
+    public PaginationResponse<FreePatternResponse> getAllByUser(int offset,
+                                                                int limit,
+                                                                String sortBy,
+                                                                String sortDir,
+                                                                Filter[] filters,
+                                                                String userId) {
         List<String> freePatternIds = new ArrayList<>();
-        var pageable = preparePageableAndFilter(pageNo, pageSize, sortBy, sortDir, filters, freePatternIds);
-        var page = freePatternRepo.getByUserAndIds(userId, freePatternIds, pageable);
+        var pageable = preparePageableAndFilter(offset, limit, sortBy, sortDir, filters, freePatternIds);
+        Page<FreePatternResponse> page;
+        if (freePatternIds.isEmpty()) {
+            page = freePatternRepo.getByUserWithPageable(userId, pageable);
+        } else {
+            page = freePatternRepo.getByUserAndIds(userId, freePatternIds, pageable);
+        }
         return PaginationMapper.getInstance().toPagination(page);
     }
 
@@ -170,13 +180,13 @@ public class FreePatternServiceImpl implements FreePatternService {
     /**
      * Get free pattern ids
      *
-     * @param pageNo Page number
+     * @param offset Page number
      * @param limit  Limit
      * @return List of free pattern ids
      */
     @Override
-    public List<String> getFreePatternIds(int pageNo, int limit) {
-        Pageable pageable = PageRequest.of(pageNo, limit);
+    public List<String> getFreePatternIds(int offset, int limit) {
+        Pageable pageable = PageRequest.of(offset, limit);
         return freePatternRepo.getFreePatternIds(pageable);
     }
 
@@ -268,23 +278,9 @@ public class FreePatternServiceImpl implements FreePatternService {
     }
 
     /**
-     * Get free patterns by create by
-     *
-     * @return List of FreePatternOnHome
-     */
-    @Override
-    public List<FreePatternResponse> getFrepsByCreateBy(String userId) {
-        if (!userRepo.existsById(userId)) {
-            throw new ResourceNotFoundException(MessageConstant.MSG_USER_NOT_FOUND,
-                    MAP_CODE.get(MessageConstant.MSG_USER_NOT_FOUND));
-        }
-        return freePatternRepo.getFrepsByCreateByWithUser(userId);
-    }
-
-    /**
      * Get free patterns by collection id
      *
-     * @param collectionId String
+     * @param collectionId      String
      * @param paginationRequest PaginationRequest
      * @return PaginationResponse
      */
@@ -301,15 +297,20 @@ public class FreePatternServiceImpl implements FreePatternService {
      * and applies filters to identify matching records. The filtered IDs are added
      * to the provided list of freePatternIds.
      *
-     * @param pageNo         the page number to retrieve, zero-based index
-     * @param pageSize       the number of records per page
+     * @param offset         the page number to retrieve, zero-based index
+     * @param limit          the number of records per page
      * @param sortBy         the property name to sort by
      * @param sortDir        the direction of sorting, either "asc" for ascending or "desc" for descending
      * @param filters        an array of filters to apply to the query
      * @param freePatternIds a reference to a list where the filtered IDs will be collected
      * @return a Pageable object configured with the specified page, size, and sort properties
      */
-    private Pageable preparePageableAndFilter(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters, List<String> freePatternIds) {
+    private Pageable preparePageableAndFilter(int offset,
+                                              int limit,
+                                              String sortBy,
+                                              String sortDir,
+                                              Filter[] filters,
+                                              List<String> freePatternIds) {
         if (filters != null && filters.length > 0) {
             GenericFilter<FreePattern> filter = GenericFilter.create(filters);
             var spec = filter.build();
@@ -318,6 +319,6 @@ public class FreePatternServiceImpl implements FreePatternService {
         }
         Sort.Direction dir = Sort.Direction.fromString(sortDir);
         Sort sort = Sort.by(dir, sortBy);
-        return PageRequest.of(pageNo, pageSize, sort);
+        return PageRequest.of(offset, limit, sort);
     }
 }

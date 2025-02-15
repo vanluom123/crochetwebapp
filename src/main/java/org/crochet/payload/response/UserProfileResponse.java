@@ -28,7 +28,7 @@ public class UserProfileResponse {
     private String email;
     private String imageUrl;
     private AuthProvider provider;
-    private boolean emailVerified;
+    private Boolean emailVerified;
     private RoleType role;
     
     // Profile info

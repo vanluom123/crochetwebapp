@@ -23,7 +23,7 @@ public class PatternResponse {
     @JsonProperty("currency_code")
     private CurrencyCode currencyCode;
     @JsonProperty("is_home")
-    private boolean isHome;
+    private Boolean isHome;
     private String link;
     private String content;
     private List<FileResponse> images;

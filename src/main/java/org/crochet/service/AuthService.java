@@ -12,15 +12,15 @@ import java.time.LocalDateTime;
 public interface AuthService {
     AuthResponse authenticateUser(LoginRequest loginRequest);
 
-    String registerUser(SignUpRequest signUpRequest);
+    void registerUser(SignUpRequest signUpRequest);
 
-    String resendVerificationEmail(String email);
+    void resendVerificationEmail(String email);
 
-    String confirmToken(String token);
+    void confirmToken(String token);
 
     String resetPasswordLink(String email);
 
-    String resetPassword(String token, PasswordResetRequest passwordResetRequest);
+    void resetPassword(String token, PasswordResetRequest passwordResetRequest);
 
     TokenResponse refreshToken(String refreshToken);
 

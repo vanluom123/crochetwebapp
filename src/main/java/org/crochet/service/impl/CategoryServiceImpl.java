@@ -169,6 +169,7 @@ public class CategoryServiceImpl implements CategoryService {
      * @return a CategoryResponse object
      */
     @Override
+    @Transactional
     public CategoryResponse getById(String id) {
         var category = findById(id);
         return CategoryMapper.INSTANCE.toResponse(category);
@@ -181,12 +182,9 @@ public class CategoryServiceImpl implements CategoryService {
      * @return a list of CategoryResponse objects
      */
     private Category findById(String id) {
-        var categories = categoryRepo.findCategoriesByIds(id);
-        if (categories.isEmpty()) {
-            throw new IllegalArgumentException(MSG_CATEGORY_NOT_FOUND,
-                    MAP_CODE.get(MSG_CATEGORY_NOT_FOUND));
-        }
-        return categories.get(0);
+        return categoryRepo.findCategoryById(id)
+                .orElseThrow(() -> new IllegalArgumentException(MSG_CATEGORY_NOT_FOUND,
+                MAP_CODE.get(MSG_CATEGORY_NOT_FOUND)));
     }
 
     /**

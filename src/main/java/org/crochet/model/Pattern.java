@@ -21,7 +21,6 @@ import lombok.experimental.SuperBuilder;
 import org.crochet.enumerator.CurrencyCode;
 import org.hibernate.annotations.BatchSize;
 
-import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -86,5 +85,5 @@ public class Pattern extends BaseEntity {
             @AttributeOverride(name = "order", column = @Column(name = "display_order")),
             @AttributeOverride(name = "lastModified", column = @Column(name = "last_modified", columnDefinition = "datetime default current_timestamp"))
     })
-    private List<File> images;
+    private Set<File> images;
 }

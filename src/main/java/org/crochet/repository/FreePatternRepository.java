@@ -25,7 +25,7 @@ import static org.hibernate.jpa.HibernateHints.HINT_READ_ONLY;
 public interface FreePatternRepository extends JpaRepository<FreePattern, String>,
         JpaSpecificationExecutor<FreePattern> {
 
-    @EntityGraph(attributePaths = {"category", "images", "files"})
+    @EntityGraph(attributePaths = {"category", "images", "colfreps"})
     @Query("""
             SELECT
               f
@@ -134,8 +134,10 @@ public interface FreePatternRepository extends JpaRepository<FreePattern, String
               JOIN fp.images i WITH i.order = 0
             WHERE
               u.id =:userId
+              AND fp.id IN :ids
             """)
-    List<FreePatternResponse> getFrepsByCreateByWithUser(@Param("userId") String userId);
+    Page<FreePatternResponse> getByUserAndIds(@Param("userId") String userId, @Param("ids") List<String> ids,
+                                              Pageable pageable);
 
     @Query("""
             SELECT
@@ -156,10 +158,8 @@ public interface FreePatternRepository extends JpaRepository<FreePattern, String
               JOIN fp.images i WITH i.order = 0
             WHERE
               u.id =:userId
-              AND fp.id IN :ids
             """)
-    Page<FreePatternResponse> getByUserAndIds(@Param("userId") String userId, @Param("ids") List<String> ids,
-                                              Pageable pageable);
+    Page<FreePatternResponse> getByUserWithPageable(@Param("userId") String userId, Pageable pageable);
 
     @Query("""
             SELECT

@@ -55,7 +55,7 @@ public interface FreePatternMapper {
         }
         if (req.getFiles() != null && !req.getFiles().isEmpty()) {
             var sortedFiles = ImageUtils.sortFiles(req.getFiles());
-            freePattern.setFiles(FileMapper.INSTANCE.toSetEntities(sortedFiles));
+            freePattern.setFiles(FileMapper.INSTANCE.toEntities(sortedFiles));
         }
         return freePattern;
     }

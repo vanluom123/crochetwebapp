@@ -79,17 +79,17 @@ public class UserServiceImpl implements UserService {
     /**
      * Retrieves all users with pagination and optional filters.
      *
-     * @param pageNo   The page number to retrieve. Page numbers start from 0.
-     * @param pageSize The number of records to retrieve per page.
-     * @param sortBy   The field by which to sort the records.
-     * @param sortDir  The direction of the sort. Can be 'ASC' for ascending or
-     *                 'DESC' for descending.
-     * @param filters  The list of filters.
+     * @param offset  The page number to retrieve. Page numbers start from 0.
+     * @param limit   The number of records to retrieve per page.
+     * @param sortBy  The field by which to sort the records.
+     * @param sortDir The direction of the sort. Can be 'ASC' for ascending or
+     *                'DESC' for descending.
+     * @param filters The list of filters.
      * @return A UserPaginationResponse object containing the retrieved records and
      * pagination details.
      */
     @Override
-    public PaginationResponse<UserResponse> getAll(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters) {
+    public PaginationResponse<UserResponse> getAll(int offset, int limit, String sortBy, String sortDir, Filter[] filters) {
         Specification<User> spec = Specification.where(null);
         if (filters != null && filters.length > 0) {
             GenericFilter<User> filter = GenericFilter.create(filters);
@@ -97,7 +97,7 @@ public class UserServiceImpl implements UserService {
         }
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
-        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+        Pageable pageable = PageRequest.of(offset, limit, sort);
         Page<User> page = userRepository.findAll(spec, pageable);
         List<UserResponse> users = UserMapper.INSTANCE.toResponses(page.getContent());
         return PaginationMapper.getInstance().toPagination(page, users);
