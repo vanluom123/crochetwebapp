@@ -55,7 +55,7 @@ public interface PatternMapper extends PartialUpdate<Pattern, PatternRequest> {
         }
         if (req.getFiles() != null && !req.getFiles().isEmpty()) {
             var sortedFiles = ImageUtils.sortFiles(req.getFiles());
-            pattern.setFiles(FileMapper.INSTANCE.toSetEntities(sortedFiles));
+            pattern.setFiles(FileMapper.INSTANCE.toEntities(sortedFiles));
         }
         return pattern;
     }

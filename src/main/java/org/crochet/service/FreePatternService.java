@@ -11,9 +11,9 @@ import java.util.List;
 public interface FreePatternService {
     void createOrUpdate(FreePatternRequest request);
 
-    PaginationResponse<FreePatternResponse> getAllFreePatterns(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters);
+    PaginationResponse<FreePatternResponse> getAllFreePatterns(int offset, int limit, String sortBy, String sortDir, Filter[] filters);
 
-    PaginationResponse<FreePatternResponse> getAllByUser(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters, String userId);
+    PaginationResponse<FreePatternResponse> getAllByUser(int offset, int limit, String sortBy, String sortDir, Filter[] filters, String userId);
 
     List<FreePatternResponse> getLimitedFreePatterns();
 
@@ -21,11 +21,9 @@ public interface FreePatternService {
 
     void delete(String id);
 
-    List<String> getFreePatternIds(int pageNo, int limit);
+    List<String> getFreePatternIds(int offset, int limit);
 
     void deleteAllById(List<String> ids);
-
-    List<FreePatternResponse> getFrepsByCreateBy(String userId);
 
     PaginationResponse<FreePatternResponse> getFrepsByCollectionId(String collectionId,
                                                                    PaginationRequest paginationRequest);

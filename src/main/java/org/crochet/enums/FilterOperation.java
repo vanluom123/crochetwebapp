@@ -1,4 +1,4 @@
-package org.crochet.enumerator;
+package org.crochet.enums;
 
 public enum FilterOperation {
     EQUAL,

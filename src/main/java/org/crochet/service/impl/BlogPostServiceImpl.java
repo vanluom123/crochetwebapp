@@ -2,6 +2,8 @@ package org.crochet.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.crochet.constant.MessageConstant;
+import org.crochet.enums.RoleType;
+import org.crochet.exception.AccessDeniedException;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.BlogPostMapper;
 import org.crochet.mapper.FileMapper;
@@ -18,6 +20,7 @@ import org.crochet.repository.BlogPostRepository;
 import org.crochet.repository.GenericFilter;
 import org.crochet.service.BlogPostService;
 import org.crochet.util.ImageUtils;
+import org.crochet.util.SecurityUtils;
 import org.crochet.util.SettingsUtil;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -30,6 +33,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
 
@@ -91,18 +95,18 @@ public class BlogPostServiceImpl implements BlogPostService {
     /**
      * Retrieves a paginated list of blog posts based on the provided parameters.
      *
-     * @param pageNo   The page number to retrieve (0-indexed).
-     * @param pageSize The number of blog posts to include in each page.
-     * @param sortBy   The attribute by which the blog posts should be sorted.
-     * @param sortDir  The sorting direction, either "ASC" (ascending) or "DESC"
-     *                 (descending).
-     * @param filters  The list of filters.
+     * @param offset  The page number to retrieve (0-indexed).
+     * @param limit   The number of blog posts to include in each page.
+     * @param sortBy  The attribute by which the blog posts should be sorted.
+     * @param sortDir The sorting direction, either "ASC" (ascending) or "DESC"
+     *                (descending).
+     * @param filters The list of filters.
      * @return A {@link org.crochet.payload.response.PaginationResponse} containing the paginated list of
      * blog posts.
      */
     @Override
-    public PaginationResponse<BlogPostResponse> getBlogs(int pageNo, int pageSize, String sortBy, String sortDir,
-                                       Filter[] filters) {
+    public PaginationResponse<BlogPostResponse> getBlogs(int offset, int limit, String sortBy, String sortDir,
+                                                         Filter[] filters) {
         Specification<BlogPost> spec = Specification.where(null);
         if (filters != null && filters.length > 0) {
             GenericFilter<BlogPost> filter = GenericFilter.create(filters);
@@ -116,7 +120,7 @@ public class BlogPostServiceImpl implements BlogPostService {
 
         Sort.Direction dir = Sort.Direction.fromString(sortDir);
         Sort sort = Sort.by(dir, sortBy);
-        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+        Pageable pageable = PageRequest.of(offset, limit, sort);
         var page = blogPostRepo.findBlogOnHomeWithIds(blogIds, pageable);
 
         return PaginationMapper.getInstance().toPagination(page);
@@ -125,13 +129,13 @@ public class BlogPostServiceImpl implements BlogPostService {
     /**
      * Get blog ids
      *
-     * @param pageNo Page number
+     * @param offset Page number
      * @param limit  Limit
      * @return List of blog ids
      */
     @Override
-    public List<String> getBlogIds(int pageNo, int limit) {
-        Pageable pageable = PageRequest.of(pageNo, limit);
+    public List<String> getBlogIds(int offset, int limit) {
+        Pageable pageable = PageRequest.of(offset, limit);
         return blogPostRepo.getBlogIds(pageable);
     }
 
@@ -188,7 +192,16 @@ public class BlogPostServiceImpl implements BlogPostService {
     @Transactional
     @Override
     public void deletePost(String id) {
+        var currentUser = SecurityUtils.getCurrentUser();
+        if (currentUser == null) {
+            throw new ResourceNotFoundException(MessageConstant.MSG_USER_NOT_FOUND,
+                    MAP_CODE.get(MessageConstant.MSG_USER_NOT_FOUND));
+        }
         var blogPost = getById(id);
+        var isAdmin = Objects.equals(currentUser.getRole(), RoleType.ADMIN);
+        if (!isAdmin && !Objects.equals(currentUser.getId(), blogPost.getCreatedBy())) {
+            throw new AccessDeniedException("Cannot delete this post");
+        }
         blogPostRepo.delete(blogPost);
     }
 

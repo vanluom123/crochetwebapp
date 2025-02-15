@@ -6,7 +6,7 @@ import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
-import org.crochet.enumerator.FilterLogic;
+import org.crochet.enums.FilterLogic;
 import org.crochet.model.Category;
 import org.crochet.payload.request.Filter;
 import org.springframework.data.jpa.domain.Specification;

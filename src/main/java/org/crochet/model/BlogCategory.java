@@ -1,5 +1,6 @@
 package org.crochet.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -11,9 +12,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
-import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -28,5 +27,5 @@ public class BlogCategory extends BaseEntity {
 
     @OneToMany(mappedBy = "blogCategory", cascade = CascadeType.ALL)
     @JsonManagedReference
-    private List<BlogPost> blogPosts;
+    private Set<BlogPost> blogPosts;
 }

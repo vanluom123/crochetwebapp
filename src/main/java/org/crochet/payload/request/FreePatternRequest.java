@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
-import org.crochet.enumerator.ChartStatus;
+import org.crochet.enums.ChartStatus;
 import org.crochet.payload.response.FileResponse;
 
 import java.util.List;

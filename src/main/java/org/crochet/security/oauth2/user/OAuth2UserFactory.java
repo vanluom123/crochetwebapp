@@ -1,6 +1,6 @@
 package org.crochet.security.oauth2.user;
 
-import org.crochet.enumerator.AuthProvider;
+import org.crochet.enums.AuthProvider;
 import org.crochet.exception.OAuth2AuthenticationProcessingException;
 
 import java.util.Map;

@@ -1,4 +1,4 @@
-FROM eclipse-temurin:17-jdk-alpine AS build
+FROM eclipse-temurin:21-jdk-jammy AS build
 WORKDIR /workspace/app
 
 # Arguments for the build
@@ -41,17 +41,27 @@ ENV REDIS_PASSWORD ${REDIS_PASSWORD}
 ENV SERVICE_ACCOUNT_KEY ${SERVICE_ACCOUNT_KEY}
 ENV ALLOWED_ORIGINS ${ALLOWED_ORIGINS}
 
+# Copy project files
 COPY . /workspace/app
-RUN --mount=type=cache,target=/root/.gradle \
-    chmod +x ./gradlew && \
-    ./gradlew clean build -x test && \
-    mkdir -p build/dependency && \
-    (cd build/dependency; jar -xf ../libs/*-SNAPSHOT.jar)
 
-FROM eclipse-temurin:17-jre-alpine
+# Build project
+RUN --mount=type=cache,target=/root/.gradle \
+    ./gradlew clean build -x test \
+    && mkdir -p build/dependency \
+    && (cd build/dependency; jar -xf ../libs/*-SNAPSHOT.jar) \
+    && rm -rf /root/.gradle
+
+# Build image
+FROM eclipse-temurin:21-jre-jammy
 VOLUME /tmp
 ARG DEPENDENCY=/workspace/app/build/dependency
 COPY --from=build ${DEPENDENCY}/BOOT-INF/lib /app/lib
 COPY --from=build ${DEPENDENCY}/META-INF /app/META-INF
 COPY --from=build ${DEPENDENCY}/BOOT-INF/classes /app
-ENTRYPOINT ["java","-cp","app:app/lib/*","org.crochet.CrochetApplication"]
+
+# Optimize JVM parameters
+ENTRYPOINT ["java", \
+    "-XX:+UseContainerSupport", \
+    "-XX:MaxRAMPercentage=75.0", \
+    "-cp", "app:app/lib/*", \
+    "org.crochet.CrochetApplication"]

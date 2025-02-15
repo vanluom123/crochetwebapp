@@ -5,8 +5,8 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.crochet.constant.AppConstant;
-import org.crochet.enumerator.AuthProvider;
-import org.crochet.enumerator.RoleType;
+import org.crochet.enums.AuthProvider;
+import org.crochet.enums.RoleType;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -28,7 +28,7 @@ public class UserProfileResponse {
     private String email;
     private String imageUrl;
     private AuthProvider provider;
-    private boolean emailVerified;
+    private Boolean emailVerified;
     private RoleType role;
     
     // Profile info

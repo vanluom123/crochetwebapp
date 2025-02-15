@@ -1,5 +1,7 @@
 package org.crochet.service.impl;
 
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
+import io.github.resilience4j.retry.annotation.Retry;
 import jakarta.servlet.http.HttpServletRequest;
 import org.crochet.exception.EmailVerificationException;
 import org.crochet.exception.ResourceNotFoundException;
@@ -27,9 +29,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
-import io.github.resilience4j.retry.annotation.Retry;
-
 import java.time.LocalDateTime;
 
 import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
@@ -39,12 +38,8 @@ import static org.crochet.constant.MessageConstant.MSG_ACCOUNT_ACTIVATION_LINK;
 import static org.crochet.constant.MessageConstant.MSG_EMAIL_ALREADY_CONFIRMED;
 import static org.crochet.constant.MessageConstant.MSG_EMAIL_NOT_VERIFIED;
 import static org.crochet.constant.MessageConstant.MSG_PASSWORD_RESET_TOKEN_EXPIRED;
-import static org.crochet.constant.MessageConstant.MSG_RESEND_SUCCESS;
 import static org.crochet.constant.MessageConstant.MSG_RESET_PASSWORD_LINK;
-import static org.crochet.constant.MessageConstant.MSG_RESET_PASSWORD_SUCCESS;
-import static org.crochet.constant.MessageConstant.MSG_SUCCESSFUL_CONFIRMATION;
 import static org.crochet.constant.MessageConstant.MSG_TOKEN_EXPIRED;
-import static org.crochet.constant.MessageConstant.MSG_USER_REGISTER_SUCCESS;
 import static org.crochet.constant.MessageConstant.REFRESH_TOKEN_NOT_IN_DB;
 import static org.crochet.constant.MessageConstant.RESET_NOTIFICATION;
 import static org.crochet.constant.MessageConstant.RESET_PASSWORD;
@@ -124,11 +119,10 @@ public class AuthServiceImpl implements AuthService {
      * Registers a new user based on the provided sign-up request.
      *
      * @param signUpRequest The sign-up request containing user information.
-     * @return A success API response.
      */
     @Override
     @Transactional
-    public String registerUser(SignUpRequest signUpRequest) {
+    public void registerUser(SignUpRequest signUpRequest) {
         // Create or update user
         User user = userService.createUser(signUpRequest);
 
@@ -146,20 +140,17 @@ public class AuthServiceImpl implements AuthService {
                 CONFIRM_YOUR_EMAIL,
                 buildEmailLink(signUpRequest.getEmail(), link, CONFIRM_YOUR_EMAIL, MSG_ACCOUNT_ACTIVATION_LINK,
                         ACTIVE_NOW));
-
-        return MSG_USER_REGISTER_SUCCESS;
     }
 
     /**
      * Resend link to active
      *
-     * @return A success API response.
      * @throws ResourceNotFoundException User not found
      */
     @Override
     @RateLimiter(name = "resendEmail", fallbackMethod = "resendVerificationEmailFallback")
     @Retry(name = "resendEmail")
-    public String resendVerificationEmail(String email) {
+    public void resendVerificationEmail(String email) {
         // If user don't exist, ResourceNotFoundException will be thrown
         User user = userService.getByEmail(email);
 
@@ -175,21 +166,18 @@ public class AuthServiceImpl implements AuthService {
         // Send confirmation email
         emailSender.send(email, CONFIRM_YOUR_EMAIL,
                 buildEmailLink(email, link, CONFIRM_YOUR_EMAIL, MSG_ACCOUNT_ACTIVATION_LINK, ACTIVE_NOW));
-
-        return MSG_RESEND_SUCCESS;
     }
 
     /**
      * Confirmation token
      *
      * @param token Token
-     * @return ApiResponse
      * @throws EmailVerificationException Email already confirmed
      * @throws TokenException             Token expired
      */
     @Transactional
     @Override
-    public String confirmToken(String token) {
+    public void confirmToken(String token) {
         var confirmationToken = confirmTokenService.getToken(token);
 
         LocalDateTime now = LocalDateTime.now();
@@ -209,8 +197,6 @@ public class AuthServiceImpl implements AuthService {
 
         // Update emailVerified to true
         userService.verifyEmail(confirmationToken.getUser().getEmail());
-
-        return MSG_SUCCESSFUL_CONFIRMATION;
     }
 
     /**
@@ -332,13 +318,12 @@ public class AuthServiceImpl implements AuthService {
      *
      * @param token                Token
      * @param passwordResetRequest PasswordResetRequest
-     * @return ApiResponse
      * @throws TokenException            Password reset token is expired
      * @throws ResourceNotFoundException User not found with current token
      */
     @Transactional
     @Override
-    public String resetPassword(String token, PasswordResetRequest passwordResetRequest) {
+    public void resetPassword(String token, PasswordResetRequest passwordResetRequest) {
         // Get PasswordResetToken
         PasswordResetToken passwordResetToken = passwordResetTokenService.getPasswordResetToken(token);
 
@@ -357,8 +342,6 @@ public class AuthServiceImpl implements AuthService {
 
         // Delete password reset token
         passwordResetTokenService.deletePasswordToken(passwordResetToken);
-
-        return MSG_RESET_PASSWORD_SUCCESS;
     }
 
     /**

@@ -88,17 +88,17 @@ public class ProductServiceImpl implements ProductService {
     /**
      * Retrieves a paginated list of products based on the provided parameters.
      *
-     * @param pageNo   The page number to retrieve (0-indexed).
-     * @param pageSize The number of products to include in each page.
-     * @param sortBy   The attribute by which the products should be sorted.
-     * @param sortDir  The sorting direction, either "ASC" (ascending) or "DESC"
-     *                 (descending).
-     * @param filters  The list of filters.
+     * @param offset  The page number to retrieve (0-indexed).
+     * @param limit   The number of products to include in each page.
+     * @param sortBy  The attribute by which the products should be sorted.
+     * @param sortDir The sorting direction, either "ASC" (ascending) or "DESC"
+     *                (descending).
+     * @param filters The list of filters.
      * @return A {@link org.crochet.payload.response.PaginationResponse} containing the paginated list of
      * products.
      */
     @Override
-    public PaginationResponse<ProductResponse> getProducts(int pageNo, int pageSize, String sortBy, String sortDir,
+    public PaginationResponse<ProductResponse> getProducts(int offset, int limit, String sortBy, String sortDir,
                                                            Filter[] filters) {
         List<String> prodIds = Collections.emptyList();
 
@@ -112,7 +112,7 @@ public class ProductServiceImpl implements ProductService {
         }
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
-        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+        Pageable pageable = PageRequest.of(offset, limit, sort);
         Page<ProductResponse> menuPage;
         if (prodIds.isEmpty()) {
             menuPage = productRepo.findProductWithPageable(pageable);
@@ -126,13 +126,13 @@ public class ProductServiceImpl implements ProductService {
     /**
      * Get product ids
      *
-     * @param pageNo Page number
+     * @param offset Page number
      * @param limit  Limit
      * @return List of product ids
      */
     @Override
-    public List<String> getProductIds(int pageNo, int limit) {
-        Pageable pageable = PageRequest.of(pageNo, limit);
+    public List<String> getProductIds(int offset, int limit) {
+        Pageable pageable = PageRequest.of(offset, limit);
         return productRepo.getProductIds(pageable);
     }
 

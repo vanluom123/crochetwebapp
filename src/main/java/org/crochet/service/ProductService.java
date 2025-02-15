@@ -10,7 +10,7 @@ import java.util.List;
 public interface ProductService {
     void createOrUpdate(ProductRequest request);
 
-    PaginationResponse<ProductResponse> getProducts(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters);
+    PaginationResponse<ProductResponse> getProducts(int offset, int limit, String sortBy, String sortDir, Filter[] filters);
 
     List<ProductResponse> getLimitedProducts();
 
@@ -18,7 +18,7 @@ public interface ProductService {
 
     void delete(String id);
 
-    List<String> getProductIds(int pageNo, int limit);
+    List<String> getProductIds(int offset, int limit);
 
     void deleteMultiple(List<String> ids);
 }

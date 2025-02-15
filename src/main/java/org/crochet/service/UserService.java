@@ -13,7 +13,7 @@ import java.util.List;
 public interface UserService {
     User createUser(SignUpRequest signUpRequest);
 
-    PaginationResponse<UserResponse> getAll(int pageNo, int pageSize, String sortBy, String sortDir,
+    PaginationResponse<UserResponse> getAll(int offset, int limit, String sortBy, String sortDir,
                               Filter[] filters);
 
     @Transactional

@@ -1,5 +1,6 @@
 package org.crochet.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.CollectionTable;
@@ -18,12 +19,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import org.crochet.enumerator.CurrencyCode;
+import org.crochet.enums.CurrencyCode;
 import org.hibernate.annotations.BatchSize;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-
-import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -73,5 +72,5 @@ public class Product extends BaseEntity {
             @AttributeOverride(name = "order", column = @Column(name = "display_order")),
             @AttributeOverride(name = "lastModified", column = @Column(name = "last_modified", columnDefinition = "datetime default current_timestamp"))
     })
-    private List<File> images;
+    private Set<File> images;
 }
