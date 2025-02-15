@@ -1,8 +1,7 @@
 package org.crochet.service.impl;
 
-import org.crochet.constant.MessageConstant;
-import org.crochet.enumerator.AuthProvider;
-import org.crochet.enumerator.RoleType;
+import org.crochet.enums.AuthProvider;
+import org.crochet.enums.RoleType;
 import org.crochet.exception.BadRequestException;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.PaginationMapper;
@@ -27,10 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
-import static org.crochet.constant.MessageConstant.MSG_INCORRECT_PASSWORD;
-import static org.crochet.constant.MessageConstant.MSG_USER_NOT_FOUND_WITH_EMAIL;
-import static org.crochet.constant.MessageConstant.MSG_USER_NOT_FOUND_WITH_ID;
+import org.crochet.enums.ResultCode;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -59,8 +55,8 @@ public class UserServiceImpl implements UserService {
     public User createUser(SignUpRequest signUpRequest) {
         // Check if the email address is already in use
         if (isValidEmail(signUpRequest.getEmail())) {
-            throw new BadRequestException(MessageConstant.MSG_EMAIL_ALREADY_IN_USE,
-                    MAP_CODE.get(MessageConstant.MSG_EMAIL_ALREADY_IN_USE));
+            throw new BadRequestException(ResultCode.MSG_EMAIL_ALREADY_IN_USE.message(),
+                    ResultCode.MSG_EMAIL_ALREADY_IN_USE.code());
         }
 
         // Creating user's account
@@ -79,17 +75,17 @@ public class UserServiceImpl implements UserService {
     /**
      * Retrieves all users with pagination and optional filters.
      *
-     * @param pageNo   The page number to retrieve. Page numbers start from 0.
-     * @param pageSize The number of records to retrieve per page.
-     * @param sortBy   The field by which to sort the records.
-     * @param sortDir  The direction of the sort. Can be 'ASC' for ascending or
-     *                 'DESC' for descending.
-     * @param filters  The list of filters.
+     * @param offset  The page number to retrieve. Page numbers start from 0.
+     * @param limit   The number of records to retrieve per page.
+     * @param sortBy  The field by which to sort the records.
+     * @param sortDir The direction of the sort. Can be 'ASC' for ascending or
+     *                'DESC' for descending.
+     * @param filters The list of filters.
      * @return A UserPaginationResponse object containing the retrieved records and
      * pagination details.
      */
     @Override
-    public PaginationResponse<UserResponse> getAll(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters) {
+    public PaginationResponse<UserResponse> getAll(int offset, int limit, String sortBy, String sortDir, Filter[] filters) {
         Specification<User> spec = Specification.where(null);
         if (filters != null && filters.length > 0) {
             GenericFilter<User> filter = GenericFilter.create(filters);
@@ -97,7 +93,7 @@ public class UserServiceImpl implements UserService {
         }
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
-        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+        Pageable pageable = PageRequest.of(offset, limit, sort);
         Page<User> page = userRepository.findAll(spec, pageable);
         List<UserResponse> users = UserMapper.INSTANCE.toResponses(page.getContent());
         return PaginationMapper.getInstance().toPagination(page, users);
@@ -112,8 +108,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public void updateUser(UserUpdateRequest request) {
         User user = userRepository.findById(request.getId())
-                .orElseThrow(() -> new ResourceNotFoundException(MSG_USER_NOT_FOUND_WITH_ID + request.getId(),
-                        MAP_CODE.get(MSG_USER_NOT_FOUND_WITH_ID)));
+                .orElseThrow(() -> new ResourceNotFoundException(ResultCode.MSG_USER_NOT_FOUND_WITH_ID.message(),
+                        ResultCode.MSG_USER_NOT_FOUND_WITH_ID.code()));
         if (request.getName() != null) {
             user.setName(request.getName());
         }
@@ -153,9 +149,10 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public User getByEmail(String email) {
+        final String normlEmail = email.toLowerCase();
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException(MSG_USER_NOT_FOUND_WITH_EMAIL + email,
-                        MAP_CODE.get(MSG_USER_NOT_FOUND_WITH_EMAIL)));
+                .orElseThrow(() -> new ResourceNotFoundException(ResultCode.MSG_USER_NOT_FOUND_WITH_EMAIL.message(),
+                        ResultCode.MSG_USER_NOT_FOUND_WITH_EMAIL.code()));
     }
 
     /**
@@ -167,8 +164,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse getDetail(String id) {
         return userRepository.getDetail(id)
-                .orElseThrow(() -> new ResourceNotFoundException(MSG_USER_NOT_FOUND_WITH_ID + id,
-                        MAP_CODE.get(MSG_USER_NOT_FOUND_WITH_ID)));
+                .orElseThrow(() -> new ResourceNotFoundException(ResultCode.MSG_USER_NOT_FOUND_WITH_ID.message(),
+                        ResultCode.MSG_USER_NOT_FOUND_WITH_ID.code()));
     }
 
     /**
@@ -208,8 +205,8 @@ public class UserServiceImpl implements UserService {
         var user = this.getByEmail(email);
         var isMatch = passwordEncoder.matches(password, user.getPassword());
         if (!isMatch) {
-            throw new BadRequestException(MSG_INCORRECT_PASSWORD,
-                    MAP_CODE.get(MSG_INCORRECT_PASSWORD));
+            throw new BadRequestException(ResultCode.MSG_INCORRECT_PASSWORD.message(),
+                    ResultCode.MSG_INCORRECT_PASSWORD.code());
         }
         return user;
     }

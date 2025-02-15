@@ -18,9 +18,7 @@ public interface FileMapper {
 
     File toEntity(FileResponse fileResponse);
 
-    List<File> toEntities(Collection<FileResponse> fileResponses);
-
-    Set<File> toSetEntities(Collection<FileResponse> fileResponses);
+    Set<File> toEntities(Collection<FileResponse> fileResponses);
 
     FileResponse toResponse(File file);
 

@@ -25,7 +25,7 @@ import static org.hibernate.jpa.HibernateHints.HINT_READ_ONLY;
 public interface FreePatternRepository extends JpaRepository<FreePattern, String>,
         JpaSpecificationExecutor<FreePattern> {
 
-    @EntityGraph(attributePaths = {"category", "images", "files"})
+    @EntityGraph(attributePaths = {"category", "images", "colfreps"})
     @Query("""
             SELECT
               f
@@ -114,28 +114,6 @@ public interface FreePatternRepository extends JpaRepository<FreePattern, String
 
     @Query("select f.id from FreePattern f order by f.createdDate desc")
     List<String> getFreePatternIds(Pageable pageable);
-
-    @Query("""
-            SELECT
-              new org.crochet.payload.response.FreePatternResponse (
-                fp.id,
-                fp.name,
-                fp.description,
-                fp.author,
-                fp.status,
-                i.fileContent,
-                u.name,
-                u.imageUrl,
-                u.id
-              )
-            FROM
-              FreePattern fp
-              JOIN User u ON fp.createdBy = u.id
-              JOIN fp.images i WITH i.order = 0
-            WHERE
-              u.id =:userId
-            """)
-    List<FreePatternResponse> getFrepsByCreateByWithUser(@Param("userId") String userId);
 
     @Query("""
             SELECT

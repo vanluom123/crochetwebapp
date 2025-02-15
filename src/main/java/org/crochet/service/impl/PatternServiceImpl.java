@@ -2,7 +2,6 @@ package org.crochet.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.crochet.constant.MessageConstant;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.FileMapper;
 import org.crochet.mapper.PaginationMapper;
@@ -32,7 +31,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
+import org.crochet.enums.ResultCode;
 
 /**
  * PatternServiceImpl class
@@ -57,8 +56,8 @@ public class PatternServiceImpl implements PatternService {
 
         if (!StringUtils.hasText(request.getId())) {
             var category = categoryRepo.findById(request.getCategoryId()).orElseThrow(
-                    () -> new ResourceNotFoundException(MessageConstant.MSG_CATEGORY_NOT_FOUND,
-                            MAP_CODE.get(MessageConstant.MSG_CATEGORY_NOT_FOUND)));
+                    () -> new ResourceNotFoundException(ResultCode.MSG_CATEGORY_NOT_FOUND.message(),
+                            ResultCode.MSG_CATEGORY_NOT_FOUND.code()));
             var images = ImageUtils.sortFiles(request.getImages());
             var files = ImageUtils.sortFiles(request.getFiles());
             pattern = Pattern.builder()
@@ -70,13 +69,13 @@ public class PatternServiceImpl implements PatternService {
                     .isHome(request.isHome())
                     .link(request.getLink())
                     .content(request.getContent())
-                    .files(FileMapper.INSTANCE.toSetEntities(files))
+                    .files(FileMapper.INSTANCE.toEntities(files))
                     .images(FileMapper.INSTANCE.toEntities(images))
                     .build();
         } else {
             pattern = patternRepo.findById(request.getId()).orElseThrow(
-                    () -> new ResourceNotFoundException(MessageConstant.MSG_PATTERN_NOT_FOUND,
-                            MAP_CODE.get(MessageConstant.MSG_PATTERN_NOT_FOUND)));
+                    () -> new ResourceNotFoundException(ResultCode.MSG_PATTERN_NOT_FOUND.message(),
+                            ResultCode.MSG_PATTERN_NOT_FOUND.code()));
             pattern = PatternMapper.INSTANCE.partialUpdate(request, pattern);
         }
 
@@ -86,16 +85,16 @@ public class PatternServiceImpl implements PatternService {
     /**
      * Get patterns
      *
-     * @param pageNo   Page number
-     * @param pageSize The size of page
-     * @param sortBy   Sort by
-     * @param sortDir  Sort directory
-     * @param filters  The list of filters
+     * @param offset  Page number
+     * @param limit   The size of page
+     * @param sortBy  Sort by
+     * @param sortDir Sort directory
+     * @param filters The list of filters
      * @return Pattern is paginated
      */
     @Override
-    public PaginationResponse<PatternResponse> getPatterns(int pageNo, int pageSize, String sortBy, String sortDir,
-                                                           Filter[] filters) {
+    public PaginationResponse<PatternResponse> getPatterns(int offset, int limit, String sortBy, String sortDir,
+                                                 Filter[] filters) {
         List<String> patternIds = Collections.emptyList();
 
         if (filters != null && filters.length > 0) {
@@ -108,7 +107,7 @@ public class PatternServiceImpl implements PatternService {
         }
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
-        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+        Pageable pageable = PageRequest.of(offset, limit, sort);
         Page<PatternResponse> page;
         if (patternIds.isEmpty()) {
             page = patternRepo.findPatternWithPageable(pageable);
@@ -146,13 +145,13 @@ public class PatternServiceImpl implements PatternService {
     /**
      * Get pattern ids
      *
-     * @param pageNo Page number
+     * @param offset Page number
      * @param limit  Limit
      * @return List of pattern ids
      */
     @Override
-    public List<String> getPatternIds(int pageNo, int limit) {
-        Pageable pageable = PageRequest.of(pageNo, limit);
+    public List<String> getPatternIds(int offset, int limit) {
+        Pageable pageable = PageRequest.of(offset, limit);
         return patternRepo.getPatternIds(pageable);
     }
 
@@ -166,8 +165,8 @@ public class PatternServiceImpl implements PatternService {
     @Override
     public PatternResponse getDetail(String id) {
         var pattern = patternRepo.findPatternById(id).orElseThrow(
-                () -> new ResourceNotFoundException(MessageConstant.MSG_PATTERN_NOT_FOUND,
-                        MAP_CODE.get(MessageConstant.MSG_PATTERN_NOT_FOUND)));
+                () -> new ResourceNotFoundException(ResultCode.MSG_PATTERN_NOT_FOUND.message(),
+                        ResultCode.MSG_PATTERN_NOT_FOUND.code()));
         return PatternMapper.INSTANCE.toResponse(pattern);
     }
 

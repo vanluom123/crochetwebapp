@@ -3,7 +3,7 @@ package org.crochet.payload.request;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
-import org.crochet.enumerator.CurrencyCode;
+import org.crochet.enums.CurrencyCode;
 import org.crochet.payload.response.FileResponse;
 
 import java.util.List;

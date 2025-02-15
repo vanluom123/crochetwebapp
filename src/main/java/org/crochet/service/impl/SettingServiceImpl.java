@@ -1,7 +1,6 @@
 package org.crochet.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.crochet.constant.MessageConstant;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.model.Settings;
 import org.crochet.payload.request.SettingRequest;
@@ -13,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
+import org.crochet.enums.ResultCode;
 
 @RequiredArgsConstructor
 @Service
@@ -44,8 +43,8 @@ public class SettingServiceImpl implements SettingService {
     @Override
     public void update(SettingRequest request) {
         Settings settings = settingsRepo.findById(request.getKey())
-                .orElseThrow(() -> new ResourceNotFoundException(MessageConstant.MSG_SETTINGS_NOT_FOUND,
-                        MAP_CODE.get(MessageConstant.MSG_SETTINGS_NOT_FOUND)));
+                .orElseThrow(() -> new ResourceNotFoundException(ResultCode.MSG_SETTINGS_NOT_FOUND.message(),
+                        ResultCode.MSG_SETTINGS_NOT_FOUND.code()));
         settings.setValue(request.getValue());
         settingsRepo.save(settings);
     }
@@ -86,8 +85,8 @@ public class SettingServiceImpl implements SettingService {
     @Override
     public SettingResponse getById(String key) {
         var setting = settingsRepo.findById(key)
-                .orElseThrow(() -> new ResourceNotFoundException(MessageConstant.MSG_SETTINGS_NOT_FOUND,
-                        MAP_CODE.get(MessageConstant.MSG_SETTINGS_NOT_FOUND)));
+                .orElseThrow(() -> new ResourceNotFoundException(ResultCode.MSG_SETTINGS_NOT_FOUND.message(),
+                        ResultCode.MSG_SETTINGS_NOT_FOUND.code()));
         return SettingResponse.builder()
                 .key(setting.getKey())
                 .value(setting.getValue())

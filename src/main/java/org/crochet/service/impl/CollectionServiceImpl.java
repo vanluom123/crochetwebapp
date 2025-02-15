@@ -1,6 +1,7 @@
 package org.crochet.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.crochet.enums.ResultCode;
 import org.crochet.exception.AccessDeniedException;
 import org.crochet.exception.BadRequestException;
 import org.crochet.exception.ResourceNotFoundException;
@@ -11,6 +12,7 @@ import org.crochet.payload.response.CollectionResponse;
 import org.crochet.repository.ColFrepRepo;
 import org.crochet.repository.CollectionRepo;
 import org.crochet.repository.FreePatternRepository;
+import org.crochet.service.CollectionAvatarService;
 import org.crochet.service.CollectionService;
 import org.crochet.util.SecurityUtils;
 import org.springframework.stereotype.Service;
@@ -19,14 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Objects;
 
-import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
-import static org.crochet.constant.MessageConstant.MSG_COLLECTION_NOT_FOUND;
-import static org.crochet.constant.MessageConstant.MSG_FREE_PATTERN_NOT_FOUND;
-import static org.crochet.constant.MessageConstant.MSG_NO_PERMISSION_DELETE_COLLECTION;
-import static org.crochet.constant.MessageConstant.MSG_NO_PERMISSION_MODIFY_COLLECTION;
-import static org.crochet.constant.MessageConstant.MSG_NO_PERMISSION_REMOVE_FREE_PATTERN_FROM_COLLECTION;
-import static org.crochet.constant.MessageConstant.MSG_USER_NOT_FOUND;
-
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -34,6 +28,7 @@ public class CollectionServiceImpl implements CollectionService {
     private final CollectionRepo collectionRepo;
     private final FreePatternRepository freePatternRepository;
     private final ColFrepRepo colFrepRepo;
+    private final CollectionAvatarService avatarService;
 
     /**
      * Add a free pattern to a collection
@@ -43,29 +38,16 @@ public class CollectionServiceImpl implements CollectionService {
      */
     @Override
     public void addFreePatternToCollection(String collectionId, String freePatternId) {
-        var collection = collectionRepo.findById(collectionId)
-                .orElseThrow(() -> new ResourceNotFoundException(MSG_COLLECTION_NOT_FOUND,
-                        MAP_CODE.get(MSG_COLLECTION_NOT_FOUND)));
+        var collection = collectionRepo.findColById(collectionId)
+                .orElseThrow(() -> new ResourceNotFoundException(ResultCode.MSG_COLLECTION_NOT_FOUND.message(),
+                        ResultCode.MSG_COLLECTION_NOT_FOUND.code()));
 
         FreePattern freePattern = freePatternRepository.findFrepById(freePatternId)
-                .orElseThrow(() -> new ResourceNotFoundException(MSG_FREE_PATTERN_NOT_FOUND,
-                        MAP_CODE.get(MSG_FREE_PATTERN_NOT_FOUND)));
+                .orElseThrow(() -> new ResourceNotFoundException(ResultCode.MSG_FREE_PATTERN_NOT_FOUND.message(),
+                        ResultCode.MSG_FREE_PATTERN_NOT_FOUND.code()));
 
-        ColFrep colFrep = new ColFrep();
-        colFrep.setCollection(collection);
-        colFrep.setFreePattern(freePattern);
-        colFrepRepo.save(colFrep);
-
-        long count = colFrepRepo.countByCollectionId(collectionId);
-        if (count == 1) {
-            var images = freePattern.getImages();
-            if (!images.isEmpty()) {
-                collection.setAvatar(images.get(0).getFileContent());
-            } else {
-                collection.setAvatar(null);
-            }
-            collectionRepo.save(collection);
-        }
+        addNewPatternToCollection(collection, freePattern);
+        updateCollectionAvatarIfFirst(collection, freePattern);
     }
 
     /**
@@ -81,8 +63,8 @@ public class CollectionServiceImpl implements CollectionService {
     public void createCollection(String name) {
         var user = SecurityUtils.getCurrentUser();
         if (user == null) {
-            throw new ResourceNotFoundException(MSG_USER_NOT_FOUND,
-                    MAP_CODE.get(MSG_USER_NOT_FOUND));
+            throw new ResourceNotFoundException(ResultCode.MSG_USER_NOT_FOUND.message(),
+                    ResultCode.MSG_USER_NOT_FOUND.code());
         }
 
         if (collectionRepo.existsCollectionByName(user.getId(), name)) {
@@ -106,18 +88,18 @@ public class CollectionServiceImpl implements CollectionService {
     public void updateCollection(String collectionId, String name) {
         var user = SecurityUtils.getCurrentUser();
         if (user == null) {
-            throw new ResourceNotFoundException(MSG_USER_NOT_FOUND,
-                    MAP_CODE.get(MSG_USER_NOT_FOUND));
+            throw new ResourceNotFoundException(ResultCode.MSG_USER_NOT_FOUND.message(),
+                    ResultCode.MSG_USER_NOT_FOUND.code());
         }
 
         var col = collectionRepo.findColById(collectionId)
-                .orElseThrow(() -> new AccessDeniedException(MSG_NO_PERMISSION_MODIFY_COLLECTION,
-                        MAP_CODE.get(MSG_NO_PERMISSION_MODIFY_COLLECTION)));
+                .orElseThrow(() -> new AccessDeniedException(ResultCode.MSG_NO_PERMISSION_MODIFY_COLLECTION.message(),
+                        ResultCode.MSG_NO_PERMISSION_MODIFY_COLLECTION.code()));
 
         if (collectionRepo.existsCollectionByName(user.getId(), name)) {
             throw new BadRequestException("Collection name already exists");
         }
-        
+
         col.setName(name);
         collectionRepo.save(col);
     }
@@ -131,17 +113,19 @@ public class CollectionServiceImpl implements CollectionService {
     public void removeFreePatternFromCollection(String freePatternId) {
         var user = SecurityUtils.getCurrentUser();
         if (user == null) {
-            throw new ResourceNotFoundException(MSG_USER_NOT_FOUND,
-                    MAP_CODE.get(MSG_USER_NOT_FOUND));
+            throw new ResourceNotFoundException(ResultCode.MSG_USER_NOT_FOUND.message(),
+                    ResultCode.MSG_USER_NOT_FOUND.code());
         }
         var freePattern = freePatternRepository.findFrepById(freePatternId)
-                .orElseThrow(() -> new ResourceNotFoundException(MSG_FREE_PATTERN_NOT_FOUND,
-                        MAP_CODE.get(MSG_FREE_PATTERN_NOT_FOUND)));
+                .orElseThrow(() -> new ResourceNotFoundException(ResultCode.MSG_FREE_PATTERN_NOT_FOUND.message(),
+                        ResultCode.MSG_FREE_PATTERN_NOT_FOUND.code()));
         if (!Objects.equals(freePattern.getCreatedBy(), user.getId())) {
-            throw new AccessDeniedException(MSG_NO_PERMISSION_REMOVE_FREE_PATTERN_FROM_COLLECTION,
-                    MAP_CODE.get(MSG_NO_PERMISSION_REMOVE_FREE_PATTERN_FROM_COLLECTION));
+            throw new AccessDeniedException(ResultCode.MSG_NO_PERMISSION_REMOVE_FREE_PATTERN_FROM_COLLECTION.message(),
+                    ResultCode.MSG_NO_PERMISSION_REMOVE_FREE_PATTERN_FROM_COLLECTION.code());
         }
+        var collection = colFrepRepo.findColByUserAndFreePattern(user.getId(), freePatternId);
         colFrepRepo.removeByFreePattern(freePatternId);
+        avatarService.updateAvatarFromNextPattern(collection);
     }
 
     /**
@@ -153,13 +137,13 @@ public class CollectionServiceImpl implements CollectionService {
     @Override
     public CollectionResponse getCollectionById(String collectionId) {
         return collectionRepo.getColById(collectionId)
-                .orElseThrow(() -> new ResourceNotFoundException(MSG_COLLECTION_NOT_FOUND,
-                        MAP_CODE.get(MSG_COLLECTION_NOT_FOUND)));
+                .orElseThrow(() -> new ResourceNotFoundException(ResultCode.MSG_COLLECTION_NOT_FOUND.message(),
+                        ResultCode.MSG_COLLECTION_NOT_FOUND.code()));
     }
 
     @Override
     public List<CollectionResponse> getAllByUserId(String userId) {
-       return collectionRepo.getAllByUserId(userId);
+        return collectionRepo.getAllByUserId(userId);
     }
 
     /**
@@ -174,19 +158,45 @@ public class CollectionServiceImpl implements CollectionService {
     public void deleteCollection(String collectionId) {
         var user = SecurityUtils.getCurrentUser();
         if (user == null) {
-            throw new ResourceNotFoundException(MSG_USER_NOT_FOUND,
-                    MAP_CODE.get(MSG_USER_NOT_FOUND));
+            throw new ResourceNotFoundException(ResultCode.MSG_USER_NOT_FOUND.message(),
+                    ResultCode.MSG_USER_NOT_FOUND.code());
         }
 
         var col = collectionRepo.findColById(collectionId)
-                .orElseThrow(() -> new ResourceNotFoundException(MSG_COLLECTION_NOT_FOUND,
-                        MAP_CODE.get(MSG_COLLECTION_NOT_FOUND)));
+                .orElseThrow(() -> new ResourceNotFoundException(ResultCode.MSG_COLLECTION_NOT_FOUND.message(),
+                        ResultCode.MSG_COLLECTION_NOT_FOUND.code()));
 
         if (!Objects.equals(col.getUser().getId(), user.getId())) {
-            throw new AccessDeniedException(MSG_NO_PERMISSION_DELETE_COLLECTION,
-                    MAP_CODE.get(MSG_NO_PERMISSION_DELETE_COLLECTION));
+            throw new AccessDeniedException(ResultCode.MSG_NO_PERMISSION_DELETE_COLLECTION.message(),
+                    ResultCode.MSG_NO_PERMISSION_DELETE_COLLECTION.code());
         }
 
         collectionRepo.delete(col);
+    }
+
+    /**
+     * Add a new pattern to a collection
+     *
+     * @param collection  Collection
+     * @param freePattern FreePattern
+     */
+    private void addNewPatternToCollection(Collection collection, FreePattern freePattern) {
+        ColFrep colFrep = new ColFrep();
+        colFrep.setCollection(collection);
+        colFrep.setFreePattern(freePattern);
+        colFrepRepo.save(colFrep);
+    }
+
+    /**
+     * Update collection avatar if it is the first pattern in the collection
+     *
+     * @param collection  Collection
+     * @param freePattern FreePattern
+     */
+    private void updateCollectionAvatarIfFirst(Collection collection, FreePattern freePattern) {
+        long count = colFrepRepo.countByCollectionId(collection.getId());
+        if (count == 1) {
+            avatarService.updateAvatar(collection, freePattern);
+        }
     }
 }

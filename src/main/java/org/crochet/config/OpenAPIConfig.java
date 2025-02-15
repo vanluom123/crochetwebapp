@@ -23,11 +23,11 @@ public class OpenAPIConfig {
         return new OpenAPI().addSecurityItem(new SecurityRequirement().addList("BearerAuth"))
                 .components(new Components().addSecuritySchemes
                         ("BearerAuth", createAPIKeyScheme()))
-                .info(new Info().title("My REST API")
-                        .description("Some custom description of API.")
+                .info(new Info().title("Crochet API")
+                        .description("API for Crochet")
                         .version("1.0").contact(new Contact().name("Crochet")
                                 .email("thamphuong.crochet@gmail.com").url("https://www.tieuphuongcrochet.com"))
                         .license(new License().name("License of API")
-                                .url("API license URL")));
+                                .url("https://www.tieuphuongcrochet.com")));
     }
 }

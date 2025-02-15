@@ -7,26 +7,22 @@ import org.crochet.payload.request.SignUpRequest;
 import org.crochet.payload.response.AuthResponse;
 import org.crochet.payload.response.TokenResponse;
 
-import java.time.LocalDateTime;
-
 public interface AuthService {
     AuthResponse authenticateUser(LoginRequest loginRequest);
 
-    String registerUser(SignUpRequest signUpRequest);
+    void registerUser(SignUpRequest signUpRequest);
 
-    String resendVerificationEmail(String email);
+    void resendVerificationEmail(String email);
 
-    String confirmToken(String token);
+    void confirmToken(String token);
 
     String resetPasswordLink(String email);
 
-    String resetPassword(String token, PasswordResetRequest passwordResetRequest);
+    void resetPassword(String token, PasswordResetRequest passwordResetRequest);
 
     TokenResponse refreshToken(String refreshToken);
 
     void logout(HttpServletRequest request);
-
-    LocalDateTime getRefreshTokenExpiresAt(String refreshToken);
 
     AuthResponse getUserInfo(String token);
 }
