@@ -16,8 +16,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.BatchSize;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import java.util.List;
 
 @Getter
@@ -27,7 +26,6 @@ import java.util.List;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Category extends BaseEntity {
     @Column(name = "name", nullable = false)
     private String name;
@@ -38,16 +36,20 @@ public class Category extends BaseEntity {
     private Category parent;
 
     @BatchSize(size = 10)
-    @OneToMany(mappedBy = "parent", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "parent",
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JsonManagedReference
     private List<Category> children;
 
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "category",
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private List<Product> products;
 
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "category",
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private List<Pattern> patterns;
 
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "category",
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private List<FreePattern> freePatterns;
 }
