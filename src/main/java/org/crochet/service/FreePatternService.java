@@ -23,6 +23,4 @@ public interface FreePatternService {
     List<String> getFreePatternIds(int pageNo, int limit);
 
     void deleteAllById(List<String> ids);
-
-    List<FreePatternResponse> getFrepsByCreateBy(String userId);
 }
