@@ -182,6 +182,28 @@ public interface FreePatternRepository extends JpaRepository<FreePattern, String
                 fp.description,
                 fp.author,
                 fp.status,
+                i.fileContent,
+                u.name,
+                u.imageUrl,
+                u.id
+              )
+            FROM
+              FreePattern fp
+              JOIN User u ON fp.createdBy = u.id
+              JOIN fp.images i WITH i.order = 0
+            WHERE
+              u.id =:userId
+            """)
+    Page<FreePatternResponse> getByUserWithPageable(@Param("userId") String userId, Pageable pageable);
+
+    @Query("""
+            SELECT
+              new org.crochet.payload.response.FreePatternResponse (
+                fp.id,
+                fp.name,
+                fp.description,
+                fp.author,
+                fp.status,
                 i.fileContent
               )
             FROM
