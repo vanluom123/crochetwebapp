@@ -16,7 +16,15 @@ import org.crochet.service.FreePatternService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -133,16 +141,5 @@ public class FreePatternController {
     public ResponseEntity<List<String>> getFreePatternIds(@RequestParam("pageNo") int pageNo,
                                                           @RequestParam("limit") int limit) {
         return ResponseEntity.ok(freePatternService.getFreePatternIds(pageNo, limit));
-    }
-
-    @Operation(summary = "Get free pattern by create by")
-    @ApiResponse(responseCode = "200", description = "List of free pattern",
-            content = @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = List.class)))
-    @GetMapping("/create-by")
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-    @SecurityRequirement(name = "BearerAuth")
-    public ResponseEntity<List<FreePatternResponse>> getFrepsByCreateBy(@RequestParam("userId") String userId) {
-        return ResponseEntity.ok(freePatternService.getFrepsByCreateBy(userId));
     }
 }
