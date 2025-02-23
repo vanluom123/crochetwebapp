@@ -14,7 +14,11 @@ import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.FreePatternRequest;
 import org.crochet.payload.response.FreePatternResponse;
 import org.crochet.payload.response.PaginatedFreePatternResponse;
-import org.crochet.repository.*;
+import org.crochet.repository.CategoryRepo;
+import org.crochet.repository.FreePatternRepoCustom;
+import org.crochet.repository.FreePatternRepository;
+import org.crochet.repository.GenericFilter;
+import org.crochet.repository.UserRepository;
 import org.crochet.service.FreePatternService;
 import org.crochet.util.ImageUtils;
 import org.crochet.util.SecurityUtils;
@@ -138,7 +142,12 @@ public class FreePatternServiceImpl implements FreePatternService {
     public PaginatedFreePatternResponse getAllByUser(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters, String userId) {
         List<String> freePatternIds = new ArrayList<>();
         var pageable = preparePageableAndFilter(pageNo, pageSize, sortBy, sortDir, filters, freePatternIds);
-        var page = freePatternRepo.getByUserAndIds(userId, freePatternIds, pageable);
+        Page<FreePatternResponse> page;
+        if(freePatternIds.isEmpty()) {
+            page = freePatternRepo.getByUserWithPageable(userId, pageable);
+        } else {
+            page = freePatternRepo.getByUserAndIds(userId, freePatternIds, pageable);
+        }
 
         return PaginatedFreePatternResponse.builder()
                 .contents(page.getContent())
@@ -274,20 +283,6 @@ public class FreePatternServiceImpl implements FreePatternService {
         } else {
             freePatternRepo.deleteAllByIdAndCreatedBy(ids, currentUser.getEmail());
         }
-    }
-
-    /**
-     * Get free patterns by create by
-     *
-     * @return List of FreePatternOnHome
-     */
-    @Override
-    public List<FreePatternResponse> getFrepsByCreateBy(String userId) {
-        if (!userRepo.existsById(userId)) {
-            throw new ResourceNotFoundException(MessageConstant.MSG_USER_NOT_FOUND,
-                    MAP_CODE.get(MessageConstant.MSG_USER_NOT_FOUND));
-        }
-        return freePatternRepo.getFrepsByCreateByWithUser(userId);
     }
 
     /**
