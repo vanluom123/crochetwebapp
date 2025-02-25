@@ -1,11 +1,8 @@
 package org.crochet.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import org.crochet.enums.ResultCode;
 import org.crochet.payload.request.LoginRequest;
 import org.crochet.payload.request.PasswordResetRequest;
 import org.crochet.payload.request.SignUpRequest;
@@ -22,8 +19,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
-import static org.crochet.constant.AppConstant.SUCCESS;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -54,7 +53,7 @@ public class AuthController {
     public ResponseData<String> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
         signUpRequest.setEmail(signUpRequest.getEmail().toLowerCase());
         authService.registerUser(signUpRequest);
-        return ResponseUtil.success(HttpStatus.CREATED, MessageConstant.MSG_USER_REGISTER_SUCCESS);
+        return ResponseUtil.success(HttpStatus.CREATED, ResultCode.MSG_USER_REGISTER_SUCCESS.message());
     }
 
     @Operation(summary = "Confirm user registration")
@@ -65,7 +64,7 @@ public class AuthController {
     @GetMapping(path = "/confirm")
     public ResponseData<String> confirm(@RequestParam("token") String token) {
         authService.confirmToken(token);
-        return ResponseUtil.success(MessageConstant.MSG_SUCCESSFUL_CONFIRMATION);
+        return ResponseUtil.success(ResultCode.MSG_SUCCESSFUL_CONFIRMATION.message());
     }
 
     @Operation(summary = "Resend email verification")
@@ -75,7 +74,7 @@ public class AuthController {
     @GetMapping("/resend-verification-email")
     public ResponseData<String> resendVerificationEmail(@RequestParam("email") String email) {
         authService.resendVerificationEmail(email);
-        return ResponseUtil.success(MessageConstant.MSG_RESEND_SUCCESS);
+        return ResponseUtil.success(ResultCode.MSG_RESEND_SUCCESS.message());
     }
 
     @Operation(summary = "Request password reset link")
@@ -86,7 +85,7 @@ public class AuthController {
     @GetMapping("/password-reset-request")
     public ResponseData<String> resetPasswordRequest(@RequestParam("email") String email) {
         var response = authService.resetPasswordLink(email);
-        return ResponseUtil.success(response, SUCCESS);
+        return ResponseUtil.success(response);
     }
 
     @Operation(summary = "Reset password")
@@ -98,11 +97,7 @@ public class AuthController {
     public ResponseData<String> resetPassword(@RequestParam("passwordResetToken") String passwordResetToken,
                                               @RequestBody PasswordResetRequest passwordResetRequest) {
         authService.resetPassword(passwordResetToken, passwordResetRequest);
-        return ResponseData.<String>builder()
-                .success(true)
-                .code(HttpStatus.OK.value())
-                .message(MessageConstant.MSG_RESET_PASSWORD_SUCCESS)
-                .build();
+        return ResponseUtil.success(ResultCode.MSG_RESET_PASSWORD_SUCCESS.message());
     }
 
     @Operation(summary = "Refresh access token")
@@ -113,12 +108,7 @@ public class AuthController {
     @PostMapping("/refresh-token")
     public ResponseData<TokenResponse> refreshToken(@RequestParam("refreshToken") String refreshToken) {
         var tokenResponse = authService.refreshToken(refreshToken);
-        return ResponseData.<TokenResponse>builder()
-                .success(true)
-                .code(HttpStatus.OK.value())
-                .message(SUCCESS)
-                .data(tokenResponse)
-                .build();
+        return ResponseUtil.success(tokenResponse);
     }
 
     @Operation(summary = "Logout")
@@ -129,10 +119,6 @@ public class AuthController {
     @GetMapping("/logout")
     public ResponseData<String> logout(HttpServletRequest request) {
         authService.logout(request);
-        return ResponseData.<String>builder()
-                .success(true)
-                .code(HttpStatus.OK.value())
-                .message("Logged out success")
-                .build();
+        return ResponseUtil.success(ResultCode.MSG_LOGOUT_SUCCESS.message());
     }
 }

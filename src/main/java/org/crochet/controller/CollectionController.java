@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.crochet.constant.AppConstant;
+import org.crochet.enums.ResultCode;
 import org.crochet.payload.request.PaginationRequest;
 import org.crochet.payload.response.CollectionResponse;
 import org.crochet.payload.response.FreePatternResponse;
@@ -14,6 +15,7 @@ import org.crochet.payload.response.PaginationResponse;
 import org.crochet.payload.response.ResponseData;
 import org.crochet.service.CollectionService;
 import org.crochet.service.FreePatternService;
+import org.crochet.util.ResponseUtil;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -26,8 +28,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
-import static org.crochet.constant.AppConstant.SUCCESS;
 
 @RestController
 @RequestMapping("/api/v1/collections")
@@ -51,11 +51,7 @@ public class CollectionController {
     @PostMapping(value = "/create")
     public ResponseData<String> create(@RequestParam("name") String name) {
         collectionService.createCollection(name);
-        return ResponseData.<String>builder()
-                .success(true)
-                .code(HttpStatus.CREATED.value())
-                .message(MessageConstant.MSG_CREATE_OR_UPDATE_SUCCESS)
-                .build();
+        return ResponseUtil.success(ResultCode.MSG_CREATE_OR_UPDATE_SUCCESS.message());
     }
 
     @Operation(summary = "Add a free pattern to collection")
@@ -70,11 +66,7 @@ public class CollectionController {
             @Parameter(description = "Free pattern ID")
             @RequestParam("free_pattern_id") String freePatternId) {
         collectionService.addFreePatternToCollection(collectionId, freePatternId);
-        return ResponseData.<String>builder()
-                .success(true)
-                .code(HttpStatus.OK.value())
-                .message("Added free pattern to collection successfully")
-                .build();
+        return ResponseUtil.success(ResultCode.MSG_CREATE_OR_UPDATE_SUCCESS.message());
     }
 
     @Operation(summary = "Update a collection")
@@ -88,11 +80,7 @@ public class CollectionController {
             @Parameter(description = "Name")
             @RequestParam("name") String name) {
         collectionService.updateCollection(collectionId, name);
-        return ResponseData.<String>builder()
-                .success(true)
-                .code(HttpStatus.OK.value())
-                .message("Updated collection successfully")
-                .build();
+        return ResponseUtil.success(ResultCode.MSG_CREATE_OR_UPDATE_SUCCESS.message());
     }
 
     @Operation(summary = "Remove a free pattern from collection")
@@ -103,11 +91,7 @@ public class CollectionController {
             @Parameter(description = "Free pattern ID")
             @RequestParam("free_pattern_id") String freePatternId) {
         collectionService.removeFreePatternFromCollection(freePatternId);
-        return ResponseData.<String>builder()
-                .success(true)
-                .code(HttpStatus.NO_CONTENT.value())
-                .message("Removed free pattern from collection successfully")
-                .build();
+        return ResponseUtil.success(ResultCode.MSG_DELETE_SUCCESS.message());
     }
 
     @Operation(summary = "Get collection by ID")
@@ -118,12 +102,7 @@ public class CollectionController {
     public ResponseData<CollectionResponse> getCollectionById(
             @Parameter(description = "Collection ID") @PathVariable("collection_id") String collectionId) {
         var res = collectionService.getCollectionById(collectionId);
-        return ResponseData.<CollectionResponse>builder()
-                .success(true)
-                .code(HttpStatus.OK.value())
-                .message(SUCCESS)
-                .data(res)
-                .build();
+        return ResponseUtil.success(res);
     }
 
     @GetMapping("/{collection_id}/free-patterns")
@@ -147,12 +126,7 @@ public class CollectionController {
                 .direction(Sort.Direction.fromString(direction))
                 .build();
         var response = freePatternService.getFrepsByCollectionId(collectionId, request);
-        return ResponseData.<PaginationResponse<FreePatternResponse>>builder()
-                .success(true)
-                .code(HttpStatus.OK.value())
-                .message(SUCCESS)
-                .data(response)
-                .build();
+        return ResponseUtil.success(response);
     }
 
     @Operation(summary = "Delete a collection")
@@ -162,10 +136,6 @@ public class CollectionController {
     public ResponseData<String> deleteCollection(
             @Parameter(description = "Collection ID") @RequestParam("collectionId") String collectionId) {
         collectionService.deleteCollection(collectionId);
-        return ResponseData.<String>builder()
-                .success(true)
-                .code(HttpStatus.NO_CONTENT.value())
-                .message(MessageConstant.MSG_DELETE_SUCCESS)
-                .build();
+        return ResponseUtil.success(ResultCode.MSG_DELETE_SUCCESS.message());
     }
 }

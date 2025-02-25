@@ -31,7 +31,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
+import org.crochet.enums.ResultCode;
 
 /**
  * ProductServiceImpl class
@@ -60,8 +60,8 @@ public class ProductServiceImpl implements ProductService {
         Product product;
         if (!StringUtils.hasText(request.getId())) {
             var category = categoryRepo.findById(request.getCategoryId()).orElseThrow(
-                    () -> new ResourceNotFoundException(MessageConstant.MSG_CATEGORY_NOT_FOUND,
-                            MAP_CODE.get(MessageConstant.MSG_CATEGORY_NOT_FOUND)));
+                    () -> new ResourceNotFoundException(ResultCode.MSG_CATEGORY_NOT_FOUND.message(),
+                            ResultCode.MSG_CATEGORY_NOT_FOUND.code()));
 
             var images = ImageUtils.sortFiles(request.getImages());
             product = Product.builder()
@@ -77,8 +77,8 @@ public class ProductServiceImpl implements ProductService {
                     .build();
         } else {
             product = productRepo.findById(request.getId())
-                    .orElseThrow(() -> new ResourceNotFoundException(MessageConstant.MSG_PRODUCT_NOT_FOUND,
-                            MAP_CODE.get(MessageConstant.MSG_PRODUCT_NOT_FOUND)));
+                    .orElseThrow(() -> new ResourceNotFoundException(ResultCode.MSG_PRODUCT_NOT_FOUND.message(),
+                            ResultCode.MSG_PRODUCT_NOT_FOUND.code()));
             product = ProductMapper.INSTANCE.update(request, product);
         }
         productRepo.save(product);
@@ -172,8 +172,8 @@ public class ProductServiceImpl implements ProductService {
     @Transactional(readOnly = true)
     public ProductResponse getDetail(String id) {
         var product = productRepo.findProductById(id).orElseThrow(
-                () -> new ResourceNotFoundException(MessageConstant.MSG_PRODUCT_NOT_FOUND,
-                        MAP_CODE.get(MessageConstant.MSG_PRODUCT_NOT_FOUND)));
+                () -> new ResourceNotFoundException(ResultCode.MSG_PRODUCT_NOT_FOUND.message(),
+                        ResultCode.MSG_PRODUCT_NOT_FOUND.code()));
         return ProductMapper.INSTANCE.toResponse(product);
     }
 

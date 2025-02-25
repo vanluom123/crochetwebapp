@@ -1,18 +1,5 @@
 package org.crochet.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import org.crochet.constant.AppConstant;
-import org.crochet.payload.request.Filter;
-import org.crochet.payload.request.PatternRequest;
-import org.crochet.payload.response.PaginationResponse;
-import org.crochet.payload.response.PatternResponse;
-import org.crochet.payload.response.ResponseData;
-import org.crochet.service.PatternService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,9 +12,24 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
 import java.util.List;
 
-import static org.crochet.constant.AppConstant.SUCCESS;
+import org.crochet.constant.AppConstant;
+import org.crochet.enums.ResultCode;
+import org.crochet.payload.request.Filter;
+import org.crochet.payload.request.PatternRequest;
+import org.crochet.payload.response.PaginationResponse;
+import org.crochet.payload.response.PatternResponse;
+import org.crochet.payload.response.ResponseData;
+import org.crochet.service.PatternService;
+import org.crochet.util.ResponseUtil;
 
 @RestController
 @RequestMapping("/api/v1/patterns")
@@ -49,11 +51,7 @@ public class PatternController {
     public ResponseData<String> createPattern(
             @RequestBody PatternRequest request) {
         patternService.createOrUpdate(request);
-        return ResponseData.<String>builder()
-                .success(true)
-                .code(HttpStatus.CREATED.value())
-                .message(MessageConstant.MSG_CREATE_OR_UPDATE_SUCCESS)
-                .build();
+        return ResponseUtil.success(ResultCode.MSG_CREATE_OR_UPDATE_SUCCESS.message());
     }
 
     @Operation(summary = "Get paginated list of patterns")
@@ -77,12 +75,7 @@ public class PatternController {
             @Parameter(description = "List filters")
             @RequestBody(required = false) Filter[] filters) {
         var response = patternService.getPatterns(offset, limit, sortBy, sortDir, filters);
-        return ResponseData.<PaginationResponse<PatternResponse>>builder()
-                .success(true)
-                .code(HttpStatus.OK.value())
-                .message(SUCCESS)
-                .data(response)
-                .build();
+        return ResponseUtil.success(response);
     }
 
     @Operation(summary = "Get pattern details by ID")
@@ -95,12 +88,7 @@ public class PatternController {
             @Parameter(description = "ID of the pattern to retrieve")
             @PathVariable("id") String id) {
         var res = patternService.getDetail(id);
-        return ResponseData.<PatternResponse>builder()
-                .success(true)
-                .code(HttpStatus.OK.value())
-                .message(SUCCESS)
-                .data(res)
-                .build();
+        return ResponseUtil.success(res);
     }
 
     @Operation(summary = "Delete a pattern")
@@ -118,11 +106,7 @@ public class PatternController {
             @Parameter(description = "ID of the pattern to delete")
             @RequestParam("id") String id) {
         patternService.deletePattern(id);
-        return ResponseData.<String>builder()
-                .success(true)
-                .code(HttpStatus.OK.value())
-                .message(MessageConstant.MSG_DELETE_SUCCESS)
-                .build();
+        return ResponseUtil.success(ResultCode.MSG_DELETE_SUCCESS.message());
     }
 
     @Operation(summary = "Get pattern ids")
@@ -133,11 +117,6 @@ public class PatternController {
     @GetMapping("/ids")
     public ResponseData<List<String>> getPatternIds(@RequestParam("offset") int offset, @RequestParam("limit") int limit) {
         var res = patternService.getPatternIds(offset, limit);
-        return ResponseData.<List<String>>builder()
-                .success(true)
-                .code(HttpStatus.OK.value())
-                .message(SUCCESS)
-                .data(res)
-                .build();
+        return ResponseUtil.success(res);
     }
 }

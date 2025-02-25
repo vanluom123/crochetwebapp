@@ -1,5 +1,17 @@
 package org.crochet.controller;
 
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.http.HttpStatus;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -8,27 +20,16 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 import org.crochet.constant.AppConstant;
+import org.crochet.enums.ResultCode;
 import org.crochet.payload.request.BlogPostRequest;
 import org.crochet.payload.request.Filter;
 import org.crochet.payload.response.BlogPostResponse;
 import org.crochet.payload.response.PaginationResponse;
 import org.crochet.payload.response.ResponseData;
 import org.crochet.service.BlogPostService;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.crochet.util.ResponseUtil;
 
 import java.util.List;
-
-import static org.crochet.constant.AppConstant.SUCCESS;
 
 @RestController
 @RequestMapping("/api/v1/blogs")
@@ -49,11 +50,7 @@ public class BlogController {
     @SecurityRequirement(name = "BearerAuth")
     public ResponseData<String> createOrUpdatePost(@RequestBody BlogPostRequest request) {
         blogPostService.createOrUpdatePost(request);
-        return ResponseData.<String>builder()
-                .success(true)
-                .code(HttpStatus.CREATED.value())
-                .message(MessageConstant.MSG_CREATE_OR_UPDATE_SUCCESS)
-                .build();
+        return ResponseUtil.success(ResultCode.MSG_CREATE_OR_UPDATE_SUCCESS.message());
     }
 
     @Operation(summary = "Get paginated list of blog posts")
@@ -77,12 +74,7 @@ public class BlogController {
             @Parameter(description = "The list of filters")
             @RequestBody(required = false) Filter[] filters) {
         var response = blogPostService.getBlogs(offset, limit, sortBy, sortDir, filters);
-        return ResponseData.<PaginationResponse<BlogPostResponse>>builder()
-                .success(true)
-                .code(HttpStatus.OK.value())
-                .message(SUCCESS)
-                .data(response)
-                .build();
+        return ResponseUtil.success(response);
     }
 
     @Operation(summary = "Get details of a post")
@@ -93,27 +85,18 @@ public class BlogController {
     @GetMapping("/{id}")
     public ResponseData<BlogPostResponse> getDetail(@PathVariable("id") String id) {
         var response = blogPostService.getDetail(id);
-        return ResponseData.<BlogPostResponse>builder()
-                .success(true)
-                .code(HttpStatus.OK.value())
-                .message(SUCCESS)
-                .data(response)
-                .build();
+        return ResponseUtil.success(response);
     }
 
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Delete a blog post")
-    @ApiResponse(responseCode = "204", description = "A post deleted successfully")
+    @ApiResponse(responseCode = "200", description = "A post deleted successfully")
     @DeleteMapping
     @PreAuthorize("isAuthenticated()")
     @SecurityRequirement(name = "BearerAuth")
     public ResponseData<String> deletePost(@RequestParam("id") String id) {
         blogPostService.deletePost(id);
-        return ResponseData.<String>builder()
-                .success(true)
-                .code(HttpStatus.NO_CONTENT.value())
-                .message(MessageConstant.MSG_DELETE_SUCCESS)
-                .build();
+        return ResponseUtil.success(ResultCode.MSG_DELETE_SUCCESS.message());
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -129,11 +112,6 @@ public class BlogController {
             @Parameter(description = "Limit (default: 48)")
             @RequestParam(value = "limit", defaultValue = AppConstant.DEFAULT_PAGE_SIZE, required = false) int limit) {
         var response = blogPostService.getBlogIds(offset, limit);
-        return ResponseData.<List<String>>builder()
-                .success(true)
-                .code(HttpStatus.OK.value())
-                .message(SUCCESS)
-                .data(response)
-                .build();
+        return ResponseUtil.success(response);
     }
 }

@@ -9,6 +9,7 @@ import org.crochet.payload.request.CommentRequest;
 import org.crochet.payload.response.CommentResponse;
 import org.crochet.payload.response.ResponseData;
 import org.crochet.service.CommentService;
+import org.crochet.util.ResponseUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,8 +17,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
-import static org.crochet.constant.AppConstant.SUCCESS;
 
 @RestController
 @RequestMapping("/api/v1/comments")
@@ -39,11 +38,6 @@ public class CommentController {
     public ResponseData<CommentResponse> createComment(
             @RequestBody CommentRequest request) {
         var response = commentService.createOrUpdate(request);
-        return ResponseData.<CommentResponse>builder()
-                .success(true)
-                .code(HttpStatus.CREATED.value())
-                .message(SUCCESS)
-                .data(response)
-                .build();
+        return ResponseUtil.success(response);
     }
 }

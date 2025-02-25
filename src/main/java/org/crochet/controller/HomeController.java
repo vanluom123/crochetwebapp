@@ -8,13 +8,12 @@ import lombok.RequiredArgsConstructor;
 import org.crochet.payload.response.HomeResponse;
 import org.crochet.payload.response.ResponseData;
 import org.crochet.service.HomeService;
+import org.crochet.util.ResponseUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
-import static org.crochet.constant.AppConstant.SUCCESS;
 
 @RestController
 @RequestMapping("/api/v1/homes")
@@ -29,11 +28,6 @@ public class HomeController {
     @GetMapping
     public ResponseData<HomeResponse> getHomes() {
         var response = homeService.getHomesAsync().join();
-        return ResponseData.<HomeResponse>builder()
-                .success(true)
-                .code(HttpStatus.OK.value())
-                .message(SUCCESS)
-                .data(response)
-                .build();
+        return ResponseUtil.success(response);
     }
 }

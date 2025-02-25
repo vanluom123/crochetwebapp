@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.crochet.payload.response.FileResponse;
 import org.crochet.payload.response.ResponseData;
 import org.crochet.service.FirebaseStorageService;
+import org.crochet.util.ResponseUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,8 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-
-import static org.crochet.constant.AppConstant.SUCCESS;
 
 @RestController
 @RequestMapping("/api/v1/firebase-storage")
@@ -40,12 +39,7 @@ public class FirebaseStorageController {
     @PostMapping(value = "/upload-file", consumes = {"multipart/form-data"})
     public ResponseData<List<FileResponse>> uploadMultipleFiles(@RequestPart("files") MultipartFile[] files) {
         var fileResponses = firebaseStorageService.uploadMultipleFiles(files);
-        return ResponseData.<List<FileResponse>>builder()
-                .success(true)
-                .code(HttpStatus.OK.value())
-                .message(SUCCESS)
-                .data(fileResponses)
-                .build();
+        return ResponseUtil.success(fileResponses);
     }
 
     @Operation(summary = "Delete multiple files from Firebase Cloud Storage")
@@ -55,11 +49,6 @@ public class FirebaseStorageController {
     @DeleteMapping
     public ResponseData<List<String>> deleteMultipleFiles(@RequestBody List<String> fileNames) {
         var response = firebaseStorageService.deleteMultipleFiles(fileNames);
-        return ResponseData.<List<String>>builder()
-                .success(true)
-                .code(HttpStatus.OK.value())
-                .message(SUCCESS)
-                .data(response)
-                .build();
+        return ResponseUtil.success(response);
     }
 }

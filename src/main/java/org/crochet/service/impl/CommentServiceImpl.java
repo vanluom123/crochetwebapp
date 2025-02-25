@@ -1,6 +1,8 @@
 package org.crochet.service.impl;
 
 import lombok.RequiredArgsConstructor;
+
+import org.crochet.enums.ResultCode;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.CommentMapper;
 import org.crochet.model.Comment;
@@ -17,8 +19,6 @@ import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 
-import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
-import static org.crochet.constant.MessageConstant.MSG_USER_NOT_FOUND;
 
 /**
  * CommentServiceImpl class
@@ -43,12 +43,13 @@ public class CommentServiceImpl implements CommentService {
     public CommentResponse createOrUpdate(CommentRequest request) {
         User user = SecurityUtils.getCurrentUser();
         if (user == null) {
-            throw new ResourceNotFoundException(MSG_USER_NOT_FOUND, MAP_CODE.get(MSG_USER_NOT_FOUND));
+            throw new ResourceNotFoundException(ResultCode.MSG_USER_NOT_FOUND.message(),
+            ResultCode.MSG_USER_NOT_FOUND.code());
         }
 
         var blog = blogPostRepo.findById(request.getBlogPostId()).orElseThrow(
-                () -> new ResourceNotFoundException(MessageConstant.MSG_BLOG_NOT_FOUND,
-                        MAP_CODE.get(MessageConstant.MSG_BLOG_NOT_FOUND))
+                () -> new ResourceNotFoundException(ResultCode.MSG_BLOG_NOT_FOUND.message(),
+                        ResultCode.MSG_BLOG_NOT_FOUND.code())
         );
 
         var id = request.getId();
@@ -60,8 +61,8 @@ public class CommentServiceImpl implements CommentService {
                     .build();
         } else {
             comment = commentRepo.findById(id).orElseThrow(
-                    () -> new ResourceNotFoundException(MessageConstant.MSG_COMMENT_NOT_FOUND,
-                            MAP_CODE.get(MessageConstant.MSG_COMMENT_NOT_FOUND))
+                    () -> new ResourceNotFoundException(ResultCode.MSG_COMMENT_NOT_FOUND.message(),
+                            ResultCode.MSG_COMMENT_NOT_FOUND.code())
             );
         }
         comment.setContent(request.getContent());

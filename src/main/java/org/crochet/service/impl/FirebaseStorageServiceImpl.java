@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.StreamSupport;
 
-import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
+import org.crochet.enums.ResultCode;
 
 @Slf4j
 @Service
@@ -58,8 +58,9 @@ public class FirebaseStorageServiceImpl implements FirebaseStorageService {
             blob = storageClient.bucket(BUCKET_NAME)
                     .create(fileName, imageFile.getInputStream(), imageFile.getContentType());
         } catch (IOException e) {
-            log.error(MessageConstant.ERROR_IMAGE_UPLOAD_FAILED);
-            throw new StorageException(MessageConstant.ERROR_IMAGE_UPLOAD_FAILED, MAP_CODE.get(MessageConstant.ERROR_IMAGE_UPLOAD_FAILED));
+            log.error(ResultCode.ERROR_IMAGE_UPLOAD_FAILED.message());
+            throw new StorageException(ResultCode.ERROR_IMAGE_UPLOAD_FAILED.message(),
+                    ResultCode.ERROR_IMAGE_UPLOAD_FAILED.code());
         }
 
         log.info("image name: {}", blob.getName());

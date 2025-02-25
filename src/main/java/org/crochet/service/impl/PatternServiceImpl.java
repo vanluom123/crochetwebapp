@@ -31,7 +31,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
+import org.crochet.enums.ResultCode;
 
 /**
  * PatternServiceImpl class
@@ -56,8 +56,8 @@ public class PatternServiceImpl implements PatternService {
 
         if (!StringUtils.hasText(request.getId())) {
             var category = categoryRepo.findById(request.getCategoryId()).orElseThrow(
-                    () -> new ResourceNotFoundException(MessageConstant.MSG_CATEGORY_NOT_FOUND,
-                            MAP_CODE.get(MessageConstant.MSG_CATEGORY_NOT_FOUND)));
+                    () -> new ResourceNotFoundException(ResultCode.MSG_CATEGORY_NOT_FOUND.message(),
+                            ResultCode.MSG_CATEGORY_NOT_FOUND.code()));
             var images = ImageUtils.sortFiles(request.getImages());
             var files = ImageUtils.sortFiles(request.getFiles());
             pattern = Pattern.builder()
@@ -74,8 +74,8 @@ public class PatternServiceImpl implements PatternService {
                     .build();
         } else {
             pattern = patternRepo.findById(request.getId()).orElseThrow(
-                    () -> new ResourceNotFoundException(MessageConstant.MSG_PATTERN_NOT_FOUND,
-                            MAP_CODE.get(MessageConstant.MSG_PATTERN_NOT_FOUND)));
+                    () -> new ResourceNotFoundException(ResultCode.MSG_PATTERN_NOT_FOUND.message(),
+                            ResultCode.MSG_PATTERN_NOT_FOUND.code()));
             pattern = PatternMapper.INSTANCE.partialUpdate(request, pattern);
         }
 
@@ -165,8 +165,8 @@ public class PatternServiceImpl implements PatternService {
     @Override
     public PatternResponse getDetail(String id) {
         var pattern = patternRepo.findPatternById(id).orElseThrow(
-                () -> new ResourceNotFoundException(MessageConstant.MSG_PATTERN_NOT_FOUND,
-                        MAP_CODE.get(MessageConstant.MSG_PATTERN_NOT_FOUND)));
+                () -> new ResourceNotFoundException(ResultCode.MSG_PATTERN_NOT_FOUND.message(),
+                        ResultCode.MSG_PATTERN_NOT_FOUND.code()));
         return PatternMapper.INSTANCE.toResponse(pattern);
     }
 

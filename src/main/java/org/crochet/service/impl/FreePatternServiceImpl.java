@@ -37,7 +37,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
+import org.crochet.enums.ResultCode;
 
 /**
  * FreePatternServiceImpl class
@@ -68,8 +68,8 @@ public class FreePatternServiceImpl implements FreePatternService {
         FreePattern freePattern;
         if (!StringUtils.hasText(request.getId())) {
             var category = categoryRepo.findCategoryById(request.getCategoryId())
-                    .orElseThrow(() -> new ResourceNotFoundException(MessageConstant.MSG_CATEGORY_NOT_FOUND,
-                            MAP_CODE.get(MessageConstant.MSG_CATEGORY_NOT_FOUND)));
+                    .orElseThrow(() -> new ResourceNotFoundException(ResultCode.MSG_CATEGORY_NOT_FOUND.message(),
+                            ResultCode.MSG_CATEGORY_NOT_FOUND.code()));
             var sortedImages = ImageUtils.sortFiles(request.getImages());
             var sortedFiles = ImageUtils.sortFiles(request.getFiles());
             freePattern = FreePattern.builder()
@@ -86,8 +86,8 @@ public class FreePatternServiceImpl implements FreePatternService {
                     .build();
         } else {
             freePattern = freePatternRepo.findById(request.getId()).orElseThrow(
-                    () -> new ResourceNotFoundException(MessageConstant.MSG_FREE_PATTERN_NOT_FOUND,
-                            MAP_CODE.get(MessageConstant.MSG_FREE_PATTERN_NOT_FOUND)));
+                    () -> new ResourceNotFoundException(ResultCode.MSG_FREE_PATTERN_NOT_FOUND.message(),
+                            ResultCode.MSG_FREE_PATTERN_NOT_FOUND.code()));
             freePattern = FreePatternMapper.INSTANCE.update(request, freePattern);
         }
         freePatternRepo.save(freePattern);
@@ -201,11 +201,11 @@ public class FreePatternServiceImpl implements FreePatternService {
     @Override
     public FreePatternResponse getDetail(String id) {
         var frep = freePatternRepo.findFrepById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(MessageConstant.MSG_FREE_PATTERN_NOT_FOUND,
-                        MAP_CODE.get(MessageConstant.MSG_FREE_PATTERN_NOT_FOUND)));
+                .orElseThrow(() -> new ResourceNotFoundException(ResultCode.MSG_FREE_PATTERN_NOT_FOUND.message(),
+                        ResultCode.MSG_FREE_PATTERN_NOT_FOUND.code()));
         var user = userRepo.findById(frep.getCreatedBy())
-                .orElseThrow(() -> new ResourceNotFoundException(MessageConstant.MSG_USER_NOT_FOUND,
-                        MAP_CODE.get(MessageConstant.MSG_USER_NOT_FOUND)));
+                .orElseThrow(() -> new ResourceNotFoundException(ResultCode.MSG_USER_NOT_FOUND.message(),
+                        ResultCode.MSG_USER_NOT_FOUND.code()));
         var images = FileMapper.INSTANCE.toResponses(frep.getImages());
         var files = FileMapper.INSTANCE.toResponses(frep.getFiles());
         var category = CategoryMapper.INSTANCE.toResponse(frep.getCategory());
@@ -237,18 +237,18 @@ public class FreePatternServiceImpl implements FreePatternService {
     public void delete(String id) {
         var currentUser = SecurityUtils.getCurrentUser();
         if (currentUser == null) {
-            throw new ResourceNotFoundException(MessageConstant.MSG_USER_NOT_FOUND,
-                    MAP_CODE.get(MessageConstant.MSG_USER_NOT_FOUND));
+            throw new ResourceNotFoundException(ResultCode.MSG_USER_NOT_FOUND.message(),
+                    ResultCode.MSG_USER_NOT_FOUND.code());
         }
 
         var freePattern = freePatternRepo.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException(MessageConstant.MSG_FREE_PATTERN_NOT_FOUND,
-                        MAP_CODE.get(MessageConstant.MSG_FREE_PATTERN_NOT_FOUND)));
+                () -> new ResourceNotFoundException(ResultCode.MSG_FREE_PATTERN_NOT_FOUND.message(),
+                        ResultCode.MSG_FREE_PATTERN_NOT_FOUND.code()));
 
         boolean isAdmin = currentUser.getRole().equals(RoleType.ADMIN);
         if (!isAdmin && !freePattern.getCreatedBy().equals(currentUser.getEmail())) {
-            throw new AccessDeniedException(MessageConstant.MSG_FORBIDDEN,
-                    MAP_CODE.get(MessageConstant.MSG_FORBIDDEN));
+            throw new AccessDeniedException(ResultCode.MSG_FORBIDDEN.message(),
+                    ResultCode.MSG_FORBIDDEN.code());
         }
 
         freePatternRepo.delete(freePattern);
@@ -264,8 +264,8 @@ public class FreePatternServiceImpl implements FreePatternService {
     public void deleteAllById(List<String> ids) {
         var currentUser = SecurityUtils.getCurrentUser();
         if (currentUser == null) {
-            throw new ResourceNotFoundException(MessageConstant.MSG_USER_NOT_FOUND,
-                    MAP_CODE.get(MessageConstant.MSG_USER_NOT_FOUND));
+            throw new ResourceNotFoundException(ResultCode.MSG_USER_NOT_FOUND.message(),
+                    ResultCode.MSG_USER_NOT_FOUND.code());
         }
 
         // Delete all free patterns if user is admin. Otherwise, delete only free patterns created by the user

@@ -1,16 +1,15 @@
 package org.crochet.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import java.util.List;
+
 import jakarta.validation.Valid;
+import org.crochet.enums.ResultCode;
 import org.crochet.payload.request.CategoryCreationRequest;
 import org.crochet.payload.request.CategoryUpdateRequest;
 import org.crochet.payload.response.CategoryResponse;
 import org.crochet.payload.response.ResponseData;
 import org.crochet.service.CategoryService;
+import org.crochet.util.ResponseUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,9 +23,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
-import static org.crochet.constant.AppConstant.SUCCESS;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 @RestController
 @RequestMapping("/api/v1/categories")
@@ -45,12 +46,7 @@ public class CategoryController {
     @PostMapping("/create")
     public ResponseData<List<CategoryResponse>> create(@Valid @RequestBody CategoryCreationRequest request) {
         var response = categoryService.create(request);
-        return ResponseData.<List<CategoryResponse>>builder()
-                .success(true)
-                .code(HttpStatus.CREATED.value())
-                .message(SUCCESS)
-                .data(response)
-                .build();
+        return ResponseUtil.success(response);
     }
 
     @Operation(summary = "Update category with parent")
@@ -62,12 +58,7 @@ public class CategoryController {
     @PutMapping("/update")
     public ResponseData<CategoryResponse> update(@Valid @RequestBody CategoryUpdateRequest request) {
         var response = categoryService.update(request);
-        return ResponseData.<CategoryResponse>builder()
-                .success(true)
-                .code(HttpStatus.OK.value())
-                .message(SUCCESS)
-                .data(response)
-                .build();
+        return ResponseUtil.success(response);
     }
 
     @Operation(summary = "Get all categories")
@@ -77,13 +68,7 @@ public class CategoryController {
     @GetMapping
     public ResponseData<List<CategoryResponse>> getAllCategories() {
         var response = categoryService.getAllCategories();
-        return ResponseData.<List<CategoryResponse>>builder()
-                .success(true)
-                .code(HttpStatus.OK.value())
-                .message(SUCCESS)
-                .data(response)
-                .build(
-        );
+        return ResponseUtil.success(response);
     }
 
     @Operation(summary = "Get category by id")
@@ -93,12 +78,7 @@ public class CategoryController {
     @GetMapping("/{id}")
     public ResponseData<CategoryResponse> getById(@PathVariable("id") String id) {
         var response = categoryService.getById(id);
-        return ResponseData.<CategoryResponse>builder()
-                .success(true)
-                .code(HttpStatus.OK.value())
-                .message(SUCCESS)
-                .data(response)
-                .build();
+        return ResponseUtil.success(response);
     }
 
     @Operation(summary = "Delete category")
@@ -110,10 +90,6 @@ public class CategoryController {
     @SecurityRequirement(name = "BearerAuth")
     public ResponseData<String> delete(@RequestParam("id") String id) {
         categoryService.delete(id);
-        return ResponseData.<String>builder()
-                .success(true)
-                .code(HttpStatus.OK.value())
-                .message(MessageConstant.MSG_DELETE_SUCCESS)
-                .build();
+        return ResponseUtil.success(ResultCode.MSG_DELETE_SUCCESS.message());
     }
 }
