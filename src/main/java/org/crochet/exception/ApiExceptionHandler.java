@@ -1,8 +1,9 @@
 package org.crochet.exception;
 
 import lombok.extern.slf4j.Slf4j;
-import org.crochet.constant.MessageConstant;
+import org.crochet.enums.ResultCode;
 import org.crochet.payload.response.ResponseData;
+import org.crochet.util.ResponseUtil;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
@@ -11,8 +12,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
 
 @Slf4j
 @RestControllerAdvice
@@ -113,15 +112,9 @@ public class ApiExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler({UsernameNotFoundException.class})
     public ResponseData<String> handleUsernameNotFoundException(UsernameNotFoundException ex) {
-        var err = ResponseData.<String>builder()
-                .success(false)
-                .code(MAP_CODE.get(MessageConstant.MSG_USER_NOT_FOUND))
-                .message(ex.getMessage())
-                .error(ex.getCause())
-                .build();
         log.error(ex.getMessage());
         log.error(ex.toString());
-        return err;
+        return ResponseUtil.error(ResultCode.MSG_USER_NOT_FOUND.code(), ex.getMessage(), ex.getCause());
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -131,15 +124,9 @@ public class ApiExceptionHandler {
         if (ex.getCause() != null) {
             message = ex.getCause().getMessage();
         }
-        var err = ResponseData.<String>builder()
-                .success(false)
-                .code(MAP_CODE.get(MessageConstant.DATA_INTEGRITY_VIOLATION))
-                .message(message)
-                .error(ex.getCause())
-                .build();
         log.error(ex.getMessage());
         log.error(ex.toString());
-        return err;
+        return ResponseUtil.error(ResultCode.DATA_INTEGRITY_VIOLATION.code(), message, ex.getCause());
     }
 
     @ResponseStatus(HttpStatus.FORBIDDEN)
@@ -157,14 +144,8 @@ public class ApiExceptionHandler {
     }
 
     private ResponseData<String> handleInternalError(RuntimeException ex, int messageCode) {
-        var err = ResponseData.<String>builder()
-                .success(false)
-                .message(ex.getMessage())
-                .code(messageCode)
-                .error(ex.getCause())
-                .build();
         log.error(ex.getMessage());
         log.error(ex.toString());
-        return err;
+        return ResponseUtil.error(messageCode, ex.getMessage(), ex.getCause());
     }
 }

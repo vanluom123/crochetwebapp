@@ -23,18 +23,6 @@ public interface ColFrepRepo extends JpaRepository<ColFrep, String> {
     long countByCollectionId(@Param("id") String id);
 
     @Query("""
-            select
-                (count(c.id) > 0)
-            from
-                ColFrep c
-            where
-                c.collection.id = :colId
-                and c.freePattern.id = :frepId
-            """)
-    boolean existsByCollectionIdAndFreePatternId(@Param("colId") String colId,
-                                                 @Param("frepId") String frepId);
-
-    @Query("""
             SELECT cf.freePattern
             FROM ColFrep cf
             WHERE cf.collection.id = :collectionId

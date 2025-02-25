@@ -1,7 +1,6 @@
 package org.crochet.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.crochet.constant.MessageConstant;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.model.Settings;
 import org.crochet.payload.request.SettingRequest;

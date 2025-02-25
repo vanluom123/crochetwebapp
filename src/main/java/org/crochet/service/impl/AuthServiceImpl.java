@@ -3,6 +3,7 @@ package org.crochet.service.impl;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.github.resilience4j.retry.annotation.Retry;
 import jakarta.servlet.http.HttpServletRequest;
+import org.crochet.enums.ResultCode;
 import org.crochet.exception.EmailVerificationException;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.exception.TokenException;
@@ -31,19 +32,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.time.LocalDateTime;
 
-import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
-import static org.crochet.constant.MessageConstant.ACTIVE_NOW;
-import static org.crochet.constant.MessageConstant.CONFIRM_YOUR_EMAIL;
-import static org.crochet.constant.MessageConstant.MSG_ACCOUNT_ACTIVATION_LINK;
-import static org.crochet.constant.MessageConstant.MSG_EMAIL_ALREADY_CONFIRMED;
-import static org.crochet.constant.MessageConstant.MSG_EMAIL_NOT_VERIFIED;
-import static org.crochet.constant.MessageConstant.MSG_PASSWORD_RESET_TOKEN_EXPIRED;
-import static org.crochet.constant.MessageConstant.MSG_RESET_PASSWORD_LINK;
-import static org.crochet.constant.MessageConstant.MSG_TOKEN_EXPIRED;
-import static org.crochet.constant.MessageConstant.REFRESH_TOKEN_NOT_IN_DB;
-import static org.crochet.constant.MessageConstant.RESET_NOTIFICATION;
-import static org.crochet.constant.MessageConstant.RESET_PASSWORD;
-import static org.crochet.constant.MessageConstant.RESET_PASSWORD_LINK;
 import static org.springframework.util.StringUtils.hasText;
 
 /**
@@ -98,7 +86,8 @@ public class AuthServiceImpl implements AuthService {
         var user = userService.validateUserCredentials(loginRequest.getEmail(), loginRequest.getPassword());
         // Check email verified
         if (!user.isEmailVerified()) {
-            throw new EmailVerificationException(MSG_EMAIL_NOT_VERIFIED, MAP_CODE.get(MSG_EMAIL_NOT_VERIFIED));
+            throw new EmailVerificationException(ResultCode.MSG_EMAIL_NOT_VERIFIED.message(),
+                    ResultCode.MSG_EMAIL_NOT_VERIFIED.code());
         }
         // Create refresh token
         var refreshToken = refreshTokenService.createRefreshToken(user.getId());
@@ -137,9 +126,12 @@ public class AuthServiceImpl implements AuthService {
 
         // Send confirmation email
         emailSender.send(signUpRequest.getEmail(),
-                CONFIRM_YOUR_EMAIL,
-                buildEmailLink(signUpRequest.getEmail(), link, CONFIRM_YOUR_EMAIL, MSG_ACCOUNT_ACTIVATION_LINK,
-                        ACTIVE_NOW));
+                ResultCode.CONFIRM_YOUR_EMAIL.message(),
+                buildEmailLink(signUpRequest.getEmail(),
+                        link,
+                        ResultCode.CONFIRM_YOUR_EMAIL.message(),
+                        ResultCode.MSG_ACCOUNT_ACTIVATION_LINK.message(),
+                        ResultCode.ACTIVE_NOW.message()));
     }
 
     /**
@@ -164,8 +156,12 @@ public class AuthServiceImpl implements AuthService {
         String link = baseUri + "/auth/confirm?token=" + confirmationToken.getToken();
 
         // Send confirmation email
-        emailSender.send(email, CONFIRM_YOUR_EMAIL,
-                buildEmailLink(email, link, CONFIRM_YOUR_EMAIL, MSG_ACCOUNT_ACTIVATION_LINK, ACTIVE_NOW));
+        emailSender.send(email, ResultCode.CONFIRM_YOUR_EMAIL.message(),
+                buildEmailLink(email,
+                        link,
+                        ResultCode.CONFIRM_YOUR_EMAIL.message(),
+                        ResultCode.MSG_ACCOUNT_ACTIVATION_LINK.message(),
+                        ResultCode.ACTIVE_NOW.message()));
     }
 
     /**
@@ -185,11 +181,13 @@ public class AuthServiceImpl implements AuthService {
         LocalDateTime confirmedAt = confirmationToken.getConfirmedAt();
 
         if (confirmedAt != null) {
-            throw new EmailVerificationException(MSG_EMAIL_ALREADY_CONFIRMED, MAP_CODE.get(MSG_EMAIL_ALREADY_CONFIRMED));
+            throw new EmailVerificationException(ResultCode.MSG_EMAIL_ALREADY_CONFIRMED.message(),
+                    ResultCode.MSG_EMAIL_ALREADY_CONFIRMED.code());
         }
 
         if (expiredAt.isBefore(now)) {
-            throw new TokenException(MSG_TOKEN_EXPIRED, MAP_CODE.get(MSG_TOKEN_EXPIRED));
+            throw new TokenException(ResultCode.MSG_TOKEN_EXPIRED.message(),
+                    ResultCode.MSG_TOKEN_EXPIRED.code());
         }
 
         // Update confirmedAt
@@ -307,10 +305,14 @@ public class AuthServiceImpl implements AuthService {
 
         // Send password reset link to email
         var passwordResetLink =
-                buildEmailLink(email, link, RESET_NOTIFICATION, MSG_RESET_PASSWORD_LINK, RESET_PASSWORD);
-        emailSender.send(email, RESET_NOTIFICATION, passwordResetLink);
+                buildEmailLink(email,
+                        link,
+                        ResultCode.RESET_NOTIFICATION.message(),
+                        ResultCode.MSG_RESET_PASSWORD_LINK.message(),
+                        ResultCode.RESET_PASSWORD.message());
+        emailSender.send(email, ResultCode.RESET_NOTIFICATION.message(), passwordResetLink);
 
-        return RESET_PASSWORD_LINK + link;
+        return ResultCode.RESET_PASSWORD_LINK.message() + link;
     }
 
     /**
@@ -331,7 +333,8 @@ public class AuthServiceImpl implements AuthService {
         LocalDateTime expiredAt = passwordResetToken.getExpiresAt();
 
         if (expiredAt.isBefore(now)) {
-            throw new TokenException(MSG_PASSWORD_RESET_TOKEN_EXPIRED, MAP_CODE.get(MSG_PASSWORD_RESET_TOKEN_EXPIRED));
+            throw new TokenException(ResultCode.MSG_PASSWORD_RESET_TOKEN_EXPIRED.message(),
+                    ResultCode.MSG_PASSWORD_RESET_TOKEN_EXPIRED.code());
         }
 
         // Get email by token
@@ -363,8 +366,8 @@ public class AuthServiceImpl implements AuthService {
                             .refreshToken(refreshToken)
                             .build();
                 }).orElseThrow(() ->
-                        new ResourceNotFoundException(REFRESH_TOKEN_NOT_IN_DB,
-                                MAP_CODE.get(REFRESH_TOKEN_NOT_IN_DB))
+                        new ResourceNotFoundException(ResultCode.REFRESH_TOKEN_NOT_IN_DB.message(),
+                                ResultCode.REFRESH_TOKEN_NOT_IN_DB.code())
                 );
     }
 
@@ -404,20 +407,5 @@ public class AuthServiceImpl implements AuthService {
     @SuppressWarnings("unused")
     private String resendVerificationEmailFallback(String email, Throwable t) {
         return "Request limit exceeded. Please wait for a while before retrying.";
-    }
-
-    /**
-     * Get refresh token expires at
-     *
-     * @param refreshToken Refresh token
-     * @return LocalDateTime
-     * @throws ResourceNotFoundException Refresh token not in database
-     */
-    @Override
-    public LocalDateTime getRefreshTokenExpiresAt(String refreshToken) {
-        var refresh = refreshTokenService.findByToken(refreshToken)
-                .orElseThrow(() -> new ResourceNotFoundException(REFRESH_TOKEN_NOT_IN_DB,
-                        MAP_CODE.get(REFRESH_TOKEN_NOT_IN_DB)));
-        return refresh.getExpiresAt();
     }
 }

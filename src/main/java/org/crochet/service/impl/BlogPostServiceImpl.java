@@ -1,7 +1,7 @@
 package org.crochet.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
-import org.crochet.constant.MessageConstant;
+import org.crochet.enums.ResultCode;
 import org.crochet.enums.RoleType;
 import org.crochet.exception.AccessDeniedException;
 import org.crochet.exception.ResourceNotFoundException;
@@ -34,8 +34,6 @@ import org.springframework.util.StringUtils;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
-import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
 
 /**
  * BlogPostServiceImpl class
@@ -74,8 +72,8 @@ public class BlogPostServiceImpl implements BlogPostService {
             BlogCategory blogCategory = null;
             if (request.getBlogCategoryId() != null) {
                 blogCategory = blogCategoryRepo.findById(request.getBlogCategoryId())
-                        .orElseThrow(() -> new ResourceNotFoundException(MessageConstant.MSG_BLOG_CATEGORY_NOT_FOUND,
-                                MAP_CODE.get(MessageConstant.MSG_BLOG_CATEGORY_NOT_FOUND)));
+                        .orElseThrow(() -> new ResourceNotFoundException(ResultCode.MSG_BLOG_CATEGORY_NOT_FOUND.message(),
+                                ResultCode.MSG_BLOG_CATEGORY_NOT_FOUND.code()));
             }
             var images = ImageUtils.sortFiles(request.getFiles());
             blogPost = BlogPost.builder()
@@ -152,8 +150,8 @@ public class BlogPostServiceImpl implements BlogPostService {
     @Override
     public BlogPostResponse getDetail(String id) {
         var blogPost = blogPostRepo.getDetail(id).orElseThrow(
-                () -> new ResourceNotFoundException(MessageConstant.MSG_BLOG_NOT_FOUND,
-                        MAP_CODE.get(MessageConstant.MSG_BLOG_NOT_FOUND)));
+                () -> new ResourceNotFoundException(ResultCode.MSG_BLOG_NOT_FOUND.message(),
+                        ResultCode.MSG_BLOG_NOT_FOUND.code()));
         return BlogPostMapper.INSTANCE.toResponse(blogPost);
     }
 
@@ -194,8 +192,8 @@ public class BlogPostServiceImpl implements BlogPostService {
     public void deletePost(String id) {
         var currentUser = SecurityUtils.getCurrentUser();
         if (currentUser == null) {
-            throw new ResourceNotFoundException(MessageConstant.MSG_USER_NOT_FOUND,
-                    MAP_CODE.get(MessageConstant.MSG_USER_NOT_FOUND));
+            throw new ResourceNotFoundException(ResultCode.MSG_USER_NOT_FOUND.message(),
+                    ResultCode.MSG_USER_NOT_FOUND.code());
         }
         var blogPost = getById(id);
         var isAdmin = Objects.equals(currentUser.getRole(), RoleType.ADMIN);
@@ -215,7 +213,7 @@ public class BlogPostServiceImpl implements BlogPostService {
      */
     private BlogPost getById(String id) {
         return blogPostRepo.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException(MessageConstant.MSG_BLOG_NOT_FOUND,
-                        MAP_CODE.get(MessageConstant.MSG_BLOG_NOT_FOUND)));
+                () -> new ResourceNotFoundException(ResultCode.MSG_BLOG_NOT_FOUND.message(),
+                        ResultCode.MSG_BLOG_NOT_FOUND.code()));
     }
 }

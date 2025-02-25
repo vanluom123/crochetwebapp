@@ -10,7 +10,6 @@ import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
 
 import java.util.List;
 
-import org.crochet.constant.MessageConstant;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.model.User;
 import org.crochet.model.UserProfile;

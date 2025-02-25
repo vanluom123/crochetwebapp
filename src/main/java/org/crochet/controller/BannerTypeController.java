@@ -1,7 +1,6 @@
 package org.crochet.controller;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import org.crochet.constant.MessageConstant;
 import org.crochet.payload.request.BannerTypeRequest;
 import org.crochet.payload.response.BannerTypeResponse;
 import org.crochet.payload.response.ResponseData;

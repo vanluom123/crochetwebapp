@@ -5,7 +5,6 @@ import com.google.cloud.storage.Bucket;
 import com.google.cloud.storage.Storage;
 import com.google.firebase.cloud.StorageClient;
 import lombok.extern.slf4j.Slf4j;
-import org.crochet.constant.MessageConstant;
 import org.crochet.exception.StorageException;
 import org.crochet.payload.response.FileResponse;
 import org.crochet.service.FirebaseStorageService;

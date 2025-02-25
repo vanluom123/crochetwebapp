@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.crochet.constant.AppConstant;
-import org.crochet.constant.MessageConstant;
 import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.PatternRequest;
 import org.crochet.payload.response.PaginationResponse;

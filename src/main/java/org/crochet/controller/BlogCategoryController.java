@@ -2,7 +2,6 @@ package org.crochet.controller;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
-import org.crochet.constant.MessageConstant;
 import org.crochet.payload.request.BlogCategoryRequest;
 import org.crochet.payload.response.BlogCategoryResponse;
 import org.crochet.payload.response.ResponseData;

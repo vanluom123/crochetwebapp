@@ -2,7 +2,6 @@ package org.crochet.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.crochet.constant.MessageConstant;
 import org.crochet.enums.RoleType;
 import org.crochet.exception.AccessDeniedException;
 import org.crochet.exception.ResourceNotFoundException;

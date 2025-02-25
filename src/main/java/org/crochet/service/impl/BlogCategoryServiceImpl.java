@@ -1,7 +1,7 @@
 package org.crochet.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.crochet.constant.MessageConstant;
+import org.crochet.enums.ResultCode;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.BlogCategoryMapper;
 import org.crochet.model.BlogCategory;
@@ -13,8 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-
-import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
 
 @Service
 @RequiredArgsConstructor
@@ -77,8 +75,8 @@ public class BlogCategoryServiceImpl implements BlogCategoryService {
      */
     private BlogCategory getById(String id) {
         return blogCategoryRepo.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException(MessageConstant.MSG_BLOG_CATEGORY_NOT_FOUND,
-                        MAP_CODE.get(MessageConstant.MSG_BLOG_CATEGORY_NOT_FOUND))
+                () -> new ResourceNotFoundException(ResultCode.MSG_BLOG_CATEGORY_NOT_FOUND.message(),
+                        ResultCode.MSG_BLOG_CATEGORY_NOT_FOUND.code())
         );
     }
 }
