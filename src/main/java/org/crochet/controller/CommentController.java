@@ -32,7 +32,7 @@ public class CommentController {
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = String.class)))
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping("/create")
+    @PostMapping
     @PreAuthorize("isAuthenticated()")
     @SecurityRequirement(name = "BearerAuth")
     public ResponseData<CommentResponse> createComment(

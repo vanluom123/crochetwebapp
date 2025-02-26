@@ -107,7 +107,7 @@ public class ProductController {
             description = "Products deleted successfully",
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseData.class)))
     @ResponseStatus(HttpStatus.OK)
-    @DeleteMapping("/delete-multiple")
+    @DeleteMapping("/bulk")
     @PreAuthorize("hasRole('ADMIN')")
     @SecurityRequirement(name = "BearerAuth")
     public ResponseData<String> deleteMultipleProducts(@RequestBody List<String> ids) {

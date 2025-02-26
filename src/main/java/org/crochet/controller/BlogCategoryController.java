@@ -29,7 +29,7 @@ public class BlogCategoryController {
     private final BlogCategoryService blogCategoryService;
 
     @ResponseStatus(HttpStatus.OK)
-    @PostMapping("/createOrUpdate")
+    @PostMapping
     @PreAuthorize("isAuthenticated()")
     @SecurityRequirement(name = "BearerAuth")
     public ResponseData<String> createOrUpdate(@RequestBody BlogCategoryRequest request) {

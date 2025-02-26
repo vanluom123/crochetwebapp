@@ -48,7 +48,7 @@ public class CollectionController {
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = String.class)))
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping(value = "/create")
+    @PostMapping
     public ResponseData<String> create(@RequestParam("name") String name) {
         collectionService.createCollection(name);
         return ResponseUtil.success(ResultCode.MSG_CREATE_OR_UPDATE_SUCCESS.message());
@@ -73,7 +73,7 @@ public class CollectionController {
     @ApiResponse(responseCode = "200", description = "Collection updated successfully",
             content = @Content(mediaType = "application/json"))
     @ResponseStatus(HttpStatus.OK)
-    @PutMapping("/update")
+    @PutMapping
     public ResponseData<String> updateCollection(
             @Parameter(description = "Collection ID")
             @RequestParam("collectionId") String collectionId,

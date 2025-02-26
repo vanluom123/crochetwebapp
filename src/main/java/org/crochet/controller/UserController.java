@@ -114,7 +114,7 @@ public class UserController {
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = ResponseData.class)))
     @ResponseStatus(HttpStatus.OK)
-    @PutMapping("/update")
+    @PutMapping
     @SecurityRequirement(name = "BearerAuth")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseData<String> updateUser(@RequestBody UserUpdateRequest request) {
@@ -164,7 +164,7 @@ public class UserController {
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = ResponseData.class)))
     @ResponseStatus(HttpStatus.OK)
-    @DeleteMapping("/delete-multiple")
+    @DeleteMapping("/bulk")
     @SecurityRequirement(name = "BearerAuth")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseData<String> deleteMultipleUsers(@RequestBody List<String> ids) {

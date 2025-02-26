@@ -43,7 +43,7 @@ public class CategoryController {
     @PreAuthorize("isAuthenticated()")
     @SecurityRequirement(name = "BearerAuth")
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping("/create")
+    @PostMapping
     public ResponseData<List<CategoryResponse>> create(@Valid @RequestBody CategoryCreationRequest request) {
         var response = categoryService.create(request);
         return ResponseUtil.success(response);
@@ -55,7 +55,7 @@ public class CategoryController {
     @PreAuthorize("isAuthenticated()")
     @SecurityRequirement(name = "BearerAuth")
     @ResponseStatus(HttpStatus.OK)
-    @PutMapping("/update")
+    @PutMapping
     public ResponseData<CategoryResponse> update(@Valid @RequestBody CategoryUpdateRequest request) {
         var response = categoryService.update(request);
         return ResponseUtil.success(response);

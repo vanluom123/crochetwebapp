@@ -33,7 +33,7 @@ public class BannerTypeController {
     }
 
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping("/createOrUpdate")
+    @PostMapping
     public ResponseData<BannerTypeResponse> createOrUpdate(@RequestBody BannerTypeRequest request) {
         var res = bannerTypeService.createOrUpdate(request);
         return ResponseUtil.success(res);

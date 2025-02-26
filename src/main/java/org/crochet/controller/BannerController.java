@@ -29,7 +29,7 @@ public class BannerController {
     @PreAuthorize("hasRole('ADMIN')")
     @SecurityRequirement(name = "BearerAuth")
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping("/batchInsertOrUpdate")
+    @PostMapping
     public ResponseData<List<BannerResponse>> batchInsertOrUpdate(@RequestBody List<BannerRequest> requests) {
         var res = bannerService.batchInsertOrUpdate(requests);
         return ResponseUtil.success(res, HttpStatus.CREATED);

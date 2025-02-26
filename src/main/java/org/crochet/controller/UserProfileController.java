@@ -48,7 +48,7 @@ public class UserProfileController {
     @ApiResponse(responseCode = "200", description = "User profile updated",
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = UserProfileResponse.class)))
-    @PutMapping("/update")
+    @PutMapping
     public ResponseData<UserProfileResponse> updateUserProfile(@RequestBody UserProfileRequest request) {
         var res = userProfileService.updateUserProfile(request);
         return ResponseData.<UserProfileResponse>builder()

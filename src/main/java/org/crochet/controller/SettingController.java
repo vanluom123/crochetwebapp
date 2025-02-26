@@ -35,7 +35,7 @@ public class SettingController {
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @PostMapping("/create")
+    @PostMapping
     public ResponseData<String> create(@RequestBody SettingRequest request) {
         settingService.create(request);
         return ResponseData.<String>builder()
@@ -46,7 +46,7 @@ public class SettingController {
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @PutMapping("/update")
+    @PutMapping
     public ResponseData<String> update(@RequestBody SettingRequest request) {
         settingService.update(request);
         return new ResponseData<>(true,
