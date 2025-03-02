@@ -27,4 +27,6 @@ public interface AuthService {
     void logout(HttpServletRequest request);
 
     LocalDateTime getRefreshTokenExpiresAt(String refreshToken);
+
+    AuthResponse getUserInfo(String token);
 }

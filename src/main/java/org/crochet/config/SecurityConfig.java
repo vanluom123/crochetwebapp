@@ -23,7 +23,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -53,7 +52,6 @@ public class SecurityConfig {
                           CustomOAuth2UserService customOAuth2UserService,
                           OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler,
                           OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler,
-                          PasswordEncoder passwordEncoder,
                           OAuth2CookieRepository oAuth2CookieRepository,
                           TokenAuthenticationFilter tokenAuthenticationFilter) {
         this.customUserDetailsService = customUserDetailsService;
@@ -101,8 +99,8 @@ public class SecurityConfig {
                         .baseUri("/oauth2/authorize")
                         .authorizationRequestRepository(oAuth2CookieRepository))
                     .redirectionEndpoint(redirect -> 
-                        redirect.baseUri("/oauth2/callback/*"))
-                    .userInfoEndpoint(userInfo -> 
+                        redirect.baseUri("/login/oauth2/code/*"))
+                    .userInfoEndpoint(userInfo ->
                         userInfo.userService(customOAuth2UserService))
                     .successHandler(oAuth2AuthenticationSuccessHandler)
                     .failureHandler(oAuth2AuthenticationFailureHandler))
