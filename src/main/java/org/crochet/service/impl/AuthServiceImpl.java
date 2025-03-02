@@ -445,4 +445,17 @@ public class AuthServiceImpl implements AuthService {
                         MAP_CODE.get(REFRESH_TOKEN_NOT_IN_DB)));
         return refresh.getExpiresAt();
     }
+
+    @Override
+    public AuthResponse getUserInfo(String token) {
+        var username = jwtTokenService.extractUsername(token);
+        var user = userService.getDetail(username);
+        return AuthResponse.builder()
+                .userId(user.getId())
+                .accessToken(token)
+                .role(user.getRole().getValue())
+                .email(user.getEmail())
+                .imageUrl(user.getImageUrl())
+                .build();
+    }
 }

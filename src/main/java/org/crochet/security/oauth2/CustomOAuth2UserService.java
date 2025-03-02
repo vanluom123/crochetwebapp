@@ -12,6 +12,7 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.Optional;
@@ -34,6 +35,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     }
 
     @Override
+    @Transactional
     public OAuth2User loadUser(OAuth2UserRequest oAuth2UserRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = super.loadUser(oAuth2UserRequest);
 
@@ -64,9 +66,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         // If user exists, update the user; otherwise, register a new user
         User user = userOptional.map(existingUser -> updateUser(existingUser, oAuth2User))
                 .orElseGet(() -> registerNewUser(oAuth2UserRequest, oAuth2User));
-
-        // Validate the user's provider
-        validateUserProvider(oAuth2UserRequest, user);
 
         user.setAttributes(oAuth2User.getAttributes());
 
@@ -99,22 +98,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     }
 
     /**
-     * Validates the user's provider against the OAuth2 user request.
-     *
-     * @param oAuth2UserRequest the OAuth2 user request
-     * @param user              the user to validate
-     * @throws OAuth2AuthenticationProcessingException if the user's provider does not match the OAuth2 client registration
-     */
-    private void validateUserProvider(OAuth2UserRequest oAuth2UserRequest, User user) {
-        AuthProvider provider = AuthProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId());
-        if (!user.getProvider().equals(provider)) {
-            throw new OAuth2AuthenticationProcessingException("Looks like you're signed up with " +
-                    user.getProvider() + " account. Please use your " + user.getProvider() +
-                    " account to login.");
-        }
-    }
-
-    /**
      * Registers a new user based on the OAuth2 user.
      *
      * @param oAuth2UserRequest the OAuth2 user request
@@ -126,11 +109,13 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         String name = oAuth2User.getAttribute("name");
         String email = getEmailFromOAuth2User(oAuth2User);
         String imageUrl = oAuth2User.getAttribute("picture");
+        String registrationId = oAuth2UserRequest.getClientRegistration().getRegistrationId().toUpperCase();
+        AuthProvider provider = AuthProvider.valueOf(registrationId);
 
         // Create a new user
         User user = User.builder()
                 .role(RoleType.USER)
-                .provider(AuthProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId()))
+                .provider(provider)
                 .providerId(providerId)
                 .name(name)
                 .email(email)

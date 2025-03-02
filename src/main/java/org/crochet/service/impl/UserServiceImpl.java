@@ -187,7 +187,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void updatePassword(String password, String email) {
         var user = getByEmail(email);
-        user.setPassword(passwordEncoder.encode(password));
+        user.setPassword(password);
         userRepository.save(user);
     }
 
