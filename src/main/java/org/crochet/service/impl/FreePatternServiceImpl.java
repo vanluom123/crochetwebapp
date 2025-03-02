@@ -255,7 +255,7 @@ public class FreePatternServiceImpl implements FreePatternService {
                         MAP_CODE.get(MessageConstant.MSG_FREE_PATTERN_NOT_FOUND)));
 
         boolean isAdmin = currentUser.getRole().equals(RoleType.ADMIN);
-        if (!isAdmin && !freePattern.getCreatedBy().equals(currentUser.getEmail())) {
+        if (!isAdmin && !freePattern.getCreatedBy().equals(currentUser.getId())) {
             throw new AccessDeniedException(MessageConstant.MSG_FORBIDDEN,
                     MAP_CODE.get(MessageConstant.MSG_FORBIDDEN));
         }
