@@ -166,4 +166,10 @@ public class AuthController {
                 .data(response)
                 .build();
     }
+
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping("/me")
+    public AuthResponse getUserInfo(@RequestParam("accessToken") String accessToken) {
+        return authService.getUserInfo(accessToken);
+    }
 }
