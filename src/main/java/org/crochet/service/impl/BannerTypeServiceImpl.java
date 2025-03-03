@@ -42,8 +42,10 @@ public class BannerTypeServiceImpl implements BannerTypeService {
             bannerType.setName(request.getName());
         } else {
             bannerType = bannerTypeRepo.findById(request.getId())
-                    .orElseThrow(() -> new ResourceNotFoundException(ResultCode.MSG_BANNER_TYPE_NOT_FOUND.message(),
-                            ResultCode.MSG_BANNER_TYPE_NOT_FOUND.code()));
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            ResultCode.MSG_BANNER_TYPE_NOT_FOUND.message(),
+                            ResultCode.MSG_BANNER_TYPE_NOT_FOUND.code()
+                    ));
             bannerType.setName(request.getName());
         }
         bannerType = bannerTypeRepo.save(bannerType);
@@ -80,8 +82,10 @@ public class BannerTypeServiceImpl implements BannerTypeService {
     @Override
     public BannerTypeResponse getById(String id) {
         var banner = bannerTypeRepo.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(ResultCode.MSG_BANNER_TYPE_NOT_FOUND.message(),
-                        ResultCode.MSG_BANNER_TYPE_NOT_FOUND.code()));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        ResultCode.MSG_BANNER_TYPE_NOT_FOUND.message(),
+                        ResultCode.MSG_BANNER_TYPE_NOT_FOUND.code()
+                ));
         return BannerTypeMapper.INSTANCE.toResponse(banner);
     }
 }

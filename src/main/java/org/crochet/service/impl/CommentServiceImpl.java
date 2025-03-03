@@ -1,7 +1,6 @@
 package org.crochet.service.impl;
 
 import lombok.RequiredArgsConstructor;
-
 import org.crochet.enums.ResultCode;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.CommentMapper;
@@ -34,7 +33,7 @@ public class CommentServiceImpl implements CommentService {
      * If the request contains an ID, it updates the existing comment with the corresponding ID.
      * If the request does not contain an ID, it creates a new comment.
      *
-     * @param request   The {@link CommentRequest} containing information for creating or updating the comment.
+     * @param request The {@link CommentRequest} containing information for creating or updating the comment.
      * @return The {@link CommentResponse} containing information about the created or updated comment.
      * @throws ResourceNotFoundException If an existing comment is to be updated, and the specified ID is not found.
      */
@@ -43,13 +42,17 @@ public class CommentServiceImpl implements CommentService {
     public CommentResponse createOrUpdate(CommentRequest request) {
         User user = SecurityUtils.getCurrentUser();
         if (user == null) {
-            throw new ResourceNotFoundException(ResultCode.MSG_USER_NOT_FOUND.message(),
-            ResultCode.MSG_USER_NOT_FOUND.code());
+            throw new ResourceNotFoundException(
+                    ResultCode.MSG_USER_LOGIN_REQUIRED.message(),
+                    ResultCode.MSG_USER_LOGIN_REQUIRED.code()
+            );
         }
 
         var blog = blogPostRepo.findById(request.getBlogPostId()).orElseThrow(
-                () -> new ResourceNotFoundException(ResultCode.MSG_BLOG_NOT_FOUND.message(),
-                        ResultCode.MSG_BLOG_NOT_FOUND.code())
+                () -> new ResourceNotFoundException(
+                        ResultCode.MSG_BLOG_NOT_FOUND.message(),
+                        ResultCode.MSG_BLOG_NOT_FOUND.code()
+                )
         );
 
         var id = request.getId();
@@ -61,8 +64,10 @@ public class CommentServiceImpl implements CommentService {
                     .build();
         } else {
             comment = commentRepo.findById(id).orElseThrow(
-                    () -> new ResourceNotFoundException(ResultCode.MSG_COMMENT_NOT_FOUND.message(),
-                            ResultCode.MSG_COMMENT_NOT_FOUND.code())
+                    () -> new ResourceNotFoundException(
+                            ResultCode.MSG_COMMENT_NOT_FOUND.message(),
+                            ResultCode.MSG_COMMENT_NOT_FOUND.code()
+                    )
             );
         }
         comment.setContent(request.getContent());

@@ -52,8 +52,10 @@ public class BannerServiceImpl implements BannerService {
             Banner banner;
             if (!StringUtils.hasText(request.getId())) {
                 var bannerType = bannerTypeRepo.findById(request.getBannerTypeId())
-                        .orElseThrow(() -> new ResourceNotFoundException(ResultCode.MSG_BANNER_TYPE_NOT_FOUND.message(),
-                                ResultCode.MSG_BANNER_TYPE_NOT_FOUND.code()));
+                        .orElseThrow(() -> new ResourceNotFoundException(
+                                ResultCode.MSG_BANNER_TYPE_NOT_FOUND.message(),
+                                ResultCode.MSG_BANNER_TYPE_NOT_FOUND.code()
+                        ));
                 banner = Banner.builder()
                         .title(request.getTitle())
                         .content(request.getContent())
@@ -66,8 +68,10 @@ public class BannerServiceImpl implements BannerService {
                         .build();
             } else {
                 banner = bannerRepo.findById(request.getId())
-                        .orElseThrow(() -> new ResourceNotFoundException(ResultCode.MSG_BANNER_NOT_FOUND.message(),
-                                ResultCode.MSG_BANNER_NOT_FOUND.code()));
+                        .orElseThrow(() -> new ResourceNotFoundException(
+                                ResultCode.MSG_BANNER_NOT_FOUND.message(),
+                                ResultCode.MSG_BANNER_NOT_FOUND.code()
+                        ));
                 banner = BannerMapper.INSTANCE.partialUpdate(request, banner);
             }
             banners.add(banner);

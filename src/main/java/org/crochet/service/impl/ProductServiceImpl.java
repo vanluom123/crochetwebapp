@@ -60,8 +60,10 @@ public class ProductServiceImpl implements ProductService {
         Product product;
         if (!StringUtils.hasText(request.getId())) {
             var category = categoryRepo.findById(request.getCategoryId()).orElseThrow(
-                    () -> new ResourceNotFoundException(ResultCode.MSG_CATEGORY_NOT_FOUND.message(),
-                            ResultCode.MSG_CATEGORY_NOT_FOUND.code()));
+                    () -> new ResourceNotFoundException(
+                            ResultCode.MSG_CATEGORY_NOT_FOUND.message(),
+                            ResultCode.MSG_CATEGORY_NOT_FOUND.code()
+                    ));
 
             var images = ImageUtils.sortFiles(request.getImages());
             product = Product.builder()
@@ -77,8 +79,10 @@ public class ProductServiceImpl implements ProductService {
                     .build();
         } else {
             product = productRepo.findById(request.getId())
-                    .orElseThrow(() -> new ResourceNotFoundException(ResultCode.MSG_PRODUCT_NOT_FOUND.message(),
-                            ResultCode.MSG_PRODUCT_NOT_FOUND.code()));
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            ResultCode.MSG_PRODUCT_NOT_FOUND.message(),
+                            ResultCode.MSG_PRODUCT_NOT_FOUND.code()
+                    ));
             product = ProductMapper.INSTANCE.update(request, product);
         }
         productRepo.save(product);
@@ -147,16 +151,11 @@ public class ProductServiceImpl implements ProductService {
         if (settingsMap.isEmpty()) {
             return Collections.emptyList();
         }
-
         var direction = settingsMap.get("homepage.product.direction").getValue();
-
         var orderBy = settingsMap.get("homepage.product.orderBy").getValue();
-
         var limit = settingsMap.get("homepage.product.limit").getValue();
-
         Sort sort = Sort.by(Sort.Direction.fromString(direction), orderBy);
         Pageable pageable = PageRequest.of(0, Integer.parseInt(limit), sort);
-
         return productRepo.findLimitedNumProduct(pageable);
     }
 
@@ -172,8 +171,10 @@ public class ProductServiceImpl implements ProductService {
     @Transactional(readOnly = true)
     public ProductResponse getDetail(String id) {
         var product = productRepo.findProductById(id).orElseThrow(
-                () -> new ResourceNotFoundException(ResultCode.MSG_PRODUCT_NOT_FOUND.message(),
-                        ResultCode.MSG_PRODUCT_NOT_FOUND.code()));
+                () -> new ResourceNotFoundException(
+                        ResultCode.MSG_PRODUCT_NOT_FOUND.message(),
+                        ResultCode.MSG_PRODUCT_NOT_FOUND.code()
+                ));
         return ProductMapper.INSTANCE.toResponse(product);
     }
 

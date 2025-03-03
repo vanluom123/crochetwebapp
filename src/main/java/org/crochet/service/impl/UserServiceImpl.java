@@ -55,8 +55,10 @@ public class UserServiceImpl implements UserService {
     public User createUser(SignUpRequest signUpRequest) {
         // Check if the email address is already in use
         if (isValidEmail(signUpRequest.getEmail())) {
-            throw new BadRequestException(ResultCode.MSG_EMAIL_ALREADY_IN_USE.message(),
-                    ResultCode.MSG_EMAIL_ALREADY_IN_USE.code());
+            throw new BadRequestException(
+                    ResultCode.MSG_EMAIL_ALREADY_IN_USE.message(),
+                    ResultCode.MSG_EMAIL_ALREADY_IN_USE.code()
+            );
         }
 
         // Creating user's account
@@ -108,8 +110,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public void updateUser(UserUpdateRequest request) {
         User user = userRepository.findById(request.getId())
-                .orElseThrow(() -> new ResourceNotFoundException(ResultCode.MSG_USER_NOT_FOUND_WITH_ID.message(),
-                        ResultCode.MSG_USER_NOT_FOUND_WITH_ID.code()));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        ResultCode.MSG_USER_NOT_FOUND_WITH_ID.message(),
+                        ResultCode.MSG_USER_NOT_FOUND_WITH_ID.code()
+                ));
         if (request.getName() != null) {
             user.setName(request.getName());
         }
@@ -149,10 +153,11 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public User getByEmail(String email) {
-        final String normlEmail = email.toLowerCase();
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException(ResultCode.MSG_USER_NOT_FOUND_WITH_EMAIL.message(),
-                        ResultCode.MSG_USER_NOT_FOUND_WITH_EMAIL.code()));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        ResultCode.MSG_USER_NOT_FOUND_WITH_EMAIL.message(),
+                        ResultCode.MSG_USER_NOT_FOUND_WITH_EMAIL.code()
+                ));
     }
 
     /**
@@ -164,8 +169,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse getDetail(String id) {
         return userRepository.getDetail(id)
-                .orElseThrow(() -> new ResourceNotFoundException(ResultCode.MSG_USER_NOT_FOUND_WITH_ID.message(),
-                        ResultCode.MSG_USER_NOT_FOUND_WITH_ID.code()));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        ResultCode.MSG_USER_NOT_FOUND_WITH_ID.message(),
+                        ResultCode.MSG_USER_NOT_FOUND_WITH_ID.code()
+                ));
     }
 
     /**
@@ -205,8 +212,10 @@ public class UserServiceImpl implements UserService {
         var user = this.getByEmail(email);
         var isMatch = passwordEncoder.matches(password, user.getPassword());
         if (!isMatch) {
-            throw new BadRequestException(ResultCode.MSG_INCORRECT_PASSWORD.message(),
-                    ResultCode.MSG_INCORRECT_PASSWORD.code());
+            throw new BadRequestException(
+                    ResultCode.MSG_INCORRECT_PASSWORD.message(),
+                    ResultCode.MSG_INCORRECT_PASSWORD.code()
+            );
         }
         return user;
     }

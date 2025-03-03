@@ -9,6 +9,7 @@ import org.crochet.payload.request.BlogCategoryRequest;
 import org.crochet.payload.response.BlogCategoryResponse;
 import org.crochet.repository.BlogCategoryRepo;
 import org.crochet.service.BlogCategoryService;
+import org.crochet.service.PermissionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,13 +19,15 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BlogCategoryServiceImpl implements BlogCategoryService {
     private final BlogCategoryRepo blogCategoryRepo;
+    private final PermissionService permissionService;
 
     @Transactional
     @Override
     public void createOrUpdate(BlogCategoryRequest request) {
         BlogCategory blogCategory;
-        if (!request.getId().isEmpty()) {
+        if (request.getId() != null && !request.getId().isEmpty()) {
             blogCategory = getById(request.getId());
+            permissionService.checkUserPermission(blogCategory, "update");
         } else {
             blogCategory = new BlogCategory();
         }
@@ -64,6 +67,7 @@ public class BlogCategoryServiceImpl implements BlogCategoryService {
     @Override
     public void delete(String id) {
         BlogCategory blogCategory = getById(id);
+        permissionService.checkUserPermission(blogCategory, "delete");
         blogCategoryRepo.delete(blogCategory);
     }
 
@@ -75,8 +79,10 @@ public class BlogCategoryServiceImpl implements BlogCategoryService {
      */
     private BlogCategory getById(String id) {
         return blogCategoryRepo.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException(ResultCode.MSG_BLOG_CATEGORY_NOT_FOUND.message(),
-                        ResultCode.MSG_BLOG_CATEGORY_NOT_FOUND.code())
+                () -> new ResourceNotFoundException(
+                        ResultCode.MSG_BLOG_CATEGORY_NOT_FOUND.message(),
+                        ResultCode.MSG_BLOG_CATEGORY_NOT_FOUND.code()
+                )
         );
     }
 }

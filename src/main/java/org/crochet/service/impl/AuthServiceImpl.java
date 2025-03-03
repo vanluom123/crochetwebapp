@@ -86,8 +86,10 @@ public class AuthServiceImpl implements AuthService {
         var user = userService.validateUserCredentials(loginRequest.getEmail(), loginRequest.getPassword());
         // Check email verified
         if (!user.isEmailVerified()) {
-            throw new EmailVerificationException(ResultCode.MSG_EMAIL_NOT_VERIFIED.message(),
-                    ResultCode.MSG_EMAIL_NOT_VERIFIED.code());
+            throw new EmailVerificationException(
+                    ResultCode.MSG_EMAIL_NOT_VERIFIED.message(),
+                    ResultCode.MSG_EMAIL_NOT_VERIFIED.code()
+            );
         }
         // Create refresh token
         var refreshToken = refreshTokenService.createRefreshToken(user.getId());
@@ -153,7 +155,7 @@ public class AuthServiceImpl implements AuthService {
         String baseUri = ServletUriComponentsBuilder.fromCurrentContextPath().toUriString();
 
         // Build the confirmation link
-        String link = baseUri + "/auth/confirm?token=" + confirmationToken.getToken();
+        String link = baseUri + "/api/v1/auth/confirm?token=" + confirmationToken.getToken();
 
         // Send confirmation email
         emailSender.send(email, ResultCode.CONFIRM_YOUR_EMAIL.message(),
@@ -181,13 +183,17 @@ public class AuthServiceImpl implements AuthService {
         LocalDateTime confirmedAt = confirmationToken.getConfirmedAt();
 
         if (confirmedAt != null) {
-            throw new EmailVerificationException(ResultCode.MSG_EMAIL_ALREADY_CONFIRMED.message(),
-                    ResultCode.MSG_EMAIL_ALREADY_CONFIRMED.code());
+            throw new EmailVerificationException(
+                    ResultCode.MSG_EMAIL_ALREADY_CONFIRMED.message(),
+                    ResultCode.MSG_EMAIL_ALREADY_CONFIRMED.code()
+            );
         }
 
         if (expiredAt.isBefore(now)) {
-            throw new TokenException(ResultCode.MSG_TOKEN_EXPIRED.message(),
-                    ResultCode.MSG_TOKEN_EXPIRED.code());
+            throw new TokenException(
+                    ResultCode.MSG_TOKEN_EXPIRED.message(),
+                    ResultCode.MSG_TOKEN_EXPIRED.code()
+            );
         }
 
         // Update confirmedAt
@@ -333,8 +339,10 @@ public class AuthServiceImpl implements AuthService {
         LocalDateTime expiredAt = passwordResetToken.getExpiresAt();
 
         if (expiredAt.isBefore(now)) {
-            throw new TokenException(ResultCode.MSG_PASSWORD_RESET_TOKEN_EXPIRED.message(),
-                    ResultCode.MSG_PASSWORD_RESET_TOKEN_EXPIRED.code());
+            throw new TokenException(
+                    ResultCode.MSG_PASSWORD_RESET_TOKEN_EXPIRED.message(),
+                    ResultCode.MSG_PASSWORD_RESET_TOKEN_EXPIRED.code()
+            );
         }
 
         // Get email by token
@@ -366,9 +374,10 @@ public class AuthServiceImpl implements AuthService {
                             .refreshToken(refreshToken)
                             .build();
                 }).orElseThrow(() ->
-                        new ResourceNotFoundException(ResultCode.REFRESH_TOKEN_NOT_IN_DB.message(),
-                                ResultCode.REFRESH_TOKEN_NOT_IN_DB.code())
-                );
+                        new ResourceNotFoundException(
+                                ResultCode.REFRESH_TOKEN_NOT_IN_DB.message(),
+                                ResultCode.REFRESH_TOKEN_NOT_IN_DB.code()
+                        ));
     }
 
     /**

@@ -39,12 +39,16 @@ public class CollectionServiceImpl implements CollectionService {
     @Override
     public void addFreePatternToCollection(String collectionId, String freePatternId) {
         var collection = collectionRepo.findColById(collectionId)
-                .orElseThrow(() -> new ResourceNotFoundException(ResultCode.MSG_COLLECTION_NOT_FOUND.message(),
-                        ResultCode.MSG_COLLECTION_NOT_FOUND.code()));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        ResultCode.MSG_COLLECTION_NOT_FOUND.message(),
+                        ResultCode.MSG_COLLECTION_NOT_FOUND.code()
+                ));
 
         FreePattern freePattern = freePatternRepository.findFrepById(freePatternId)
-                .orElseThrow(() -> new ResourceNotFoundException(ResultCode.MSG_FREE_PATTERN_NOT_FOUND.message(),
-                        ResultCode.MSG_FREE_PATTERN_NOT_FOUND.code()));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        ResultCode.MSG_FREE_PATTERN_NOT_FOUND.message(),
+                        ResultCode.MSG_FREE_PATTERN_NOT_FOUND.code()
+                ));
 
         addNewPatternToCollection(collection, freePattern);
         updateCollectionAvatarIfFirst(collection, freePattern);
@@ -63,8 +67,10 @@ public class CollectionServiceImpl implements CollectionService {
     public void createCollection(String name) {
         var user = SecurityUtils.getCurrentUser();
         if (user == null) {
-            throw new ResourceNotFoundException(ResultCode.MSG_USER_NOT_FOUND.message(),
-                    ResultCode.MSG_USER_NOT_FOUND.code());
+            throw new ResourceNotFoundException(
+                    ResultCode.MSG_USER_NOT_FOUND.message(),
+                    ResultCode.MSG_USER_NOT_FOUND.code()
+            );
         }
 
         if (collectionRepo.existsCollectionByName(user.getId(), name)) {
@@ -88,13 +94,17 @@ public class CollectionServiceImpl implements CollectionService {
     public void updateCollection(String collectionId, String name) {
         var user = SecurityUtils.getCurrentUser();
         if (user == null) {
-            throw new ResourceNotFoundException(ResultCode.MSG_USER_NOT_FOUND.message(),
-                    ResultCode.MSG_USER_NOT_FOUND.code());
+            throw new ResourceNotFoundException(
+                    ResultCode.MSG_USER_NOT_FOUND.message(),
+                    ResultCode.MSG_USER_NOT_FOUND.code()
+            );
         }
 
         var col = collectionRepo.findColById(collectionId)
-                .orElseThrow(() -> new AccessDeniedException(ResultCode.MSG_NO_PERMISSION_MODIFY_COLLECTION.message(),
-                        ResultCode.MSG_NO_PERMISSION_MODIFY_COLLECTION.code()));
+                .orElseThrow(() -> new AccessDeniedException(
+                        ResultCode.MSG_NO_PERMISSION_MODIFY_COLLECTION.message(),
+                        ResultCode.MSG_NO_PERMISSION_MODIFY_COLLECTION.code()
+                ));
 
         if (collectionRepo.existsCollectionByName(user.getId(), name)) {
             throw new BadRequestException("Collection name already exists");
@@ -113,15 +123,21 @@ public class CollectionServiceImpl implements CollectionService {
     public void removeFreePatternFromCollection(String freePatternId) {
         var user = SecurityUtils.getCurrentUser();
         if (user == null) {
-            throw new ResourceNotFoundException(ResultCode.MSG_USER_NOT_FOUND.message(),
-                    ResultCode.MSG_USER_NOT_FOUND.code());
+            throw new ResourceNotFoundException(
+                    ResultCode.MSG_USER_NOT_FOUND.message(),
+                    ResultCode.MSG_USER_NOT_FOUND.code()
+            );
         }
         var freePattern = freePatternRepository.findFrepById(freePatternId)
-                .orElseThrow(() -> new ResourceNotFoundException(ResultCode.MSG_FREE_PATTERN_NOT_FOUND.message(),
-                        ResultCode.MSG_FREE_PATTERN_NOT_FOUND.code()));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        ResultCode.MSG_FREE_PATTERN_NOT_FOUND.message(),
+                        ResultCode.MSG_FREE_PATTERN_NOT_FOUND.code()
+                ));
         if (!Objects.equals(freePattern.getCreatedBy(), user.getId())) {
-            throw new AccessDeniedException(ResultCode.MSG_NO_PERMISSION_REMOVE_FREE_PATTERN_FROM_COLLECTION.message(),
-                    ResultCode.MSG_NO_PERMISSION_REMOVE_FREE_PATTERN_FROM_COLLECTION.code());
+            throw new AccessDeniedException(
+                    ResultCode.MSG_NO_PERMISSION_REMOVE_FREE_PATTERN_FROM_COLLECTION.message(),
+                    ResultCode.MSG_NO_PERMISSION_REMOVE_FREE_PATTERN_FROM_COLLECTION.code()
+            );
         }
         var collection = colFrepRepo.findColByUserAndFreePattern(user.getId(), freePatternId);
         colFrepRepo.removeByFreePattern(freePatternId);
@@ -137,8 +153,10 @@ public class CollectionServiceImpl implements CollectionService {
     @Override
     public CollectionResponse getCollectionById(String collectionId) {
         return collectionRepo.getColById(collectionId)
-                .orElseThrow(() -> new ResourceNotFoundException(ResultCode.MSG_COLLECTION_NOT_FOUND.message(),
-                        ResultCode.MSG_COLLECTION_NOT_FOUND.code()));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        ResultCode.MSG_COLLECTION_NOT_FOUND.message(),
+                        ResultCode.MSG_COLLECTION_NOT_FOUND.code()
+                ));
     }
 
     @Override
@@ -158,17 +176,23 @@ public class CollectionServiceImpl implements CollectionService {
     public void deleteCollection(String collectionId) {
         var user = SecurityUtils.getCurrentUser();
         if (user == null) {
-            throw new ResourceNotFoundException(ResultCode.MSG_USER_NOT_FOUND.message(),
-                    ResultCode.MSG_USER_NOT_FOUND.code());
+            throw new ResourceNotFoundException(
+                    ResultCode.MSG_USER_NOT_FOUND.message(),
+                    ResultCode.MSG_USER_NOT_FOUND.code()
+            );
         }
 
         var col = collectionRepo.findColById(collectionId)
-                .orElseThrow(() -> new ResourceNotFoundException(ResultCode.MSG_COLLECTION_NOT_FOUND.message(),
-                        ResultCode.MSG_COLLECTION_NOT_FOUND.code()));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        ResultCode.MSG_COLLECTION_NOT_FOUND.message(),
+                        ResultCode.MSG_COLLECTION_NOT_FOUND.code()
+                ));
 
         if (!Objects.equals(col.getUser().getId(), user.getId())) {
-            throw new AccessDeniedException(ResultCode.MSG_NO_PERMISSION_DELETE_COLLECTION.message(),
-                    ResultCode.MSG_NO_PERMISSION_DELETE_COLLECTION.code());
+            throw new AccessDeniedException(
+                    ResultCode.MSG_NO_PERMISSION_DELETE_COLLECTION.message(),
+                    ResultCode.MSG_NO_PERMISSION_DELETE_COLLECTION.code()
+            );
         }
 
         collectionRepo.delete(col);

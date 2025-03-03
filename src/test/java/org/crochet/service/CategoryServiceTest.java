@@ -28,12 +28,14 @@ public class CategoryServiceTest {
 
     @Mock
     private CategoryRepo categoryRepo;
+    @Mock
+    private PermissionService permissionService;
 
     private CategoryServiceImpl categoryService;
 
     @BeforeEach
     void setUp() {
-        categoryService = new CategoryServiceImpl(categoryRepo);
+        categoryService = new CategoryServiceImpl(categoryRepo, permissionService);
     }
 
     @Test

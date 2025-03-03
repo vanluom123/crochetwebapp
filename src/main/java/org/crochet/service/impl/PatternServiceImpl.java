@@ -16,6 +16,7 @@ import org.crochet.repository.CategoryRepo;
 import org.crochet.repository.GenericFilter;
 import org.crochet.repository.PatternRepository;
 import org.crochet.service.PatternService;
+import org.crochet.service.PermissionService;
 import org.crochet.util.ImageUtils;
 import org.crochet.util.SettingsUtil;
 import org.springframework.data.domain.Page;
@@ -43,6 +44,7 @@ public class PatternServiceImpl implements PatternService {
     private final PatternRepository patternRepo;
     private final CategoryRepo categoryRepo;
     private final SettingsUtil settingsUtil;
+    private final PermissionService permissionService;
 
     /**
      * Create or update pattern
@@ -56,8 +58,10 @@ public class PatternServiceImpl implements PatternService {
 
         if (!StringUtils.hasText(request.getId())) {
             var category = categoryRepo.findById(request.getCategoryId()).orElseThrow(
-                    () -> new ResourceNotFoundException(ResultCode.MSG_CATEGORY_NOT_FOUND.message(),
-                            ResultCode.MSG_CATEGORY_NOT_FOUND.code()));
+                    () -> new ResourceNotFoundException(
+                            ResultCode.MSG_CATEGORY_NOT_FOUND.message(),
+                            ResultCode.MSG_CATEGORY_NOT_FOUND.code()
+                    ));
             var images = ImageUtils.sortFiles(request.getImages());
             var files = ImageUtils.sortFiles(request.getFiles());
             pattern = Pattern.builder()
@@ -74,8 +78,11 @@ public class PatternServiceImpl implements PatternService {
                     .build();
         } else {
             pattern = patternRepo.findById(request.getId()).orElseThrow(
-                    () -> new ResourceNotFoundException(ResultCode.MSG_PATTERN_NOT_FOUND.message(),
-                            ResultCode.MSG_PATTERN_NOT_FOUND.code()));
+                    () -> new ResourceNotFoundException(
+                            ResultCode.MSG_PATTERN_NOT_FOUND.message(),
+                            ResultCode.MSG_PATTERN_NOT_FOUND.code()
+                    ));
+            permissionService.checkUserPermission(pattern, "update");
             pattern = PatternMapper.INSTANCE.partialUpdate(request, pattern);
         }
 
@@ -130,13 +137,9 @@ public class PatternServiceImpl implements PatternService {
         if (settingsMap.isEmpty()) {
             return Collections.emptyList();
         }
-
         var direction = settingsMap.get("homepage.pattern.direction").getValue();
-
         var orderBy = settingsMap.get("homepage.pattern.orderBy").getValue();
-
         var limit = settingsMap.get("homepage.pattern.limit").getValue();
-
         Sort sort = Sort.by(Sort.Direction.fromString(direction), orderBy);
         Pageable pageable = PageRequest.of(0, Integer.parseInt(limit), sort);
         return patternRepo.findLimitedNumPattern(pageable);
@@ -165,8 +168,10 @@ public class PatternServiceImpl implements PatternService {
     @Override
     public PatternResponse getDetail(String id) {
         var pattern = patternRepo.findPatternById(id).orElseThrow(
-                () -> new ResourceNotFoundException(ResultCode.MSG_PATTERN_NOT_FOUND.message(),
-                        ResultCode.MSG_PATTERN_NOT_FOUND.code()));
+                () -> new ResourceNotFoundException(
+                        ResultCode.MSG_PATTERN_NOT_FOUND.message(),
+                        ResultCode.MSG_PATTERN_NOT_FOUND.code()
+                ));
         return PatternMapper.INSTANCE.toResponse(pattern);
     }
 

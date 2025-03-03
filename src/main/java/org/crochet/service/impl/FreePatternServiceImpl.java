@@ -21,6 +21,7 @@ import org.crochet.repository.FreePatternRepository;
 import org.crochet.repository.GenericFilter;
 import org.crochet.repository.UserRepository;
 import org.crochet.service.FreePatternService;
+import org.crochet.service.PermissionService;
 import org.crochet.util.ImageUtils;
 import org.crochet.util.SecurityUtils;
 import org.crochet.util.SettingsUtil;
@@ -51,6 +52,7 @@ public class FreePatternServiceImpl implements FreePatternService {
     private final SettingsUtil settingsUtil;
     private final UserRepository userRepo;
     private final FreePatternRepoCustom freePatternRepoCustom;
+    private final PermissionService permissionService;
 
     /**
      * Creates a new FreePattern or updates an existing one based on the provided
@@ -68,8 +70,10 @@ public class FreePatternServiceImpl implements FreePatternService {
         FreePattern freePattern;
         if (!StringUtils.hasText(request.getId())) {
             var category = categoryRepo.findCategoryById(request.getCategoryId())
-                    .orElseThrow(() -> new ResourceNotFoundException(ResultCode.MSG_CATEGORY_NOT_FOUND.message(),
-                            ResultCode.MSG_CATEGORY_NOT_FOUND.code()));
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            ResultCode.MSG_CATEGORY_NOT_FOUND.message(),
+                            ResultCode.MSG_CATEGORY_NOT_FOUND.code()
+                    ));
             var sortedImages = ImageUtils.sortFiles(request.getImages());
             var sortedFiles = ImageUtils.sortFiles(request.getFiles());
             freePattern = FreePattern.builder()
@@ -86,8 +90,11 @@ public class FreePatternServiceImpl implements FreePatternService {
                     .build();
         } else {
             freePattern = freePatternRepo.findById(request.getId()).orElseThrow(
-                    () -> new ResourceNotFoundException(ResultCode.MSG_FREE_PATTERN_NOT_FOUND.message(),
-                            ResultCode.MSG_FREE_PATTERN_NOT_FOUND.code()));
+                    () -> new ResourceNotFoundException(
+                            ResultCode.MSG_FREE_PATTERN_NOT_FOUND.message(),
+                            ResultCode.MSG_FREE_PATTERN_NOT_FOUND.code()
+                    ));
+            permissionService.checkUserPermission(freePattern, "update");
             freePattern = FreePatternMapper.INSTANCE.update(request, freePattern);
         }
         freePatternRepo.save(freePattern);
@@ -163,16 +170,11 @@ public class FreePatternServiceImpl implements FreePatternService {
         if (settingsMap.isEmpty()) {
             return Collections.emptyList();
         }
-
         var direction = settingsMap.get("homepage.fp.direction").getValue();
-
         var orderBy = settingsMap.get("homepage.fp.orderBy").getValue();
-
         var limit = settingsMap.get("homepage.fp.limit").getValue();
-
         Sort sort = Sort.by(Sort.Direction.fromString(direction), orderBy);
         Pageable pageable = PageRequest.of(0, Integer.parseInt(limit), sort);
-
         return freePatternRepo.findLimitedNumFreePattern(pageable);
     }
 
@@ -201,11 +203,15 @@ public class FreePatternServiceImpl implements FreePatternService {
     @Override
     public FreePatternResponse getDetail(String id) {
         var frep = freePatternRepo.findFrepById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(ResultCode.MSG_FREE_PATTERN_NOT_FOUND.message(),
-                        ResultCode.MSG_FREE_PATTERN_NOT_FOUND.code()));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        ResultCode.MSG_FREE_PATTERN_NOT_FOUND.message(),
+                        ResultCode.MSG_FREE_PATTERN_NOT_FOUND.code()
+                ));
         var user = userRepo.findById(frep.getCreatedBy())
-                .orElseThrow(() -> new ResourceNotFoundException(ResultCode.MSG_USER_NOT_FOUND.message(),
-                        ResultCode.MSG_USER_NOT_FOUND.code()));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        ResultCode.MSG_USER_NOT_FOUND.message(),
+                        ResultCode.MSG_USER_NOT_FOUND.code()
+                ));
         var images = FileMapper.INSTANCE.toResponses(frep.getImages());
         var files = FileMapper.INSTANCE.toResponses(frep.getFiles());
         var category = CategoryMapper.INSTANCE.toResponse(frep.getCategory());
@@ -235,22 +241,12 @@ public class FreePatternServiceImpl implements FreePatternService {
     @Transactional
     @Override
     public void delete(String id) {
-        var currentUser = SecurityUtils.getCurrentUser();
-        if (currentUser == null) {
-            throw new ResourceNotFoundException(ResultCode.MSG_USER_NOT_FOUND.message(),
-                    ResultCode.MSG_USER_NOT_FOUND.code());
-        }
-
         var freePattern = freePatternRepo.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException(ResultCode.MSG_FREE_PATTERN_NOT_FOUND.message(),
-                        ResultCode.MSG_FREE_PATTERN_NOT_FOUND.code()));
-
-        boolean isAdmin = currentUser.getRole().equals(RoleType.ADMIN);
-        if (!isAdmin && !freePattern.getCreatedBy().equals(currentUser.getId())) {
-            throw new AccessDeniedException(ResultCode.MSG_FORBIDDEN.message(),
-                    ResultCode.MSG_FORBIDDEN.code());
-        }
-
+                () -> new ResourceNotFoundException(
+                        ResultCode.MSG_FREE_PATTERN_NOT_FOUND.message(),
+                        ResultCode.MSG_FREE_PATTERN_NOT_FOUND.code()
+                ));
+        permissionService.checkUserPermission(freePattern, "delete");
         freePatternRepo.delete(freePattern);
     }
 
@@ -264,8 +260,10 @@ public class FreePatternServiceImpl implements FreePatternService {
     public void deleteAllById(List<String> ids) {
         var currentUser = SecurityUtils.getCurrentUser();
         if (currentUser == null) {
-            throw new ResourceNotFoundException(ResultCode.MSG_USER_NOT_FOUND.message(),
-                    ResultCode.MSG_USER_NOT_FOUND.code());
+            throw new ResourceNotFoundException(
+                    ResultCode.MSG_USER_LOGIN_REQUIRED.message(),
+                    ResultCode.MSG_USER_LOGIN_REQUIRED.code()
+            );
         }
 
         // Delete all free patterns if user is admin. Otherwise, delete only free patterns created by the user

@@ -74,8 +74,9 @@ public class ConfirmTokenServiceImpl implements ConfirmTokenService {
         return confirmationTokenRepository
                 .findByToken(token)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException(ResultCode.MSG_CONFIRM_TOKEN_NOT_FOUND.message(),
-                                ResultCode.MSG_CONFIRM_TOKEN_NOT_FOUND.code())
-                );
+                        new ResourceNotFoundException(
+                                ResultCode.MSG_CONFIRM_TOKEN_NOT_FOUND.message(),
+                                ResultCode.MSG_CONFIRM_TOKEN_NOT_FOUND.code()
+                        ));
     }
 }

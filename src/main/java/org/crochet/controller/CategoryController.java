@@ -86,7 +86,7 @@ public class CategoryController {
             content = {@Content(mediaType = "application/json", schema = @Schema(implementation = String.class))})
     @ResponseStatus(HttpStatus.OK)
     @DeleteMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("isAuthenticated()")
     @SecurityRequirement(name = "BearerAuth")
     public ResponseData<String> delete(@RequestParam("id") String id) {
         categoryService.delete(id);

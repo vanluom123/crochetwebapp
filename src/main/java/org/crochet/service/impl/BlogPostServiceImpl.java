@@ -2,8 +2,6 @@ package org.crochet.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.crochet.enums.ResultCode;
-import org.crochet.enums.RoleType;
-import org.crochet.exception.AccessDeniedException;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.BlogPostMapper;
 import org.crochet.mapper.FileMapper;
@@ -19,8 +17,8 @@ import org.crochet.repository.BlogCategoryRepo;
 import org.crochet.repository.BlogPostRepository;
 import org.crochet.repository.GenericFilter;
 import org.crochet.service.BlogPostService;
+import org.crochet.service.PermissionService;
 import org.crochet.util.ImageUtils;
-import org.crochet.util.SecurityUtils;
 import org.crochet.util.SettingsUtil;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -33,7 +31,6 @@ import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * BlogPostServiceImpl class
@@ -44,13 +41,16 @@ public class BlogPostServiceImpl implements BlogPostService {
     private final BlogPostRepository blogPostRepo;
     private final BlogCategoryRepo blogCategoryRepo;
     private final SettingsUtil settingsUtil;
+    private final PermissionService permissionService;
 
     public BlogPostServiceImpl(BlogPostRepository blogPostRepo,
                                BlogCategoryRepo blogCategoryRepo,
-                               SettingsUtil settingsUtil) {
+                               SettingsUtil settingsUtil,
+                               PermissionService permissionService) {
         this.blogPostRepo = blogPostRepo;
         this.blogCategoryRepo = blogCategoryRepo;
         this.settingsUtil = settingsUtil;
+        this.permissionService = permissionService;
     }
 
     /**
@@ -72,8 +72,10 @@ public class BlogPostServiceImpl implements BlogPostService {
             BlogCategory blogCategory = null;
             if (request.getBlogCategoryId() != null) {
                 blogCategory = blogCategoryRepo.findById(request.getBlogCategoryId())
-                        .orElseThrow(() -> new ResourceNotFoundException(ResultCode.MSG_BLOG_CATEGORY_NOT_FOUND.message(),
-                                ResultCode.MSG_BLOG_CATEGORY_NOT_FOUND.code()));
+                        .orElseThrow(() -> new ResourceNotFoundException(
+                                ResultCode.MSG_BLOG_CATEGORY_NOT_FOUND.message(),
+                                ResultCode.MSG_BLOG_CATEGORY_NOT_FOUND.code()
+                        ));
             }
             var images = ImageUtils.sortFiles(request.getFiles());
             blogPost = BlogPost.builder()
@@ -85,6 +87,7 @@ public class BlogPostServiceImpl implements BlogPostService {
                     .build();
         } else {
             blogPost = getById(request.getId());
+            permissionService.checkUserPermission(blogPost, "update");
             blogPost = BlogPostMapper.INSTANCE.partialUpdate(request, blogPost);
         }
         blogPostRepo.save(blogPost);
@@ -150,8 +153,10 @@ public class BlogPostServiceImpl implements BlogPostService {
     @Override
     public BlogPostResponse getDetail(String id) {
         var blogPost = blogPostRepo.getDetail(id).orElseThrow(
-                () -> new ResourceNotFoundException(ResultCode.MSG_BLOG_NOT_FOUND.message(),
-                        ResultCode.MSG_BLOG_NOT_FOUND.code()));
+                () -> new ResourceNotFoundException(
+                        ResultCode.MSG_BLOG_NOT_FOUND.message(),
+                        ResultCode.MSG_BLOG_NOT_FOUND.code()
+                ));
         return BlogPostMapper.INSTANCE.toResponse(blogPost);
     }
 
@@ -167,13 +172,9 @@ public class BlogPostServiceImpl implements BlogPostService {
         if (settingsMap.isEmpty()) {
             return List.of();
         }
-
         String direction = settingsMap.get("homepage.blog.direction").getValue();
-
         String orderBy = settingsMap.get("homepage.blog.orderBy").getValue();
-
         String limit = settingsMap.get("homepage.blog.limit").getValue();
-
         Sort sort = Sort.by(Sort.Direction.fromString(direction), orderBy);
         Pageable pageable = PageRequest.of(0, Integer.parseInt(limit), sort);
 
@@ -190,16 +191,8 @@ public class BlogPostServiceImpl implements BlogPostService {
     @Transactional
     @Override
     public void deletePost(String id) {
-        var currentUser = SecurityUtils.getCurrentUser();
-        if (currentUser == null) {
-            throw new ResourceNotFoundException(ResultCode.MSG_USER_NOT_FOUND.message(),
-                    ResultCode.MSG_USER_NOT_FOUND.code());
-        }
         var blogPost = getById(id);
-        var isAdmin = Objects.equals(currentUser.getRole(), RoleType.ADMIN);
-        if (!isAdmin && !Objects.equals(currentUser.getId(), blogPost.getCreatedBy())) {
-            throw new AccessDeniedException("Cannot delete this post");
-        }
+        permissionService.checkUserPermission(blogPost, "delete");
         blogPostRepo.delete(blogPost);
     }
 
@@ -213,7 +206,9 @@ public class BlogPostServiceImpl implements BlogPostService {
      */
     private BlogPost getById(String id) {
         return blogPostRepo.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException(ResultCode.MSG_BLOG_NOT_FOUND.message(),
-                        ResultCode.MSG_BLOG_NOT_FOUND.code()));
+                () -> new ResourceNotFoundException(
+                        ResultCode.MSG_BLOG_NOT_FOUND.message(),
+                        ResultCode.MSG_BLOG_NOT_FOUND.code()
+                ));
     }
 }
