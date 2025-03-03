@@ -26,6 +26,8 @@ public interface UserService {
 
     User getByEmail(String email);
 
+    User getById(String id);
+
     UserResponse getDetail(String id);
 
     void updatePassword(String password, String email);

@@ -160,6 +160,15 @@ public class UserServiceImpl implements UserService {
                 ));
     }
 
+    @Override
+    public User getById(String id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        ResultCode.MSG_USER_NOT_FOUND.message(),
+                        ResultCode.MSG_USER_NOT_FOUND.code()
+                ));
+    }
+
     /**
      * Retrieves a user by their ID.
      *

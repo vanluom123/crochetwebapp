@@ -1,6 +1,7 @@
 package org.crochet.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.ObjectUtils;
 import org.crochet.enums.ResultCode;
 import org.crochet.exception.AccessDeniedException;
 import org.crochet.exception.BadRequestException;
@@ -19,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -133,7 +133,7 @@ public class CollectionServiceImpl implements CollectionService {
                         ResultCode.MSG_FREE_PATTERN_NOT_FOUND.message(),
                         ResultCode.MSG_FREE_PATTERN_NOT_FOUND.code()
                 ));
-        if (!Objects.equals(freePattern.getCreatedBy(), user.getId())) {
+        if (ObjectUtils.notEqual(freePattern.getCreatedBy(), user.getId())) {
             throw new AccessDeniedException(
                     ResultCode.MSG_NO_PERMISSION_REMOVE_FREE_PATTERN_FROM_COLLECTION.message(),
                     ResultCode.MSG_NO_PERMISSION_REMOVE_FREE_PATTERN_FROM_COLLECTION.code()
@@ -188,7 +188,7 @@ public class CollectionServiceImpl implements CollectionService {
                         ResultCode.MSG_COLLECTION_NOT_FOUND.code()
                 ));
 
-        if (!Objects.equals(col.getUser().getId(), user.getId())) {
+        if (ObjectUtils.notEqual(col.getUser().getId(), user.getId())) {
             throw new AccessDeniedException(
                     ResultCode.MSG_NO_PERMISSION_DELETE_COLLECTION.message(),
                     ResultCode.MSG_NO_PERMISSION_DELETE_COLLECTION.code()

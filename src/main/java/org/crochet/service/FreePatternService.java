@@ -1,5 +1,6 @@
 package org.crochet.service;
 
+import org.crochet.model.FreePattern;
 import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.FreePatternRequest;
 import org.crochet.payload.request.PaginationRequest;
@@ -27,4 +28,6 @@ public interface FreePatternService {
 
     PaginationResponse<FreePatternResponse> getFrepsByCollectionId(String collectionId,
                                                                    PaginationRequest paginationRequest);
+
+    FreePattern findById(String id);
 }

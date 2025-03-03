@@ -124,7 +124,7 @@ public class AuthServiceImpl implements AuthService {
         String baseUri = ServletUriComponentsBuilder.fromCurrentContextPath().toUriString();
 
         // Build the confirmation link
-        String link = baseUri + "/auth/confirm?token=" + confirmationToken.getToken();
+        String link = baseUri + "/api/v1/auth/confirm?token=" + confirmationToken.getToken();
 
         // Send confirmation email
         emailSender.send(signUpRequest.getEmail(),
@@ -307,7 +307,7 @@ public class AuthServiceImpl implements AuthService {
 
         // Build the base URI
         String baseUri = ServletUriComponentsBuilder.fromCurrentContextPath().toUriString();
-        String link = baseUri + "/auth/reset-password?passwordResetToken=" + passwordResetToken.getToken();
+        String link = baseUri + "/api/v1/auth/reset-password?passwordResetToken=" + passwordResetToken.getToken();
 
         // Send password reset link to email
         var passwordResetLink =

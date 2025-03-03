@@ -1,5 +1,6 @@
 package org.crochet.service;
 
+import org.crochet.model.BlogPost;
 import org.crochet.payload.request.BlogPostRequest;
 import org.crochet.payload.request.Filter;
 import org.crochet.payload.response.BlogPostResponse;
@@ -19,4 +20,6 @@ public interface BlogPostService {
     List<String> getBlogIds(int offset, int limit);
 
     void deletePost(String id);
+
+    BlogPost getById(String id);
 }

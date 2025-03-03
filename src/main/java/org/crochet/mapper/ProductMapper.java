@@ -1,5 +1,6 @@
 package org.crochet.mapper;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.crochet.model.Product;
 import org.crochet.payload.request.ProductRequest;
 import org.crochet.payload.response.ProductResponse;
@@ -50,7 +51,7 @@ public interface ProductMapper {
         if (request.getContent() != null) {
             product.setContent(request.getContent());
         }
-        if (request.getImages() != null && !request.getImages().isEmpty()) {
+        if (ObjectUtils.isNotEmpty(product.getImages())) {
             var sortedImages = ImageUtils.sortFiles(request.getImages());
             product.setImages(FileMapper.INSTANCE.toEntities(sortedImages));
         }

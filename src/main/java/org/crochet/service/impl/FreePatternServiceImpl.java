@@ -2,8 +2,9 @@ package org.crochet.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
+import org.crochet.enums.ResultCode;
 import org.crochet.enums.RoleType;
-import org.crochet.exception.AccessDeniedException;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.CategoryMapper;
 import org.crochet.mapper.FileMapper;
@@ -15,13 +16,13 @@ import org.crochet.payload.request.FreePatternRequest;
 import org.crochet.payload.request.PaginationRequest;
 import org.crochet.payload.response.FreePatternResponse;
 import org.crochet.payload.response.PaginationResponse;
-import org.crochet.repository.CategoryRepo;
 import org.crochet.repository.FreePatternRepoCustom;
 import org.crochet.repository.FreePatternRepository;
 import org.crochet.repository.GenericFilter;
-import org.crochet.repository.UserRepository;
+import org.crochet.service.CategoryService;
 import org.crochet.service.FreePatternService;
 import org.crochet.service.PermissionService;
+import org.crochet.service.UserService;
 import org.crochet.util.ImageUtils;
 import org.crochet.util.SecurityUtils;
 import org.crochet.util.SettingsUtil;
@@ -38,8 +39,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.crochet.enums.ResultCode;
-
 /**
  * FreePatternServiceImpl class
  */
@@ -48,11 +47,11 @@ import org.crochet.enums.ResultCode;
 @RequiredArgsConstructor
 public class FreePatternServiceImpl implements FreePatternService {
     private final FreePatternRepository freePatternRepo;
-    private final CategoryRepo categoryRepo;
     private final SettingsUtil settingsUtil;
-    private final UserRepository userRepo;
     private final FreePatternRepoCustom freePatternRepoCustom;
     private final PermissionService permissionService;
+    private final CategoryService categoryService;
+    private final UserService userService;
 
     /**
      * Creates a new FreePattern or updates an existing one based on the provided
@@ -69,11 +68,7 @@ public class FreePatternServiceImpl implements FreePatternService {
     public void createOrUpdate(FreePatternRequest request) {
         FreePattern freePattern;
         if (!StringUtils.hasText(request.getId())) {
-            var category = categoryRepo.findCategoryById(request.getCategoryId())
-                    .orElseThrow(() -> new ResourceNotFoundException(
-                            ResultCode.MSG_CATEGORY_NOT_FOUND.message(),
-                            ResultCode.MSG_CATEGORY_NOT_FOUND.code()
-                    ));
+            var category = categoryService.findById(request.getCategoryId());
             var sortedImages = ImageUtils.sortFiles(request.getImages());
             var sortedFiles = ImageUtils.sortFiles(request.getFiles());
             freePattern = FreePattern.builder()
@@ -89,11 +84,7 @@ public class FreePatternServiceImpl implements FreePatternService {
                     .images(FileMapper.INSTANCE.toEntities(sortedImages))
                     .build();
         } else {
-            freePattern = freePatternRepo.findById(request.getId()).orElseThrow(
-                    () -> new ResourceNotFoundException(
-                            ResultCode.MSG_FREE_PATTERN_NOT_FOUND.message(),
-                            ResultCode.MSG_FREE_PATTERN_NOT_FOUND.code()
-                    ));
+            freePattern = findById(request.getId());
             permissionService.checkUserPermission(freePattern, "update");
             freePattern = FreePatternMapper.INSTANCE.update(request, freePattern);
         }
@@ -207,11 +198,7 @@ public class FreePatternServiceImpl implements FreePatternService {
                         ResultCode.MSG_FREE_PATTERN_NOT_FOUND.message(),
                         ResultCode.MSG_FREE_PATTERN_NOT_FOUND.code()
                 ));
-        var user = userRepo.findById(frep.getCreatedBy())
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        ResultCode.MSG_USER_NOT_FOUND.message(),
-                        ResultCode.MSG_USER_NOT_FOUND.code()
-                ));
+        var user = userService.getById(frep.getCreatedBy());
         var images = FileMapper.INSTANCE.toResponses(frep.getImages());
         var files = FileMapper.INSTANCE.toResponses(frep.getFiles());
         var category = CategoryMapper.INSTANCE.toResponse(frep.getCategory());
@@ -267,10 +254,10 @@ public class FreePatternServiceImpl implements FreePatternService {
         }
 
         // Delete all free patterns if user is admin. Otherwise, delete only free patterns created by the user
-        if (currentUser.getRole().equals(RoleType.ADMIN)) {
+        if (currentUser.getRole() == RoleType.ADMIN) {
             freePatternRepo.deleteAllById(ids);
         } else {
-            freePatternRepo.deleteAllByIdAndCreatedBy(ids, currentUser.getEmail());
+            freePatternRepo.deleteAllByIdAndCreatedBy(ids, currentUser.getId());
         }
     }
 
@@ -308,7 +295,7 @@ public class FreePatternServiceImpl implements FreePatternService {
                                               String sortDir,
                                               Filter[] filters,
                                               List<String> freePatternIds) {
-        if (filters != null && filters.length > 0) {
+        if (ObjectUtils.isNotEmpty(filters)) {
             GenericFilter<FreePattern> filter = GenericFilter.create(filters);
             var spec = filter.build();
             List<String> ids = freePatternRepoCustom.findAllIds(spec);
@@ -317,5 +304,14 @@ public class FreePatternServiceImpl implements FreePatternService {
         Sort.Direction dir = Sort.Direction.fromString(sortDir);
         Sort sort = Sort.by(dir, sortBy);
         return PageRequest.of(offset, limit, sort);
+    }
+
+    @Override
+    public FreePattern findById(String id) {
+        return freePatternRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        ResultCode.MSG_FREE_PATTERN_NOT_FOUND.message(),
+                        ResultCode.MSG_FREE_PATTERN_NOT_FOUND.code()
+                ));
     }
 }

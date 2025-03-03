@@ -2,6 +2,8 @@ package org.crochet.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
+import org.crochet.enums.ResultCode;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.FileMapper;
 import org.crochet.mapper.PaginationMapper;
@@ -12,9 +14,9 @@ import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.PatternRequest;
 import org.crochet.payload.response.PaginationResponse;
 import org.crochet.payload.response.PatternResponse;
-import org.crochet.repository.CategoryRepo;
 import org.crochet.repository.GenericFilter;
 import org.crochet.repository.PatternRepository;
+import org.crochet.service.CategoryService;
 import org.crochet.service.PatternService;
 import org.crochet.service.PermissionService;
 import org.crochet.util.ImageUtils;
@@ -32,8 +34,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.crochet.enums.ResultCode;
-
 /**
  * PatternServiceImpl class
  */
@@ -42,9 +42,9 @@ import org.crochet.enums.ResultCode;
 @RequiredArgsConstructor
 public class PatternServiceImpl implements PatternService {
     private final PatternRepository patternRepo;
-    private final CategoryRepo categoryRepo;
     private final SettingsUtil settingsUtil;
     private final PermissionService permissionService;
+    private final CategoryService categoryService;
 
     /**
      * Create or update pattern
@@ -57,11 +57,7 @@ public class PatternServiceImpl implements PatternService {
         Pattern pattern;
 
         if (!StringUtils.hasText(request.getId())) {
-            var category = categoryRepo.findById(request.getCategoryId()).orElseThrow(
-                    () -> new ResourceNotFoundException(
-                            ResultCode.MSG_CATEGORY_NOT_FOUND.message(),
-                            ResultCode.MSG_CATEGORY_NOT_FOUND.code()
-                    ));
+            var category = categoryService.findById(request.getCategoryId());
             var images = ImageUtils.sortFiles(request.getImages());
             var files = ImageUtils.sortFiles(request.getFiles());
             pattern = Pattern.builder()
@@ -77,11 +73,7 @@ public class PatternServiceImpl implements PatternService {
                     .images(FileMapper.INSTANCE.toEntities(images))
                     .build();
         } else {
-            pattern = patternRepo.findById(request.getId()).orElseThrow(
-                    () -> new ResourceNotFoundException(
-                            ResultCode.MSG_PATTERN_NOT_FOUND.message(),
-                            ResultCode.MSG_PATTERN_NOT_FOUND.code()
-                    ));
+            pattern = findById(request.getId());
             permissionService.checkUserPermission(pattern, "update");
             pattern = PatternMapper.INSTANCE.partialUpdate(request, pattern);
         }
@@ -101,10 +93,10 @@ public class PatternServiceImpl implements PatternService {
      */
     @Override
     public PaginationResponse<PatternResponse> getPatterns(int offset, int limit, String sortBy, String sortDir,
-                                                 Filter[] filters) {
+                                                           Filter[] filters) {
         List<String> patternIds = Collections.emptyList();
 
-        if (filters != null && filters.length > 0) {
+        if (ObjectUtils.isNotEmpty(filters)) {
             GenericFilter<Pattern> filter = GenericFilter.create(filters);
             var spec = filter.build();
             patternIds = patternRepo.findAll(spec)
@@ -173,6 +165,15 @@ public class PatternServiceImpl implements PatternService {
                         ResultCode.MSG_PATTERN_NOT_FOUND.code()
                 ));
         return PatternMapper.INSTANCE.toResponse(pattern);
+    }
+
+    @Override
+    public Pattern findById(String id) {
+        return patternRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        ResultCode.MSG_PATTERN_NOT_FOUND.message(),
+                        ResultCode.MSG_PATTERN_NOT_FOUND.code()
+                ));
     }
 
     /**

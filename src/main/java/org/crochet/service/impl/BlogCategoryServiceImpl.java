@@ -12,6 +12,7 @@ import org.crochet.service.BlogCategoryService;
 import org.crochet.service.PermissionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 
@@ -25,11 +26,11 @@ public class BlogCategoryServiceImpl implements BlogCategoryService {
     @Override
     public void createOrUpdate(BlogCategoryRequest request) {
         BlogCategory blogCategory;
-        if (request.getId() != null && !request.getId().isEmpty()) {
+        if (!StringUtils.hasText(request.getId())) {
+            blogCategory = new BlogCategory();
+        } else {
             blogCategory = getById(request.getId());
             permissionService.checkUserPermission(blogCategory, "update");
-        } else {
-            blogCategory = new BlogCategory();
         }
         blogCategory.setName(request.getName());
         blogCategoryRepo.save(blogCategory);
@@ -77,7 +78,8 @@ public class BlogCategoryServiceImpl implements BlogCategoryService {
      * @param id the blog category id
      * @return the blog category
      */
-    private BlogCategory getById(String id) {
+    @Override
+    public BlogCategory getById(String id) {
         return blogCategoryRepo.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException(
                         ResultCode.MSG_BLOG_CATEGORY_NOT_FOUND.message(),

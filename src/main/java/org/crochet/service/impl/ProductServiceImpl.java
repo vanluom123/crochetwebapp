@@ -2,6 +2,8 @@ package org.crochet.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
+import org.crochet.enums.ResultCode;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.FileMapper;
 import org.crochet.mapper.PaginationMapper;
@@ -12,9 +14,9 @@ import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.ProductRequest;
 import org.crochet.payload.response.PaginationResponse;
 import org.crochet.payload.response.ProductResponse;
-import org.crochet.repository.CategoryRepo;
 import org.crochet.repository.GenericFilter;
 import org.crochet.repository.ProductRepository;
+import org.crochet.service.CategoryService;
 import org.crochet.service.ProductService;
 import org.crochet.util.ImageUtils;
 import org.crochet.util.SettingsUtil;
@@ -31,8 +33,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.crochet.enums.ResultCode;
-
 /**
  * ProductServiceImpl class
  */
@@ -41,7 +41,7 @@ import org.crochet.enums.ResultCode;
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepo;
-    private final CategoryRepo categoryRepo;
+    private final CategoryService categoryService;
     private final SettingsUtil settingsUtil;
 
     /**
@@ -59,12 +59,7 @@ public class ProductServiceImpl implements ProductService {
     public void createOrUpdate(ProductRequest request) {
         Product product;
         if (!StringUtils.hasText(request.getId())) {
-            var category = categoryRepo.findById(request.getCategoryId()).orElseThrow(
-                    () -> new ResourceNotFoundException(
-                            ResultCode.MSG_CATEGORY_NOT_FOUND.message(),
-                            ResultCode.MSG_CATEGORY_NOT_FOUND.code()
-                    ));
-
+            var category = categoryService.findById(request.getCategoryId());
             var images = ImageUtils.sortFiles(request.getImages());
             product = Product.builder()
                     .category(category)
@@ -78,11 +73,7 @@ public class ProductServiceImpl implements ProductService {
                     .images(FileMapper.INSTANCE.toEntities(images))
                     .build();
         } else {
-            product = productRepo.findById(request.getId())
-                    .orElseThrow(() -> new ResourceNotFoundException(
-                            ResultCode.MSG_PRODUCT_NOT_FOUND.message(),
-                            ResultCode.MSG_PRODUCT_NOT_FOUND.code()
-                    ));
+            product = findById(request.getId());
             product = ProductMapper.INSTANCE.update(request, product);
         }
         productRepo.save(product);
@@ -105,7 +96,7 @@ public class ProductServiceImpl implements ProductService {
                                                            Filter[] filters) {
         List<String> prodIds = Collections.emptyList();
 
-        if (filters != null && filters.length > 0) {
+        if (ObjectUtils.isNotEmpty(filters)) {
             GenericFilter<Product> filter = GenericFilter.create(filters);
             var spec = filter.build();
             prodIds = productRepo.findAll(spec)
@@ -170,12 +161,17 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional(readOnly = true)
     public ProductResponse getDetail(String id) {
-        var product = productRepo.findProductById(id).orElseThrow(
+        var product = findById(id);
+        return ProductMapper.INSTANCE.toResponse(product);
+    }
+
+    @Override
+    public Product findById(String id) {
+        return productRepo.findProductById(id).orElseThrow(
                 () -> new ResourceNotFoundException(
                         ResultCode.MSG_PRODUCT_NOT_FOUND.message(),
                         ResultCode.MSG_PRODUCT_NOT_FOUND.code()
                 ));
-        return ProductMapper.INSTANCE.toResponse(product);
     }
 
     /**

@@ -13,9 +13,9 @@ import org.crochet.payload.request.BlogPostRequest;
 import org.crochet.payload.request.Filter;
 import org.crochet.payload.response.BlogPostResponse;
 import org.crochet.payload.response.PaginationResponse;
-import org.crochet.repository.BlogCategoryRepo;
 import org.crochet.repository.BlogPostRepository;
 import org.crochet.repository.GenericFilter;
+import org.crochet.service.BlogCategoryService;
 import org.crochet.service.BlogPostService;
 import org.crochet.service.PermissionService;
 import org.crochet.util.ImageUtils;
@@ -39,16 +39,16 @@ import java.util.Map;
 @Service
 public class BlogPostServiceImpl implements BlogPostService {
     private final BlogPostRepository blogPostRepo;
-    private final BlogCategoryRepo blogCategoryRepo;
+    private final BlogCategoryService blogCategoryService;
     private final SettingsUtil settingsUtil;
     private final PermissionService permissionService;
 
     public BlogPostServiceImpl(BlogPostRepository blogPostRepo,
-                               BlogCategoryRepo blogCategoryRepo,
+                               BlogCategoryService blogCategoryService,
                                SettingsUtil settingsUtil,
                                PermissionService permissionService) {
         this.blogPostRepo = blogPostRepo;
-        this.blogCategoryRepo = blogCategoryRepo;
+        this.blogCategoryService = blogCategoryService;
         this.settingsUtil = settingsUtil;
         this.permissionService = permissionService;
     }
@@ -71,11 +71,7 @@ public class BlogPostServiceImpl implements BlogPostService {
         if (!StringUtils.hasText(request.getId())) {
             BlogCategory blogCategory = null;
             if (request.getBlogCategoryId() != null) {
-                blogCategory = blogCategoryRepo.findById(request.getBlogCategoryId())
-                        .orElseThrow(() -> new ResourceNotFoundException(
-                                ResultCode.MSG_BLOG_CATEGORY_NOT_FOUND.message(),
-                                ResultCode.MSG_BLOG_CATEGORY_NOT_FOUND.code()
-                        ));
+                blogCategory = blogCategoryService.getById(request.getBlogCategoryId());
             }
             var images = ImageUtils.sortFiles(request.getFiles());
             blogPost = BlogPost.builder()
@@ -204,7 +200,8 @@ public class BlogPostServiceImpl implements BlogPostService {
      * @throws ResourceNotFoundException If the specified blog post ID does not
      *                                   correspond to an existing blog post.
      */
-    private BlogPost getById(String id) {
+    @Override
+    public BlogPost getById(String id) {
         return blogPostRepo.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException(
                         ResultCode.MSG_BLOG_NOT_FOUND.message(),

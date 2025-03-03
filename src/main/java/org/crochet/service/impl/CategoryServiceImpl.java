@@ -190,7 +190,8 @@ public class CategoryServiceImpl implements CategoryService {
      * @param id the parent category ID
      * @return a list of CategoryResponse objects
      */
-    private Category findById(String id) {
+    @Override
+    public Category findById(String id) {
         return categoryRepo.findCategoryById(id)
                 .orElseThrow(() -> new IllegalArgumentException(
                         ResultCode.MSG_CATEGORY_NOT_FOUND.message(),
