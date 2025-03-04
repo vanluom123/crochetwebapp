@@ -101,11 +101,11 @@ public class FreePatternController {
     @PostMapping
     public ResponseData<PaginationResponse<FreePatternResponse>> getAllFreePatterns(
             @Parameter(description = "Page number (default: 0)")
-            @RequestParam(value = "offset", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER,
-                    required = false) int offset,
+            @RequestParam(value = "pageNo", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER,
+                    required = false) int pageNo,
             @Parameter(description = "Page size (default: 48)")
-            @RequestParam(value = "limit", defaultValue = AppConstant.DEFAULT_PAGE_SIZE,
-                    required = false) int limit,
+            @RequestParam(value = "pageSize", defaultValue = AppConstant.DEFAULT_PAGE_SIZE,
+                    required = false) int pageSize,
             @Parameter(description = "Sort by field (default: createdDate)")
             @RequestParam(value = "sortBy", defaultValue = AppConstant.DEFAULT_SORT_BY, required = false) String sortBy,
             @Parameter(description = "Sort direction (default: DESC)")
@@ -113,7 +113,7 @@ public class FreePatternController {
                     required = false) String sortDir,
             @Parameter(description = "List filters")
             @RequestBody(required = false) Filter[] filters) {
-        var response = freePatternService.getAllFreePatterns(offset, limit, sortBy, sortDir, filters);
+        var response = freePatternService.getAllFreePatterns(pageNo, pageSize, sortBy, sortDir, filters);
         return ResponseUtil.success(response);
     }
 
@@ -123,9 +123,9 @@ public class FreePatternController {
                     schema = @Schema(implementation = List.class)))
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/ids")
-    public ResponseData<List<String>> getFreePatternIds(@RequestParam("offset") int offset,
-                                                        @RequestParam("limit") int limit) {
-        var res = freePatternService.getFreePatternIds(offset, limit);
+    public ResponseData<List<String>> getFreePatternIds(@RequestParam("pageNo") int pageNo,
+                                                        @RequestParam("pageSize") int pageSize) {
+        var res = freePatternService.getFreePatternIds(pageNo, pageSize);
         return ResponseUtil.success(res);
     }
 }

@@ -9,6 +9,7 @@ import org.crochet.payload.request.UserProfileRequest;
 import org.crochet.payload.response.ResponseData;
 import org.crochet.payload.response.UserProfileResponse;
 import org.crochet.service.UserProfileService;
+import org.crochet.util.ResponseUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -35,12 +36,7 @@ public class UserProfileController {
     @GetMapping
     public ResponseData<UserProfileResponse> loadUserProfile(@RequestParam("userId") String userId) {
         var res = userProfileService.loadUserProfile(userId);
-        return ResponseData.<UserProfileResponse>builder()
-                .success(true)
-                .code(HttpStatus.OK.value())
-                .message("Load user profile success")
-                .data(res)
-                .build();
+        return ResponseUtil.success(res, "Load user profile success");
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -51,11 +47,6 @@ public class UserProfileController {
     @PutMapping
     public ResponseData<UserProfileResponse> updateUserProfile(@RequestBody UserProfileRequest request) {
         var res = userProfileService.updateUserProfile(request);
-        return ResponseData.<UserProfileResponse>builder()
-                .success(true)
-                .code(HttpStatus.OK.value())
-                .message("Update user profile success")
-                .data(res)
-                .build();
+        return ResponseUtil.success(res, "Update user profile success");
     }
 }

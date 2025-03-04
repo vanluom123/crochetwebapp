@@ -61,11 +61,11 @@ public class BlogController {
     @PostMapping
     public ResponseData<PaginationResponse<BlogPostResponse>> getBlogs(
             @Parameter(description = "Page number (default: 0)")
-            @RequestParam(value = "offset", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER,
-                    required = false) int offset,
+            @RequestParam(value = "pageNo", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER,
+                    required = false) int pageNo,
             @Parameter(description = "Page size (default: 48)")
-            @RequestParam(value = "limit", defaultValue = AppConstant.DEFAULT_PAGE_SIZE,
-                    required = false) int limit,
+            @RequestParam(value = "pageSize", defaultValue = AppConstant.DEFAULT_PAGE_SIZE,
+                    required = false) int pageSize,
             @Parameter(description = "Sort by field (default: createdDate)")
             @RequestParam(value = "sortBy", defaultValue = AppConstant.DEFAULT_SORT_BY, required = false) String sortBy,
             @Parameter(description = "Sort direction (default: DESC)")
@@ -73,7 +73,7 @@ public class BlogController {
                     required = false) String sortDir,
             @Parameter(description = "The list of filters")
             @RequestBody(required = false) Filter[] filters) {
-        var response = blogPostService.getBlogs(offset, limit, sortBy, sortDir, filters);
+        var response = blogPostService.getBlogs(pageNo, pageSize, sortBy, sortDir, filters);
         return ResponseUtil.success(response);
     }
 
@@ -107,11 +107,11 @@ public class BlogController {
     @GetMapping("/ids")
     public ResponseData<List<String>> getBlogIds(
             @Parameter(description = "Page number (default: 0)")
-            @RequestParam(value = "offset", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER,
-                    required = false) int offset,
+            @RequestParam(value = "pageNo", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER,
+                    required = false) int pageNo,
             @Parameter(description = "Limit (default: 48)")
-            @RequestParam(value = "limit", defaultValue = AppConstant.DEFAULT_PAGE_SIZE, required = false) int limit) {
-        var response = blogPostService.getBlogIds(offset, limit);
+            @RequestParam(value = "pageSize", defaultValue = AppConstant.DEFAULT_PAGE_SIZE, required = false) int pageSize) {
+        var response = blogPostService.getBlogIds(pageNo, pageSize);
         return ResponseUtil.success(response);
     }
 }

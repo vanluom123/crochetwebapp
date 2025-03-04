@@ -13,7 +13,6 @@ import org.crochet.mapper.PaginationMapper;
 import org.crochet.model.FreePattern;
 import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.FreePatternRequest;
-import org.crochet.payload.request.PaginationRequest;
 import org.crochet.payload.response.FreePatternResponse;
 import org.crochet.payload.response.PaginationResponse;
 import org.crochet.repository.FreePatternRepoCustom;
@@ -264,14 +263,21 @@ public class FreePatternServiceImpl implements FreePatternService {
     /**
      * Get free patterns by collection id
      *
-     * @param collectionId      String
-     * @param paginationRequest PaginationRequest
+     * @param collectionId  Collection id
+     * @param offset        Page number
+     * @param limit         Page size
+     * @param sortBy        Sort by
+     * @param sortDir       Sort direction
      * @return PaginationResponse
      */
     @Override
-    public PaginationResponse<FreePatternResponse> getFrepsByCollectionId(String collectionId,
-                                                                          PaginationRequest paginationRequest) {
-        var pageable = paginationRequest.getPageable();
+    public PaginationResponse<FreePatternResponse>
+    getFrepsByCollectionId(String collectionId,
+                           int offset,
+                           int limit,
+                           String sortBy,
+                           String sortDir) {
+        Pageable pageable = PageRequest.of(offset, limit, Sort.Direction.fromString(sortDir), sortBy);
         var frepResponse = freePatternRepo.getFrepsByCollection(collectionId, pageable);
         return PaginationMapper.getInstance().toPagination(frepResponse);
     }

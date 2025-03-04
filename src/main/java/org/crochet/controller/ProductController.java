@@ -61,11 +61,11 @@ public class ProductController {
     @PostMapping
     public ResponseData<PaginationResponse<ProductResponse>> getProducts(
             @Parameter(description = "Page number")
-            @RequestParam(value = "offset", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER,
-                    required = false) int offset,
+            @RequestParam(value = "pageNo", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER,
+                    required = false) int pageNo,
             @Parameter(description = "Page size")
-            @RequestParam(value = "limit", defaultValue = AppConstant.DEFAULT_PAGE_SIZE,
-                    required = false) int limit,
+            @RequestParam(value = "pageSize", defaultValue = AppConstant.DEFAULT_PAGE_SIZE,
+                    required = false) int pageSize,
             @Parameter(description = "Sort by field")
             @RequestParam(value = "sortBy", defaultValue = AppConstant.DEFAULT_SORT_BY, required = false) String sortBy,
             @Parameter(description = "Sort direction")
@@ -73,7 +73,7 @@ public class ProductController {
                     required = false) String sortDir,
             @Parameter(description = "The list of filters")
             @RequestBody(required = false) Filter[] filters) {
-        var response = productService.getProducts(offset, limit, sortBy, sortDir, filters);
+        var response = productService.getProducts(pageNo, pageSize, sortBy, sortDir, filters);
         return ResponseUtil.success(response);
     }
 
@@ -122,11 +122,11 @@ public class ProductController {
     @GetMapping("/ids")
     public ResponseData<List<String>> getProductIds(
             @Parameter(description = "Page number (default: 0)")
-            @RequestParam(value = "offset", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER,
-                    required = false) int offset,
+            @RequestParam(value = "pageNo", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER,
+                    required = false) int pageNo,
             @Parameter(description = "Limit (default: 48)")
-            @RequestParam(value = "limit", defaultValue = AppConstant.DEFAULT_PAGE_SIZE, required = false) int limit) {
-        var response = productService.getProductIds(offset, limit);
+            @RequestParam(value = "pageSize", defaultValue = AppConstant.DEFAULT_PAGE_SIZE, required = false) int pageSize) {
+        var response = productService.getProductIds(pageNo, pageSize);
         return ResponseUtil.success(response);
     }
 }

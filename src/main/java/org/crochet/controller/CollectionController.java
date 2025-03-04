@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.crochet.constant.AppConstant;
 import org.crochet.enums.ResultCode;
-import org.crochet.payload.request.PaginationRequest;
 import org.crochet.payload.response.CollectionResponse;
 import org.crochet.payload.response.FreePatternResponse;
 import org.crochet.payload.response.PaginationResponse;
@@ -16,7 +15,6 @@ import org.crochet.payload.response.ResponseData;
 import org.crochet.service.CollectionService;
 import org.crochet.service.FreePatternService;
 import org.crochet.util.ResponseUtil;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -108,24 +106,18 @@ public class CollectionController {
     @GetMapping("/{collection_id}/free-patterns")
     public ResponseData<PaginationResponse<FreePatternResponse>> getAllByCollection(
             @Parameter(description = "Page number (default: 0)")
-            @RequestParam(value = "offset", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER,
-                    required = false) int offset,
+            @RequestParam(value = "pageNo", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER,
+                    required = false) int pageNo,
             @Parameter(description = "Page size (default: 48)")
-            @RequestParam(value = "limit", defaultValue = AppConstant.DEFAULT_PAGE_SIZE,
-                    required = false) int limit,
+            @RequestParam(value = "pageSize", defaultValue = AppConstant.DEFAULT_PAGE_SIZE,
+                    required = false) int pageSize,
             @Parameter(description = "Sort by field (default: createdDate)")
-            @RequestParam(value = "sortBy", defaultValue = AppConstant.DEFAULT_SORT_BY, required = false) String orderBy,
+            @RequestParam(value = "sortBy", defaultValue = AppConstant.DEFAULT_SORT_BY, required = false) String sortBy,
             @Parameter(description = "Sort direction (default: DESC)")
             @RequestParam(value = "sortDir", defaultValue = AppConstant.DEFAULT_SORT_DIRECTION,
-                    required = false) String direction,
+                    required = false) String sortDir,
             @PathVariable("collection_id") String collectionId) {
-        PaginationRequest request = PaginationRequest.builder()
-                .offset(offset)
-                .limit(limit)
-                .orderBy(orderBy)
-                .direction(Sort.Direction.fromString(direction))
-                .build();
-        var response = freePatternService.getFrepsByCollectionId(collectionId, request);
+        var response = freePatternService.getFrepsByCollectionId(collectionId, pageNo, pageSize, sortBy, sortDir);
         return ResponseUtil.success(response);
     }
 

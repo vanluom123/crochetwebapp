@@ -3,7 +3,6 @@ package org.crochet.service;
 import org.crochet.model.FreePattern;
 import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.FreePatternRequest;
-import org.crochet.payload.request.PaginationRequest;
 import org.crochet.payload.response.FreePatternResponse;
 import org.crochet.payload.response.PaginationResponse;
 
@@ -26,8 +25,7 @@ public interface FreePatternService {
 
     void deleteAllById(List<String> ids);
 
-    PaginationResponse<FreePatternResponse> getFrepsByCollectionId(String collectionId,
-                                                                   PaginationRequest paginationRequest);
+    PaginationResponse<FreePatternResponse> getFrepsByCollectionId(String collectionId, int offset, int limit, String sortBy, String sortDir);
 
     FreePattern findById(String id);
 }

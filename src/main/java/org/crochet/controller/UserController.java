@@ -17,6 +17,7 @@ import org.crochet.payload.response.UserResponse;
 import org.crochet.service.CollectionService;
 import org.crochet.service.FreePatternService;
 import org.crochet.service.UserService;
+import org.crochet.util.ResponseUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -31,8 +32,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-
-import static org.crochet.constant.AppConstant.SUCCESS;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -68,12 +67,7 @@ public class UserController {
             @RequestParam(value = "sortDir", defaultValue = AppConstant.DEFAULT_SORT_DIRECTION, required = false) String sortDir,
             @Parameter(description = "The list of filters") @RequestBody(required = false) Filter[] filters) {
         var response = userService.getAll(offset, limit, sortBy, sortDir, filters);
-        return ResponseData.<PaginationResponse<UserResponse>>builder()
-                .success(true)
-                .code(HttpStatus.OK.value())
-                .message(SUCCESS)
-                .data(response)
-                .build();
+        return ResponseUtil.success(response);
     }
 
     @Operation(summary = "Get paginated free patterns by user",
@@ -99,12 +93,7 @@ public class UserController {
             @RequestBody(required = false) Filter[] filters,
             @Parameter(description = "User ID") @PathVariable("userId") String userId) {
         var res = freePatternService.getAllByUser(pageNo, pageSize, sortBy, sortDir, filters, userId);
-        return ResponseData.<PaginationResponse<FreePatternResponse>>builder()
-                .success(true)
-                .code(HttpStatus.OK.value())
-                .message(SUCCESS)
-                .data(res)
-                .build();
+        return ResponseUtil.success(res);
     }
 
     @Operation(summary = "Update a user's details",
@@ -119,11 +108,7 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseData<String> updateUser(@RequestBody UserUpdateRequest request) {
         userService.updateUser(request);
-        return ResponseData.<String>builder()
-                .success(true)
-                .code(HttpStatus.OK.value())
-                .message("User updated successfully")
-                .build();
+        return ResponseUtil.success("User updated successfully");
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -132,12 +117,7 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseData<UserResponse> getDetail(@Parameter(description = "User ID") @PathVariable("id") String id) {
         var user = userService.getDetail(id);
-        return ResponseData.<UserResponse>builder()
-                .success(true)
-                .code(HttpStatus.OK.value())
-                .message(SUCCESS)
-                .data(user)
-                .build();
+        return ResponseUtil.success(user);
     }
 
     @Operation(summary = "Delete a user", description = "Allows admins to delete a specific user by ID.")
@@ -151,11 +131,7 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseData<String> deleteUser(@RequestParam("id") String id) {
         userService.deleteUser(id);
-        return ResponseData.<String>builder()
-                .success(true)
-                .code(HttpStatus.OK.value())
-                .message("User deleted successfully")
-                .build();
+        return ResponseUtil.success("Users deleted successfully");
     }
 
     @Operation(summary = "Delete multiple users",
@@ -169,11 +145,7 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseData<String> deleteMultipleUsers(@RequestBody List<String> ids) {
         userService.deleteMultipleUsers(ids);
-        return ResponseData.<String>builder()
-                .success(true)
-                .code(HttpStatus.OK.value())
-                .message("Users deleted successfully")
-                .build();
+        return ResponseUtil.success("Users deleted successfully");
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -182,11 +154,6 @@ public class UserController {
     @PreAuthorize("isAuthenticated()")
     public ResponseData<List<CollectionResponse>> getCollections(@PathVariable("userId") String userId) {
         var res = collectionService.getAllByUserId(userId);
-        return ResponseData.<List<CollectionResponse>>builder()
-                .success(true)
-                .code(HttpStatus.OK.value())
-                .message(SUCCESS)
-                .data(res)
-                .build();
+        return ResponseUtil.success(res);
     }
 }
