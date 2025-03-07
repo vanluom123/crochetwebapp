@@ -59,7 +59,22 @@ public interface BlogPostRepository extends JpaRepository<BlogPost, String>, Jpa
             WHERE
               p.id IN :ids
             """)
-    Page<BlogPostResponse> findBlogOnHomeWithIds(@Param("ids") List<String> ids, Pageable pageable);
+    Page<BlogPostResponse> findPostByIds(@Param("ids") List<String> ids, Pageable pageable);
+
+    @Query("""
+            SELECT
+              new org.crochet.payload.response.BlogPostResponse (
+                p.id,
+                p.title,
+                p.content,
+                f.fileContent,
+                p.createdDate
+              )
+            FROM
+              BlogPost p
+              JOIN p.files f WITH f.order = 0
+            """)
+    Page<BlogPostResponse> findPostWithPageable(Pageable pageable);
 
     @Query("""
             SELECT
