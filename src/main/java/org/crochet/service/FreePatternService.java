@@ -1,18 +1,31 @@
 package org.crochet.service;
 
-import org.crochet.payload.request.Filter;
+import org.crochet.model.FreePattern;
 import org.crochet.payload.request.FreePatternRequest;
 import org.crochet.payload.response.FreePatternResponse;
 import org.crochet.payload.response.PaginatedFreePatternResponse;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
 
 public interface FreePatternService {
     void createOrUpdate(FreePatternRequest request);
 
-    PaginatedFreePatternResponse getAllFreePatterns(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters);
+    PaginatedFreePatternResponse
+    getAllFreePatterns(int pageNo,
+                       int pageSize,
+                       String sortBy,
+                       String sortDir,
+                       String categoryId,
+                       Specification<FreePattern> spec);
 
-    PaginatedFreePatternResponse getAllByUser(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters, String userId);
+    PaginatedFreePatternResponse
+    getAllByUser(int pageNo,
+                 int pageSize,
+                 String sortBy,
+                 String sortDir,
+                 String userId,
+                 Specification<FreePattern> spec);
 
     List<FreePatternResponse> getLimitedFreePatterns();
 

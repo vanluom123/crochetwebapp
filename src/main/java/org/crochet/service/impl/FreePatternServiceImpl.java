@@ -1,5 +1,6 @@
 package org.crochet.service.impl;
 
+import com.turkraft.springfilter.converter.FilterSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.crochet.constant.MessageConstant;
@@ -10,29 +11,29 @@ import org.crochet.mapper.CategoryMapper;
 import org.crochet.mapper.FileMapper;
 import org.crochet.mapper.FreePatternMapper;
 import org.crochet.model.FreePattern;
-import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.FreePatternRequest;
 import org.crochet.payload.response.FreePatternResponse;
 import org.crochet.payload.response.PaginatedFreePatternResponse;
 import org.crochet.repository.CategoryRepo;
 import org.crochet.repository.FreePatternRepoCustom;
 import org.crochet.repository.FreePatternRepository;
-import org.crochet.repository.GenericFilter;
+import org.crochet.repository.FreePatternSpecifications;
 import org.crochet.repository.UserRepository;
 import org.crochet.service.FreePatternService;
 import org.crochet.util.ImageUtils;
+import org.crochet.util.ObjectUtils;
 import org.crochet.util.SecurityUtils;
 import org.crochet.util.SettingsUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -99,22 +100,34 @@ public class FreePatternServiceImpl implements FreePatternService {
      * @param pageSize Page size
      * @param sortBy   Sort by
      * @param sortDir  Sort direction
-     * @param filters  List Filters
+     * @param categoryId Category id
+     * @param spec    Specification
      * @return PaginatedFreePatternResponse
      */
+    @SuppressWarnings("ConstantValue")
     @Transactional(readOnly = true)
     @Override
-    public PaginatedFreePatternResponse getAllFreePatterns(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters) {
-        List<String> freePatternIds = new ArrayList<>();
-        var pageable = preparePageableAndFilter(pageNo, pageSize, sortBy, sortDir, filters, freePatternIds);
-
+    public PaginatedFreePatternResponse
+    getAllFreePatterns(int pageNo,
+                       int pageSize,
+                       String sortBy,
+                       String sortDir,
+                       String categoryId,
+                       Specification<FreePattern> spec) {
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+        var filter = ((FilterSpecification<FreePattern>) spec).getFilter();
+        var hasCategory = categoryId != null && !categoryId.isBlank();
         Page<FreePatternResponse> page;
-        if (freePatternIds.isEmpty()) {
-            page = freePatternRepo.getFrepWithPageable(pageable);
-        } else {
-            page = freePatternRepo.getFrepByIds(freePatternIds, pageable);
+        if (hasCategory) {
+            spec = spec.and(FreePatternSpecifications.getAllByCategoryId(categoryId));
         }
-
+        if ((filter != null && ObjectUtils.isNotEmpty(filter.getChildren())) || hasCategory) {
+            List<String> ids = freePatternRepoCustom.findAllIds(spec);
+            page = freePatternRepo.getFrepByIds(ids, pageable);
+        } else {
+            page = freePatternRepo.getFrepWithPageable(pageable);
+        }
         return PaginatedFreePatternResponse.builder()
                 .contents(page.getContent())
                 .pageNo(page.getNumber())
@@ -133,22 +146,30 @@ public class FreePatternServiceImpl implements FreePatternService {
      * @param pageSize the number of items per page
      * @param sortBy   the attribute to sort the results by
      * @param sortDir  the direction to sort the results (e.g., "asc" or "desc")
-     * @param filters  an array of filter conditions to apply to the query, can be null or empty
      * @param userId   the ID of the user whose free patterns are to be retrieved
+     * @param spec     the specification for filtering the results
      * @return a {@link PaginatedFreePatternResponse} containing the paginated and filtered list of free patterns
      */
+    @SuppressWarnings("ConstantValue")
     @Transactional(readOnly = true)
     @Override
-    public PaginatedFreePatternResponse getAllByUser(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters, String userId) {
-        List<String> freePatternIds = new ArrayList<>();
-        var pageable = preparePageableAndFilter(pageNo, pageSize, sortBy, sortDir, filters, freePatternIds);
+    public PaginatedFreePatternResponse
+    getAllByUser(int pageNo,
+                 int pageSize,
+                 String sortBy,
+                 String sortDir,
+                 String userId,
+                 Specification<FreePattern> spec) {
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+        var filter = ((FilterSpecification<FreePattern>) spec).getFilter();
         Page<FreePatternResponse> page;
-        if(freePatternIds.isEmpty()) {
-            page = freePatternRepo.getByUserWithPageable(userId, pageable);
-        } else {
+        if (filter != null && ObjectUtils.isNotEmpty(filter.getChildren())) {
+            var freePatternIds = freePatternRepoCustom.findAllIds(spec);
             page = freePatternRepo.getByUserAndIds(userId, freePatternIds, pageable);
+        } else {
+            page = freePatternRepo.getByUserWithPageable(userId, pageable);
         }
-
         return PaginatedFreePatternResponse.builder()
                 .contents(page.getContent())
                 .pageNo(page.getNumber())
@@ -283,30 +304,5 @@ public class FreePatternServiceImpl implements FreePatternService {
         } else {
             freePatternRepo.deleteAllByIdAndCreatedBy(ids, currentUser.getEmail());
         }
-    }
-
-    /**
-     * Prepares a Pageable object based on the given pagination and sorting parameters,
-     * and applies filters to identify matching records. The filtered IDs are added
-     * to the provided list of freePatternIds.
-     *
-     * @param pageNo         the page number to retrieve, zero-based index
-     * @param pageSize       the number of records per page
-     * @param sortBy         the property name to sort by
-     * @param sortDir        the direction of sorting, either "asc" for ascending or "desc" for descending
-     * @param filters        an array of filters to apply to the query
-     * @param freePatternIds a reference to a list where the filtered IDs will be collected
-     * @return a Pageable object configured with the specified page, size, and sort properties
-     */
-    private Pageable preparePageableAndFilter(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters, List<String> freePatternIds) {
-        if (filters != null && filters.length > 0) {
-            GenericFilter<FreePattern> filter = GenericFilter.create(filters);
-            var spec = filter.build();
-            List<String> ids = freePatternRepoCustom.findAllIds(spec);
-            freePatternIds.addAll(ids);
-        }
-        Sort.Direction dir = Sort.Direction.fromString(sortDir);
-        Sort sort = Sort.by(dir, sortBy);
-        return PageRequest.of(pageNo, pageSize, sort);
     }
 }

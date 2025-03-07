@@ -1,5 +1,6 @@
 package org.crochet.controller;
 
+import com.turkraft.springfilter.boot.Filter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -7,12 +8,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.crochet.constant.AppConstant;
-import org.crochet.payload.request.Filter;
+import org.crochet.model.Pattern;
 import org.crochet.payload.request.PatternRequest;
 import org.crochet.payload.response.PatternPaginationResponse;
 import org.crochet.payload.response.PatternResponse;
 import org.crochet.payload.response.ResponseData;
 import org.crochet.service.PatternService;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -61,7 +63,7 @@ public class PatternController {
     @ApiResponse(responseCode = "200", description = "List of patterns",
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = PatternPaginationResponse.class)))
-    @PostMapping("/pagination")
+    @GetMapping("/pagination")
     public ResponseEntity<PatternPaginationResponse> getPatterns(
             @Parameter(description = "Page number (default: 0)")
             @RequestParam(value = "pageNo", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER,
@@ -74,9 +76,9 @@ public class PatternController {
             @Parameter(description = "Sort direction (default: ASC)")
             @RequestParam(value = "sortDir", defaultValue = AppConstant.DEFAULT_SORT_DIRECTION,
                     required = false) String sortDir,
-            @Parameter(description = "List filters")
-            @RequestBody(required = false) Filter[] filters) {
-        var response = patternService.getPatterns(pageNo, pageSize, sortBy, sortDir, filters);
+            @RequestParam(value = "categoryId", required = false) String categoryId,
+            @Filter Specification<Pattern> spec) {
+        var response = patternService.getPatterns(pageNo, pageSize, sortBy, sortDir, categoryId, spec);
         return ResponseEntity.ok(response);
     }
 
