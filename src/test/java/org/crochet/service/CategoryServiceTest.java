@@ -13,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -27,12 +28,14 @@ public class CategoryServiceTest {
 
     @Mock
     private CategoryRepo categoryRepo;
+    @Mock
+    private PermissionService permissionService;
 
     private CategoryServiceImpl categoryService;
 
     @BeforeEach
     void setUp() {
-        categoryService = new CategoryServiceImpl(categoryRepo);
+        categoryService = new CategoryServiceImpl(categoryRepo, permissionService);
     }
 
     @Test
@@ -61,7 +64,7 @@ public class CategoryServiceTest {
         assertNotNull(responses, "Responses should not be null");
         assertFalse(responses.isEmpty(), "Responses should not be empty");
         assertEquals(1, responses.size(), "There should be exactly one category response");
-        assertEquals("New Category", responses.get(0).getName(), "Category name should match");
+        assertEquals("New Category", responses.getFirst().getName(), "Category name should match");
 
         // Verify repository interactions
         verify(categoryRepo, times(1)).existsByNameAndParentIsNull("New Category");
@@ -86,7 +89,7 @@ public class CategoryServiceTest {
         Category childCategory = new Category();
         childCategory.setName("Child Category 2");
         childCategory.setParent(parent);
-        parent.setChildren(List.of(childCategory));
+        parent.setChildren(Set.of(childCategory));
 
         List<Category> savedCategories = List.of(childCategory);
         when(categoryRepo.saveAll(anyList())).thenReturn(savedCategories);
@@ -97,7 +100,7 @@ public class CategoryServiceTest {
         // Assert
         assertNotNull(responses);
         assertEquals(1, responses.size());
-        assertEquals("Child Category 2", responses.get(0).getName());
+        assertEquals("Child Category 2", responses.getFirst().getName());
 
         // Verify repository interactions
         verify(categoryRepo, times(1)).findAllById(List.of("parent-id"));

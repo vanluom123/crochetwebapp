@@ -1,8 +1,8 @@
-FROM eclipse-temurin:17-jdk-alpine AS build
+FROM eclipse-temurin:21-jdk-jammy AS build
 WORKDIR /workspace/app
 
 # Arguments for the build
-ARG env=dev
+ARG ENV=dev
 ARG EMAIL
 ARG DB_HOST
 ARG DB_PORT
@@ -22,7 +22,7 @@ ARG SERVICE_ACCOUNT_KEY
 ARG ALLOWED_ORIGINS
 
 # Environment variables
-ENV env ${env}
+ENV ENV ${ENV}
 ENV EMAIL ${EMAIL}
 ENV DB_HOST ${DB_HOST}
 ENV DB_PORT ${DB_PORT}
@@ -41,16 +41,27 @@ ENV REDIS_PASSWORD ${REDIS_PASSWORD}
 ENV SERVICE_ACCOUNT_KEY ${SERVICE_ACCOUNT_KEY}
 ENV ALLOWED_ORIGINS ${ALLOWED_ORIGINS}
 
+# Copy project files
 COPY . /workspace/app
-RUN --mount=type=cache,target=/root/.gradle
-RUN chmod +x ./gradlew
-RUN ./gradlew clean build
-RUN mkdir -p build/dependency && (cd build/dependency; jar -xf ../libs/*-SNAPSHOT.jar)
 
-FROM eclipse-temurin:17-jdk-alpine
+# Build project
+RUN --mount=type=cache,target=/root/.gradle \
+    ./gradlew clean build -x test \
+    && mkdir -p build/dependency \
+    && (cd build/dependency; jar -xf ../libs/*-SNAPSHOT.jar) \
+    && rm -rf /root/.gradle
+
+# Build image
+FROM eclipse-temurin:21-jre-jammy
 VOLUME /tmp
 ARG DEPENDENCY=/workspace/app/build/dependency
 COPY --from=build ${DEPENDENCY}/BOOT-INF/lib /app/lib
 COPY --from=build ${DEPENDENCY}/META-INF /app/META-INF
 COPY --from=build ${DEPENDENCY}/BOOT-INF/classes /app
-ENTRYPOINT ["java","-cp","app:app/lib/*","org.crochet.CrochetApplication"]
+
+# Optimize JVM parameters
+ENTRYPOINT ["java", \
+    "-XX:+UseContainerSupport", \
+    "-XX:MaxRAMPercentage=75.0", \
+    "-cp", "app:app/lib/*", \
+    "org.crochet.CrochetApplication"]

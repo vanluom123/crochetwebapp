@@ -4,6 +4,7 @@ import jakarta.persistence.criteria.JoinType;
 import org.crochet.model.Pattern;
 import org.springframework.data.jpa.domain.Specification;
 
+@SuppressWarnings({"DataFlowIssue", "unused"})
 public class PatternSpecifications {
 
     public static Specification<Pattern> fetchJoin() {

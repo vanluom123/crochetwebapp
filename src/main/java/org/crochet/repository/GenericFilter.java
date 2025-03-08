@@ -6,9 +6,11 @@ import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
-import org.crochet.enumerator.FilterLogic;
+import org.crochet.enums.FilterLogic;
+import org.crochet.enums.FilterOperation;
 import org.crochet.model.Category;
 import org.crochet.payload.request.Filter;
+import org.crochet.util.ObjectUtils;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;
@@ -16,134 +18,91 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.EnumMap;
 import java.util.List;
-import java.util.stream.Stream;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
- * GenericFilter class
+ * Optimized GenericFilter for building dynamic JPA specifications
  *
- * @param <T> BaseEntity
+ * @param <T> Entity type
  */
 public class GenericFilter<T> {
 
-    private static final List<DateTimeFormatter> DATE_TIME_FORMATTERS = List.of(
-            DateTimeFormatter.ISO_LOCAL_DATE_TIME,
-            DateTimeFormatter.ISO_DATE_TIME,
-            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"),
-            DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"),
-            DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss"),
-            DateTimeFormatter.ISO_LOCAL_DATE,
-            DateTimeFormatter.ISO_DATE,
-            DateTimeFormatter.ISO_TIME,
-            DateTimeFormatter.BASIC_ISO_DATE,
-            DateTimeFormatter.ISO_LOCAL_TIME,
-            DateTimeFormatter.ISO_INSTANT,
-            DateTimeFormatter.ISO_OFFSET_DATE,
-            DateTimeFormatter.ISO_OFFSET_DATE_TIME,
-            DateTimeFormatter.ISO_OFFSET_TIME,
-            DateTimeFormatter.ISO_ORDINAL_DATE,
-            DateTimeFormatter.ISO_WEEK_DATE,
-            DateTimeFormatter.ISO_ZONED_DATE_TIME,
-            DateTimeFormatter.RFC_1123_DATE_TIME
-    );
-
     private final FilterNode rootNode;
+    private static final Map<FilterOperation, PredicateBuilder> PREDICATE_BUILDERS = new EnumMap<>(FilterOperation.class);
+    private static final Map<Class<?>, ValueParser<?>> VALUE_PARSERS = new ConcurrentHashMap<>();
+    private static List<DateTimeFormatter> DATE_TIME_FORMATTERS;
+
+    static {
+        // Initialize predicate builders map
+        initPredicateBuilders();
+
+        // Initialize value parsers
+        initValueParsers();
+    }
 
     /**
-     * Creates a GenericFilter object from an array of Filter objects.
-     *
-     * @param filters An array of Filter objects containing filter logic and criteria.
-     * @return A GenericFilter object with the specified filters applied.
+     * Creates a GenericFilter from an array of Filter objects.
      */
     public static <T> GenericFilter<T> create(Filter[] filters) {
         GenericFilter<T> genericFilter = new GenericFilter<>();
-        if (isEmpty(filters)) {
+        if (ObjectUtils.isEmpty(filters)) {
             return genericFilter;
         }
 
         FilterNode rootNode = genericFilter.getRoot();
-        List<FilterNode> filterNodes = Stream.of(filters)
-                .parallel()
-                .filter(GenericFilter::hasFilterCriteria)
+        List<FilterNode> filterNodes = Arrays.stream(filters)
+                .filter(filter -> filter != null && ObjectUtils.isNotEmpty(filter.getFilterCriteria()))
                 .map(GenericFilter::createFilterNode)
-                .toList();
+                .collect(Collectors.toList());
         rootNode.addAllChildren(filterNodes);
 
         return genericFilter;
     }
 
     /**
-     * Constructor
+     * Private constructor
      */
     private GenericFilter() {
         this.rootNode = new FilterNode(FilterLogic.ALL);
     }
 
     /**
-     * Get root
-     *
-     * @return FilterNode
+     * Get root node
      */
     private FilterNode getRoot() {
         return rootNode;
     }
 
     /**
-     * Build
-     *
-     * @return Specification
+     * Build specification
      */
     public Specification<T> build() {
         return (root, query, criteriaBuilder) -> buildPredicate(rootNode, root, query, criteriaBuilder);
     }
 
     /**
-     * Checks if the array of filters is empty or null.
-     *
-     * @param filters An array of filters to check.
-     * @return true if the filters array is null or has no elements; false otherwise.
-     */
-    private static boolean isEmpty(Filter[] filters) {
-        return filters == null || filters.length == 0;
-    }
-
-    /**
-     * Determines if a given filter contains any filter criteria.
-     *
-     * @param filter the Filter object to be checked.
-     * @return true if the filter contains criteria; false otherwise.
-     */
-    private static boolean hasFilterCriteria(Filter filter) {
-        return !filter.getFilterCriteria().isEmpty();
-    }
-
-    /**
-     * Creates a FilterNode from a given Filter object.
-     *
-     * @param filter the Filter object containing filter logic and criteria.
-     * @return a FilterNode representing the root of the filter tree with its child nodes.
+     * Creates a FilterNode from a Filter object
      */
     private static FilterNode createFilterNode(Filter filter) {
         FilterNode parentNode = new FilterNode(filter.getFilterLogic());
         List<FilterNode> childNodes = filter.getFilterCriteria().stream()
-                .parallel()
                 .map(FilterNode::new)
-                .toList();
+                .collect(Collectors.toList());
         parentNode.addAllChildren(childNodes);
         return parentNode;
     }
 
     /**
-     * Build predicate
-     *
-     * @param node            FilterNode
-     * @param root            Root
-     * @param criteriaBuilder CriteriaBuilder
-     * @return Predicate
+     * Build predicate recursively from filter node
      */
     private Predicate buildPredicate(FilterNode node, Root<T> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
-        List<Predicate> predicates = new ArrayList<>(node.getChildren().size());
+        List<Predicate> predicates = new ArrayList<>();
 
         for (FilterNode child : node.getChildren()) {
             if (child.getCriteria() != null) {
@@ -157,154 +116,61 @@ public class GenericFilter<T> {
             return criteriaBuilder.conjunction();
         }
 
+        Predicate[] predicateArray = predicates.toArray(new Predicate[0]);
         return node.getLogic() == FilterLogic.ALL
-                ? criteriaBuilder.and(predicates.toArray(new Predicate[0]))
-                : criteriaBuilder.or(predicates.toArray(new Predicate[0]));
+                ? criteriaBuilder.and(predicateArray)
+                : criteriaBuilder.or(predicateArray);
     }
 
     /**
-     * Create predicate
-     *
-     * @param criteria        FilterCriteria
-     * @param root            Root
-     * @param criteriaBuilder CriteriaBuilder
-     * @return Predicate
+     * Create a predicate for a single filter criteria
      */
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    private Predicate createPredicate(FilterCriteria criteria, Root<T> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
-        return switch (criteria.getOperation()) {
-            case EQUAL -> criteriaBuilder.equal(getPath(root, criteria.getKey()), parseValue(root, criteria));
-            case NOT_EQUAL -> criteriaBuilder.notEqual(getPath(root, criteria.getKey()), parseValue(root, criteria));
-            case GREATER_THAN ->
-                    criteriaBuilder.greaterThan(getPath(root, criteria.getKey()), (Comparable) parseValue(root, criteria));
-            case LESS_THAN ->
-                    criteriaBuilder.lessThan(getPath(root, criteria.getKey()), (Comparable) parseValue(root, criteria));
-            case GREATER_THAN_OR_EQUAL ->
-                    criteriaBuilder.greaterThanOrEqualTo(getPath(root, criteria.getKey()), (Comparable) parseValue(root, criteria));
-            case LESS_THAN_OR_EQUAL ->
-                    criteriaBuilder.lessThanOrEqualTo(getPath(root, criteria.getKey()), (Comparable) parseValue(root, criteria));
-            case LIKE ->
-                    criteriaBuilder.like(criteriaBuilder.lower(getPath(root, criteria.getKey())), "%" + criteria.getValue().toString().toLowerCase() + "%");
-            case IN -> {
-                if (criteria.getKey().equals("category.id")) {
-                    yield getByCategoryAndChildren((List<String>) criteria.getValue(), root, query, criteriaBuilder);
-                }
-                yield getPath(root, criteria.getKey()).in((Collection<?>) criteria.getValue());
-            }
-            case BETWEEN -> {
-                if (criteria.getValue() instanceof List<?> values && values.size() == 2) {
-                    yield criteriaBuilder.between(getPath(root, criteria.getKey()),
-                            (Comparable) parseValue(root, new FilterCriteria(criteria.getKey(), values.get(0), criteria.getOperation())),
-                            (Comparable) parseValue(root, new FilterCriteria(criteria.getKey(), values.get(1), criteria.getOperation())));
-                }
-                throw new IllegalArgumentException("Between operation requires a list of two values");
-            }
-        };
+    private Predicate createPredicate(FilterCriteria criteria, Root<T> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+        PredicateBuilder builder = PREDICATE_BUILDERS.get(criteria.getOperation());
+        if (builder == null) {
+            throw new IllegalArgumentException("Unsupported operation: " + criteria.getOperation());
+        }
+
+        return builder.build(criteria, root, query, cb, this);
     }
 
     /**
-     * Get path
-     *
-     * @param root Root
-     * @param key  String
-     * @param <Y>  Object
-     * @return Path
+     * Get path from root by dot notation key
      */
-    private <Y> Path<Y> getPath(Root<T> root, String key) {
-        String[] split = key.split("\\.");
-        Path<Y> path = root.get(split[0]);
-        for (int i = 1; i < split.length; i++) {
-            path = path.get(split[i]);
+    <Y> Path<Y> getPath(Root<?> root, String key) {
+        String[] parts = key.split("\\.");
+        Path<Y> path = root.get(parts[0]);
+        for (int i = 1; i < parts.length; i++) {
+            path = path.get(parts[i]);
         }
         return path;
     }
 
     /**
-     * Parse value
-     *
-     * @param root     Root
-     * @param criteria FilterCriteria
-     * @return Object
+     * Parse value according to field type
      */
-    private Object parseValue(Root<T> root, FilterCriteria criteria) {
-        Class<?> fieldType = getPath(root, criteria.getKey()).getJavaType();
+    Object parseValue(Root<?> root, FilterCriteria criteria) {
+        Path<?> path = getPath(root, criteria.getKey());
+        Class<?> fieldType = path.getJavaType();
         Object value = criteria.getValue();
 
-        if (isEnumType(fieldType, value)) {
-            return parseEnumValue(fieldType, (String) value);
-        } else if (isDateTimeType(fieldType, value)) {
-            return parseDateTime((String) value, fieldType.isAssignableFrom(LocalDateTime.class));
+        if (value == null) {
+            return null;
         }
+
+        ValueParser<?> parser = VALUE_PARSERS.get(fieldType);
+        if (parser != null) {
+            return parser.parse(value);
+        }
+
         return value;
     }
 
     /**
-     * Determines if a given field type is an enumeration and the value is a string.
-     *
-     * @param fieldType the Class object representing the field type.
-     * @param value the value to check.
-     * @return true if the field type is an enumeration and the value is a string; false otherwise.
-     */
-    private boolean isEnumType(Class<?> fieldType, Object value) {
-        return fieldType.isEnum() && value instanceof String;
-    }
-
-    /**
-     * Parses the provided string value into an Enum of the specified field type.
-     *
-     * @param fieldType the Class object representing the Enum type.
-     * @param value the string value to be converted to an Enum constant.
-     * @return the Enum constant corresponding to the provided string value.
-     */
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    private Object parseEnumValue(Class<?> fieldType, String value) {
-        return Enum.valueOf((Class<Enum>) fieldType, value);
-    }
-
-    /**
-     * Determines if a given field type is a LocalDateTime or LocalDate and the value is a string.
-     *
-     * @param fieldType the Class object representing the field type.
-     * @param value the value to check.
-     * @return true if the field type is a LocalDateTime or LocalDate and the value is a string; false otherwise.
-     */
-    private boolean isDateTimeType(Class<?> fieldType, Object value) {
-        return (LocalDateTime.class.isAssignableFrom(fieldType) || LocalDate.class.isAssignableFrom(fieldType)) && value instanceof String;
-    }
-
-    /**
-     * Parse DateTime
-     *
-     * @param dateTimeString String
-     * @param isDateTime     Boolean
-     * @return LocalDateTime
-     */
-    private static LocalDateTime parseDateTime(String dateTimeString, boolean isDateTime) {
-        for (DateTimeFormatter formatter : DATE_TIME_FORMATTERS) {
-            try {
-                if (isDateTime) {
-                    return LocalDateTime.parse(dateTimeString, formatter);
-                } else {
-                    return LocalDate.parse(dateTimeString, formatter).atStartOfDay();
-                }
-            } catch (DateTimeParseException e) {
-                // Continue to the next formatter
-            }
-        }
-        throw new IllegalArgumentException("Unable to parse date time: " + dateTimeString);
-    }
-
-    /**
-     * Get by category and children
-     *
-     * @param categoryIds The list of category ids
-     * @param root        Root
-     * @param query       CriteriaQuery
-     * @param cb          CriteriaBuilder
-     * @return Predicate
+     * Get predicate for category and its children
      */
     private Predicate getByCategoryAndChildren(List<String> categoryIds,
-                                               Root<T> root,
+                                               Root<?> root,
                                                CriteriaQuery<?> query,
                                                CriteriaBuilder cb) {
         Subquery<String> subquery = query.subquery(String.class);
@@ -317,5 +183,180 @@ public class GenericFilter<T> {
                 ));
 
         return root.get("category").get("id").in(subquery);
+    }
+
+    /**
+     * Parse date/time string to LocalDateTime
+     */
+    private static LocalDateTime parseDateTime(String value, boolean isDateTime) {
+        if (DATE_TIME_FORMATTERS == null) {
+            initDateTimeFormatters();
+        }
+
+        for (DateTimeFormatter formatter : DATE_TIME_FORMATTERS) {
+            try {
+                if (isDateTime) {
+                    return LocalDateTime.parse(value, formatter);
+                } else {
+                    return LocalDate.parse(value, formatter).atStartOfDay();
+                }
+            } catch (DateTimeParseException e) {
+                // Continue to next formatter
+            }
+        }
+        throw new IllegalArgumentException("Unable to parse date/time: " + value);
+    }
+
+    /**
+     * Initialize date/time formatters lazily
+     */
+    private static synchronized void initDateTimeFormatters() {
+        if (DATE_TIME_FORMATTERS == null) {
+            DATE_TIME_FORMATTERS = List.of(
+                    DateTimeFormatter.ISO_LOCAL_DATE_TIME,
+                    DateTimeFormatter.ISO_DATE_TIME,
+                    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"),
+                    DateTimeFormatter.ofPattern("yyyy-MM-dd"),
+                    DateTimeFormatter.ofPattern("dd-MM-yyy HH:mm:ss"),
+                    DateTimeFormatter.ofPattern("dd-MM-yyy"),
+                    DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"),
+                    DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss"),
+                    DateTimeFormatter.ISO_LOCAL_DATE,
+                    DateTimeFormatter.ISO_DATE,
+                    DateTimeFormatter.BASIC_ISO_DATE
+                    // Reduced number of formatters for better performance
+            );
+        }
+    }
+
+    /**
+     * Initialize predicate builders
+     */
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private static void initPredicateBuilders() {
+        PREDICATE_BUILDERS.put(FilterOperation.EQUAL,
+                (criteria, root, query, cb, filter) ->
+                        cb.equal(filter.getPath(root, criteria.getKey()), filter.parseValue(root, criteria)));
+
+        PREDICATE_BUILDERS.put(FilterOperation.NOT_EQUAL,
+                (criteria, root, query, cb, filter) ->
+                        cb.notEqual(filter.getPath(root, criteria.getKey()), filter.parseValue(root, criteria)));
+
+        PREDICATE_BUILDERS.put(FilterOperation.GREATER_THAN,
+                (criteria, root, query, cb, filter) ->
+                        cb.greaterThan(filter.getPath(root, criteria.getKey()),
+                                (Comparable) filter.parseValue(root, criteria)));
+
+        PREDICATE_BUILDERS.put(FilterOperation.LESS_THAN,
+                (criteria, root, query, cb, filter) ->
+                        cb.lessThan(filter.getPath(root, criteria.getKey()),
+                                (Comparable) filter.parseValue(root, criteria)));
+
+        PREDICATE_BUILDERS.put(FilterOperation.GREATER_THAN_OR_EQUAL,
+                (criteria, root, query, cb, filter) ->
+                        cb.greaterThanOrEqualTo(filter.getPath(root, criteria.getKey()),
+                                (Comparable) filter.parseValue(root, criteria)));
+
+        PREDICATE_BUILDERS.put(FilterOperation.LESS_THAN_OR_EQUAL,
+                (criteria, root, query, cb, filter) ->
+                        cb.lessThanOrEqualTo(filter.getPath(root, criteria.getKey()),
+                                (Comparable) filter.parseValue(root, criteria)));
+
+        PREDICATE_BUILDERS.put(FilterOperation.LIKE,
+                (criteria, root, query, cb, filter) ->
+                        cb.like(cb.lower(filter.getPath(root, criteria.getKey())),
+                                "%" + criteria.getValue().toString().toLowerCase() + "%"));
+
+        PREDICATE_BUILDERS.put(FilterOperation.IN,
+                (criteria, root, query, cb, filter) -> {
+                    if ("category.id".equals(criteria.getKey())) {
+                        return filter.getByCategoryAndChildren((List<String>) criteria.getValue(), root, query, cb);
+                    }
+                    return filter.getPath(root, criteria.getKey()).in((Collection<?>) criteria.getValue());
+                });
+
+        PREDICATE_BUILDERS.put(FilterOperation.BETWEEN,
+                (criteria, root, query, cb, filter) -> {
+                    if (!(criteria.getValue() instanceof List<?> values) || values.size() != 2) {
+                        throw new IllegalArgumentException("Between operation requires a list of two values");
+                    }
+                    return cb.between(filter.getPath(root, criteria.getKey()),
+                            (Comparable) filter.parseValue(root, new FilterCriteria(criteria.getKey(), values.get(0), criteria.getOperation())),
+                            (Comparable) filter.parseValue(root, new FilterCriteria(criteria.getKey(), values.get(1), criteria.getOperation())));
+                });
+
+        // New operations
+        PREDICATE_BUILDERS.put(FilterOperation.IS_NULL,
+                (criteria, root, query, cb, filter) ->
+                        cb.isNull(filter.getPath(root, criteria.getKey())));
+
+        PREDICATE_BUILDERS.put(FilterOperation.IS_NOT_NULL,
+                (criteria, root, query, cb, filter) ->
+                        cb.isNotNull(filter.getPath(root, criteria.getKey())));
+
+        PREDICATE_BUILDERS.put(FilterOperation.STARTS_WITH,
+                (criteria, root, query, cb, filter) ->
+                        cb.like(cb.lower(filter.getPath(root, criteria.getKey())),
+                                criteria.getValue().toString().toLowerCase() + "%"));
+
+        PREDICATE_BUILDERS.put(FilterOperation.ENDS_WITH,
+                (criteria, root, query, cb, filter) ->
+                        cb.like(cb.lower(filter.getPath(root, criteria.getKey())),
+                                "%" + criteria.getValue().toString().toLowerCase()));
+    }
+
+    /**
+     * Initialize value parsers
+     */
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private static void initValueParsers() {
+        // Enum parser
+        VALUE_PARSERS.put(Enum.class, value -> {
+            if (!(value instanceof String)) return value;
+            Class<? extends Enum> enumClass = Enum.class;
+            return Enum.valueOf(enumClass, (String) value);
+        });
+
+        // LocalDateTime parser
+        VALUE_PARSERS.put(LocalDateTime.class, value -> {
+            if (!(value instanceof String)) return value;
+            return parseDateTime((String) value, true);
+        });
+
+        // LocalDate parser
+        VALUE_PARSERS.put(LocalDate.class, value -> {
+            if (!(value instanceof String)) return value;
+            return parseDateTime((String) value, false).toLocalDate();
+        });
+
+        // Boolean parser
+        VALUE_PARSERS.put(Boolean.class, value -> {
+            if (value instanceof Boolean) return value;
+            if (value instanceof String) {
+                String strVal = ((String) value).toLowerCase();
+                return "true".equals(strVal) || "yes".equals(strVal) || "1".equals(strVal);
+            }
+            if (value instanceof Number) {
+                return ((Number) value).intValue() != 0;
+            }
+            return value;
+        });
+    }
+
+    /**
+     * Predicate builder functional interface
+     */
+    @FunctionalInterface
+    private interface PredicateBuilder {
+        Predicate build(FilterCriteria criteria, Root<?> root, CriteriaQuery<?> query,
+                        CriteriaBuilder cb, GenericFilter<?> filter);
+    }
+
+    /**
+     * Value parser functional interface
+     */
+    @FunctionalInterface
+    private interface ValueParser<T> {
+        T parse(Object value);
     }
 }

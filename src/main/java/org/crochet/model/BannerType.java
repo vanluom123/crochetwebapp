@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
-import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -25,5 +25,5 @@ public class BannerType extends BaseEntity {
     private String name;
 
     @OneToMany(mappedBy = "bannerType", cascade = CascadeType.ALL)
-    private List<Banner> banners;
+    private Set<Banner> banners;
 }

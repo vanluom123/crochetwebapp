@@ -3,7 +3,7 @@ package org.crochet.payload.request;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.crochet.enumerator.FilterLogic;
+import org.crochet.enums.FilterLogic;
 import org.crochet.repository.FilterCriteria;
 
 import java.util.List;

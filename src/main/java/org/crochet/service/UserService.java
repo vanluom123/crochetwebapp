@@ -4,7 +4,7 @@ import org.crochet.model.User;
 import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.SignUpRequest;
 import org.crochet.payload.request.UserUpdateRequest;
-import org.crochet.payload.response.UserPaginationResponse;
+import org.crochet.payload.response.PaginationResponse;
 import org.crochet.payload.response.UserResponse;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,8 +13,8 @@ import java.util.List;
 public interface UserService {
     User createUser(SignUpRequest signUpRequest);
 
-    UserPaginationResponse getAll(int pageNo, int pageSize, String sortBy, String sortDir,
-                                  Filter[] filters);
+    PaginationResponse<UserResponse> getAll(int offset, int limit, String sortBy, String sortDir,
+                              Filter[] filters);
 
     @Transactional
     void updateUser(UserUpdateRequest request);
@@ -25,6 +25,8 @@ public interface UserService {
     void deleteMultipleUsers(List<String> ids);
 
     User getByEmail(String email);
+
+    User getById(String id);
 
     UserResponse getDetail(String id);
 

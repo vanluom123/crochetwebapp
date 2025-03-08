@@ -1,22 +1,25 @@
 package org.crochet.service;
 
+import org.crochet.model.BlogPost;
 import org.crochet.payload.request.BlogPostRequest;
 import org.crochet.payload.request.Filter;
-import org.crochet.payload.response.BlogPostPaginationResponse;
 import org.crochet.payload.response.BlogPostResponse;
+import org.crochet.payload.response.PaginationResponse;
 
 import java.util.List;
 
 public interface BlogPostService {
     void createOrUpdatePost(BlogPostRequest request);
 
-    BlogPostPaginationResponse getBlogs(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters);
+    PaginationResponse<BlogPostResponse> getBlogs(int offset, int limit, String sortBy, String sortDir, Filter[] filters);
 
     BlogPostResponse getDetail(String id);
 
     List<BlogPostResponse> getLimitedBlogPosts();
 
-    List<String> getBlogIds(int pageNo, int limit);
+    List<String> getBlogIds(int offset, int limit);
 
     void deletePost(String id);
+
+    BlogPost getById(String id);
 }

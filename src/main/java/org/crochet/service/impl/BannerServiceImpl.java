@@ -1,7 +1,7 @@
 package org.crochet.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
-import org.crochet.constant.MessageConstant;
+import org.crochet.enums.ResultCode;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.BannerMapper;
 import org.crochet.model.Banner;
@@ -10,15 +10,13 @@ import org.crochet.payload.response.BannerResponse;
 import org.crochet.repository.BannerRepo;
 import org.crochet.repository.BannerTypeRepo;
 import org.crochet.service.BannerService;
+import org.crochet.util.ObjectUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
 
 @Slf4j
 @Service
@@ -29,11 +27,11 @@ public class BannerServiceImpl implements BannerService {
     /**
      * Constructor
      *
-     * @param bannerRepo the banner repository
+     * @param bannerRepo     the banner repository
      * @param bannerTypeRepo the banner type repository
      */
     public BannerServiceImpl(BannerRepo bannerRepo,
-            BannerTypeRepo bannerTypeRepo) {
+                             BannerTypeRepo bannerTypeRepo) {
         this.bannerRepo = bannerRepo;
         this.bannerTypeRepo = bannerTypeRepo;
     }
@@ -52,10 +50,12 @@ public class BannerServiceImpl implements BannerService {
 
         for (BannerRequest request : requests) {
             Banner banner;
-            if (!StringUtils.hasText(request.getId())) {
+            if (!ObjectUtils.hasText(request.getId())) {
                 var bannerType = bannerTypeRepo.findById(request.getBannerTypeId())
-                        .orElseThrow(() -> new ResourceNotFoundException(MessageConstant.MSG_BANNER_TYPE_NOT_FOUND,
-                                MAP_CODE.get(MessageConstant.MSG_BANNER_TYPE_NOT_FOUND)));
+                        .orElseThrow(() -> new ResourceNotFoundException(
+                                ResultCode.MSG_BANNER_TYPE_NOT_FOUND.message(),
+                                ResultCode.MSG_BANNER_TYPE_NOT_FOUND.code()
+                        ));
                 banner = Banner.builder()
                         .title(request.getTitle())
                         .content(request.getContent())
@@ -68,8 +68,10 @@ public class BannerServiceImpl implements BannerService {
                         .build();
             } else {
                 banner = bannerRepo.findById(request.getId())
-                        .orElseThrow(() -> new ResourceNotFoundException(MessageConstant.MSG_BANNER_NOT_FOUND,
-                                MAP_CODE.get(MessageConstant.MSG_BANNER_NOT_FOUND)));
+                        .orElseThrow(() -> new ResourceNotFoundException(
+                                ResultCode.MSG_BANNER_NOT_FOUND.message(),
+                                ResultCode.MSG_BANNER_NOT_FOUND.code()
+                        ));
                 banner = BannerMapper.INSTANCE.partialUpdate(request, banner);
             }
             banners.add(banner);

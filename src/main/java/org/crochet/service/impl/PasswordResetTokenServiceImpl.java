@@ -1,5 +1,6 @@
 package org.crochet.service.impl;
 
+import org.crochet.enums.ResultCode;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.model.PasswordResetToken;
 import org.crochet.model.User;
@@ -9,10 +10,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
-
-import static org.crochet.constant.MessageCodeConstant.MAP_CODE;
-import static org.crochet.constant.MessageConstant.MSG_PASSWORD_RESET_TOKEN_NOT_FOUND;
-import static org.crochet.constant.MessageConstant.MSG_USER_NOT_FOUND_WITH_TOKEN;
 
 @Service
 public class PasswordResetTokenServiceImpl implements PasswordResetTokenService {
@@ -63,8 +60,8 @@ public class PasswordResetTokenServiceImpl implements PasswordResetTokenService 
     public String getEmailByToken(String token) {
         return passwordResetTokenRepository.findEmailByToken(token)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException(MSG_USER_NOT_FOUND_WITH_TOKEN + token,
-                                MAP_CODE.get(MSG_USER_NOT_FOUND_WITH_TOKEN))
+                        new ResourceNotFoundException(ResultCode.MSG_USER_NOT_FOUND_WITH_TOKEN.message(),
+                                ResultCode.MSG_USER_NOT_FOUND_WITH_TOKEN.code())
                 );
     }
 
@@ -88,8 +85,8 @@ public class PasswordResetTokenServiceImpl implements PasswordResetTokenService 
     public PasswordResetToken getPasswordResetToken(String token) {
         return passwordResetTokenRepository.findByToken(token)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException(MSG_PASSWORD_RESET_TOKEN_NOT_FOUND,
-                                MAP_CODE.get(MSG_PASSWORD_RESET_TOKEN_NOT_FOUND))
+                        new ResourceNotFoundException(ResultCode.MSG_PASSWORD_RESET_TOKEN_NOT_FOUND.message(),
+                                ResultCode.MSG_PASSWORD_RESET_TOKEN_NOT_FOUND.code())
                 );
     }
 }

@@ -46,17 +46,6 @@ public interface CategoryRepo extends JpaRepository<Category, String> {
             FROM
               Category c
             WHERE
-              c.id IN :ids
-            """)
-    List<Category> findCategoriesByIds(@Param("ids") String... ids);
-
-    @EntityGraph(attributePaths = {"children"})
-    @Query("""
-            SELECT
-              c
-            FROM
-              Category c
-            WHERE
               c.id = :id
             """)
     Optional<Category> findCategoryById(@Param("id") String id);

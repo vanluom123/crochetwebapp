@@ -2,10 +2,12 @@ package org.crochet.controller;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
+import org.crochet.enums.ResultCode;
 import org.crochet.payload.request.SettingRequest;
 import org.crochet.payload.response.ResponseData;
 import org.crochet.payload.response.SettingResponse;
 import org.crochet.service.SettingService;
+import org.crochet.util.ResponseUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,10 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-import static org.crochet.constant.AppConstant.SUCCESS;
-
 @RestController
-@RequestMapping("/setting")
+@RequestMapping("/api/v1/settings")
 @RequiredArgsConstructor
 @SecurityRequirement(name = "BearerAuth")
 @PreAuthorize("hasRole('ADMIN')")
@@ -37,26 +37,16 @@ public class SettingController {
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @PostMapping("/create")
+    @PostMapping
     public ResponseData<String> create(@RequestBody SettingRequest request) {
         settingService.create(request);
-        return ResponseData.<String>builder()
-                .success(true)
-                .code(HttpStatus.OK.value())
-                .message(SUCCESS)
-                .data("Create success")
-                .build();
+        return ResponseUtil.success(ResultCode.MSG_CREATE_OR_UPDATE_SUCCESS.message());
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @PutMapping("/update")
+    @PutMapping
     public ResponseData<String> update(@RequestBody SettingRequest request) {
         settingService.update(request);
-        return ResponseData.<String>builder()
-                .success(true)
-                .code(HttpStatus.OK.value())
-                .message(SUCCESS)
-                .data("Update success")
-                .build();
+        return ResponseUtil.success(ResultCode.MSG_CREATE_OR_UPDATE_SUCCESS.message());
     }
 }
