@@ -61,7 +61,7 @@ public interface PatternRepository extends JpaRepository<Pattern, String>, JpaSp
             WHERE
               p.id IN :patternIds
             """)
-    Page<PatternResponse> findPatternOnHomeWithIds(@Param("patternIds") List<String> ids, Pageable pageable);
+    Page<PatternResponse> findPatternWithIds(@Param("patternIds") List<String> ids, Pageable pageable);
 
     @Query("""
             SELECT

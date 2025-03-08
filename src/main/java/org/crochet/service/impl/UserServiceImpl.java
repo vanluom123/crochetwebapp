@@ -1,5 +1,6 @@
 package org.crochet.service.impl;
 
+import com.turkraft.springfilter.converter.FilterSpecification;
 import org.crochet.constant.MessageConstant;
 import org.crochet.enumerator.AuthProvider;
 import org.crochet.enumerator.RoleType;
@@ -7,15 +8,13 @@ import org.crochet.exception.BadRequestException;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.mapper.UserMapper;
 import org.crochet.model.User;
-import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.SignUpRequest;
 import org.crochet.payload.request.UserUpdateRequest;
 import org.crochet.payload.response.UserPaginationResponse;
 import org.crochet.payload.response.UserResponse;
-import org.crochet.repository.GenericFilter;
 import org.crochet.repository.UserRepository;
 import org.crochet.service.UserService;
-import org.springframework.data.domain.Page;
+import org.crochet.util.ObjectUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -39,11 +38,11 @@ public class UserServiceImpl implements UserService {
     /**
      * Constructor for the UserServiceImpl class.
      *
-     * @param userRepository   The repository for the User entity.
+     * @param userRepository  The repository for the User entity.
      * @param passwordEncoder The password encoder.
      */
     public UserServiceImpl(UserRepository userRepository,
-            PasswordEncoder passwordEncoder) {
+                           PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
@@ -83,23 +82,22 @@ public class UserServiceImpl implements UserService {
      * @param sortBy   The field by which to sort the records.
      * @param sortDir  The direction of the sort. Can be 'ASC' for ascending or
      *                 'DESC' for descending.
-     * @param filters  The list of filters.
+     * @param spec     The specification object containing the filter criteria.
      * @return A UserPaginationResponse object containing the retrieved records and
-     *         pagination details.
+     * pagination details.
      */
+    @SuppressWarnings("ConstantValue")
     @Override
-    public UserPaginationResponse getAll(int pageNo, int pageSize, String sortBy, String sortDir, Filter[] filters) {
-        Specification<User> spec = Specification.where(null);
-        if (filters != null && filters.length > 0) {
-            GenericFilter<User> filter = GenericFilter.create(filters);
-            spec = filter.build();
-        }
-
+    public UserPaginationResponse getAll(int pageNo, int pageSize, String sortBy, String sortDir, Specification<User> spec) {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
-        Page<User> page = userRepository.findAll(spec, pageable);
+        var filter = ((FilterSpecification<User>) spec).getFilter();
+        Specification<User> userSpec = Specification.where(null);
+        if (filter != null && ObjectUtils.isNotEmpty(filter.getChildren())) {
+            userSpec = userSpec.and(spec);
+        }
+        var page = userRepository.findAll(userSpec, pageable);
         List<UserResponse> users = UserMapper.INSTANCE.toResponses(page.getContent());
-
         return UserPaginationResponse.builder()
                 .contents(users)
                 .pageNo(pageNo)

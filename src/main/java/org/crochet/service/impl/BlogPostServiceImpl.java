@@ -1,5 +1,6 @@
 package org.crochet.service.impl;
 
+import com.turkraft.springfilter.converter.FilterSpecification;
 import lombok.extern.slf4j.Slf4j;
 import org.crochet.constant.MessageConstant;
 import org.crochet.exception.ResourceNotFoundException;
@@ -9,15 +10,15 @@ import org.crochet.model.BlogCategory;
 import org.crochet.model.BlogPost;
 import org.crochet.model.Settings;
 import org.crochet.payload.request.BlogPostRequest;
-import org.crochet.payload.request.Filter;
 import org.crochet.payload.response.BlogPostPaginationResponse;
 import org.crochet.payload.response.BlogPostResponse;
 import org.crochet.repository.BlogCategoryRepo;
 import org.crochet.repository.BlogPostRepository;
-import org.crochet.repository.GenericFilter;
 import org.crochet.service.BlogPostService;
 import org.crochet.util.ImageUtils;
+import org.crochet.util.ObjectUtils;
 import org.crochet.util.SettingsUtil;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -95,29 +96,27 @@ public class BlogPostServiceImpl implements BlogPostService {
      * @param sortBy   The attribute by which the blog posts should be sorted.
      * @param sortDir  The sorting direction, either "ASC" (ascending) or "DESC"
      *                 (descending).
-     * @param filters  The list of filters.
+     * @param spec     The specification used to filter the blog posts.
      * @return A {@link BlogPostPaginationResponse} containing the paginated list of
      * blog posts.
      */
+    @SuppressWarnings("ConstantValue")
     @Override
     public BlogPostPaginationResponse getBlogs(int pageNo, int pageSize, String sortBy, String sortDir,
-                                               Filter[] filters) {
-        Specification<BlogPost> spec = Specification.where(null);
-        if (filters != null && filters.length > 0) {
-            GenericFilter<BlogPost> filter = GenericFilter.create(filters);
-            spec = filter.build();
-        }
-
-        List<BlogPost> blogPosts = blogPostRepo.findAll(spec);
-        var blogIds = blogPosts.stream()
-                .map(BlogPost::getId)
-                .toList();
-
-        Sort.Direction dir = Sort.Direction.fromString(sortDir);
-        Sort sort = Sort.by(dir, sortBy);
+                                               Specification<BlogPost> spec) {
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
-        var page = blogPostRepo.findBlogOnHomeWithIds(blogIds, pageable);
-
+        var filter = ((FilterSpecification<BlogPost>) spec).getFilter();
+        Page<BlogPostResponse> page;
+        if (filter != null && ObjectUtils.isNotEmpty(filter.getChildren())) {
+            List<BlogPost> blogPosts = blogPostRepo.findAll(spec);
+            var blogIds = blogPosts.stream()
+                    .map(BlogPost::getId)
+                    .toList();
+            page = blogPostRepo.findPostByIds(blogIds, pageable);
+        } else {
+            page = blogPostRepo.findPostWithPageable(pageable);
+        }
         return BlogPostPaginationResponse.builder()
                 .contents(page.getContent())
                 .pageNo(page.getNumber())

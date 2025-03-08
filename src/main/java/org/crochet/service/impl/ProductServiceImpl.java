@@ -1,5 +1,6 @@
 package org.crochet.service.impl;
 
+import com.turkraft.springfilter.converter.FilterSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.crochet.constant.MessageConstant;
@@ -8,20 +9,21 @@ import org.crochet.mapper.FileMapper;
 import org.crochet.mapper.ProductMapper;
 import org.crochet.model.Product;
 import org.crochet.model.Settings;
-import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.ProductRequest;
 import org.crochet.payload.response.ProductPaginationResponse;
 import org.crochet.payload.response.ProductResponse;
 import org.crochet.repository.CategoryRepo;
-import org.crochet.repository.GenericFilter;
 import org.crochet.repository.ProductRepository;
+import org.crochet.repository.ProductSpecifications;
 import org.crochet.service.ProductService;
 import org.crochet.util.ImageUtils;
+import org.crochet.util.ObjectUtils;
 import org.crochet.util.SettingsUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -87,38 +89,38 @@ public class ProductServiceImpl implements ProductService {
     /**
      * Retrieves a paginated list of products based on the provided parameters.
      *
-     * @param pageNo   The page number to retrieve (0-indexed).
-     * @param pageSize The number of products to include in each page.
-     * @param sortBy   The attribute by which the products should be sorted.
-     * @param sortDir  The sorting direction, either "ASC" (ascending) or "DESC"
-     *                 (descending).
-     * @param filters  The list of filters.
+     * @param pageNo     The page number to retrieve (0-indexed).
+     * @param pageSize   The number of products to include in each page.
+     * @param sortBy     The attribute by which the products should be sorted.
+     * @param sortDir    The sorting direction, either "ASC" (ascending) or "DESC"
+     *                   (descending).
+     * @param categoryId
+     * @param spec       The list of filters.
      * @return A {@link ProductPaginationResponse} containing the paginated list of
      * products.
      */
+    @SuppressWarnings("ConstantValue")
     @Override
     public ProductPaginationResponse getProducts(int pageNo, int pageSize, String sortBy, String sortDir,
-                                                 Filter[] filters) {
-        List<String> prodIds = Collections.emptyList();
-
-        if (filters != null && filters.length > 0) {
-            GenericFilter<Product> filter = GenericFilter.create(filters);
-            var spec = filter.build();
-            prodIds = productRepo.findAll(spec)
-                    .stream()
-                    .map(Product::getId)
-                    .toList();
-        }
+                                                 String categoryId, Specification<Product> spec) {
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
         Page<ProductResponse> menuPage;
-        if (prodIds.isEmpty()) {
-            menuPage = productRepo.findProductWithPageable(pageable);
-        } else {
-            menuPage = productRepo.findProductWithIds(prodIds, pageable);
+        var filter = ((FilterSpecification<Product>) spec).getFilter();
+        var hasCategory = ObjectUtils.hasText(categoryId);
+        if (hasCategory) {
+            spec = spec.and(ProductSpecifications.inHierarchy(categoryId));
         }
-
+        if ((filter != null && ObjectUtils.isNotEmpty(filter.getChildren())) || hasCategory) {
+            var prodIds = productRepo.findAll(spec)
+                    .stream()
+                    .map(Product::getId)
+                    .toList();
+            menuPage = productRepo.findProductWithIds(prodIds, pageable);
+        } else {
+            menuPage = productRepo.findProductWithPageable(pageable);
+        }
         return ProductPaginationResponse.builder()
                 .contents(menuPage.getContent())
                 .pageNo(menuPage.getNumber())

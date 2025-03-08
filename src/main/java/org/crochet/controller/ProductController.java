@@ -1,5 +1,6 @@
 package org.crochet.controller;
 
+import com.turkraft.springfilter.boot.Filter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -7,16 +8,25 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.crochet.constant.AppConstant;
-import org.crochet.payload.request.Filter;
+import org.crochet.model.Product;
 import org.crochet.payload.request.ProductRequest;
 import org.crochet.payload.response.ProductPaginationResponse;
 import org.crochet.payload.response.ProductResponse;
 import org.crochet.payload.response.ResponseData;
 import org.crochet.service.ProductService;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -56,7 +66,7 @@ public class ProductController {
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = ProductPaginationResponse.class)))
     @ApiResponse(responseCode = "400", description = "Invalid input")
-    @PostMapping("/pagination")
+    @GetMapping("/pagination")
     public ResponseEntity<ProductPaginationResponse> getProducts(
             @Parameter(description = "Page number")
             @RequestParam(value = "pageNo", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER,
@@ -65,13 +75,14 @@ public class ProductController {
             @RequestParam(value = "pageSize", defaultValue = AppConstant.DEFAULT_PAGE_SIZE,
                     required = false) int pageSize,
             @Parameter(description = "Sort by field")
-            @RequestParam(value = "sortBy", defaultValue = AppConstant.DEFAULT_SORT_BY, required = false) String sortBy,
+            @RequestParam(value = "sortBy", defaultValue = AppConstant.DEFAULT_SORT_BY,
+                    required = false) String sortBy,
             @Parameter(description = "Sort direction")
             @RequestParam(value = "sortDir", defaultValue = AppConstant.DEFAULT_SORT_DIRECTION,
                     required = false) String sortDir,
-            @Parameter(description = "The list of filters")
-            @RequestBody(required = false) Filter[] filters) {
-        var response = productService.getProducts(pageNo, pageSize, sortBy, sortDir, filters);
+            @RequestParam(value = "categoryId", required = false) String categoryId,
+            @Filter Specification<Product> spec) {
+        var response = productService.getProducts(pageNo, pageSize, sortBy, sortDir, categoryId, spec);
         return ResponseEntity.ok(response);
     }
 

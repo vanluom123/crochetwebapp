@@ -1,5 +1,6 @@
 package org.crochet.service.impl;
 
+import com.turkraft.springfilter.converter.FilterSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.crochet.constant.MessageConstant;
@@ -8,20 +9,21 @@ import org.crochet.mapper.FileMapper;
 import org.crochet.mapper.PatternMapper;
 import org.crochet.model.Pattern;
 import org.crochet.model.Settings;
-import org.crochet.payload.request.Filter;
 import org.crochet.payload.request.PatternRequest;
 import org.crochet.payload.response.PatternPaginationResponse;
 import org.crochet.payload.response.PatternResponse;
 import org.crochet.repository.CategoryRepo;
-import org.crochet.repository.GenericFilter;
 import org.crochet.repository.PatternRepository;
+import org.crochet.repository.PatternSpecifications;
 import org.crochet.service.PatternService;
 import org.crochet.util.ImageUtils;
+import org.crochet.util.ObjectUtils;
 import org.crochet.util.SettingsUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -85,36 +87,36 @@ public class PatternServiceImpl implements PatternService {
     /**
      * Get patterns
      *
-     * @param pageNo   Page number
-     * @param pageSize The size of page
-     * @param sortBy   Sort by
-     * @param sortDir  Sort directory
-     * @param filters  The list of filters
+     * @param pageNo     Page number
+     * @param pageSize   The size of page
+     * @param sortBy     Sort by
+     * @param sortDir    Sort directory
+     * @param categoryId The list of filters
+     * @param spec       Specification<Pattern>
      * @return Pattern is paginated
      */
+    @SuppressWarnings("ConstantValue")
     @Override
     public PatternPaginationResponse getPatterns(int pageNo, int pageSize, String sortBy, String sortDir,
-                                                 Filter[] filters) {
-        List<String> patternIds = Collections.emptyList();
-
-        if (filters != null && filters.length > 0) {
-            GenericFilter<Pattern> filter = GenericFilter.create(filters);
-            var spec = filter.build();
-            patternIds = patternRepo.findAll(spec)
-                    .stream()
-                    .map(Pattern::getId)
-                    .toList();
-        }
-
+                                                 String categoryId, Specification<Pattern> spec) {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
         Page<PatternResponse> page;
-        if (patternIds.isEmpty()) {
-            page = patternRepo.findPatternWithPageable(pageable);
-        } else {
-            page = patternRepo.findPatternOnHomeWithIds(patternIds, pageable);
+        var filter = ((FilterSpecification<Pattern>) spec).getFilter();
+        var hasCategory = ObjectUtils.hasText(categoryId);
+        if (hasCategory) {
+            spec = spec.and(PatternSpecifications.inHierarchy(categoryId));
         }
+        if ((filter != null && ObjectUtils.isNotEmpty(filter.getChildren())) || hasCategory) {
+            var patternIds = patternRepo.findAll(spec)
+                    .stream()
+                    .map(Pattern::getId)
+                    .toList();
+            page = patternRepo.findPatternWithIds(patternIds, pageable);
+        } else {
+            page = patternRepo.findPatternWithPageable(pageable);
 
+        }
         return PatternPaginationResponse.builder()
                 .contents(page.getContent())
                 .pageNo(page.getNumber())

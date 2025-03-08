@@ -20,6 +20,7 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, String>, JpaSpecificationExecutor<User> {
 
+    @SuppressWarnings("NullableProblems")
     @EntityGraph(attributePaths = {"userProfile"})
     Page<User> findAll(Specification<User> spec, Pageable pageable);
 
