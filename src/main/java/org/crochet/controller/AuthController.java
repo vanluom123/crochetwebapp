@@ -124,7 +124,8 @@ public class AuthController {
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/me")
-    public AuthResponse getUserInfo(@RequestParam("accessToken") String accessToken) {
-        return authService.getUserInfo(accessToken);
+    public ResponseData<AuthResponse> getUserInfo(@RequestParam("accessToken") String accessToken) {
+        var res = authService.getUserInfo(accessToken);
+        return ResponseUtil.success(res);
     }
 }

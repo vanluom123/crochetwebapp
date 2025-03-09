@@ -56,31 +56,6 @@ app:
 authorize:
   http-request:
     allowedOrigins: ${ALLOWED_ORIGINS}
-    authenticated:
-      - "/blog/create"
-      - "/comment/create"
-      - "/free-pattern/create"
-      - "/free-pattern/delete"
-      - "/free-pattern/create-by"
-      - "/free-pattern/collection/**"
-      - "/pattern/create"
-      - "/pattern/detail"
-      - "/category/create"
-      - "/category/update"
-      - "/category-pattern/create"
-      - "/category-pattern/update"
-      - "/category-free-pattern/create"
-      - "/category-free-pattern/update"
-      - "/firebase-storage/upload-file"
-      - "/product/create"
-      - "/users/**"
-      - "/banner/batchInsertOrUpdate"
-      - "/bannerType/**"
-      - "/blog-categories/create"
-      - "/blog-categories/update"
-      - "/blog-categories/delete/**"
-      - "/setting/**"
-      - "/collections/**"
 
 # Firebase configuration
 firebase:

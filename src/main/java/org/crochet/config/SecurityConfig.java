@@ -99,7 +99,6 @@ public class SecurityConfig {
 
     private void configureAuthorization(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(authReq -> authReq
-            .requestMatchers(authorizeHttpRequestProperties().getAuthenticated()).authenticated()
             .anyRequest().permitAll()
         );
     }

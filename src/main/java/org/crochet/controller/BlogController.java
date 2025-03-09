@@ -103,7 +103,7 @@ public class BlogController {
     @ApiResponse(responseCode = "200", description = "List of blog ids",
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = List.class)))
-    @GetMapping("/all-ids")
+    @GetMapping("/ids")
     public ResponseData<List<String>> getBlogIds(
             @Parameter(description = "Page number (default: 0)")
             @RequestParam(value = "pageNo", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER,

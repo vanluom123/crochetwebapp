@@ -124,9 +124,9 @@ public class CollectionController {
     @Operation(summary = "Delete a collection")
     @ApiResponse(responseCode = "204", description = "Collection deleted successfully")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @DeleteMapping
+    @DeleteMapping("/{collectionId}")
     public ResponseData<String> deleteCollection(
-            @Parameter(description = "Collection ID") @RequestParam("collectionId") String collectionId) {
+            @Parameter(description = "Collection ID") @PathVariable("collectionId") String collectionId) {
         collectionService.deleteCollection(collectionId);
         return ResponseUtil.success(ResultCode.MSG_DELETE_SUCCESS.message());
     }

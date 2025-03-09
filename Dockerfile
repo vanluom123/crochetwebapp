@@ -46,10 +46,10 @@ COPY . /workspace/app
 
 # Build project
 RUN --mount=type=cache,target=/root/.gradle \
-    ./gradlew clean build -x test \
+    chmod +x gradlew \
+    && ./gradlew clean build -x test \
     && mkdir -p build/dependency \
-    && (cd build/dependency; jar -xf ../libs/*-SNAPSHOT.jar) \
-    && rm -rf /root/.gradle
+    && (cd build/dependency; jar -xf ../libs/*-SNAPSHOT.jar)
 
 # Build image
 FROM eclipse-temurin:21-jre-jammy

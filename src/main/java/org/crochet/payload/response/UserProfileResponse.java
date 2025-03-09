@@ -11,7 +11,7 @@ import org.crochet.constant.AppConstant;
 import org.crochet.enums.AuthProvider;
 import org.crochet.enums.RoleType;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 @Getter
@@ -31,8 +31,8 @@ public class UserProfileResponse {
     
     // Profile info
     private String phone;
-    @JsonFormat(pattern = AppConstant.DATE_PATTERN)
-    private LocalDateTime birthDate;
+    @JsonFormat(pattern = AppConstant.DATE_NOT_TIME_PATTERN)
+    private LocalDate birthDate;
     private String gender;
     private String backgroundImageUrl;
     
