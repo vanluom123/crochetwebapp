@@ -59,16 +59,10 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     private OAuth2User processOAuth2User(OAuth2UserRequest oAuth2UserRequest, OAuth2User oAuth2User) {
         // Extract email from OAuth2 user
         String email = getEmailFromOAuth2User(oAuth2User);
-
         // Check if user exists in the repository
-        Optional<User> userOptional = getUserByEmail(email);
-
-        // If user exists, update the user; otherwise, register a new user
-        User user = userOptional.map(existingUser -> updateUser(existingUser, oAuth2User))
+        var user = getUserByEmail(email)
                 .orElseGet(() -> registerNewUser(oAuth2UserRequest, oAuth2User));
-
         user.setAttributes(oAuth2User.getAttributes());
-
         return user;
     }
 
@@ -124,24 +118,5 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 .build();
         // Save the new user in the repository
         return userRepository.save(user);
-    }
-
-    /**
-     * Updates an existing user with the attributes from the OAuth2 user.
-     *
-     * @param existingUser the existing user
-     * @param oAuth2User   the OAuth2 user
-     * @return the updated user
-     */
-    private User updateUser(User existingUser, OAuth2User oAuth2User) {
-        String name = oAuth2User.getAttribute("name");
-        String imageUrl = oAuth2User.getAttribute("picture");
-
-        // Update the existing user's attributes
-        existingUser.setName(name);
-        existingUser.setImageUrl(imageUrl);
-
-        // Save the updated user in the repository
-        return userRepository.save(existingUser);
     }
 }

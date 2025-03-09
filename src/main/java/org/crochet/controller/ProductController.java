@@ -45,7 +45,7 @@ public class ProductController {
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = ProductResponse.class)))
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping("/create")
+    @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     @SecurityRequirement(name = "BearerAuth")
     public ResponseData<String> createProduct(@RequestBody ProductRequest request) {
@@ -95,10 +95,10 @@ public class ProductController {
             description = "Product deleted successfully",
             content = @Content(mediaType = "application/json"))
     @ResponseStatus(HttpStatus.OK)
-    @DeleteMapping
+    @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @SecurityRequirement(name = "BearerAuth")
-    public ResponseData<String> deleteProduct(@RequestParam("id") String id) {
+    public ResponseData<String> deleteProduct(@PathVariable("id") String id) {
         productService.delete(id);
         return ResponseUtil.success(ResultCode.MSG_DELETE_SUCCESS.message());
     }

@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.crochet.constant.AppConstant;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -17,8 +17,8 @@ public class UserProfileRequest {
     private String name;
     private String imageUrl;
     private String phone;
-    @JsonFormat(pattern = AppConstant.DATE_PATTERN)
-    private LocalDateTime birthDate;
+    @JsonFormat(pattern = AppConstant.DATE_NOT_TIME_PATTERN)
+    private LocalDate birthDate;
     private String gender;
     private String backgroundImageUrl;
 }

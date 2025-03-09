@@ -45,7 +45,7 @@ public class FreePatternController {
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = FreePatternResponse.class)))
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping("/create")
+    @PostMapping
     @PreAuthorize("isAuthenticated()")
     @SecurityRequirement(name = "BearerAuth")
     public ResponseData<String> createPattern(@RequestBody FreePatternRequest request) {
@@ -71,12 +71,12 @@ public class FreePatternController {
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = String.class)))
     @ResponseStatus(HttpStatus.OK)
-    @DeleteMapping
+    @DeleteMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
     @SecurityRequirement(name = "BearerAuth")
     public ResponseData<String> delete(
             @Parameter(description = "ID of the pattern to delete")
-            @RequestParam("id") String id) {
+            @PathVariable("id") String id) {
         freePatternService.delete(id);
         return ResponseUtil.success(ResultCode.MSG_DELETE_SUCCESS.message());
     }
