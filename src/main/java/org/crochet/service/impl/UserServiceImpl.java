@@ -96,7 +96,7 @@ public class UserServiceImpl implements UserService {
         }
         var page = userRepository.findAll(userSpec, pageable);
         List<UserResponse> users = UserMapper.INSTANCE.toResponses(page.getContent());
-        return PaginationMapper.getInstance().toPagination(page, users);
+        return PaginationMapper.toPagination(page, users);
     }
 
     /**

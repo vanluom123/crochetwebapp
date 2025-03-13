@@ -118,7 +118,7 @@ public class BlogPostServiceImpl implements BlogPostService {
         } else {
             page = blogPostRepo.findPostWithPageable(pageable);
         }
-        return PaginationMapper.getInstance().toPagination(page);
+        return PaginationMapper.toPagination(page);
     }
 
     /**

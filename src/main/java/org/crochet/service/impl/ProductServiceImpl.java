@@ -113,7 +113,7 @@ public class ProductServiceImpl implements ProductService {
         } else {
             menuPage = productRepo.findProductWithPageable(pageable);
         }
-        return PaginationMapper.getInstance().toPagination(menuPage);
+        return PaginationMapper.toPagination(menuPage);
     }
 
     /**

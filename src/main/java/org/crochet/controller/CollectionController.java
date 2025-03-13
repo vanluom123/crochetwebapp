@@ -57,12 +57,12 @@ public class CollectionController {
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = String.class)))
     @ResponseStatus(HttpStatus.OK)
-    @PostMapping("/add-pattern")
+    @PostMapping("/{collection_id}/add-pattern/{free_pattern_id}")
     public ResponseData<String> addPatternToCollection(
             @Parameter(description = "Collection ID")
-            @RequestParam("collection_id") String collectionId,
+            @PathVariable("collection_id") String collectionId,
             @Parameter(description = "Free pattern ID")
-            @RequestParam("free_pattern_id") String freePatternId) {
+            @PathVariable("free_pattern_id") String freePatternId) {
         collectionService.addFreePatternToCollection(collectionId, freePatternId);
         return ResponseUtil.success(ResultCode.MSG_CREATE_OR_UPDATE_SUCCESS.message());
     }
@@ -71,10 +71,10 @@ public class CollectionController {
     @ApiResponse(responseCode = "200", description = "Collection updated successfully",
             content = @Content(mediaType = "application/json"))
     @ResponseStatus(HttpStatus.OK)
-    @PutMapping
+    @PutMapping("/{collectionId}")
     public ResponseData<String> updateCollection(
             @Parameter(description = "Collection ID")
-            @RequestParam("collectionId") String collectionId,
+            @PathVariable("collectionId") String collectionId,
             @Parameter(description = "Name")
             @RequestParam("name") String name) {
         collectionService.updateCollection(collectionId, name);
@@ -84,10 +84,10 @@ public class CollectionController {
     @Operation(summary = "Remove a free pattern from collection")
     @ApiResponse(responseCode = "204", description = "Pattern removed from collection successfully")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @DeleteMapping("/remove-pattern")
+    @DeleteMapping("/remove-pattern/{free_pattern_id}")
     public ResponseData<String> removePatternFromCollection(
             @Parameter(description = "Free pattern ID")
-            @RequestParam("free_pattern_id") String freePatternId) {
+            @PathVariable("free_pattern_id") String freePatternId) {
         collectionService.removeFreePatternFromCollection(freePatternId);
         return ResponseUtil.success(ResultCode.MSG_DELETE_SUCCESS.message());
     }
@@ -124,9 +124,9 @@ public class CollectionController {
     @Operation(summary = "Delete a collection")
     @ApiResponse(responseCode = "204", description = "Collection deleted successfully")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @DeleteMapping("/{collectionId}")
+    @DeleteMapping("/{collection_id}")
     public ResponseData<String> deleteCollection(
-            @Parameter(description = "Collection ID") @PathVariable("collectionId") String collectionId) {
+            @Parameter(description = "Collection ID") @PathVariable("collection_id") String collectionId) {
         collectionService.deleteCollection(collectionId);
         return ResponseUtil.success(ResultCode.MSG_DELETE_SUCCESS.message());
     }

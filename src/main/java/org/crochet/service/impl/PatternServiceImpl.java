@@ -113,7 +113,7 @@ public class PatternServiceImpl implements PatternService {
             page = patternRepo.findPatternWithPageable(pageable);
 
         }
-        return PaginationMapper.getInstance().toPagination(page);
+        return PaginationMapper.toPagination(page);
     }
 
     /**
