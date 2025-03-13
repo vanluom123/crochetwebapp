@@ -39,7 +39,7 @@ public interface PatternRepository extends JpaRepository<Pattern, String>, JpaSp
               )
             FROM
               Pattern p
-              JOIN p.images i WITH i.order = 0
+              LEFT JOIN p.images i WITH i.order = 0
             WHERE
               p.isHome = TRUE
             """)
@@ -57,7 +57,7 @@ public interface PatternRepository extends JpaRepository<Pattern, String>, JpaSp
               )
             FROM
               Pattern p
-              JOIN p.images i WITH i.order = 0
+              LEFT JOIN p.images i WITH i.order = 0
             WHERE
               p.id IN :patternIds
             """)
@@ -75,7 +75,7 @@ public interface PatternRepository extends JpaRepository<Pattern, String>, JpaSp
               )
             FROM
               Pattern p
-              JOIN p.images i WITH i.order = 0
+              LEFT JOIN p.images i WITH i.order = 0
             """)
     Page<PatternResponse> findPatternWithPageable(Pageable pageable);
 
