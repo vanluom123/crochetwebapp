@@ -1,4 +1,7 @@
 spring:
+  config:
+    activate:
+      on-profile: dev
   jpa:
     open-in-view: false
     properties:
