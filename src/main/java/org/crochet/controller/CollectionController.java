@@ -123,7 +123,7 @@ public class CollectionController {
 
     @Operation(summary = "Delete a collection")
     @ApiResponse(responseCode = "204", description = "Collection deleted successfully")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(HttpStatus.OK)
     @DeleteMapping("/{collection_id}")
     public ResponseData<String> deleteCollection(
             @Parameter(description = "Collection ID") @PathVariable("collection_id") String collectionId) {
