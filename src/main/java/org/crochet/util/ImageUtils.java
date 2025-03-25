@@ -16,18 +16,22 @@ public class ImageUtils {
      * @return Sorted list of files with order assigned, or null if input is empty
      */
     public static <T extends FileResponse> List<T> sortFiles(Collection<T> files) {
-        if (files == null || files.isEmpty()) {
-            return null;
+        if (ObjectUtils.isEmpty(files)) {
+            return List.of();
         }
 
         List<T> sortedFiles = files.stream()
-            .filter(file -> file.getLastModified() != null)
-            .sorted(Comparator.comparing(FileResponse::getLastModified))
-            .toList();
+                .sorted(Comparator.comparing(
+                                FileResponse::getLastModified,
+                                Comparator.nullsLast(Comparator.naturalOrder()))
+                        .reversed()
+                )
+                .toList();
 
-        // Use an AtomicInteger to assign order
         AtomicInteger order = new AtomicInteger(0);
-        sortedFiles.forEach(file -> file.setOrder(order.getAndIncrement()));
+        sortedFiles.forEach(file ->
+                file.setOrder(ObjectUtils.applyIfNotNull(file, f -> order.getAndIncrement(), -1))
+        );
 
         return sortedFiles;
     }

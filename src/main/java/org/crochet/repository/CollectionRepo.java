@@ -15,7 +15,7 @@ import java.util.Optional;
 public interface CollectionRepo extends JpaRepository<Collection, String> {
     @Query("""
             SELECT
-              new org.crochet.payload.response.CollectionResponse (c.id, c.name, c.avatar, COUNT(cf.id))
+              new org.crochet.payload.response.CollectionResponse (c.id, c.name, c.avatar, COUNT(cf.id), u.id)
             FROM
               Collection c
               LEFT JOIN User u ON u.id = c.user.id
@@ -31,18 +31,20 @@ public interface CollectionRepo extends JpaRepository<Collection, String> {
 
     @Query("""
             SELECT
-              new org.crochet.payload.response.CollectionResponse (c.id, c.name, c.avatar, COUNT(cf.id))
+              new org.crochet.payload.response.CollectionResponse (c.id, c.name, c.avatar, COUNT(cf.id), u.id)
             FROM
               Collection c
               LEFT JOIN ColFrep cf ON cf.collection.id = c.id
+              LEFT JOIN User u ON u.id = c.user.id
             WHERE
-              c.id =:cid
+              c.id =:cid and c.user.id = :userId
             GROUP BY
               c.id,
               c.name,
               c.avatar
             """)
-    Optional<CollectionResponse> getColById(@Param("cid") String cid);
+    Optional<CollectionResponse> getColById(@Param("userId") String userId,
+                                            @Param("cid") String cid);
 
     @EntityGraph(attributePaths = {"user", "colfreps", "colfreps.freePattern", "colfreps.freePattern.images"})
     @Query("""

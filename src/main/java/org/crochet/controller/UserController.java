@@ -165,4 +165,46 @@ public class UserController {
         var res = collectionService.getAllByUserId(userId);
         return ResponseUtil.success(res);
     }
+
+    @Operation(summary = "Get free patterns by collection ID",
+            description = "Allows users to fetch free patterns associated with a specific collection.")
+    @ApiResponse(responseCode = "200",
+            description = "Paginated free patterns retrieved successfully",
+            content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = PaginationResponse.class)))
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping("/{userId}/collections/{collection_id}/free-patterns")
+    @SecurityRequirement(name = "BearerAuth")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseData<PaginationResponse<FreePatternResponse>> getFreePatternsByCollection(
+            @Parameter(description = "Page number (default: 0)")
+            @RequestParam(value = "pageNo", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER,
+                    required = false) int pageNo,
+            @Parameter(description = "Page size (default: 48)")
+            @RequestParam(value = "pageSize", defaultValue = AppConstant.DEFAULT_PAGE_SIZE,
+                    required = false) int pageSize,
+            @Parameter(description = "Sort by field (default: createdDate)")
+            @RequestParam(value = "sortBy", defaultValue = AppConstant.DEFAULT_SORT_BY, required = false) String sortBy,
+            @Parameter(description = "Sort direction (default: DESC)")
+            @RequestParam(value = "sortDir", defaultValue = AppConstant.DEFAULT_SORT_DIRECTION,
+                    required = false) String sortDir,
+            @PathVariable("userId") String userId,
+            @PathVariable("collection_id") String collectionId) {
+        var response = freePatternService.getFrepsByCollectionId(userId, collectionId, pageNo, pageSize, sortBy, sortDir);
+        return ResponseUtil.success(response);
+    }
+
+    @Operation(summary = "Get collection by ID")
+    @ApiResponse(responseCode = "200", description = "Collection details",
+            content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = CollectionResponse.class)))
+    @GetMapping("/{userId}/collections/{collection_id}")
+    public ResponseData<CollectionResponse> getCollectionById(
+            @Parameter(description = "User ID")
+            @PathVariable("userId") String userId,
+            @Parameter(description = "Collection ID")
+            @PathVariable("collection_id") String collectionId) {
+        var res = collectionService.getCollectionById(userId, collectionId);
+        return ResponseUtil.success(res);
+    }
 }

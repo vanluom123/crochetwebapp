@@ -124,22 +124,17 @@ public class CollectionServiceImpl implements CollectionService {
         var user = SecurityUtils.getCurrentUser();
         if (user == null) {
             throw new ResourceNotFoundException(
-                    ResultCode.MSG_USER_NOT_FOUND.message(),
-                    ResultCode.MSG_USER_NOT_FOUND.code()
-            );
-        }
-        var freePattern = freePatternRepository.findFrepById(freePatternId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        ResultCode.MSG_FREE_PATTERN_NOT_FOUND.message(),
-                        ResultCode.MSG_FREE_PATTERN_NOT_FOUND.code()
-                ));
-        if (ObjectUtils.notEqual(freePattern.getCreatedBy(), user.getId())) {
-            throw new AccessDeniedException(
-                    ResultCode.MSG_NO_PERMISSION_REMOVE_FREE_PATTERN_FROM_COLLECTION.message(),
-                    ResultCode.MSG_NO_PERMISSION_REMOVE_FREE_PATTERN_FROM_COLLECTION.code()
+                    ResultCode.MSG_USER_LOGIN_REQUIRED.message(),
+                    ResultCode.MSG_USER_LOGIN_REQUIRED.code()
             );
         }
         var collection = colFrepRepo.findColByUserAndFreePattern(user.getId(), freePatternId);
+        if (collection == null) {
+            throw new ResourceNotFoundException(
+                    ResultCode.MSG_COLLECTION_NOT_FOUND.message(),
+                    ResultCode.MSG_COLLECTION_NOT_FOUND.code()
+            );
+        }
         colFrepRepo.removeByFreePattern(freePatternId);
         avatarService.updateAvatarFromNextPattern(collection);
     }
@@ -151,8 +146,8 @@ public class CollectionServiceImpl implements CollectionService {
      * @return collection
      */
     @Override
-    public CollectionResponse getCollectionById(String collectionId) {
-        return collectionRepo.getColById(collectionId)
+    public CollectionResponse getCollectionById(String userId, String collectionId) {
+        return collectionRepo.getColById(userId, collectionId)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         ResultCode.MSG_COLLECTION_NOT_FOUND.message(),
                         ResultCode.MSG_COLLECTION_NOT_FOUND.code()
@@ -196,6 +191,25 @@ public class CollectionServiceImpl implements CollectionService {
         }
 
         collectionRepo.delete(col);
+    }
+
+    /**
+     * Check if a free pattern is in a collection
+     *
+     * @param freePatternId free pattern id
+     * @return true if the free pattern is in the collection, false otherwise
+     */
+    @Override
+    public boolean checkFreePatternInCollection(String freePatternId) {
+        var user = SecurityUtils.getCurrentUser();
+        if (user == null) {
+            throw new ResourceNotFoundException(
+                    ResultCode.MSG_USER_LOGIN_REQUIRED.message(),
+                    ResultCode.MSG_USER_LOGIN_REQUIRED.code()
+            );
+        }
+        var collByUserAndFrep = colFrepRepo.findColByUserAndFreePattern(user.getId(), freePatternId);
+        return collByUserAndFrep != null;
     }
 
     /**

@@ -1,12 +1,10 @@
 package org.crochet.util;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.BeanUtils;
+
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -14,7 +12,6 @@ import java.util.stream.Collectors;
  * Utility class for common Object operations.
  * Extends functionality from Apache Commons Lang3 ObjectUtils.
  */
-@SuppressWarnings("ALL")
 public final class ObjectUtils {
 
     /**
@@ -88,37 +85,6 @@ public final class ObjectUtils {
     }
 
     /**
-     * Returns the first non-null value from an array of objects.
-     *
-     * @param <T>    the type of the objects
-     * @param values the array of objects to check
-     * @return the first non-null value, or null if all values are null
-     */
-    @SafeVarargs
-    public static <T> T firstNonNull(final T... values) {
-        if (values != null) {
-            for (final T value : values) {
-                if (value != null) {
-                    return value;
-                }
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Returns the default value if the object is null.
-     *
-     * @param <T>          the type of the objects
-     * @param obj          the object to check
-     * @param defaultValue the default value to return if obj is null
-     * @return obj if not null, defaultValue otherwise
-     */
-    public static <T> T defaultIfNull(final T obj, final T defaultValue) {
-        return obj != null ? obj : defaultValue;
-    }
-
-    /**
      * Deep equality check between two objects.
      *
      * @param o1 the first object
@@ -137,22 +103,6 @@ public final class ObjectUtils {
 
     public static boolean notEqual(final Object o1, final Object o2) {
         return !equals(o1, o2);
-    }
-
-    /**
-     * Safely gets a value from a collection by index, returning defaultValue if out of bounds.
-     *
-     * @param <T>          the type of elements in the collection
-     * @param collection   the collection to get the element from
-     * @param index        the index of the element to get
-     * @param defaultValue the default value to return if the index is out of bounds
-     * @return the element at the specified index, or defaultValue if index is out of bounds
-     */
-    public static <T> T getOrDefault(final List<T> collection, final int index, final T defaultValue) {
-        if (isEmpty(collection) || index < 0 || index >= collection.size()) {
-            return defaultValue;
-        }
-        return collection.get(index);
     }
 
     /**
@@ -177,23 +127,6 @@ public final class ObjectUtils {
     }
 
     /**
-     * Safely gets a value from a map by key, returning defaultValue if key not found.
-     *
-     * @param <K>          the type of keys in the map
-     * @param <V>          the type of values in the map
-     * @param map          the map to get the value from
-     * @param key          the key to look up
-     * @param defaultValue the default value to return if the key is not found
-     * @return the value associated with the key, or defaultValue if the key is not found
-     */
-    public static <K, V> V getOrDefault(final Map<K, V> map, final K key, final V defaultValue) {
-        if (isEmpty(map) || key == null) {
-            return defaultValue;
-        }
-        return map.getOrDefault(key, defaultValue);
-    }
-
-    /**
      * Safely checks if a collection contains an element.
      *
      * @param <T>        the type of elements in the collection
@@ -203,17 +136,6 @@ public final class ObjectUtils {
      */
     public static <T> boolean contains(final Collection<T> collection, final T element) {
         return collection != null && collection.contains(element);
-    }
-
-    /**
-     * Creates a defensive copy of a list.
-     *
-     * @param <T>  the type of elements in the list
-     * @param list the list to copy
-     * @return an unmodifiable copy of the list, or an empty list if the input is null
-     */
-    public static <T> List<T> defensiveCopy(final List<T> list) {
-        return list == null ? Collections.emptyList() : Collections.unmodifiableList(new ArrayList<>(list));
     }
 
     /**
@@ -260,4 +182,82 @@ public final class ObjectUtils {
         }
         return o1.compareTo(o2);
     }
+
+    /**
+     * Converts an object to JSON string using the provided ObjectMapper.
+     *
+     * @param object the object to convert
+     * @param mapper the ObjectMapper to use
+     * @return the JSON string or null if conversion failed
+     */
+    public static String toJson(Object object, ObjectMapper mapper) {
+        if (object == null || mapper == null) {
+            return null;
+        }
+
+        try {
+            return mapper.writeValueAsString(object);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to convert object to JSON", e);
+        }
+    }
+
+    /**
+     * Parses a JSON string to an object using the provided ObjectMapper.
+     *
+     * @param <T> the type of the target object
+     * @param json the JSON string to parse
+     * @param clazz the class of the target type
+     * @param mapper the ObjectMapper to use
+     * @return the parsed object or null if parsing failed
+     */
+    public static <T> T fromJson(String json, Class<T> clazz, ObjectMapper mapper) {
+        if (!hasText(json) || clazz == null || mapper == null) {
+            return null;
+        }
+
+        try {
+            return mapper.readValue(json, clazz);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to parse JSON", e);
+        }
+    }
+
+    /**
+     * Copies only non-null properties from source to target object.
+     *
+     * @param source the source object
+     * @param target the target object
+     */
+    public static void copyNonNullProperties(Object source, Object target) {
+        if (source == null || target == null) {
+            return;
+        }
+
+        BeanUtils.copyProperties(source, target, getNullPropertyNames(source));
+    }
+
+    /**
+     * Gets an array of property names that have null values in the object.
+     *
+     * @param source the object to check
+     * @return array of property names with null values
+     */
+    private static String[] getNullPropertyNames(Object source) {
+        final org.springframework.beans.BeanWrapper src =
+            new org.springframework.beans.BeanWrapperImpl(source);
+
+        java.beans.PropertyDescriptor[] pds = src.getPropertyDescriptors();
+        Set<String> nullNames = new HashSet<>();
+
+        for (java.beans.PropertyDescriptor pd : pds) {
+            Object srcValue = src.getPropertyValue(pd.getName());
+            if (srcValue == null) {
+                nullNames.add(pd.getName());
+            }
+        }
+
+        return nullNames.toArray(new String[0]);
+    }
+
 }

@@ -7,9 +7,11 @@ import org.crochet.model.User;
 import org.crochet.repository.ConfirmationTokenRepository;
 import org.crochet.service.ConfirmTokenService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
+
 @Service
 public class ConfirmTokenServiceImpl implements ConfirmTokenService {
     private final ConfirmationTokenRepository confirmationTokenRepository;
@@ -77,5 +79,18 @@ public class ConfirmTokenServiceImpl implements ConfirmTokenService {
                                 ResultCode.MSG_CONFIRM_TOKEN_NOT_FOUND.message(),
                                 ResultCode.MSG_CONFIRM_TOKEN_NOT_FOUND.code()
                         ));
+    }
+
+    /**
+     * Delete expired or confirmed tokens
+     */
+    @Transactional
+    @Override
+    public void deleteExpiredOrConfirmedTokens() {
+        var tokens = confirmationTokenRepository.findAll()
+                .stream()
+                .filter(token -> token.getExpiresAt().isBefore(LocalDateTime.now()) || token.getConfirmedAt() != null)
+                .toList();
+        confirmationTokenRepository.deleteAll(tokens);
     }
 }

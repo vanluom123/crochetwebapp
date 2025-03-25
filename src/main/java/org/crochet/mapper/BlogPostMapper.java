@@ -1,10 +1,10 @@
 package org.crochet.mapper;
 
-import org.apache.commons.lang3.ObjectUtils;
 import org.crochet.model.BlogPost;
 import org.crochet.payload.request.BlogPostRequest;
 import org.crochet.payload.response.BlogPostResponse;
 import org.crochet.util.ImageUtils;
+import org.crochet.util.ObjectUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
