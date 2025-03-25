@@ -85,6 +85,7 @@ public class FreePatternController {
     @ApiResponse(responseCode = "200", description = "Free patterns deleted successfully",
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = ResponseData.class)))
+    @ResponseStatus(HttpStatus.OK)
     @DeleteMapping("/bulk")
     @PreAuthorize("isAuthenticated()")
     @SecurityRequirement(name = "BearerAuth")

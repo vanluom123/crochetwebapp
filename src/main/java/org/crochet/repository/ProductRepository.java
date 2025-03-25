@@ -29,7 +29,7 @@ public interface ProductRepository extends JpaRepository<Product, String>, JpaSp
               )
             FROM
               Product p
-              JOIN p.images i
+              LEFT JOIN p.images i
             WITH
               i.order = 0
             WHERE
@@ -64,7 +64,7 @@ public interface ProductRepository extends JpaRepository<Product, String>, JpaSp
               )
             FROM
               Product p
-              JOIN p.images i
+              LEFT JOIN p.images i
             WITH
               i.order = 0
             WHERE
@@ -84,7 +84,7 @@ public interface ProductRepository extends JpaRepository<Product, String>, JpaSp
               )
             FROM
               Product p
-              JOIN p.images i
+              LEFT JOIN p.images i
             WITH
               i.order = 0
             """)

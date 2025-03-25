@@ -37,7 +37,14 @@ public interface FreePatternService {
 
     void deleteAllById(List<String> ids);
 
-    PaginationResponse<FreePatternResponse> getFrepsByCollectionId(String collectionId, int offset, int limit, String sortBy, String sortDir);
+    PaginationResponse<FreePatternResponse>
+    getFrepsByCollectionId(
+            String userId,
+            String collectionId,
+            int offset,
+            int limit,
+            String sortBy,
+            String sortDir);
 
     FreePattern findById(String id);
 }

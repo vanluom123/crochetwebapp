@@ -12,4 +12,6 @@ public interface RefreshTokenService {
     RefreshToken verifyExpiration(RefreshToken token);
 
     void revokeByToken(String token);
+
+    void deleteExpiredRefreshTokens();
 }

@@ -1,10 +1,10 @@
 package org.crochet.mapper;
 
-import org.apache.commons.lang3.ObjectUtils;
 import org.crochet.model.FreePattern;
 import org.crochet.payload.request.FreePatternRequest;
 import org.crochet.payload.response.FreePatternResponse;
 import org.crochet.util.ImageUtils;
+import org.crochet.util.ObjectUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;

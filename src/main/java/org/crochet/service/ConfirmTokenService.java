@@ -11,4 +11,6 @@ public interface ConfirmTokenService {
     void updateConfirmedAt(String token, LocalDateTime dateTime);
 
     ConfirmationToken getToken(String token);
+
+    void deleteExpiredOrConfirmedTokens();
 }

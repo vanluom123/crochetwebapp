@@ -47,6 +47,7 @@ public class FirebaseStorageController {
             description = "If all files are deleted, return empty. Otherwise, return files are not deleted.",
             content = @Content(mediaType = "application/json"))
     @DeleteMapping
+    @ResponseStatus(HttpStatus.OK)
     public ResponseData<List<String>> deleteMultipleFiles(@RequestBody List<String> fileNames) {
         var response = firebaseStorageService.deleteMultipleFiles(fileNames);
         return ResponseUtil.success(response);

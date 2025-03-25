@@ -13,9 +13,11 @@ public interface CollectionService {
 
     void removeFreePatternFromCollection(String freePatternId);
 
-    CollectionResponse getCollectionById(String collectionId);
+    CollectionResponse getCollectionById(String userId, String collectionId);
 
     List<CollectionResponse> getAllByUserId(String userId);
 
     void deleteCollection(String collectionId);
+
+    boolean checkFreePatternInCollection(String freePatternId);
 }

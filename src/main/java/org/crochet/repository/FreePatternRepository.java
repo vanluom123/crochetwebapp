@@ -51,8 +51,8 @@ public interface FreePatternRepository extends JpaRepository<FreePattern, String
               )
             FROM
               FreePattern fp
-              JOIN fp.images i WITH i.order = 0
-              JOIN User u ON fp.createdBy = u.id
+              LEFT JOIN fp.images i WITH i.order = 0
+              LEFT JOIN User u ON fp.createdBy = u.id
             WHERE
               fp.isHome = TRUE
             """)
@@ -73,8 +73,8 @@ public interface FreePatternRepository extends JpaRepository<FreePattern, String
               )
             FROM
               FreePattern fp
-              JOIN User u ON fp.createdBy = u.id
-              JOIN fp.images i
+              LEFT JOIN User u ON fp.createdBy = u.id
+              LEFT JOIN fp.images i
             WITH
               i.order = 0
             WHERE
@@ -101,8 +101,8 @@ public interface FreePatternRepository extends JpaRepository<FreePattern, String
               )
             FROM
               FreePattern fp
-              JOIN User u ON fp.createdBy = u.id
-              JOIN fp.images i
+              LEFT JOIN User u ON fp.createdBy = u.id
+              LEFT JOIN fp.images i
             WITH
               i.order = 0
             """)
@@ -130,8 +130,8 @@ public interface FreePatternRepository extends JpaRepository<FreePattern, String
               )
             FROM
               FreePattern fp
-              JOIN User u ON fp.createdBy = u.id
-              JOIN fp.images i WITH i.order = 0
+              LEFT JOIN User u ON fp.createdBy = u.id
+              LEFT JOIN fp.images i WITH i.order = 0
             WHERE
               u.id =:userId
               AND fp.id IN :ids
@@ -154,8 +154,8 @@ public interface FreePatternRepository extends JpaRepository<FreePattern, String
               )
             FROM
               FreePattern fp
-              JOIN User u ON fp.createdBy = u.id
-              JOIN fp.images i WITH i.order = 0
+              LEFT JOIN User u ON fp.createdBy = u.id
+              LEFT JOIN fp.images i WITH i.order = 0
             WHERE
               u.id =:userId
             """)
@@ -176,14 +176,17 @@ public interface FreePatternRepository extends JpaRepository<FreePattern, String
               )
             FROM
               FreePattern fp
-              JOIN fp.images i WITH i.order = 0
+              LEFT JOIN fp.images i WITH i.order = 0
               JOIN fp.colfreps colFrep
               JOIN colFrep.collection c
-              JOIN User u ON fp.createdBy = u.id
+              LEFT JOIN User u ON u.id = fp.createdBy
             WHERE
               c.id =:colId
+              and c.user.id = :userId
             """)
-    Page<FreePatternResponse> getFrepsByCollection(@Param("colId") String collectionId, Pageable pageable);
+    Page<FreePatternResponse> getFrepsByCollection(@Param("userId") String userId,
+                                                   @Param("colId") String collectionId,
+                                                   Pageable pageable);
 
     @Transactional
     @Modifying

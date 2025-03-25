@@ -92,12 +92,12 @@ public class FreePatternServiceImpl implements FreePatternService {
     /**
      * Get all free patterns with filter
      *
-     * @param offset  Page number
-     * @param limit   Page size
-     * @param sortBy  Sort by
-     * @param sortDir Sort direction
+     * @param offset     Page number
+     * @param limit      Page size
+     * @param sortBy     Sort by
+     * @param sortDir    Sort direction
      * @param categoryId Category id
-     * @param spec    Specification<FreePattern>
+     * @param spec       Specification<FreePattern>
      * @return PaginatedFreePatternResponse
      */
     @SuppressWarnings("ConstantValue")
@@ -118,7 +118,7 @@ public class FreePatternServiceImpl implements FreePatternService {
         } else {
             page = freePatternRepo.getFrepWithPageable(pageable);
         }
-        return PaginationMapper.getInstance().toPagination(page);
+        return PaginationMapper.toPagination(page);
     }
 
     /**
@@ -152,7 +152,7 @@ public class FreePatternServiceImpl implements FreePatternService {
         } else {
             page = freePatternRepo.getByUserWithPageable(userId, pageable);
         }
-        return PaginationMapper.getInstance().toPagination(page);
+        return PaginationMapper.toPagination(page);
     }
 
     /**
@@ -280,14 +280,16 @@ public class FreePatternServiceImpl implements FreePatternService {
      */
     @Override
     public PaginationResponse<FreePatternResponse>
-    getFrepsByCollectionId(String collectionId,
-                           int offset,
-                           int limit,
-                           String sortBy,
-                           String sortDir) {
+    getFrepsByCollectionId(
+            String userId,
+            String collectionId,
+            int offset,
+            int limit,
+            String sortBy,
+            String sortDir) {
         Pageable pageable = PageRequest.of(offset, limit, Sort.Direction.fromString(sortDir), sortBy);
-        var frepResponse = freePatternRepo.getFrepsByCollection(collectionId, pageable);
-        return PaginationMapper.getInstance().toPagination(frepResponse);
+        var frepResponse = freePatternRepo.getFrepsByCollection(userId, collectionId, pageable);
+        return PaginationMapper.toPagination(frepResponse);
     }
 
     @Override
