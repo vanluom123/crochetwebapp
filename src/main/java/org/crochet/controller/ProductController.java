@@ -120,6 +120,7 @@ public class ProductController {
     @ApiResponse(responseCode = "200", description = "List of product ids",
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = List.class)))
+    @ResponseStatus(HttpStatus.OK)
     @GetMapping("/ids")
     public ResponseData<List<String>> getProductIds(
             @Parameter(description = "Page number (default: 0)")

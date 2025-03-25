@@ -1,6 +1,5 @@
 package org.crochet.service;
 
-import org.crochet.exception.AccessDeniedException;
 import org.crochet.exception.ResourceNotFoundException;
 import org.crochet.model.ColFrep;
 import org.crochet.model.Collection;
@@ -152,10 +151,6 @@ public class CollectionServiceTest {
         User user = new User();
         user.setId("user-123");
 
-        FreePattern freePattern = new FreePattern();
-        freePattern.setId(freePatternId);
-        freePattern.setCreatedBy("user-123");
-
         Collection collection = new Collection();
         collection.setId("col-789");
 
@@ -163,7 +158,6 @@ public class CollectionServiceTest {
         try (MockedStatic<SecurityUtils> mockedSecurity = mockStatic(SecurityUtils.class)) {
             mockedSecurity.when(SecurityUtils::getCurrentUser).thenReturn(user);
 
-            when(freePatternRepository.findFrepById(freePatternId)).thenReturn(Optional.of(freePattern));
             when(colFrepRepo.findColByUserAndFreePattern(user.getId(), freePatternId)).thenReturn(collection);
 
             collectionService.removeFreePatternFromCollection(freePatternId);
@@ -198,33 +192,10 @@ public class CollectionServiceTest {
         try (MockedStatic<SecurityUtils> mockedSecurity = mockStatic(SecurityUtils.class)) {
             mockedSecurity.when(SecurityUtils::getCurrentUser).thenReturn(user);
 
-            when(freePatternRepository.findFrepById(freePatternId)).thenReturn(Optional.empty());
+            // When no collection is found for the user and pattern, return null
+            when(colFrepRepo.findColByUserAndFreePattern(user.getId(), freePatternId)).thenReturn(null);
 
             assertThrows(ResourceNotFoundException.class, () ->
-                    collectionService.removeFreePatternFromCollection(freePatternId));
-
-            verify(colFrepRepo, never()).removeByFreePattern(anyString());
-            verify(avatarService, never()).updateAvatarFromNextPattern(any());
-        }
-    }
-
-    @Test
-    void testRemoveFreePatternFromCollection_AccessDeniedForFreePattern() {
-        String freePatternId = "fp-456";
-        User user = new User();
-        user.setId("user-123");
-
-        FreePattern freePattern = new FreePattern();
-        freePattern.setId(freePatternId);
-        // Set a different createdBy to simulate access denied
-        freePattern.setCreatedBy("user-999");
-
-        try (MockedStatic<SecurityUtils> mockedSecurity = mockStatic(SecurityUtils.class)) {
-            mockedSecurity.when(SecurityUtils::getCurrentUser).thenReturn(user);
-
-            when(freePatternRepository.findFrepById(freePatternId)).thenReturn(Optional.of(freePattern));
-
-            assertThrows(AccessDeniedException.class, () ->
                     collectionService.removeFreePatternFromCollection(freePatternId));
 
             verify(colFrepRepo, never()).removeByFreePattern(anyString());

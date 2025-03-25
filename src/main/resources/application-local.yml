@@ -1,4 +1,7 @@
 spring:
+  config:
+    activate:
+      on-profile: local
   jpa:
     show-sql: true
     open-in-view: false

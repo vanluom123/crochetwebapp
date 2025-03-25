@@ -35,6 +35,10 @@ public class CollectionAvatarServiceImpl implements CollectionAvatarService {
         var remainingPatterns = colFrepRepo.findFirstFreePatternByCollectionId(collection.getId());
         if (!remainingPatterns.isEmpty()) {
             updateAvatar(collection, remainingPatterns.getFirst());
+        } else {
+            // Clear the avatar when no patterns remain in collection
+            collection.setAvatar(null);
+            collectionRepo.save(collection);
         }
     }
 }

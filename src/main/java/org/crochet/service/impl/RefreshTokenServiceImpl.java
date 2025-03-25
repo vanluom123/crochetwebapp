@@ -115,4 +115,18 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
             refreshTokenRepo.save(token);
         });
     }
+
+    /**
+     * Delete expired and revoked refresh tokens
+     */
+    @Override
+    @Transactional
+    public void deleteExpiredRefreshTokens() {
+        var refreshTokens = refreshTokenRepo.findAll()
+                .stream()
+                .filter(RefreshToken::isRevoked)
+                .filter(token -> token.getExpiresAt().isBefore(LocalDateTime.now()))
+                .toList();
+        refreshTokenRepo.deleteAll(refreshTokens);
+    }
 }

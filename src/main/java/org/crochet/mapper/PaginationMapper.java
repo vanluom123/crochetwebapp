@@ -1,20 +1,13 @@
 package org.crochet.mapper;
 
+import lombok.experimental.UtilityClass;
 import org.crochet.payload.response.PaginationResponse;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
 
+@UtilityClass
 public class PaginationMapper {
-    private PaginationMapper() {}
-
-    private static class SingletonHolder {
-        private static final PaginationMapper INSTANCE = new PaginationMapper();
-    }
-
-    public static PaginationMapper getInstance() {
-        return SingletonHolder.INSTANCE;
-    }
 
     public <T> PaginationResponse<T> toPagination(Page<T> page) {
         PaginationResponse<T> response = new PaginationResponse<>();
