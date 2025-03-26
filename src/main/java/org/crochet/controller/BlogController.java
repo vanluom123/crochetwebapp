@@ -46,7 +46,7 @@ public class BlogController {
                     schema = @Schema(implementation = String.class)))
     @ResponseStatus(HttpStatus.OK)
     @PostMapping
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @SecurityRequirement(name = "BearerAuth")
     public ResponseData<String> createOrUpdatePost(@RequestBody BlogPostRequest request) {
         blogPostService.createOrUpdatePost(request);
@@ -91,7 +91,7 @@ public class BlogController {
     @Operation(summary = "Delete a blog post")
     @ApiResponse(responseCode = "200", description = "A post deleted successfully")
     @DeleteMapping("/{id}")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @SecurityRequirement(name = "BearerAuth")
     public ResponseData<String> deletePost(@PathVariable("id") String id) {
         blogPostService.deletePost(id);

@@ -46,7 +46,7 @@ public class FreePatternController {
                     schema = @Schema(implementation = FreePatternResponse.class)))
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @SecurityRequirement(name = "BearerAuth")
     public ResponseData<String> createPattern(@RequestBody FreePatternRequest request) {
         freePatternService.createOrUpdate(request);
@@ -72,7 +72,7 @@ public class FreePatternController {
                     schema = @Schema(implementation = String.class)))
     @ResponseStatus(HttpStatus.OK)
     @DeleteMapping("/{id}")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @SecurityRequirement(name = "BearerAuth")
     public ResponseData<String> delete(
             @Parameter(description = "ID of the pattern to delete")
@@ -87,7 +87,7 @@ public class FreePatternController {
                     schema = @Schema(implementation = ResponseData.class)))
     @ResponseStatus(HttpStatus.OK)
     @DeleteMapping("/bulk")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @SecurityRequirement(name = "BearerAuth")
     public ResponseData<String> deleteMultiple(
             @Parameter(description = "List of pattern ids to delete")
