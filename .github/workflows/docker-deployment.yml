@@ -46,7 +46,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Build & push Docker image
     needs: gradle-build
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/release' && !contains(github.event.head_commit.message, '[skip-docker]')
     steps:
       - name: Login to Docker Hub
         uses: docker/login-action@v3
