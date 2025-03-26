@@ -33,7 +33,7 @@ public class CommentController {
                     schema = @Schema(implementation = String.class)))
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @SecurityRequirement(name = "BearerAuth")
     public ResponseData<CommentResponse> createComment(
             @RequestBody CommentRequest request) {

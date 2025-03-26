@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/collections")
 @SecurityRequirement(name = "BearerAuth")
-@PreAuthorize("isAuthenticated()")
+@PreAuthorize("hasAnyRole('USER', 'ADMIN')")
 public class CollectionController {
     private final CollectionService collectionService;
 

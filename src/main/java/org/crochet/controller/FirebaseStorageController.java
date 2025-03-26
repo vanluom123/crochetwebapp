@@ -23,7 +23,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/firebase-storage")
-@PreAuthorize("isAuthenticated()")
+@PreAuthorize("hasAnyRole('USER', 'ADMIN')")
 @SecurityRequirement(name = "BearerAuth")
 public class FirebaseStorageController {
     private final FirebaseStorageService firebaseStorageService;

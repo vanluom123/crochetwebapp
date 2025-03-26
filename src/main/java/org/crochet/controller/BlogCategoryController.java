@@ -29,7 +29,7 @@ public class BlogCategoryController {
 
     @ResponseStatus(HttpStatus.OK)
     @PostMapping
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @SecurityRequirement(name = "BearerAuth")
     public ResponseData<String> createOrUpdate(@RequestBody BlogCategoryRequest request) {
         blogCategoryService.createOrUpdate(request);
@@ -38,7 +38,7 @@ public class BlogCategoryController {
 
     @ResponseStatus(HttpStatus.OK)
     @DeleteMapping("/{id}")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @SecurityRequirement(name = "BearerAuth")
     public ResponseData<String> delete(@PathVariable("id") String id) {
         blogCategoryService.delete(id);
