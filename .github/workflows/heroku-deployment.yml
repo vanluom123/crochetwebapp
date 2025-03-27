@@ -10,20 +10,20 @@ on:
 
 env:
   ENV: prod
-  EMAIL: ${{ env.EMAIL }}
-  DB_HOST: ${{ env.DB_HOST }}
-  DB_PORT: ${{ env.DB_PORT }}
-  DB_NAME: ${{ env.DB_NAME }}
-  DB_USERNAME: ${{ env.DB_USERNAME }}
-  DB_PASSWORD: ${{ env.DB_PASSWORD }}
-  GOOGLE_CLIENT_ID: ${{ env.GOOGLE_CLIENT_ID }}
-  GOOGLE_CLIENT_SECRET: ${{ env.GOOGLE_CLIENT_SECRET }}
-  TOKEN_SECRET: ${{ env.TOKEN_SECRET }}
-  APP_PASSWORD: ${{ env.APP_PASSWORD }}
-  SERVICE_ACCOUNT_KEY: ${{ env.SERVICE_ACCOUNT_KEY }}
-  HEROKU_API_KEY: ${{ env.HEROKU_API_KEY }}
-  HEROKU_APP: ${{ env.HEROKU_APP }}
-  HEROKU_EMAIL: ${{ env.HEROKU_EMAIL }}
+  EMAIL: ${{ secrets.EMAIL }}
+  DB_HOST: ${{ secrets.DB_HOST }}
+  DB_PORT: ${{ secrets.DB_PORT }}
+  DB_NAME: ${{ secrets.DB_NAME }}
+  DB_USERNAME: ${{ secrets.DB_USERNAME }}
+  DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+  GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+  GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+  TOKEN_SECRET: ${{ secrets.TOKEN_SECRET }}
+  APP_PASSWORD: ${{ secrets.APP_PASSWORD }}
+  SERVICE_ACCOUNT_KEY: ${{ secrets.SERVICE_ACCOUNT_KEY }}
+  HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+  HEROKU_APP: ${{ secrets.HEROKU_APP }}
+  HEROKU_EMAIL: ${{ secrets.HEROKU_EMAIL }}
 
 jobs:
   build:
